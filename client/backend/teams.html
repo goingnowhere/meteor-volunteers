@@ -1,0 +1,78 @@
+<template name="addTeam">
+  {{> insertUpdateTemplate form=form data=this }}
+</template>
+
+<template name="teamsView">
+  <ul class="nav nav-tabs" id="tabContent">
+      <li class="active"><a href="#details" data-toggle="tab">{{_ "details"}}</a></li>
+      {{#if _id}}
+      <li><a href="#shifts" data-toggle="tab">{{_ "shifts"}}</a></li>
+      <li><a href="#tasks" data-toggle="tab">{{_ "tasks"}}</a></li>
+      {{/if}}
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active" id="details">
+      {{> insertUpdateTemplate form=formTeam data=this }}
+    </div>
+
+    <div class="tab-pane" id="shifts">
+      {{#if currentShift._id }}
+        <table class="table">
+          <tr>
+            <td><h3>{{_ "update_shift"}}</h3></td>
+            <td align="right">{{fa "undo" "abandonShift"}} {{_ "cancel"}}</td>
+          </tr>
+        </table>
+        {{> insertUpdateTemplate form=formShift data=currentShift }}
+      {{else}}
+        {{#if currentShift.add }}
+          <table class="table">
+            <tr>
+              <td><h3>{{_ "new_shift"}}</h3></td>
+              <td align="right">{{fa "undo" "abandonShift"}} {{_ "cancel"}}</td>
+            </tr>
+          </table>
+          {{> insertUpdateTemplate form=formShift data=currentShift }}
+        {{else}}
+          <table class="table">
+            <tr>
+              <td><h3>{{_ "shifts"}}</h3></td>
+              <td align="right">{{fa "plus" "addShift"}} {{_ "add_new_shift"}}</td>
+            </tr>
+          </table>
+        {{/if}}
+      {{/if}}
+      {{> shiftsTable }}
+    </div>
+
+    <div class="tab-pane" id="tasks">
+      {{#if currentTask._id }}
+        <table class="table">
+          <tr>
+            <td><h3>{{_ "update_task"}}</h3></td>
+            <td align="right">{{fa "undo" "abandonTask"}} {{_ "cancel"}}</td>
+          </tr>
+        </table>
+        {{> insertUpdateTemplate form=formTask data=currentTask }}
+      {{else}}
+        {{#if currentTask.add }}
+          <table class="table">
+            <tr>
+              <td><h3>{{_ "new_task"}}</h3></td>
+              <td align="right">{{fa "undo" "abandonTask"}} {{_ "cancel"}}</td>
+            </tr>
+          </table>
+          {{> insertUpdateTemplate form=formTask data=currentTask }}
+        {{else}}
+          <table class="table">
+            <tr>
+              <td><h3>{{_ "tasks"}}</h3></td>
+              <td align="right">{{fa "plus" "addTask"}} {{_ "add_new_task"}}</td>
+            </tr>
+          </table>
+        {{/if}}
+      {{/if}}
+      {{> tasksTable }}
+    </div>
+  </div>
+</template>

@@ -1,0 +1,50 @@
+<template name="addTeamShifts">
+  {{> insertUpdate form=form data=this }}
+</template>
+
+<template name="shiftsTable">
+  <table class="table">
+    {{#each shift in allShifts}}
+      <tr>
+        <td>{{shift.title}}</td>
+        <td>{{formatDate shift.start}}-{{formatDate shift.end}}</td>
+        <td>
+          <i class="fa fa-pencil-square-o" aria-hidden="true" data-action="editShift" data-id="{{shift._id}}"></i>
+          <i class="fa fa-trash-o" aria-hidden="true" data-action="deleteShift" data-id="{{shift._id}}"></i>
+        </td>
+      </tr>
+    {{/each}}
+  </table>
+</template>
+
+<template name="shiftsTasksTableView">
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h1 class="panel-title">
+        {{teamName}} {{title}}
+        <div class="pull-right">
+          {{#if dueDate}}
+            {{formatDate dueDate}} - {{_ "estimated_time"}} {{estematedTime}}
+          {{else}}
+            {{formatDate start}} {{formatTime start}}-{{formatTime end}}
+          {{/if}}
+        </div>
+      </h1>
+    </div>
+    <div class="panel-body">
+      {{description}}
+    </div>
+    <div class="panel-footer clearfix">
+      <div class="pull-right">
+        <div class="checkbox ￼checkbox-success">
+          <input type="checkbox" class="styled" id="{{rnd}}"
+            data-shiftid="{{shiftId}}" data-teamid="{{teamId}}"
+            data-type="toggleShift" {{isChecked}}>
+          <label for="{{rnd}}">
+            {{_ "selected"}}
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

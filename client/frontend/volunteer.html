@@ -1,0 +1,72 @@
+<template name="addVolunteerForm">
+  {{> insertUpdateTemplate form=form data=this }}
+</template>
+
+<template name="volunteerShiftsForm">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="panel panel-default">
+        <form class="form-horizontal">
+          <div class="form-group">
+            <div class="col-sm-2">{{> rangePicker searchQuery=searchQuery}}</div>
+            <div class="col-sm-2">{{> periodPicker searchQuery=searchQuery}}</div>
+            <div class="col-sm-2">{{> tagsPicker searchQuery=searchQuery}}</div>
+            <div class="col-sm-2">{{> areasPicker searchQuery=searchQuery}}</div>
+            <div class="col-sm-4">{{> moreFilters searchQuery=searchQuery}}</div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div class="row">
+      <ul class="list-group">
+        {{#each shift in allShiftsTasks}}
+          <li class="list-group-item clearfix">
+            {{> shiftsTasksTableView shift }}
+          </li>
+        {{/each}}
+      </ul>
+      {{#unless (loadNoMore "shift")}}
+        <div class="col-sm-offset-5 col-sm-2 text-center">
+          <button class="btn btn-primary" data-action="loadMore" data-type="shift">{{_ "load_more"}}</button>
+        </div>
+      {{/unless}}
+    </div>
+  </div>
+  <!-- {{/if}} -->
+</template>
+
+<!-- <template name="volunteerList">
+  <div class="panel panel-default">
+    <div class="panel-body">
+      {{#if isVolunteer}}
+          {{#if hasLead}}
+            {{#markdown}}{{_ "volunteer_has_lead"}}{{/markdown}}
+            {{> reactiveTable settings=VolunteerCrewUserTableSettings }}
+          {{/if}}
+          {{#if hasShift}}
+            {{#markdown}}{{_ "volunteer_has_task"}}{{/markdown}}
+            {{> reactiveTable settings=VolunteerShiftUserTableSettings }}
+          {{else}}
+            {{#markdown}}{{_ "volunteer_wait_for_task"}}{{/markdown}}
+          {{/if}}
+      {{else}}
+          {{#markdown}}{{_ "create_volunteer_profile"}}{{/markdown}}
+      {{/if}}
+    </div>
+  </div>
+</template>
+
+<template name="publicVolunteerCal">
+  <ul class="nav nav-tabs" role="tablist">
+    {{#each areas}}
+      <li role="presentation">
+        <a href="#" data-action="switchTab" data-id="{{this._id}}">{{_ this.name}}</a>
+      </li>
+    {{/each}}
+  </ul>
+  <div class="panel">
+    {{#if currentAreaTab }}
+      {{> fullcalendar options }}
+    {{/if}}
+  </div>
+</template> -->

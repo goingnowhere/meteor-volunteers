@@ -1,0 +1,18 @@
+<template name="addTeamTasks">
+  {{> insertUpdate form=form data=this}}
+</template>
+
+<template name="tasksTable">
+  <table class="table">
+    {{#each task in tasks}}
+      <tr>
+        <td>{{task.title}}</td>
+        <td>{{formatDate task.dueDate}}</td>
+        <td>
+          <i class="fa fa-pencil-square-o" aria-hidden="true" data-action="editTask" data-id="{{task._id}}"></i>
+          <i class="fa fa-trash-o" aria-hidden="true" data-action="deleteTask" data-id="{{task._id}}"></i>
+        </td>
+      </tr>
+    {{/each}}
+  </table>
+</template>
