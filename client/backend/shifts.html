@@ -26,7 +26,7 @@
           {{#if dueDate}}
             {{formatDate dueDate}} - {{_ "estimated_time"}} {{estematedTime}}
           {{else}}
-            {{formatDate start}} {{formatTime start}}-{{formatTime end}}
+            {{formatDate start}} {{startTime}}-{{endTime}}
           {{/if}}
         </div>
       </h1>
@@ -35,6 +35,7 @@
       {{description}}
     </div>
     <div class="panel-footer clearfix">
+      {{fa "tags"}} {{#each tag in tags}} {{tag}} {{/each}}
       <div class="pull-right">
         <div class="checkbox ￼checkbox-success">
           <input type="checkbox" class="styled" id="{{rnd}}"

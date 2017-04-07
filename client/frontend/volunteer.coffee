@@ -15,12 +15,13 @@ makeFilter = (searchQuery) ->
   if rangeList.length > 0
     range = _.map(rangeList,(d) -> moment(d, 'YYYY-MM-DD'))
     range = moment.range(rangeList)
+    console.log range.start.startOf('day').toDate()
     sel.push
       $and: [
-        {start: { $gte: range.start.toDate() }},
-        {start: { $lt: range.end.toDate() }}
+        {start: { $gte: range.start.startOf('day').toDate() }},
+        {start: { $lt: range.end.endOf('day').toDate() }}
       ]
-  console.log "range",sel
+  # console.log "range",sel
 
   daysList = searchQuery.get('range')
   # if daysList.length > 0
@@ -31,27 +32,32 @@ makeFilter = (searchQuery) ->
   #       {start: { $gte: range.start.toDate() }},
   #       {start: { $lt: range.end.toDate() }}
   #     ]
-  console.log "days",sel
+  # console.log "days",sel
 
   periodList = searchQuery.get('period')
-  if periodList.length > 0
+  if periodList && periodList.length > 0
     periods = share.periods.get()
-    # for p in periodList
-      # console.log periods[p]
-
-  console.log "period",sel
+    for p in periodList
+      console.log periods[p]
+      sel.push
+        $and: [
+          {startTime: { $gte: periods[p].start }},
+          {startTime: { $lt: periods[p].end }}
+        ]
 
   tags = searchQuery.get('tags')
+  console.log tags
   if tags.length > 0 then sel.push {tags: { $in: tags }}
+  console.log sel
 
   areas = searchQuery.get('areas')
 
-  if sel.length > 0
-    return {"$or": sel}
+  return if sel.length > 0 then {"$or": sel} else {}
 
 Template.volunteerShiftsForm.onCreated () ->
   template = this
   template.searchQuery = new ReactiveDict()
+  template.sel = new ReactiveVar({})
   template.ShiftTaskLocal = new Mongo.Collection(null)
   # subscribe to all shifts and tasks for this user
   template.subscribe('Volunteers.shifts')
@@ -68,12 +74,11 @@ Template.volunteerShiftsForm.onCreated () ->
   template.searchQuery.set('period',[])
   template.searchQuery.set('tags',[])
   template.searchQuery.set('areas',[])
-  template.searchQuery.set('limit-shift',1)
-  template.searchQuery.set('limit-task',10)
+  template.searchQuery.set('limit',10)
 
   template.autorun () ->
     filter = makeFilter(template.searchQuery)
-    limit = template.searchQuery.get('limit-shift')
+    limit = template.searchQuery.get('limit')
     subShifts = template.subscribe('Volunteers.teamShifts', filter, limit)
     subTasks = template.subscribe('Volunteers.teamTasks', filter, limit)
 
@@ -94,27 +99,32 @@ Template.volunteerShiftsForm.onCreated () ->
           description: shift.description
           start: shift.start
           end: shift.end
+          startTime: shift.startTime
+          endTime: shift.endTime
           isChecked: isChecked
-          tags: []
+          tags: team.tags
+          areas: team.areas
           rnd: Random.id()
         template.ShiftTaskLocal.upsert(sel,{$set: mod})
+    template.sel.set(filter)
 
 Template.volunteerShiftsForm.helpers
   'searchQuery': () -> Template.instance().searchQuery
-  'loadNoMore': (type) ->
+  'loadNoMore': () ->
     template = Template.instance()
-    shifts = template.ShiftTaskLocal.find({type: type})
-    limit = template.searchQuery.get("limit-#{type}")
+    shifts = template.ShiftTaskLocal.find()
+    limit = template.searchQuery.get("limit")
     shifts.count() < limit
   'allShiftsTasks': () ->
-    console.log "AAA"
-    Template.instance().ShiftTaskLocal.find({},{sort: {isCheckbox:1, start: 1, dueDate:1}})
+    template = Template.instance()
+    sort = {sort: {isCheckbox:1, start: 1, dueDate:1}}
+    sel = template.sel.get()
+    Template.instance().ShiftTaskLocal.find(sel,sort)
 
 Template.volunteerShiftsForm.events
   'click [data-action="loadMore"]': ( event, template ) ->
-    type = $(event.target).data('type')
-    limit = template.searchQuery.get("limit-#{type}")
-    template.searchQuery.set("limit-#{type}",limit+10)
+    limit = template.searchQuery.get("limit")
+    template.searchQuery.set("limit",limit+10)
   'change [data-type="toggleShift"]': ( event, template ) ->
     checked = event.target.checked
     shiftId = $(event.target).data('shiftid')

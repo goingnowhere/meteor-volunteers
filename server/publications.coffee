@@ -13,7 +13,7 @@ Meteor.publish 'Volunteers.teamTasksUser', () ->
 
 Meteor.publish 'Volunteers.teamShifts', (sel={},limit=1) ->
   if sel then sel.visibility = "public"
-  console.log "filter",sel
+  console.log "filter %j",sel
   console.log 'limit',limit
   share.TeamShifts.find(sel,{limit: limit})
 
@@ -41,7 +41,7 @@ Meteor.publish 'Volunteers.tasks', () ->
   if Roles.userIsInRole(this.userId, [ 'manager' ])
     share.Tasks.find()
   else
-    Tasks.find({usersId: this.userId})
+    share.Tasks.find({usersId: this.userId})
 
 Meteor.publish 'Volunteers.volunteerForm', () ->
   if Roles.userIsInRole(this.userId, [ 'manager' ])

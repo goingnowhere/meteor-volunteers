@@ -25,7 +25,9 @@ Template.rangePicker.events
 
 Template.periodPicker.onRendered () ->
   data = _.map(_.pairs(share.periods.get()), (v) ->
-    {id:v[0], text:"#{v[1].start}-#{v[1].end}" }
+    s = moment().hour(v[1].start).startOf('hour').format("HH:mm")
+    e = moment().hour(v[1].end).endOf('hour').startOf('hour').format("HH:mm")
+    {id:v[0], text:"#{s}-#{e}" }
   )
   $("#period").select2({
     data:data,
