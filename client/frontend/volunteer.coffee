@@ -15,7 +15,6 @@ makeFilter = (searchQuery) ->
   if rangeList.length > 0
     range = _.map(rangeList,(d) -> moment(d, 'YYYY-MM-DD'))
     range = moment.range(rangeList)
-    console.log range.start.startOf('day').toDate()
     sel.push
       $and: [
         {start: { $gte: range.start.startOf('day').toDate() }},
@@ -38,7 +37,6 @@ makeFilter = (searchQuery) ->
   if periodList && periodList.length > 0
     periods = share.periods.get()
     for p in periodList
-      console.log periods[p]
       sel.push
         $and: [
           {startTime: { $gte: periods[p].start }},
@@ -46,75 +44,89 @@ makeFilter = (searchQuery) ->
         ]
 
   tags = searchQuery.get('tags')
-  console.log tags
   if tags.length > 0 then sel.push {tags: { $in: tags }}
-  console.log sel
+
+  # types = searchQuery.get('types')
+  # console.log "AAAAAAA",types
+  # if types.length > 0
+  #   sel.push {type: { $in: types }}
+  # else
+  #   types = ['shift','task','lead']
+  #   sel.push {type: { $in: types }}
 
   areas = searchQuery.get('areas')
 
   return if sel.length > 0 then {"$or": sel} else {}
+
+addLocalShiftsCollection = (collection,template,type) ->
+  filter = makeFilter(template.searchQuery)
+  limit = template.searchQuery.get('limit')
+  collection.find(filter,{limit: limit}).forEach((shift) ->
+    team = share.Teams.findOne(shift.teamId)
+    # We subscribe only to shifts belonging to this user
+    sel = {shiftId: shift._id, type: type}
+    isChecked = if share.Shifts.findOne(sel) then "checked" else null
+    sel =
+      teamId: team._id
+      shiftId: shift._id
+    mod =
+      type: type
+      teamName: team.name
+      # areaIds: if team.parents then team.parents else []
+      title: shift.title
+      description: shift.description
+      isChecked: isChecked
+      tags: team.tags
+      areas: team.areas
+      rnd: Random.id()
+
+    if type == 'shift'
+      _.extend(mod,
+        start: shift.start
+        end: shift.end
+        startTime: shift.startTime
+        endTime: shift.endTime)
+    if type == 'task' then _.extend(mod, {dueDate : shift.dueDate })
+    if type == 'lead' then _.extend(mod, {role : shift.role })
+    template.ShiftTaskLocal.upsert(sel,{$set: mod})
+  )
 
 Template.volunteerShiftsForm.onCreated () ->
   template = this
   template.searchQuery = new ReactiveDict()
   template.sel = new ReactiveVar({})
   template.ShiftTaskLocal = new Mongo.Collection(null)
-  # subscribe to all shifts and tasks for this user
-  template.subscribe('Volunteers.shifts')
-  template.subscribe('Volunteers.tasks')
-  # subscribe to all public teams
-  template.subscribe('Volunteers.teams')
-  # subscribe to all shifts and tasks associated to public teams
 
-  template.subscribe('Volunteers.teamShifts')
-  template.subscribe('Volunteers.teamTasks')
+  template.subscribe('Volunteers.shifts')
 
   template.searchQuery.set('range',[])
   template.searchQuery.set('days',[])
   template.searchQuery.set('period',[])
   template.searchQuery.set('tags',[])
+  template.searchQuery.set('types',[])
   template.searchQuery.set('areas',[])
   template.searchQuery.set('limit',10)
 
   template.autorun () ->
     filter = makeFilter(template.searchQuery)
     limit = template.searchQuery.get('limit')
-    subShifts = template.subscribe('Volunteers.teamShifts', filter, limit)
-    subTasks = template.subscribe('Volunteers.teamTasks', filter, limit)
+    sub = template.subscribe('Volunteers.allDuties', filter, limit)
 
-    if subShifts.ready()
-      for shift in share.TeamShifts.find().fetch()
-        team = share.Teams.findOne(shift.teamId)
-        # We subscribe only to shifts belonging to this user
-        sel = {shiftId: shift._id}
-        isChecked = if share.Shifts.findOne(sel) then "checked" else null
-        sel =
-          teamId: team._id
-          shiftId: shift._id
-        mod =
-          type: "shift"
-          teamName: team.name
-          areaName: ""
-          title: shift.title
-          description: shift.description
-          start: shift.start
-          end: shift.end
-          startTime: shift.startTime
-          endTime: shift.endTime
-          isChecked: isChecked
-          tags: team.tags
-          areas: team.areas
-          rnd: Random.id()
-        template.ShiftTaskLocal.upsert(sel,{$set: mod})
+    # each type should be trigger only is template.searchQuery.get('type')
+    if sub.ready()
+      addLocalShiftsCollection(share.TeamShifts,template,'shift')
+      addLocalShiftsCollection(share.TeamTasks,template,'task')
+      addLocalShiftsCollection(share.TeamLeads,template,'lead')
     template.sel.set(filter)
 
 Template.volunteerShiftsForm.helpers
   'searchQuery': () -> Template.instance().searchQuery
   'loadNoMore': () ->
-    template = Template.instance()
-    shifts = template.ShiftTaskLocal.find()
-    limit = template.searchQuery.get("limit")
-    shifts.count() < limit
+    # template = Template.instance()
+    # shifts = template.ShiftTaskLocal.find()
+    # limit = template.searchQuery.get("limit")
+    # shifts.count() < limit
+    false
   'allShiftsTasks': () ->
     template = Template.instance()
     sort = {sort: {isCheckbox:1, start: 1, dueDate:1}}

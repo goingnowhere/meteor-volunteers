@@ -52,30 +52,30 @@ Meteor.methods 'Volunteers.shift.upsert': (sel,op,userId) ->
     shift = share.Shifts.findOne(sel)
     if shift
       mod =
-        if op == "push" then {$addToSet: {usersId: userId}}
-        else if op == "pull" then {$pull: {usersId: userId}}
+        if op == "push" then {$addToSet: {userId: userId}}
+        else if op == "pull" then {$pull: {userId: userId}}
         else {}
       share.Shifts.update(shift._id,mod)
     else
-      share.Shifts.update(sel,{$set: {usersId: [userId]}},{upsert: true})
+      share.Shifts.update(sel,{$set: {userId: [userId]}},{upsert: true})
 
-Meteor.methods 'Volunteers.tasks.remove': (taskId) ->
-  console.log ["Volunteers.tasks.remove",taskId]
-  check(taskId,String)
-  userId = Meteor.userId()
-  if Roles.userIsInRole(userId, [ 'manager' ])
-    share.Tasks.remove(taskId)
-
-Meteor.methods 'Volunteers.tasks.update': (doc) ->
-  console.log ["Volunteers.tasks.update",doc]
-  SimpleSchema.validate(doc.modifier,share.Schemas.Tasks,{ modifier: true })
-  userId = Meteor.userId()
-  if Roles.userIsInRole(userId, [ 'manager' ])
-    share.Tasks.update(doc._id, doc.modifier)
-
-Meteor.methods 'Volunteers.tasks.insert': (doc) ->
-  console.log ["Volunteers.tasks.insert",doc]
-  SimpleSchema.validate(doc,share.Schemas.Tasks)
-  userId = Meteor.userId()
-  if Roles.userIsInRole(userId, [ 'manager' ])
-    share.Tasks.insert(doc)
+# Meteor.methods 'Volunteers.tasks.remove': (taskId) ->
+#   console.log ["Volunteers.tasks.remove",taskId]
+#   check(taskId,String)
+#   userId = Meteor.userId()
+#   if Roles.userIsInRole(userId, [ 'manager' ])
+#     share.Tasks.remove(taskId)
+#
+# Meteor.methods 'Volunteers.tasks.update': (doc) ->
+#   console.log ["Volunteers.tasks.update",doc]
+#   SimpleSchema.validate(doc.modifier,share.Schemas.Tasks,{ modifier: true })
+#   userId = Meteor.userId()
+#   if Roles.userIsInRole(userId, [ 'manager' ])
+#     share.Tasks.update(doc._id, doc.modifier)
+#
+# Meteor.methods 'Volunteers.tasks.insert': (doc) ->
+#   console.log ["Volunteers.tasks.insert",doc]
+#   SimpleSchema.validate(doc,share.Schemas.Tasks)
+#   userId = Meteor.userId()
+#   if Roles.userIsInRole(userId, [ 'manager' ])
+#     share.Tasks.insert(doc)

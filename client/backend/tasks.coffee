@@ -1,7 +1,7 @@
 Template.addTeamTasks.onCreated () ->
   template = this
   template.subscribe('Volunteers.users')
-  template.subscribe('Volunteers.teamsTasks')
+  template.subscribe('Volunteers.teamTasks')
 
 Template.addTeamTasks.helpers
   form: () -> { collection: share.TeamTasks }
@@ -9,14 +9,17 @@ Template.addTeamTasks.helpers
 Template.tasksTable.onCreated () ->
   template = this
   template.subscribe('Volunteers.users')
-  console.log template.data
-  template.subscribe('Volunteers.teamsTasks.backend',template.data._id)
+  if template.data?._id
+    template.subscribe('Volunteers.teamTasks.backend',template.data._id)
 
 Template.tasksTable.helpers
-  'tasks': () -> share.TeamTasks.find()
-  # 'getTasksUsers': (taskId) -> share.Tasks.findOne({shiftId: shiftId})
+  'allTasks': () -> share.TeamTasks.find()
 
 AutoForm.addHooks ['UpdateTeamTasksFormId'], #,'InsertTeamTasksFormId'],
   docToForm: (doc) ->
     doc.dueDate = moment(doc.dueDate).format("DD-MM-YYYY HH:mm")
     return doc
+
+AutoForm.addHooks ['InsertTeamTasksFormId','UpdateTeamTasksFormId'],
+  onSuccess: (formType, result) ->
+    this.template.data.var.set({add: false, teamId: result.teamId})

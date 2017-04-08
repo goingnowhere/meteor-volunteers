@@ -9,12 +9,15 @@ periods =
   'evening': {start:20,end:24}
 share.periods = new ReactiveVar(periods)
 
+share.roles = new ReactiveVar(["lead","co-lead"])
+
 Volunteers = () ->
   Collections:
     VolunteerForm: share.VolunteerForm
     Teams: share.Teams
     TeamShifts: share.TeamShifts
     TeamTasks: share.TeamTasks
+    TeamLeads: share.TeamLeads
     Shifts: share.Shifts
   Schemas: share.Schemas
   setPeriods: (periods) -> share.periods.set(periods)

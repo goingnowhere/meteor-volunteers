@@ -2,17 +2,56 @@
   {{> insertUpdateTemplate form=form data=this }}
 </template>
 
+<template name="addDepartment">
+  {{> insertUpdateTemplate form=form data=this }}
+</template>
+
+<template name="addDivision">
+  {{> insertUpdateTemplate form=form data=this }}
+</template>
+
 <template name="teamsView">
   <ul class="nav nav-tabs" id="tabContent">
       <li class="active"><a href="#details" data-toggle="tab">{{_ "details"}}</a></li>
       {{#if _id}}
       <li><a href="#shifts" data-toggle="tab">{{_ "shifts"}}</a></li>
       <li><a href="#tasks" data-toggle="tab">{{_ "tasks"}}</a></li>
+      <li><a href="#leads" data-toggle="tab">{{_ "leads"}}</a></li>
       {{/if}}
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="details">
       {{> insertUpdateTemplate form=formTeam data=this }}
+    </div>
+
+    <div class="tab-pane" id="leads">
+      {{#if currentLead._id }}
+        <table class="table">
+          <tr>
+            <td><h3>{{_ "update_lead"}}</h3></td>
+            <td align="right">{{fa "undo" "abandonLead"}} {{_ "cancel"}}</td>
+          </tr>
+        </table>
+        {{> insertUpdateTemplate form=formLead data=currentLead }}
+      {{else}}
+        {{#if currentLead.add }}
+          <table class="table">
+            <tr>
+              <td><h3>{{_ "new_lead"}}</h3></td>
+              <td align="right">{{fa "undo" "abandonLead"}} {{_ "cancel"}}</td>
+            </tr>
+          </table>
+          {{> insertUpdateTemplate form=formLead data=currentLead var=currentLeadVar}}
+        {{else}}
+          <table class="table">
+            <tr>
+              <td><h3>{{_ "leads"}}</h3></td>
+              <td align="right">{{fa "plus" "addLead"}} {{_ "add_new_lead"}}</td>
+            </tr>
+          </table>
+        {{/if}}
+      {{/if}}
+      {{> leadsTable }}
     </div>
 
     <div class="tab-pane" id="shifts">
@@ -23,7 +62,7 @@
             <td align="right">{{fa "undo" "abandonShift"}} {{_ "cancel"}}</td>
           </tr>
         </table>
-        {{> insertUpdateTemplate form=formShift data=currentShift }}
+        {{> insertUpdateTemplate form=formShift data=currentShift var=currentShiftVar}}
       {{else}}
         {{#if currentShift.add }}
           <table class="table">
@@ -62,7 +101,7 @@
               <td align="right">{{fa "undo" "abandonTask"}} {{_ "cancel"}}</td>
             </tr>
           </table>
-          {{> insertUpdateTemplate form=formTask data=currentTask }}
+          {{> insertUpdateTemplate form=formTask data=currentTask var=currentTaskVar}}
         {{else}}
           <table class="table">
             <tr>

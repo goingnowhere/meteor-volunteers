@@ -32,6 +32,7 @@ Package.onUse(function(api) {
     'reactive-var',
     'random',
     'matb33:collection-hooks',
+    'abate:autoform-components',
     'abate:formbuilder'
   ], ['client', 'server']);
 
@@ -40,7 +41,6 @@ Package.onUse(function(api) {
     // 'tracker',
     'twbs:bootstrap',
     'fortawesome:fontawesome',
-    'abate:autoform-components',
     'natestrauser:select2@4.0.3',
     'zimme:select2-bootstrap3-css',
     'drewy:datetimepicker',
@@ -66,6 +66,7 @@ Package.onUse(function(api) {
     'client/css/custom.css',
     "client/frontend/filters.html",
     "client/frontend/filters.coffee",
+    "client/frontend/shifts.html",
     "client/frontend/volunteer.html",
     "client/frontend/volunteer.coffee",
 
@@ -77,6 +78,8 @@ Package.onUse(function(api) {
     "client/backend/shifts.coffee",
     "client/backend/teams.html",
     "client/backend/teams.coffee",
+    "client/backend/leads.html",
+    "client/backend/leads.coffee",
   ], "client");
 
   api.add_files([

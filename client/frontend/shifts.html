@@ -1,0 +1,39 @@
+<template name="shiftsTasksTableView">
+  <div class="panel
+    {{#if $eq type 'shift'}}panel-success{{/if}}
+    {{#if $eq type 'task'}}panel-warning{{/if}}
+    {{#if $eq type 'lead'}}panel-info{{/if}}">
+    <div class="panel-heading">
+      <h1 class="panel-title">
+        {{#if $eq type "shift"}}{{fa "clock-o"}}{{/if}}
+        {{#if $eq type "task"}}{{fa "tasks"}}{{/if}}
+        {{#if $eq type "lead"}}{{fa "user-circle"}}{{/if}}
+        {{teamName}}: {{#if $eq type "lead"}}{{_ role}} {{_ "position"}}{{else}}{{title}}{{/if}}
+        <div class="pull-right">
+          {{#if $eq type "task"}}
+            {{formatDate dueDate}} - {{_ "estimated_time"}} {{estimatedTime}}
+          {{/if}}
+          {{#if $eq type "shift"}}
+            {{formatDate start}} {{startTime}}-{{endTime}}
+          {{/if}}
+        </div>
+      </h1>
+    </div>
+    <div class="panel-body">
+      {{description}}
+    </div>
+    <div class="panel-footer clearfix">
+      {{fa "tags"}} {{#each tag in tags}} {{tag}} {{/each}}
+      <div class="pull-right">
+        <div class="checkbox ￼checkbox-success">
+          <input type="checkbox" class="styled" id="{{rnd}}"
+            data-shiftid="{{shiftId}}" data-teamid="{{teamId}}"
+            data-type="toggleShift" {{isChecked}}>
+          <label for="{{rnd}}">
+            {{_ "selected"}}
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

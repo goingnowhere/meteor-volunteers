@@ -5,21 +5,41 @@ SimpleSchema.extendOptions(['autoform'])
 
 share.Schemas = {}
 
-share.Shifts = new Mongo.Collection 'Volunteers.shifts'
-share.Schemas.Shifts = new SimpleSchema(
-  teamId: String
-  shiftId: String
-  usersId: [String]
-)
-share.Shifts.attachSchema(share.Schemas.Shifts)
+share.getTagList = () ->
+  tags = _.union.apply null, share.Teams.find().map((team) -> team.tags)
+  _.map tags, (tag) -> {value: tag, label: tag}
 
-share.Tasks = new Mongo.Collection 'Volunteers.tasks'
-share.Schemas.Tasks = new SimpleSchema(
-  teamId: String
-  taskId: String
-  usersId: [String]
-)
-share.Tasks.attachSchema(share.Schemas.Tasks)
+CommonUnit = new SimpleSchema(
+  name:
+    type: String
+    label: () -> TAPi18n.__("teamname")
+  tags:
+    type: Array
+    label: () -> TAPi18n.__("tags")
+    optional: true
+    autoform:
+      type: "select2"
+      options: share.getTagList
+      afFieldInput:
+        multiple: true
+        select2Options: () -> {tags: true}
+  "tags.$": String
+  description:
+    type: String
+    label: () -> TAPi18n.__("description")
+    optional: true
+    autoform:
+      rows: 5
+  visibility:
+    type: String
+    label: () -> TAPi18n.__("visibility")
+    allowedValues: ["public";"private"]
+  parents:
+    type: Array
+    optional: true #???
+    autoform:
+      omit: true
+  "parents.$": String)
 
 CommonTask = new SimpleSchema(
   teamId:
@@ -50,17 +70,20 @@ CommonTask = new SimpleSchema(
     autoform:
       afFieldInput:
         placeholder: "max"
-  # if not set inherit the visibility of the team
   visibility:
     type: String
     label: () -> TAPi18n.__("visibility")
     allowedValues: ["public";"private"]
-    # autoValue: () -> ...
+    autoform:
+      defaultValue: () ->
+        teamId = AutoForm.getFieldValue("teamId")
+        if teamId
+          share.Teams.findOne(teamId).visibility
 )
 
 share.TeamTasks = new Mongo.Collection 'Volunteers.teamTasks'
 share.Schemas.TeamTasks = new SimpleSchema(
-  estematedTime:
+  estimatedTime:
     type: String
     allowedValues: ["1-3hs", "3-6hs", "6-12hs","1d","2ds","more"]
     defaultValue: "1-3hs"
@@ -114,60 +137,41 @@ share.Schemas.TeamShifts = new SimpleSchema(
   startTime:
     type: Number
     autoValue: () -> moment(this.field('start').value).hour()
+    autoform:
+      omit: true
   endTime:
     type: Number
     autoValue: () -> moment(this.field('end').value).hour() + 1
+    autoform:
+      omit: true
 )
 
 share.Schemas.TeamShifts.extend(CommonTask)
 share.TeamShifts.attachSchema(share.Schemas.TeamShifts)
 
-share.Teams = new Mongo.Collection 'Volunteers.teams'
-roleOptions = ["lead","co-lead"]
+share.TeamLeads = new Mongo.Collection 'Volunteers.teamLeads'
 
-share.getTagList = () ->
-  tags = _.union.apply null, share.Teams.find().map((team) -> team.tags)
-  _.map tags, (tag) -> {value: tag, label: tag}
-
-share.Schemas.Teams = new SimpleSchema(
-  name:
+share.Schemas.TeamLeads = new SimpleSchema(
+  teamId:
     type: String
-    label: () -> TAPi18n.__("teamname")
-  leads:
-    type: Array
-    label: () -> TAPi18n.__("leads")
-    optional: true
     autoform:
-      template: "inlineArray"
-  "leads.$":
-    type: Object
-    autoform:
-      template: "inlineObject"
-  "leads.$.userId":
+      type: "hidden"
+  userId:
     type: String
     label: () -> TAPi18n.__("user")
+    optional: true
     autoform:
       type: "select2"
       options: () ->
         Meteor.users.find().map((e) ->
-          {value: e._id, label: e.emails[0].address })
-  "leads.$.role":
+          {value: e._id, label: (share.getUserName(e._id,true))})
+  role:
     type: String
     label: () -> TAPi18n.__("role")
     autoform:
-      options: () -> _.map(roleOptions, (e) -> {value: e, label: TAPi18n.__(e)})
-      defaultValue: "lead"
-  tags:
-    type: Array
-    label: () -> TAPi18n.__("tags")
-    optional: true
-    autoform:
-      type: "select2"
-      options: share.getTagList
-      afFieldInput:
-        multiple: true
-        select2Options: () -> {tags: true}
-  "tags.$": String
+      options: () ->
+        _.map(share.roles.get(), (e) -> {value: e, label: TAPi18n.__(e)})
+      # defaultValue: "lead"
   description:
     type: String
     label: () -> TAPi18n.__("description")
@@ -178,15 +182,25 @@ share.Schemas.Teams = new SimpleSchema(
     type: String
     label: () -> TAPi18n.__("visibility")
     allowedValues: ["public";"private"]
-  parents:
-    type: Array
-    optional: true #???
     autoform:
-      omit: true
-  "parents.$": String
+      defaultValue: () ->
+        teamId = AutoForm.getFieldValue("teamId")
+        if teamId
+          share.Teams.findOne(teamId).visibility
 )
+share.TeamLeads.attachSchema(share.Schemas.TeamLeads)
 
+share.Teams = new Mongo.Collection 'Volunteers.teams'
+share.Schemas.Teams = CommonUnit
 share.Teams.attachSchema(share.Schemas.Teams)
+
+share.Department = new Mongo.Collection 'Volunteers.department'
+share.Schemas.Department = CommonUnit
+share.Department.attachSchema(share.Schemas.Department)
+
+share.Division = new Mongo.Collection 'Volunteers.division'
+share.Schemas.Division = CommonUnit
+share.Division.attachSchema(share.Schemas.Division)
 
 share.TeamShifts.before.insert (userId, doc) ->
   doc.start = moment(doc.start,"DD-MM-YYYY HH:mm").toDate()

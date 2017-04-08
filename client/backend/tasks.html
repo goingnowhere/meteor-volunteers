@@ -4,7 +4,7 @@
 
 <template name="tasksTable">
   <table class="table">
-    {{#each task in tasks}}
+    {{#each task in allTasks}}
       <tr>
         <td>{{task.title}}</td>
         <td>{{formatDate task.dueDate}}</td>

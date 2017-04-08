@@ -1,0 +1,18 @@
+<template name="addTeamLeads">
+  {{> insertUpdate form=form data=this}}
+</template>
+
+<template name="leadsTable">
+  <table class="table">
+    {{#each lead in allLeads}}
+      <tr>
+        <td>{{#if lead.userId}}{{getUserName lead.userId}}{{else}}{{_ "vacant"}}{{/if}}</td>
+        <td>{{lead.role}}</td>
+        <td>
+          <i class="fa fa-pencil-square-o" aria-hidden="true" data-action="editLead" data-id="{{lead._id}}"></i>
+          <i class="fa fa-trash-o" aria-hidden="true" data-action="deleteLead" data-id="{{lead._id}}"></i>
+        </td>
+      </tr>
+    {{/each}}
+  </table>
+</template>

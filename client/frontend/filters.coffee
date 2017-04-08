@@ -39,6 +39,19 @@ Template.periodPicker.events
     val = template.$('#period').val()
     template.data.searchQuery.set('period',val)
 
+Template.typePicker.onRendered () ->
+  data = _.map(["shift","task","lead"],(t) ->
+    id: t
+    text: (TAPi18n.__ t))
+  $("#type").select2({
+    data: data,
+    multiple: true})
+
+Template.typePicker.events
+  'change #type': ( event, template ) ->
+    val = template.$('#type').val()
+    template.data.searchQuery.set('types',val)
+
 Template.tagsPicker.onRendered () ->
   template = this
   sub = template.subscribe("Volunteers.teams")

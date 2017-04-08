@@ -10,9 +10,10 @@
           <div class="form-group">
             <div class="col-sm-2">{{> rangePicker searchQuery=searchQuery}}</div>
             <div class="col-sm-2">{{> periodPicker searchQuery=searchQuery}}</div>
+            <div class="col-sm-2">{{> typePicker searchQuery=searchQuery}}</div>
             <div class="col-sm-2">{{> tagsPicker searchQuery=searchQuery}}</div>
             <div class="col-sm-2">{{> areasPicker searchQuery=searchQuery}}</div>
-            <div class="col-sm-4">{{> moreFilters searchQuery=searchQuery}}</div>
+            <div class="col-sm-2">{{> moreFilters searchQuery=searchQuery}}</div>
           </div>
         </form>
       </div>
@@ -21,6 +22,7 @@
       <ul class="list-group">
         {{#each shift in allShiftsTasks}}
           <li class="list-group-item clearfix">
+            {{debug shift}}
             {{> shiftsTasksTableView shift }}
           </li>
         {{/each}}

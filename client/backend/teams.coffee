@@ -3,10 +3,6 @@ Template.addTeam.onCreated () ->
   template = this
   template.subscribe('Volunteers.users')
   template.subscribe('Volunteers.teams')
-  template.currentQuote = new ReactiveVar()
-  template.currentBill = new ReactiveVar()
-
-Template.addTeam.helpers
 
 Template.addTeam.events
   'click [data-action="removeTeam"]': (event,template) ->
@@ -16,19 +12,37 @@ Template.addTeam.events
 Template.teamsView.onCreated () ->
   template = this
   sel = {}
-  if template.data
-    if template.data._id then sel = {teamId: template.data._id}
+  if template.data?._id then sel = {teamId: template.data._id}
   template.currentShift = new ReactiveVar(sel)
   template.currentTask = new ReactiveVar(sel)
+  template.currentLead = new ReactiveVar(sel)
 
 Template.teamsView.helpers
   'formTeam': () -> { collection: share.Teams }
   'formShift': () -> { collection: share.TeamShifts }
   'formTask': () -> { collection: share.TeamTasks }
+  'formLead': () -> { collection: share.TeamLeads }
   'currentShift': () -> Template.instance().currentShift.get()
   'currentTask': () -> Template.instance().currentTask.get()
+  'currentLead': () -> Template.instance().currentLead.get()
+  'currentShiftVar': () -> Template.instance().currentShift
+  'currentTaskVar': () -> Template.instance().currentTask
+  'currentLeadVar': () -> Template.instance().currentLead
 
 Template.teamsView.events
+  'click [data-action="abandonLead"]': (event,template) ->
+    Id = template.data._id
+    template.currentLead.set({add: false, teamId: Id})
+  'click [data-action="addLead"]': (event,template) ->
+    Id = template.data._id
+    template.currentLead.set({add: true, teamId: Id})
+  'click [data-action="deleteLead"]': (event,template) ->
+    Id = $(event.target).data('id')
+    Meteor.call "volunteers.teamLeads.remove", Id
+  'click [data-action="editLead"]': (event,template) ->
+    Id = $(event.target).data('id')
+    template.currentLead.set(share.TeamLeads.findOne(Id))
+
   'click [data-action="abandonShift"]': (event,template) ->
     Id = template.data._id
     template.currentShift.set({add: false, teamId: Id})
@@ -55,9 +69,8 @@ Template.teamsView.events
     Id = $(event.target).data('id')
     template.currentTask.set(share.TeamTasks.findOne(Id))
 
-AutoForm.addHooks ['insertTeamFormId'],
+AutoForm.addHooks ['InsertTeamFormId'],
   onSuccess: (formType, result) ->
-    console.log this
-    console.log result
     this.template.currentShift.set({teamId:result._id})
     this.template.currentTask.set({teamId:result._id})
+    this.template.currentLead.set({teamId:result._id})
