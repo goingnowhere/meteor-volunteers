@@ -3,6 +3,8 @@ Template.addTeamShifts.onCreated () ->
   template.subscribe('Volunteers.users')
   template.subscribe('Volunteers.teamShifts')
 
+AutoForm.debug()
+
 Template.addTeamShifts.helpers
   form: () -> { collection: share.TeamShifts }
 

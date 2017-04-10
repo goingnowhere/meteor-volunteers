@@ -2,14 +2,14 @@
 Template.addTeam.onCreated () ->
   template = this
   template.subscribe('Volunteers.users')
-  template.subscribe('Volunteers.teams')
+  template.subscribe('Volunteers.team')
 
 Template.addTeam.events
   'click [data-action="removeTeam"]': (event,template) ->
     teamId = $(event.target).data('id')
-    Meteor.call "Teams.remove", teamId
+    Meteor.call "Team.remove", teamId
 
-Template.teamsView.onCreated () ->
+Template.teamView.onCreated () ->
   template = this
   sel = {}
   if template.data?._id then sel = {teamId: template.data._id}
@@ -17,11 +17,11 @@ Template.teamsView.onCreated () ->
   template.currentTask = new ReactiveVar(sel)
   template.currentLead = new ReactiveVar(sel)
 
-Template.teamsView.helpers
-  'formTeam': () -> { collection: share.Teams }
+Template.teamView.helpers
+  'formTeam': () -> { collection: share.Team }
   'formShift': () -> { collection: share.TeamShifts }
   'formTask': () -> { collection: share.TeamTasks }
-  'formLead': () -> { collection: share.TeamLeads }
+  'formLead': () -> { collection: share.Lead }
   'currentShift': () -> Template.instance().currentShift.get()
   'currentTask': () -> Template.instance().currentTask.get()
   'currentLead': () -> Template.instance().currentLead.get()
@@ -29,7 +29,7 @@ Template.teamsView.helpers
   'currentTaskVar': () -> Template.instance().currentTask
   'currentLeadVar': () -> Template.instance().currentLead
 
-Template.teamsView.events
+Template.teamView.events
   'click [data-action="abandonLead"]': (event,template) ->
     Id = template.data._id
     template.currentLead.set({add: false, teamId: Id})
@@ -38,10 +38,10 @@ Template.teamsView.events
     template.currentLead.set({add: true, teamId: Id})
   'click [data-action="deleteLead"]': (event,template) ->
     Id = $(event.target).data('id')
-    Meteor.call "volunteers.teamLeads.remove", Id
+    Meteor.call "volunteers.lead.remove", Id
   'click [data-action="editLead"]': (event,template) ->
     Id = $(event.target).data('id')
-    template.currentLead.set(share.TeamLeads.findOne(Id))
+    template.currentLead.set(share.Lead.findOne(Id))
 
   'click [data-action="abandonShift"]': (event,template) ->
     Id = template.data._id

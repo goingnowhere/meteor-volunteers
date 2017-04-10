@@ -1,8 +1,18 @@
 
-Meteor.publish 'Volunteers.teams', () ->
+Meteor.publish 'Volunteers.team', () ->
   if this.userId
     sel = {visibility: "public"}
-    share.Teams.find(sel)
+    share.Team.find(sel)
+
+Meteor.publish 'Volunteers.division', () ->
+  if this.userId
+    sel = {visibility: "public"}
+    share.Division.find(sel)
+
+Meteor.publish 'Volunteers.department', () ->
+  if this.userId
+    sel = {visibility: "public"}
+    share.Department.find(sel)
 
 Meteor.publish 'Volunteers.teamShifts', (sel={},limit=1) ->
   if this.userId
@@ -14,34 +24,44 @@ Meteor.publish 'Volunteers.teamTasks', (sel={},limit=1) ->
     if sel then sel.visibility = "public"
     share.TeamTasks.find(sel,{limit: limit})
 
-Meteor.publish 'Volunteers.teamLeads', (sel={},limit=1) ->
+Meteor.publish 'Volunteers.lead', (sel={},limit=1) ->
   if this.userId
     if sel then sel.visibility = "public"
-    share.TeamLeads.find(sel,{limit: limit})
+    share.Lead.find(sel,{limit: limit})
 
 Meteor.publish 'Volunteers.allDuties', (sel={},limit=1) ->
   if this.userId
     if sel then sel.visibility = "public"
     s = share.TeamShifts.find(sel,{limit: limit / 3})
     t = share.TeamTasks.find(sel,{limit: limit / 3})
-    l = share.TeamLeads.find(sel,{limit: limit / 3})
-    tt = share.Teams.find(sel)
+    l = share.Lead.find(sel,{limit: limit / 3})
+    tt = share.Team.find(sel)
     [s,t,l,tt]
 
-Meteor.publish 'Volunteers.teamShifts.backend', (teamId) ->
+Meteor.publish 'Volunteers.teamShifts.backend', (id) ->
   if this.userId
     if Roles.userIsInRole(this.userId, [ 'manager' ])
-      share.TeamShifts.find({teamId: teamId})
+      share.TeamShifts.find({teamId: id})
 
-Meteor.publish 'Volunteers.teamTasks.backend', (teamId) ->
+Meteor.publish 'Volunteers.teamTasks.backend', (id) ->
   if this.userId
     if Roles.userIsInRole(this.userId, [ 'manager' ])
-      share.TeamTasks.find({teamId: teamId})
+      share.TeamTasks.find({teamId: id})
 
-Meteor.publish 'Volunteers.teamLeads.backend', (teamId) ->
+Meteor.publish 'Volunteers.lead.backend', (id) ->
   if this.userId
     if Roles.userIsInRole(this.userId, [ 'manager' ])
-      share.TeamLeads.find({teamId: teamId})
+      share.Lead.find({teamId: id})
+
+Meteor.publish 'Volunteers.department.backend', (id) ->
+  if this.userId
+    if Roles.userIsInRole(this.userId, [ 'manager' ])
+      share.Department.find({parent: id})
+
+Meteor.publish 'Volunteers.team.backend', (id) ->
+  if this.userId
+    if Roles.userIsInRole(this.userId, [ 'manager' ])
+      share.Team.find({parent: id})
 
 Meteor.publish 'Volunteers.shifts', () ->
   if this.userId

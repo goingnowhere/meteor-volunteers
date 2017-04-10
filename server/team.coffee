@@ -1,42 +1,42 @@
 import SimpleSchema from 'simpl-schema'
 
-Meteor.methods 'Volunteers.teams.remove': (teamId) ->
-  console.log ["Volunteers.teams.remove", teamId]
+Meteor.methods 'Volunteers.team.remove': (teamId) ->
+  console.log ["Volunteers.team.remove", teamId]
   check(teamId,String)
   if Roles.userIsInRole(Meteor.userId(), [ 'manager' ])
     console.log "Remove all shifts related to this team"
-    share.Teams.remove(teamId)
+    share.Team.remove(teamId)
 
-Meteor.methods 'Volunteers.teams.insert': (doc) ->
-  console.log ["Volunteers.teams.insert",doc]
-  SimpleSchema.validate(doc, share.Schemas.Teams)
+Meteor.methods 'Volunteers.team.insert': (doc) ->
+  console.log ["Volunteers.team.insert",doc]
+  SimpleSchema.validate(doc, share.Schemas.Team)
   if Roles.userIsInRole(Meteor.userId(), [ 'manager' ])
-    share.Teams.insert(doc)
+    share.Team.insert(doc)
 
-Meteor.methods 'Volunteers.teams.update': (doc) ->
-  console.log ["Volunteers.teams.update",doc]
-  SimpleSchema.validate(doc.modifier,share.Schemas.Teams,{ modifier: true })
+Meteor.methods 'Volunteers.team.update': (doc) ->
+  console.log ["Volunteers.team.update",doc]
+  SimpleSchema.validate(doc.modifier,share.Schemas.Team,{ modifier: true })
   if Roles.userIsInRole(Meteor.userId(), [ 'manager' ])
-    share.Teams.update(doc._id,doc.modifier)
+    share.Team.update(doc._id,doc.modifier)
 # ------------------
-Meteor.methods 'Volunteers.teamLeads.insert': (doc) ->
-  console.log ["Volunteers.teamLeads.insert",doc]
-  SimpleSchema.validate(doc, share.Schemas.TeamLeads)
+Meteor.methods 'Volunteers.lead.insert': (doc) ->
+  console.log ["Volunteers.lead.insert",doc]
+  SimpleSchema.validate(doc, share.Schemas.Lead)
   if Roles.userIsInRole(Meteor.userId(), [ 'manager' ])
-    share.TeamLeads.insert(doc)
+    share.Lead.insert(doc)
 
-Meteor.methods 'Volunteers.teamLeads.update': (doc) ->
-  console.log ["Volunteers.teamLeads.update",doc]
-  SimpleSchema.validate(doc.modifier,share.Schemas.TeamLeads,{modifier:true})
+Meteor.methods 'Volunteers.lead.update': (doc) ->
+  console.log ["Volunteers.lead.update",doc]
+  SimpleSchema.validate(doc.modifier,share.Schemas.Lead,{modifier:true})
   if Roles.userIsInRole(Meteor.userId(), [ 'manager' ])
-    share.TeamLeads.update(doc._id,doc.modifier)
+    share.Lead.update(doc._id,doc.modifier)
 
-Meteor.methods 'Volunteers.teamsLeads.remove': (Id) ->
-  console.log ["Volunteers.teamsLeads.remove",Id]
-  check(Id,String)
+Meteor.methods 'Volunteers.lead.remove': (id) ->
+  console.log ["Volunteers.lead.remove",id]
+  check(id,String)
   uid = Meteor.userId()
-  if (userId == uid) || (Roles.userIsInRole(uid, [ 'manager' ]))
-    share.TeamLeads.remove(Id)
+  if (id == uid) || (Roles.userIsInRole(uid, [ 'manager' ]))
+    share.Lead.remove(id)
 # ------------------
 Meteor.methods 'Volunteers.teamShifts.insert': (doc) ->
   console.log ["Volunteers.teamShifts.insert",doc]
@@ -50,8 +50,8 @@ Meteor.methods 'Volunteers.teamShifts.update': (doc) ->
   if Roles.userIsInRole(Meteor.userId(), [ 'manager' ])
     share.TeamShifts.update(doc._id,doc.modifier)
 
-Meteor.methods 'Volunteers.teamsShifts.remove': (Id) ->
-  console.log ["Volunteers.teamsShifts.remove",Id]
+Meteor.methods 'Volunteers.teamShifts.remove': (Id) ->
+  console.log ["Volunteers.teamShifts.remove",Id]
   check(Id,String)
   uid = Meteor.userId()
   if (userId == uid) || (Roles.userIsInRole(uid, [ 'manager' ]))
@@ -69,8 +69,8 @@ Meteor.methods 'Volunteers.teamTasks.update': (doc) ->
   if Roles.userIsInRole(Meteor.userId(), [ 'manager' ])
     share.TeamTasks.update(doc._id,doc.modifier)
 
-Meteor.methods 'Volunteers.teamsTasks.remove': (Id) ->
-  console.log ["Volunteers.teamsTasks.remove",Id]
+Meteor.methods 'Volunteers.teamTasks.remove': (Id) ->
+  console.log ["Volunteers.teamTasks.remove",Id]
   check(Id,String)
   uid = Meteor.userId()
   if (userId == uid) || (Roles.userIsInRole(uid, [ 'manager' ]))

@@ -1,0 +1,82 @@
+<template name="multiAddView">
+  <ul class="nav nav-tabs" id="tabContent">
+      <li class="active"><a href="#{{main.id}}" data-toggle="tab">{{_ main.label}}</a></li>
+      {{#if main.data._id}}
+        {{#each tab in tabs}}
+          <li><a href="#{{tab.id}}" data-toggle="tab">{{_ tab.label}}</a></li>
+        {{/each}}
+      {{/if}}
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active" id="{{main.id}}">
+      {{> insertUpdateTemplate form=main.form data=main.data}}
+    </div>
+    {{#each tab in tabs}}
+      <div class="tab-pane" id="{{tab.id}}">
+        {{#let tabData=(getTabData tab.id)}}
+          {{#if tabData._id }}
+            <table class="table">
+              <tr>
+                <td><h3>{{_ "update"}}</h3></td>
+                <td align="right">
+                  <i class="fa fa-undo" data-action="abandon" data-tabname="{{tab.id}}"></i> {{_ "cancel"}}
+                </td>
+              </tr>
+            </table>
+            {{> insertUpdateTemplate form=tab.form data=tabData var=tabVarDict}}
+          {{else}}
+            {{#if tabData.add }}
+              <table class="table">
+                <tr>
+                  <td><h3>{{_ "new"}}</h3></td>
+                  <td align="right">
+                    <i class="fa fa-undo" data-action="abandon" data-tabname="{{tab.id}}"></i> {{_ "cancel"}}
+                  </td>
+                </tr>
+              </table>
+              {{> insertUpdateTemplate form=tab.form data=tabData var=tabVarDict}}
+            {{else}}
+              <table class="table">
+                <tr>
+                  <td><h3>{{_ tab.label}}</h3></td>
+                  <td align="right">
+                    <i class="fa fa-plus" data-action="add" data-tabname="{{tab.id}}"></i> {{_ "add_new"}}
+                  </td>
+                </tr>
+              </table>
+            {{/if}}
+          {{/if}}
+          {{#if main.data._id}}
+            <table class="table">
+              {{#each item in (allItems tab.form.collection)}}
+                <tr>
+                  {{#each field in tab.tableFields }}
+                    <td>
+                      {{#if field.template}}
+                        {{> Template.dynamic template=field.template data=item }}
+                      {{else}}
+                        {{getField field.name item}}
+                      {{/if}}
+                    </td>
+                  {{/each}}
+                  <td>
+                    <i class="fa fa-pencil-square-o" aria-hidden="true" data-action="edit" data-tabname="{{tab.id}}" data-id="{{item._id}}"></i>
+                    <i class="fa fa-trash-o" aria-hidden="true" data-action="delete" data-tabname="{{tab.id}}" data-id="{{item._id}}"></i>
+                  </td>
+                </tr>
+              {{/each}}
+            </table>
+          {{/if}}
+        {{/let}}
+      </div>
+    {{/each}}
+  </div>
+</template>
+
+<!-- <template name="test">
+  {{> multiAddView main=main tabs=tabs}}
+</template>
+
+<template name="leadField">
+  {{#if userId}}{{getUserName userId}}{{else}}{{_ "vacant"}}{{/if}}
+</template> -->

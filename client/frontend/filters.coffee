@@ -54,7 +54,7 @@ Template.typePicker.events
 
 Template.tagsPicker.onRendered () ->
   template = this
-  sub = template.subscribe("Volunteers.teams")
+  sub = template.subscribe("Volunteers.team")
   template.autorun () ->
     if sub.ready()
       data = _.map(share.getTagList(),(t) ->

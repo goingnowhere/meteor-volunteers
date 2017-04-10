@@ -62,7 +62,7 @@ addLocalShiftsCollection = (collection,template,type) ->
   filter = makeFilter(template.searchQuery)
   limit = template.searchQuery.get('limit')
   collection.find(filter,{limit: limit}).forEach((shift) ->
-    team = share.Teams.findOne(shift.teamId)
+    team = share.Team.findOne(shift.teamId)
     # We subscribe only to shifts belonging to this user
     sel = {shiftId: shift._id, type: type}
     isChecked = if share.Shifts.findOne(sel) then "checked" else null
@@ -116,7 +116,7 @@ Template.volunteerShiftsForm.onCreated () ->
     if sub.ready()
       addLocalShiftsCollection(share.TeamShifts,template,'shift')
       addLocalShiftsCollection(share.TeamTasks,template,'task')
-      addLocalShiftsCollection(share.TeamLeads,template,'lead')
+      addLocalShiftsCollection(share.Lead,template,'lead')
     template.sel.set(filter)
 
 Template.volunteerShiftsForm.helpers
@@ -204,7 +204,7 @@ Template.volunteerShiftsForm.events
 #         key: 'teamId',
 #         label: (() -> TAPi18n.__("team")),
 #         fn: (val,row,label) ->
-#           if val then TAPi18n.__(Teams.findOne(val).name)
+#           if val then TAPi18n.__(Team.findOne(val).name)
 #         cellClass: "volunteer-task-td"},
 #       { key: 'start', label: (() -> TAPi18n.__("start"))},
 #       { key: 'end', label: (() -> TAPi18n.__("end"))},
@@ -239,7 +239,7 @@ Template.volunteerShiftsForm.events
 #         duration: { days: 2 }
 #     header:
 #       right: 'timelineTwoDays, timelineDay, prev,next'
-#     resourceLabelText: TAPi18n.__ "teams"
+#     resourceLabelText: TAPi18n.__ "team"
 #     resourceAreaWidth: "20%"
 #     resources: (callback) ->
 #       areaId = Session.get('currentAreaTab').areaId
@@ -249,7 +249,7 @@ Template.volunteerShiftsForm.events
 #           end: shift.end,
 #           dow: [0, 1, 2, 3, 4, 5, 6]
 #         })
-#       resources = Teams.find({areaId:areaId}).map((team) ->
+#       resources = Team.find({areaId:areaId}).map((team) ->
 #         id: team._id
 #         resourceId: team._id
 #         title: team.name

@@ -2,15 +2,7 @@
   {{> insertUpdateTemplate form=form data=this }}
 </template>
 
-<template name="addDepartment">
-  {{> insertUpdateTemplate form=form data=this }}
-</template>
-
-<template name="addDivision">
-  {{> insertUpdateTemplate form=form data=this }}
-</template>
-
-<template name="teamsView">
+<template name="teamView">
   <ul class="nav nav-tabs" id="tabContent">
       <li class="active"><a href="#details" data-toggle="tab">{{_ "details"}}</a></li>
       {{#if _id}}
@@ -32,7 +24,7 @@
             <td align="right">{{fa "undo" "abandonLead"}} {{_ "cancel"}}</td>
           </tr>
         </table>
-        {{> insertUpdateTemplate form=formLead data=currentLead }}
+        {{> insertUpdateTemplate form=formLead data=currentLead var=currentLeadVar}}
       {{else}}
         {{#if currentLead.add }}
           <table class="table">
@@ -71,7 +63,7 @@
               <td align="right">{{fa "undo" "abandonShift"}} {{_ "cancel"}}</td>
             </tr>
           </table>
-          {{> insertUpdateTemplate form=formShift data=currentShift }}
+          {{> insertUpdateTemplate form=formShift data=currentShift var=currentShiftVar}}
         {{else}}
           <table class="table">
             <tr>
@@ -92,7 +84,7 @@
             <td align="right">{{fa "undo" "abandonTask"}} {{_ "cancel"}}</td>
           </tr>
         </table>
-        {{> insertUpdateTemplate form=formTask data=currentTask }}
+        {{> insertUpdateTemplate form=formTask data=currentTask var=currentTaskVar}}
       {{else}}
         {{#if currentTask.add }}
           <table class="table">

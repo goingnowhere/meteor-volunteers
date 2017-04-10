@@ -1,20 +1,22 @@
-Template.addTeamLeads.onCreated () ->
+Template.addLead.onCreated () ->
   template = this
   template.subscribe('Volunteers.users')
-  template.subscribe('Volunteers.teamLeads')
+  template.subscribe('Volunteers.lead')
 
-Template.addTeamLeads.helpers
-  form: () -> { collection: share.TeamLeads }
+Template.addLead.helpers
+  form: () -> { collection: share.Lead }
 
 Template.leadsTable.onCreated () ->
   template = this
   template.subscribe('Volunteers.users')
+  console.log "FFFFFFFFF",template
   if template.data?._id
-    template.subscribe('Volunteers.teamLeads.backend',template.data._id)
+    template.subscribe('Volunteers.lead.backend',template.data._id)
 
 Template.leadsTable.helpers
-  'allLeads': () -> share.TeamLeads.find()
+  'allLeads': () -> share.Lead.find()
 
-AutoForm.addHooks ['InsertTeamLeadsFormId','UpdateTeamLeadsFormId'],
+AutoForm.addHooks ['InsertLeadFormId','UpdateLeadFormId'],
   onSuccess: (formType, result) ->
-    this.template.data.var.set({add: false, teamId: Id})
+    console.log "ZZZ"
+    this.template.data.var.set({add: false, teamId: result._id})

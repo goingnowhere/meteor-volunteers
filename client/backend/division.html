@@ -1,0 +1,87 @@
+<template name="addDivision">
+  {{> insertUpdateTemplate form=form data=this }}
+</template>
+
+<template name="divisionView1">
+  {{> multiAddView main=main tabs=tabs}}
+</template>
+
+<template name="leadField">
+  {{#if userId}}{{getUserName userId}}{{else}}{{_ "vacant"}}{{/if}}
+</template>
+
+<template name="divisionView">
+  <ul class="nav nav-tabs" id="tabContent">
+      <li class="active"><a href="#details" data-toggle="tab">{{_ "details"}}</a></li>
+      {{#if _id}}
+      <li><a href="#dept" data-toggle="tab">{{_ "department"}}</a></li>
+      <li><a href="#leads" data-toggle="tab">{{_ "leads"}}</a></li>
+      {{/if}}
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active" id="details">
+      {{> insertUpdateTemplate form=formDivision data=this}}
+    </div>
+
+    <div class="tab-pane" id="leads">
+      {{#if currentLead._id }}
+        <table class="table">
+          <tr>
+            <td><h3>{{_ "update_lead"}}</h3></td>
+            <td align="right">{{fa "undo" "abandonLead"}} {{_ "cancel"}}</td>
+          </tr>
+        </table>
+        {{> insertUpdateTemplate form=formLead data=currentLead var=currentLeadVar}}
+      {{else}}
+        {{#if currentLead.add }}
+          <table class="table">
+            <tr>
+              <td><h3>{{_ "new_lead"}}</h3></td>
+              <td align="right">{{fa "undo" "abandonLead"}} {{_ "cancel"}}</td>
+            </tr>
+          </table>
+          {{> insertUpdateTemplate form=formLead data=currentLead var=currentLeadVar}}
+        {{else}}
+          <table class="table">
+            <tr>
+              <td><h3>{{_ "leads"}}</h3></td>
+              <td align="right">{{fa "plus" "addLead"}} {{_ "add_new_lead"}}</td>
+            </tr>
+          </table>
+        {{/if}}
+      {{/if}}
+      {{> leadsTable }}
+    </div>
+
+    <div class="tab-pane" id="dept">
+      {{#if currentDept._id }}
+        <table class="table">
+          <tr>
+            <td><h3>{{_ "update_department"}}</h3></td>
+            <td align="right">{{fa "undo" "abandonDept"}} {{_ "cancel"}}</td>
+          </tr>
+        </table>
+        {{> insertUpdateTemplate form=formDept data=currentDept var=currentDeptVar}}
+      {{else}}
+        {{#if currentDept.add }}
+          <table class="table">
+            <tr>
+              <td><h3>{{_ "new_department"}}</h3></td>
+              <td align="right">{{fa "undo" "abandonDept"}} {{_ "cancel"}}</td>
+            </tr>
+          </table>
+          {{> insertUpdateTemplate form=formDept data=currentDept var=currentDeptVar}}
+        {{else}}
+          <table class="table">
+            <tr>
+              <td><h3>{{_ "department"}}</h3></td>
+              <td align="right">{{fa "plus" "addDept"}} {{_ "add_new_department"}}</td>
+            </tr>
+          </table>
+        {{/if}}
+      {{/if}}
+      <!-- {{> departmentTable }} -->
+    </div>
+
+  </div>
+</template>

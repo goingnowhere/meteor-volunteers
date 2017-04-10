@@ -31,7 +31,6 @@ Package.onUse(function(api) {
     'reactive-dict',
     'reactive-var',
     'random',
-    'matb33:collection-hooks',
     'abate:autoform-components',
     'abate:formbuilder'
   ], ['client', 'server']);
@@ -54,7 +53,7 @@ Package.onUse(function(api) {
 
   api.add_files([
     'both/global.coffee',
-    "both/teams.coffee",
+    "both/team.coffee",
     "both/volunteer.coffee",
     "api.coffee"
   ], ["server","client"]);
@@ -70,21 +69,30 @@ Package.onUse(function(api) {
     "client/frontend/volunteer.html",
     "client/frontend/volunteer.coffee",
 
+    "client/backend/multiCollection.html",
+    "client/backend/multiCollection.coffee",
     "client/backend/volunteer.html",
     "client/backend/volunteer.coffee",
     "client/backend/tasks.html",
     "client/backend/tasks.coffee",
     "client/backend/shifts.html",
     "client/backend/shifts.coffee",
-    "client/backend/teams.html",
-    "client/backend/teams.coffee",
     "client/backend/leads.html",
     "client/backend/leads.coffee",
+
+    "client/backend/team.html",
+    "client/backend/team.coffee",
+    "client/backend/department.html",
+    "client/backend/department.coffee",
+    "client/backend/division.html",
+    "client/backend/division.coffee",
   ], "client");
 
   api.add_files([
     'server/volunteer.coffee',
-    'server/teams.coffee',
+    'server/team.coffee',
+    'server/division.coffee',
+    'server/department.coffee',
     'server/publications.coffee'
   ],"server");
 

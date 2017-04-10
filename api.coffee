@@ -14,10 +14,12 @@ share.roles = new ReactiveVar(["lead","co-lead"])
 Volunteers = () ->
   Collections:
     VolunteerForm: share.VolunteerForm
-    Teams: share.Teams
+    Team: share.Team
+    Division: share.Division
+    Department: share.Department
     TeamShifts: share.TeamShifts
     TeamTasks: share.TeamTasks
-    TeamLeads: share.TeamLeads
+    Lead: share.Lead
     Shifts: share.Shifts
   Schemas: share.Schemas
   setPeriods: (periods) -> share.periods.set(periods)

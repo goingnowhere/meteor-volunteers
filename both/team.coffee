@@ -6,13 +6,13 @@ SimpleSchema.extendOptions(['autoform'])
 share.Schemas = {}
 
 share.getTagList = () ->
-  tags = _.union.apply null, share.Teams.find().map((team) -> team.tags)
+  tags = _.union.apply null, share.Team.find().map((team) -> team.tags)
   _.map tags, (tag) -> {value: tag, label: tag}
 
 CommonUnit = new SimpleSchema(
   name:
     type: String
-    label: () -> TAPi18n.__("teamname")
+    label: () -> TAPi18n.__("name")
   tags:
     type: Array
     label: () -> TAPi18n.__("tags")
@@ -34,12 +34,12 @@ CommonUnit = new SimpleSchema(
     type: String
     label: () -> TAPi18n.__("visibility")
     allowedValues: ["public";"private"]
-  parents:
-    type: Array
-    optional: true #???
+  parent:
+    type: String
+    optional: true
     autoform:
       omit: true
-  "parents.$": String)
+)
 
 CommonTask = new SimpleSchema(
   teamId:
@@ -78,7 +78,7 @@ CommonTask = new SimpleSchema(
       defaultValue: () ->
         teamId = AutoForm.getFieldValue("teamId")
         if teamId
-          share.Teams.findOne(teamId).visibility
+          share.Team.findOne(teamId).visibility
 )
 
 share.TeamTasks = new Mongo.Collection 'Volunteers.teamTasks'
@@ -91,6 +91,8 @@ share.Schemas.TeamTasks = new SimpleSchema(
     type: Date
     label: () -> TAPi18n.__("due_date")
     optional: true
+    autoValue: () ->
+      moment(this.field('dueDate').value,"DD-MM-YYYY HH:mm").toDate()
     autoform:
       afFieldInput:
         type: "datetimepicker"
@@ -110,6 +112,8 @@ share.Schemas.TeamShifts = new SimpleSchema(
   start:
     type: Date
     label: () -> TAPi18n.__("start")
+    autoValue: () ->
+      moment(this.field('start').value,"DD-MM-YYYY HH:mm").toDate()
     autoform:
       afFieldInput:
         type: "datetimepicker"
@@ -123,6 +127,8 @@ share.Schemas.TeamShifts = new SimpleSchema(
   end:
     type: Date
     label: () -> TAPi18n.__("end")
+    autoValue: () ->
+      moment(this.field('end').value,"DD-MM-YYYY HH:mm").toDate()
     autoform:
       afFieldInput:
         validation: "none"
@@ -149,9 +155,9 @@ share.Schemas.TeamShifts = new SimpleSchema(
 share.Schemas.TeamShifts.extend(CommonTask)
 share.TeamShifts.attachSchema(share.Schemas.TeamShifts)
 
-share.TeamLeads = new Mongo.Collection 'Volunteers.teamLeads'
+share.Lead = new Mongo.Collection 'Volunteers.lead'
 
-share.Schemas.TeamLeads = new SimpleSchema(
+share.Schemas.Lead = new SimpleSchema(
   teamId:
     type: String
     autoform:
@@ -183,16 +189,13 @@ share.Schemas.TeamLeads = new SimpleSchema(
     label: () -> TAPi18n.__("visibility")
     allowedValues: ["public";"private"]
     autoform:
-      defaultValue: () ->
-        teamId = AutoForm.getFieldValue("teamId")
-        if teamId
-          share.Teams.findOne(teamId).visibility
+      defaultValue: "public"
 )
-share.TeamLeads.attachSchema(share.Schemas.TeamLeads)
+share.Lead.attachSchema(share.Schemas.Lead)
 
-share.Teams = new Mongo.Collection 'Volunteers.teams'
-share.Schemas.Teams = CommonUnit
-share.Teams.attachSchema(share.Schemas.Teams)
+share.Team = new Mongo.Collection 'Volunteers.team'
+share.Schemas.Team = CommonUnit
+share.Team.attachSchema(share.Schemas.Team)
 
 share.Department = new Mongo.Collection 'Volunteers.department'
 share.Schemas.Department = CommonUnit
@@ -201,17 +204,3 @@ share.Department.attachSchema(share.Schemas.Department)
 share.Division = new Mongo.Collection 'Volunteers.division'
 share.Schemas.Division = CommonUnit
 share.Division.attachSchema(share.Schemas.Division)
-
-share.TeamShifts.before.insert (userId, doc) ->
-  doc.start = moment(doc.start,"DD-MM-YYYY HH:mm").toDate()
-  doc.end = moment(doc.end,"DD-MM-YYYY HH:mm").toDate()
-share.TeamShifts.before.update (userId, doc, fieldNames, modifier, options) ->
-  doc = modifier["$set"]
-  doc.start = moment(doc.start,"DD-MM-YYYY HH:mm").toDate()
-  doc.end = moment(doc.end,"DD-MM-YYYY HH:mm").toDate()
-
-share.TeamTasks.before.insert (userId, doc) ->
-  doc.dueDate = moment(doc.dueDate,"DD-MM-YYYY HH:mm").toDate()
-share.TeamTasks.before.update (userId, doc, fieldNames, modifier, options) ->
-  doc = modifier["$set"]
-  doc.dueDate = moment(doc.dueDate,"DD-MM-YYYY HH:mm").toDate()
