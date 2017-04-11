@@ -44,7 +44,7 @@ share.Schemas.Shifts = new SimpleSchema(
   userId: [String]
   type:
     type: String
-    allowedValues: ["shift","task","lead"]
+    allowedValues: ["shift","task"]
 )
 share.Shifts.attachSchema(share.Schemas.Shifts)
 

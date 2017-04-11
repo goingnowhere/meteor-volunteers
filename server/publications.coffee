@@ -51,17 +51,17 @@ Meteor.publish 'Volunteers.teamTasks.backend', (id) ->
 Meteor.publish 'Volunteers.lead.backend', (id) ->
   if this.userId
     if Roles.userIsInRole(this.userId, [ 'manager' ])
-      share.Lead.find({teamId: id})
+      share.Lead.find({parentId: id})
 
 Meteor.publish 'Volunteers.department.backend', (id) ->
   if this.userId
     if Roles.userIsInRole(this.userId, [ 'manager' ])
-      share.Department.find({parent: id})
+      share.Department.find({parentId: id})
 
 Meteor.publish 'Volunteers.team.backend', (id) ->
   if this.userId
     if Roles.userIsInRole(this.userId, [ 'manager' ])
-      share.Team.find({parent: id})
+      share.Team.find({parentId: id})
 
 Meteor.publish 'Volunteers.shifts', () ->
   if this.userId

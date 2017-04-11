@@ -58,13 +58,38 @@ makeFilter = (searchQuery) ->
 
   return if sel.length > 0 then {"$or": sel} else {}
 
-addLocalShiftsCollection = (collection,template,type) ->
-  filter = makeFilter(template.searchQuery)
-  limit = template.searchQuery.get('limit')
+addLocalLeadsCollection = (template,filter,limit) ->
+  share.Lead.find(filter,{limit: limit}).forEach((lead) ->
+    if lead.position == 'team'
+      team = share.Team.findOne(lead.parentId)
+    else if lead.position == 'department'
+      team = share.Department.findOne(lead.parentId)
+    else if lead.position == 'division'
+      team = share.Division.findOne(lead.parentId)
+    console.log lead
+    console.log team
+    isChecked = if lead.userId == Meteor.userId() then "checked" else null
+    sel =
+      teamId: team._id
+      shiftId: lead._id
+    mod =
+      type: 'lead'
+      teamName: team.name
+      parentId: team.parentId
+      title: lead.role
+      role: lead.role
+      description: shift.description
+      isChecked: isChecked
+      rnd: Random.id()
+
+    template.ShiftTaskLocal.upsert(sel,{$set: mod})
+  )
+
+addLocalShiftsCollection = (collection,template,type,filter,limit) ->
   collection.find(filter,{limit: limit}).forEach((shift) ->
     team = share.Team.findOne(shift.teamId)
     # We subscribe only to shifts belonging to this user
-    sel = {shiftId: shift._id, type: type}
+    sel = {shiftId: shift._id, type: type, userId: Meteor.userId()}
     isChecked = if share.Shifts.findOne(sel) then "checked" else null
     sel =
       teamId: team._id
@@ -72,12 +97,11 @@ addLocalShiftsCollection = (collection,template,type) ->
     mod =
       type: type
       teamName: team.name
-      # areaIds: if team.parents then team.parents else []
+      parentId: team.parentId
       title: shift.title
       description: shift.description
       isChecked: isChecked
       tags: team.tags
-      areas: team.areas
       rnd: Random.id()
 
     if type == 'shift'
@@ -110,13 +134,17 @@ Template.volunteerShiftsForm.onCreated () ->
   template.autorun () ->
     filter = makeFilter(template.searchQuery)
     limit = template.searchQuery.get('limit')
+    template.subscribe('Volunteers.Division')
+    template.subscribe('Volunteers.Department')
     sub = template.subscribe('Volunteers.allDuties', filter, limit)
 
     # each type should be trigger only is template.searchQuery.get('type')
     if sub.ready()
-      addLocalShiftsCollection(share.TeamShifts,template,'shift')
-      addLocalShiftsCollection(share.TeamTasks,template,'task')
-      addLocalShiftsCollection(share.Lead,template,'lead')
+      filter = makeFilter(template.searchQuery)
+      limit = template.searchQuery.get('limit')
+      addLocalShiftsCollection(share.TeamShifts,template,'shift',filter,limit)
+      addLocalShiftsCollection(share.TeamTasks,template,'task',filter,limit)
+      addLocalLeadsCollection(template,filter,limit)
     template.sel.set(filter)
 
 Template.volunteerShiftsForm.helpers

@@ -2,6 +2,10 @@
   {{> insertUpdate form=form data=this}}
 </template>
 
+<template name="shiftField">
+  {{formatDate start}}-{{formatDate end}}
+</template>
+
 <template name="shiftsTable">
   <table class="table">
     {{#each shift in allShifts}}

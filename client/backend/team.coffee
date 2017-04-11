@@ -9,65 +9,44 @@ Template.addTeam.events
     teamId = $(event.target).data('id')
     Meteor.call "Team.remove", teamId
 
-Template.teamView.onCreated () ->
-  template = this
-  sel = {}
-  if template.data?._id then sel = {teamId: template.data._id}
-  template.currentShift = new ReactiveVar(sel)
-  template.currentTask = new ReactiveVar(sel)
-  template.currentLead = new ReactiveVar(sel)
-
 Template.teamView.helpers
-  'formTeam': () -> { collection: share.Team }
-  'formShift': () -> { collection: share.TeamShifts }
-  'formTask': () -> { collection: share.TeamTasks }
-  'formLead': () -> { collection: share.Lead }
-  'currentShift': () -> Template.instance().currentShift.get()
-  'currentTask': () -> Template.instance().currentTask.get()
-  'currentLead': () -> Template.instance().currentLead.get()
-  'currentShiftVar': () -> Template.instance().currentShift
-  'currentTaskVar': () -> Template.instance().currentTask
-  'currentLeadVar': () -> Template.instance().currentLead
-
-Template.teamView.events
-  'click [data-action="abandonLead"]': (event,template) ->
-    Id = template.data._id
-    template.currentLead.set({add: false, teamId: Id})
-  'click [data-action="addLead"]': (event,template) ->
-    Id = template.data._id
-    template.currentLead.set({add: true, teamId: Id})
-  'click [data-action="deleteLead"]': (event,template) ->
-    Id = $(event.target).data('id')
-    Meteor.call "volunteers.lead.remove", Id
-  'click [data-action="editLead"]': (event,template) ->
-    Id = $(event.target).data('id')
-    template.currentLead.set(share.Lead.findOne(Id))
-
-  'click [data-action="abandonShift"]': (event,template) ->
-    Id = template.data._id
-    template.currentShift.set({add: false, teamId: Id})
-  'click [data-action="addShift"]': (event,template) ->
-    Id = template.data._id
-    template.currentShift.set({add: true, teamId: Id})
-  'click [data-action="deleteShift"]': (event,template) ->
-    Id = $(event.target).data('id')
-    Meteor.call "volunteers.teamShifts.remove", Id
-  'click [data-action="editShift"]': (event,template) ->
-    Id = $(event.target).data('id')
-    template.currentShift.set(share.TeamShifts.findOne(Id))
-
-  'click [data-action="abandonTask"]': (event,template) ->
-    Id = template.data._id
-    template.currentTask.set({add: false, teamId: Id})
-  'click [data-action="addTask"]': (event,template) ->
-    Id = template.data._id
-    template.currentTask.set({add: true, teamId: Id})
-  'click [data-action="deleteTask"]': (event,template) ->
-    Id = $(event.target).data('id')
-    Meteor.call "volunteers.teamTasks.remove", Id
-  'click [data-action="editTask"]': (event,template) ->
-    Id = $(event.target).data('id')
-    template.currentTask.set(share.TeamTasks.findOne(Id))
+  'main': () ->
+    id: "details"
+    label: "details"
+    form: { collection: share.Team }
+    data: Template.currentData()
+  'tabs': () ->
+    parentId = if Template.currentData() then Template.currentData()._id
+    shift =  {
+      id: "shift"
+      label: "shifts"
+      tableFields: [ { name: 'title'}, {name: 'start',template: "shiftField"} ]
+      form: { collection: share.TeamShifts }
+      subscription : (template) ->
+        [ template.subscribe('Volunteers.teamShifts.backend',parentId) ]
+      }
+    task =  {
+      id: "task"
+      label: "tasks"
+      tableFields: [ { name: 'title'}, {name: 'dueDate'} ]
+      form: { collection: share.TeamTasks }
+      subscription : (template) ->
+        [ template.subscribe('Volunteers.teamTasks.backend',parentId) ]
+      }
+    lead =  {
+      id: "leads"
+      label: "leads"
+      tableFields: [
+       { name: 'userId', template:"leadField"},
+       { name: 'role' }
+      ]
+      form: { collection: share.Lead }
+      subscription : (template) ->
+        [ template.subscribe('Volunteers.users'),
+         template.subscribe('Volunteers.lead.backend',parentId)
+       ]
+      }
+    return [shift,task,lead]
 
 AutoForm.addHooks ['InsertTeamFormId'],
   onSuccess: (formType, result) ->

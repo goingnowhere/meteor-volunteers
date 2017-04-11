@@ -34,7 +34,7 @@ CommonUnit = new SimpleSchema(
     type: String
     label: () -> TAPi18n.__("visibility")
     allowedValues: ["public";"private"]
-  parent:
+  parentId:
     type: String
     optional: true
     autoform:
@@ -74,11 +74,6 @@ CommonTask = new SimpleSchema(
     type: String
     label: () -> TAPi18n.__("visibility")
     allowedValues: ["public";"private"]
-    autoform:
-      defaultValue: () ->
-        teamId = AutoForm.getFieldValue("teamId")
-        if teamId
-          share.Team.findOne(teamId).visibility
 )
 
 share.TeamTasks = new Mongo.Collection 'Volunteers.teamTasks'
@@ -158,7 +153,7 @@ share.TeamShifts.attachSchema(share.Schemas.TeamShifts)
 share.Lead = new Mongo.Collection 'Volunteers.lead'
 
 share.Schemas.Lead = new SimpleSchema(
-  teamId:
+  parentId:
     type: String
     autoform:
       type: "hidden"
@@ -178,6 +173,11 @@ share.Schemas.Lead = new SimpleSchema(
       options: () ->
         _.map(share.roles.get(), (e) -> {value: e, label: TAPi18n.__(e)})
       # defaultValue: "lead"
+  position:
+    type: String
+    allowedValues: ["team","department","division"]
+    autoform:
+      type: "hidden"
   description:
     type: String
     label: () -> TAPi18n.__("description")

@@ -1,6 +1,5 @@
 <template name="addVolunteerForm">
   {{> insertUpdateTemplate form=form data=this }}
-  {{> test }}
 </template>
 
 <template name="volunteerShiftsForm">
@@ -23,7 +22,6 @@
       <ul class="list-group">
         {{#each shift in allShiftsTasks}}
           <li class="list-group-item clearfix">
-            {{debug shift}}
             {{> shiftsTasksTableView shift }}
           </li>
         {{/each}}
@@ -35,7 +33,6 @@
       {{/unless}}
     </div>
   </div>
-  <!-- {{/if}} -->
 </template>
 
 <!-- <template name="volunteerList">
