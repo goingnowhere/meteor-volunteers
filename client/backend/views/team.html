@@ -1,0 +1,150 @@
+<template name="teamShiftsView">
+  <div class="panel panel-default">
+    <div class="panel-heading"><h4>{{date}}</h4></div>
+    <div class="panel-body">
+      <table class="table">
+        <thead>
+          <th class="col-md-2">{{_ "time"}}</th>
+          <th class="col-md-4">{{_ "name"}}</th>
+          <th class="col-md-2 pull-rigth">{{_ "positions"}}</th>
+        </thead>
+        {{#each shift in shifts}}
+          <tr>
+            <td class="col-md-5">{{shift.start}} - {{shift.end}}</td>
+            <td class="col-md-6">{{shift.title}}</td>
+            <td class="col-md-1 pull-rigth"><div class="badge">{{shift.vacant}} / {{shift.confirmed}}</div></td>
+            <td class="col-md-1 pull-rigth">
+              <div class="btn-group pull-right">
+                <button type="button" class="btn btn-default btn-circle dropdown-toggle"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu">
+                  <li class="dropdown-item"><a href="#" data-action="edit" data-id="{{shift._id}}">
+                    {{fa "pencil-square-o"}} {{_ "edit"}}</a></li>
+                  <li class="dropdown-item"><a href="#" data-action="delete" data-id="{{shift._id}}">
+                    {{fa "trash-o"}} {{_ "remove"}}</a></li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+        {{/each}}
+      </table>
+    </div>
+    <!-- <div class="panel-footer">
+      <div class="progress">
+        <div style="width: 5%;" aria-valuemax="100" aria-valuemin="0"
+          aria-valuenow="{{progress}}" role="progressbar" class="progress-bar  ">
+        </div>
+      </div>
+    </div> -->
+  </div>
+</template>
+
+<template name="teamTasksView">
+  <div class="panel
+    {{#if $gt timeleft 4}}panel-warning{{else}}
+      {{#if $lte timeleft 0}}panel-danger{{else}}
+        panel-default
+      {{/if}}
+    {{/if}}">
+    <div class="panel-heading">
+      {{#if $eq status "done"}}{{fa "check"}}{{/if}}
+      {{#if $eq status "archived"}}{{fa "archive"}}{{/if}}
+      {{#if $eq status "overdue"}}{{fa "danger"}}{{/if}}
+      {{title}}
+      <div class="btn-group pull-right">
+        <button type="button" class="btn btn-default btn-circle dropdown-toggle"
+          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li class="dropdown-item"><a href="#" data-action="toggle" data-id="{{_id}}">
+            {{fa "check"}}
+            {{#if $eq status "done"}}{{_ "mark_pending"}}{{/if}}
+            {{#if $eq status "pending"}}{{_ "mark_done"}}{{/if}}
+          </a></li>
+          <li class="dropdown-item"><a href="#" data-action="edit" data-id="{{_id}}">
+            {{fa "pencil-square-o"}} {{_ "edit"}}</a></li>
+          <li class="dropdown-item"><a href="#" data-action="delete" data-id="{{_id}}">
+            {{fa "trash-o"}} {{_ "remove"}}</a></li>
+          <li class="dropdown-item"><a href="#" data-action="archive" data-id="{{_id}}">
+            {{fa "archive"}} {{_ "archive"}}</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="panel-body">
+      {{_ "due_date"}}: {{dueDate}}
+      <div class="badge pull-right">{{vacant}} / {{confirmed}}</div>
+    </div>
+  </div>
+</template>
+
+<template name="teamDayViewGrid">
+  <div class="panel">
+    <table class="table">
+      <tr>
+        <td><h3>{{_ "team"}} : {{name}}</h3></td>
+        <td align="right">
+          <div class="btn-group">
+            <button type="button" class="btn btn-info btn-sm dropdown-toggle"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <i class="fa fa-wrench fa-fw"></i>
+            </button>
+            <ul class="dropdown-menu">
+              <li class="dropdown-item"><a href="#" data-action="edit" data-id="{{_id}}">
+                {{fa "pencil-square-o"}} {{_ "edit"}}</a></li>
+              <li class="dropdown-item"><a href="#" data-action="delete" data-id="{{_id}}">
+                {{fa "trash-o"}} {{_ "remove"}}</a></li>
+            </ul>
+          </div>
+        </td>
+      </tr>
+    </table>
+  </div>
+  {{_ "team_leads"}} :
+  <ul class="inline">
+    {{#each lead in allLeads}}
+      <li>{{getUserName lead.userId}} ( {{lead.role}})</li>
+    {{/each}}
+  </ul>
+  <div class="row">
+    <div class="col-md-6">
+      <table class="table">
+        <tr>
+          <td><h3>{{_ "shifts"}}</h3></td>
+          <td align="right">
+            <button type="button" class="btn btn-default btn-sm" data-action="addShift">
+              {{fa "plus"}} {{_ "add_new_shift"}}
+            </button>
+          </td>
+        </tr>
+      </table>
+      {{#each shift in allShifts}}
+          {{> teamShiftsView shift}}
+      {{/each}}
+    </div>
+    <div class="col-md-6">
+      <table class="table">
+        <tr>
+          <td><h3>{{_ "tasks"}}</h3></td>
+          <td align="right">
+            <button type="button" class="btn btn-default btn-sm" data-action="addTask">
+              {{fa "plus"}} {{_ "add_new_task"}}
+            </button>
+          </td>
+        </tr>
+      </table>
+      <div class="form-inline">
+        {{#each s in taskStatus}}
+          <label class="control-label">{{_ s.status}}</label>
+          <input type="checkbox" id="taskStatus" value="{{s.status}}"
+            class="form-control" {{s.isChecked}}>
+        {{/each}}
+      </div>
+      {{#each task in allTasks}}
+        {{> teamTasksView task}}
+      {{/each}}
+    </div>
+  </div>
+</template>

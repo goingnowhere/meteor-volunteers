@@ -5,8 +5,8 @@ Template.addDepartment.onCreated () ->
 
 Template.addDepartment.events
   'click [data-action="removeDept"]': (event,template) ->
-    Id = $(event.target).data('id')
-    Meteor.call "Volunteers.department.remove", Id
+    id = $(event.target).data('id')
+    Meteor.call "Volunteers.department.remove", id
 
 Template.departmentView.helpers
   'main': () ->

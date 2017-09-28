@@ -9,55 +9,6 @@ Template.addVolunteerForm.onCreated () ->
 Template.addVolunteerForm.helpers
   'form': () -> { collection: share.form.get() }
 
-makeFilter = (searchQuery) ->
-  sel = []
-  rangeList = searchQuery.get('range')
-  if rangeList.length > 0
-    range = _.map(rangeList,(d) -> moment(d, 'YYYY-MM-DD'))
-    range = moment.range(rangeList)
-    sel.push
-      $and: [
-        {start: { $gte: range.start.startOf('day').toDate() }},
-        {start: { $lt: range.end.endOf('day').toDate() }}
-      ]
-  # console.log "range",sel
-
-  daysList = searchQuery.get('range')
-  # if daysList.length > 0
-  #   range = _.map(rangeList,(d) -> moment(d, 'YYYY-MM-DD'))
-  #   range = moment.range(rangeList)
-  #   sel.push
-  #     $and: [
-  #       {start: { $gte: range.start.toDate() }},
-  #       {start: { $lt: range.end.toDate() }}
-  #     ]
-  # console.log "days",sel
-
-  periodList = searchQuery.get('period')
-  if periodList && periodList.length > 0
-    periods = share.periods.get()
-    for p in periodList
-      sel.push
-        $and: [
-          {startTime: { $gte: periods[p].start }},
-          {startTime: { $lt: periods[p].end }}
-        ]
-
-  tags = searchQuery.get('tags')
-  if tags.length > 0 then sel.push {tags: { $in: tags }}
-
-  # types = searchQuery.get('types')
-  # console.log "AAAAAAA",types
-  # if types.length > 0
-  #   sel.push {type: { $in: types }}
-  # else
-  #   types = ['shift','task','lead']
-  #   sel.push {type: { $in: types }}
-
-  areas = searchQuery.get('areas')
-
-  return if sel.length > 0 then {"$or": sel} else {}
-
 addLocalLeadsCollection = (template,filter,limit) ->
   share.Lead.find(filter,{limit: limit}).forEach((lead) ->
     if lead.position == 'team'
@@ -88,40 +39,47 @@ addLocalLeadsCollection = (template,filter,limit) ->
 addLocalShiftsCollection = (collection,template,type,filter,limit) ->
   collection.find(filter,{limit: limit}).forEach((shift) ->
     team = share.Team.findOne(shift.teamId)
-    # We subscribe only to shifts belonging to this user
-    sel = {shiftId: shift._id, type: type, userId: Meteor.userId()}
-    isChecked = if share.Shifts.findOne(sel) then "checked" else null
-    sel =
-      teamId: team._id
-      shiftId: shift._id
-    mod =
-      type: type
-      teamName: team.name
-      parentId: team.parentId
-      title: shift.title
-      description: shift.description
-      isChecked: isChecked
-      tags: team.tags
-      rnd: Random.id()
+    users = []
+    sub = template.subscribe('Volunteers.shifts.byShift',shift._id)
+    if sub.ready()
+      users = share.Shifts.find(
+        {shiftId: shift._id,status: {$in: ["confirmed"]}}).map((s) -> s.userId)
+      console.log "AAA",users
+      sel = {shiftId: shift._id, type: type, userId: Meteor.userId()}
+      isChecked = if share.Shifts.findOne(sel) then "checked" else null
+      sel =
+        teamId: team._id
+        shiftId: shift._id
+      mod =
+        type: type
+        teamName: team.name
+        parentId: team.parentId
+        title: shift.title
+        description: shift.description
+        isChecked: isChecked
+        policy: shift.policy
+        tags: team.tags
+        rnd: Random.id()
+        users: users
 
-    if type == 'shift'
-      _.extend(mod,
-        start: shift.start
-        end: shift.end
-        startTime: shift.startTime
-        endTime: shift.endTime)
-    if type == 'task' then _.extend(mod, {dueDate : shift.dueDate })
-    if type == 'lead' then _.extend(mod, {role : shift.role })
-    template.ShiftTaskLocal.upsert(sel,{$set: mod})
-  )
+      if type == 'shift'
+        _.extend(mod,
+          start: shift.start
+          end: shift.end
+          startTime: shift.startTime
+          endTime: shift.endTime)
+      if type == 'task'
+        _.extend(mod,
+          dueDate : shift.dueDate
+          estimatedTime: shift.estimatedTime)
+      template.ShiftTaskLocal.upsert(sel,{$set: mod})
+    )
 
 Template.volunteerShiftsForm.onCreated () ->
   template = this
   template.searchQuery = new ReactiveDict()
-  template.sel = new ReactiveVar({})
   template.ShiftTaskLocal = new Mongo.Collection(null)
-
-  template.subscribe('Volunteers.shifts')
+  template.sel = new ReactiveVar({})
 
   template.searchQuery.set('range',[])
   template.searchQuery.set('days',[])
@@ -134,30 +92,29 @@ Template.volunteerShiftsForm.onCreated () ->
   template.autorun () ->
     filter = makeFilter(template.searchQuery)
     limit = template.searchQuery.get('limit')
-    template.subscribe('Volunteers.Division')
-    template.subscribe('Volunteers.Department')
+    console.log filter
+    console.log limit
+    template.subscribe('Volunteers.division')
+    template.subscribe('Volunteers.department')
     sub = template.subscribe('Volunteers.allDuties', filter, limit)
 
-    # each type should be trigger only is template.searchQuery.get('type')
     if sub.ready()
-      filter = makeFilter(template.searchQuery)
-      limit = template.searchQuery.get('limit')
       addLocalShiftsCollection(share.TeamShifts,template,'shift',filter,limit)
       addLocalShiftsCollection(share.TeamTasks,template,'task',filter,limit)
-      addLocalLeadsCollection(template,filter,limit)
+      # addLocalLeadsCollection(template,filter,limit)
     template.sel.set(filter)
 
 Template.volunteerShiftsForm.helpers
   'searchQuery': () -> Template.instance().searchQuery
-  'loadNoMore': () ->
-    # template = Template.instance()
-    # shifts = template.ShiftTaskLocal.find()
-    # limit = template.searchQuery.get("limit")
-    # shifts.count() < limit
-    false
+  'loadMore': () ->
+    template = Template.instance()
+    shifts = template.ShiftTaskLocal.find()
+    limit = template.searchQuery.get("limit")
+    console.log "nomore does not work", shifts.count(), limit
+    shifts.count() <= limit
   'allShiftsTasks': () ->
     template = Template.instance()
-    sort = {sort: {isCheckbox:1, start: 1, dueDate:1}}
+    sort = {sort: {isChecked:-1, start: -1, dueDate:-1}}
     sel = template.sel.get()
     Template.instance().ShiftTaskLocal.find(sel,sort)
 
@@ -165,14 +122,6 @@ Template.volunteerShiftsForm.events
   'click [data-action="loadMore"]': ( event, template ) ->
     limit = template.searchQuery.get("limit")
     template.searchQuery.set("limit",limit+10)
-  'change [data-type="toggleShift"]': ( event, template ) ->
-    checked = event.target.checked
-    shiftId = $(event.target).data('shiftid')
-    teamId = $(event.target).data('teamid')
-    userId = Meteor.userId()
-    sel = {teamId:teamId,shiftId:shiftId}
-    op = if checked == false then "pull" else "push"
-    Meteor.call "Volunteers.shift.upsert", sel,op,userId
 
 # Template.volunteerList.helpers
 #   "isVolunteer": () ->

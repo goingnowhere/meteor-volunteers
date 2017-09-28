@@ -1,13 +1,13 @@
-
-Template.addTeam.onCreated () ->
-  template = this
-  template.subscribe('Volunteers.users')
-  template.subscribe('Volunteers.team')
-
-Template.addTeam.events
-  'click [data-action="removeTeam"]': (event,template) ->
-    teamId = $(event.target).data('id')
-    Meteor.call "Team.remove", teamId
+ 
+# Template.addTeam.onCreated () ->
+#   template = this
+#   template.subscribe('Volunteers.users')
+#   template.subscribe('Volunteers.team')
+#
+# Template.addTeam.events
+#   'click [data-action="removeTeam"]': (event,template) ->
+#     teamId = $(event.target).data('id')
+#     Meteor.call "Team.remove", teamId
 
 Template.teamView.helpers
   'main': () ->

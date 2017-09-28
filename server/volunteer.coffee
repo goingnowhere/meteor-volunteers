@@ -39,25 +39,31 @@ Meteor.methods 'Volunteers.shifts.update': (doc) ->
 
 Meteor.methods 'Volunteers.shifts.insert': (doc) ->
   console.log ["Volunteers.shifts.insert",doc]
-  SimpleSchema.validate(doc,share.Schemas.Shifts)
+  SimpleSchema.validate(doc,share.Schemas.Shifts.omit('status'))
   userId = Meteor.userId()
-  if Roles.userIsInRole(userId, [ 'manager' ])
-    share.Shifts.insert(doc)
+  if (doc.userId == userId) || (Roles.userIsInRole(userId, [ 'manager' ]))
+    t = (
+      if doc.type == "shift"
+        share.TeamShifts.findOne(doc.shiftId)
+      else
+        share.TeamTasks.findOne(doc.shiftId))
+    console.log "aa",t
+    status = (
+      if t.policy == "public" then "confirmed"
+      else if t.policy == "requireApproval" then "pending")
+    console.log "aa",status
+    if status
+      doc.status = status
+      console.log t,doc
+      share.Shifts.insert(doc)
 
-Meteor.methods 'Volunteers.shift.upsert': (sel,op,userId) ->
-  console.log ["Volunteers.shift.upsert",sel,op,userId]
-  # check(sel,{teamId:String,shiftId:String})
-  uid = Meteor.userId()
-  if (userId == uid) || (Roles.userIsInRole(uid, [ 'manager' ]))
-    shift = share.Shifts.findOne(sel)
-    if shift
-      mod =
-        if op == "push" then {$addToSet: {userId: userId}}
-        else if op == "pull" then {$pull: {userId: userId}}
-        else {}
-      share.Shifts.update(shift._id,mod)
-    else
-      share.Shifts.update(sel,{$set: {userId: [userId]}},{upsert: true})
+Meteor.methods 'Volunteers.shifts.bail': (sel) ->
+  console.log ["Volunteers.shifts.bail",sel]
+  SimpleSchema.validate(sel,share.Schemas.Shifts.omit('status'))
+  userId = Meteor.userId()
+  if (sel.userId == userId) || (Roles.userIsInRole(userId, [ 'manager' ]))
+    console.log "AAAA"
+    share.Shifts.update(sel,{$set: {status: "bailed"}})
 
 # Meteor.methods 'Volunteers.tasks.remove': (taskId) ->
 #   console.log ["Volunteers.tasks.remove",taskId]

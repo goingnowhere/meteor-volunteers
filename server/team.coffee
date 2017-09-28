@@ -4,7 +4,7 @@ Meteor.methods 'Volunteers.team.remove': (teamId) ->
   console.log ["Volunteers.team.remove", teamId]
   check(teamId,String)
   if Roles.userIsInRole(Meteor.userId(), [ 'manager' ])
-    console.log "Remove all shifts related to this team"
+    console.log "Remove all shifts and tasks and leads related to this team"
     share.Team.remove(teamId)
 
 Meteor.methods 'Volunteers.team.insert': (doc) ->
@@ -45,7 +45,7 @@ Meteor.methods 'Volunteers.teamShifts.insert': (doc) ->
     share.TeamShifts.insert(doc)
 
 Meteor.methods 'Volunteers.teamShifts.update': (doc) ->
-  console.log ["Volunteers.teamShifts.update",doc]
+  console.log ["Volunteers.teamShifts.update",doc.modifier]
   SimpleSchema.validate(doc.modifier,share.Schemas.TeamShifts,{modifier:true})
   if Roles.userIsInRole(Meteor.userId(), [ 'manager' ])
     share.TeamShifts.update(doc._id,doc.modifier)
@@ -64,7 +64,7 @@ Meteor.methods 'Volunteers.teamTasks.insert': (doc) ->
     share.TeamTasks.insert(doc)
 
 Meteor.methods 'Volunteers.teamTasks.update': (doc) ->
-  console.log ["Volunteers.teamTasks.update",doc]
+  console.log ["Volunteers.teamTasks.update",doc.modifier]
   SimpleSchema.validate(doc.modifier,share.Schemas.TeamTasks,{modifier:true})
   if Roles.userIsInRole(Meteor.userId(), [ 'manager' ])
     share.TeamTasks.update(doc._id,doc.modifier)

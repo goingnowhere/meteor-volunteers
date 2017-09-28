@@ -26,11 +26,11 @@
           </li>
         {{/each}}
       </ul>
-      {{#unless loadNoMore}}
+      {{#if loadMore}}
         <div class="col-sm-offset-5 col-sm-2 text-center">
           <button class="btn btn-primary" data-action="loadMore">{{_ "load_more"}}</button>
         </div>
-      {{/unless}}
+      {{/if}}
     </div>
   </div>
 </template>

@@ -41,7 +41,13 @@ share.Shifts = new Mongo.Collection 'Volunteers.shifts'
 share.Schemas.Shifts = new SimpleSchema(
   teamId: String
   shiftId: String
-  userId: [String]
+  userId: String
+  status:
+    type: String
+    allowedValues: ["confirmed", "pending", "refused", "bailed"]
+    autoform:
+      omit: true
+      defaultValue: "pending"
   type:
     type: String
     allowedValues: ["shift","task"]

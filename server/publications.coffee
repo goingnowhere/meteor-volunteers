@@ -1,37 +1,34 @@
 
 Meteor.publish 'Volunteers.team', () ->
   if this.userId
-    sel = {visibility: "public"}
-    share.Team.find(sel)
+    share.Team.find()
 
 Meteor.publish 'Volunteers.division', () ->
   if this.userId
-    sel = {visibility: "public"}
-    share.Division.find(sel)
+    share.Division.find()
 
 Meteor.publish 'Volunteers.department', () ->
   if this.userId
-    sel = {visibility: "public"}
-    share.Department.find(sel)
+    share.Department.find()
 
 Meteor.publish 'Volunteers.teamShifts', (sel={},limit=1) ->
   if this.userId
-    if sel then sel.visibility = "public"
+    sel.policy = {$or: ["public","requireApproval"]}
     share.TeamShifts.find(sel,{limit: limit})
 
 Meteor.publish 'Volunteers.teamTasks', (sel={},limit=1) ->
   if this.userId
-    if sel then sel.visibility = "public"
+    sel.policy = {$or: ["public","requireApproval"]}
     share.TeamTasks.find(sel,{limit: limit})
 
 Meteor.publish 'Volunteers.lead', (sel={},limit=1) ->
   if this.userId
-    if sel then sel.visibility = "public"
+    sel.policy = {$or: ["public","requireApproval"]}
     share.Lead.find(sel,{limit: limit})
 
 Meteor.publish 'Volunteers.allDuties', (sel={},limit=1) ->
   if this.userId
-    if sel then sel.visibility = "public"
+    sel.policy = {$in: ["requireApproval","public"]}
     s = share.TeamShifts.find(sel,{limit: limit / 3})
     t = share.TeamTasks.find(sel,{limit: limit / 3})
     l = share.Lead.find(sel,{limit: limit / 3})
@@ -68,9 +65,14 @@ Meteor.publish 'Volunteers.shifts', () ->
     if Roles.userIsInRole(this.userId, [ 'manager' ])
       share.Shifts.find()
     else
-      # I could limit the visibility to the _id so not to
-      # leak who else choose this shift ...
       share.Shifts.find({usersId: this.userId})
+
+Meteor.publish 'Volunteers.shifts.byShift', (shiftId) ->
+  if this.userId
+    if Roles.userIsInRole(this.userId, [ 'manager' ])
+      share.Shifts.find({shiftId: shiftId})
+    else
+      share.Shifts.find({usersId: this.userId, shiftId: shiftId})
 
 Meteor.publish 'Volunteers.teamShiftsUser', () ->
   if this.userId

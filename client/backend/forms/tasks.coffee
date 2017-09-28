@@ -1,10 +1,10 @@
-Template.addTeamTasks.onCreated () ->
-  template = this
-  template.subscribe('Volunteers.users')
-  template.subscribe('Volunteers.teamTasks')
-
-Template.addTeamTasks.helpers
-  form: () -> { collection: share.TeamTasks }
+# Template.addTeamTasks.onCreated () ->
+#   template = this
+#   template.subscribe('Volunteers.users')
+#   template.subscribe('Volunteers.teamTasks')
+#
+# Template.addTeamTasks.helpers
+#   form: () -> { collection: share.TeamTasks }
 
 Template.tasksTable.onCreated () ->
   template = this
