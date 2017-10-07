@@ -2,12 +2,12 @@ import SimpleSchema from 'simpl-schema'
 
 Template.addVolunteerForm.onCreated () ->
   template = this
-  template.autorun () ->
-    Meteor.subscribe('FormBuilder.dynamicForms', () ->
-      share.extendVolunteerForm() )
+  template.subscribe('FormBuilder.dynamicForms')
+  template.subscribe('Volunteers.volunteerForm')
 
 Template.addVolunteerForm.helpers
   'form': () -> { collection: share.form.get() }
+  'data': () -> share.VolunteerForm.findOne()
 
 addLocalLeadsCollection = (template,filter,limit) ->
   share.Lead.find(filter,{limit: limit}).forEach((lead) ->

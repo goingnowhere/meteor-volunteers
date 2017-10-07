@@ -21,7 +21,7 @@ Package.onUse(function(api) {
     'tmeasday:check-npm-versions',
     // 'tap:i18n@1.8.2',
     'aldeed:collection2-core',
-    'aldeed:autoform@6.0.0',
+    'aldeed:autoform@6.2.0',
     'aldeed:autoform-select2',
     'alanning:roles@1.2.15',
     'check',
@@ -37,7 +37,7 @@ Package.onUse(function(api) {
 
   api.use( [
     'templating',
-    // 'tracker',
+    'tracker',
     'twbs:bootstrap',
     'fortawesome:fontawesome',
     'natestrauser:select2@4.0.3',
@@ -46,9 +46,9 @@ Package.onUse(function(api) {
     // 'drblue:fullcalendar',
   ], 'client');
 
-  api.use( [
-    'peerlibrary:server-autorun',
-  ], 'server');
+  // api.use( [
+  //   'peerlibrary:server-autorun',
+  // ], 'server');
 
   api.add_files([
     'both/global.coffee',
