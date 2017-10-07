@@ -37,41 +37,42 @@ addLocalLeadsCollection = (template,filter,limit) ->
   )
 
 addLocalShiftsCollection = (collection,template,type,filter,limit) ->
-  collection.find(filter,{limit: limit}).forEach((shift) ->
-    team = share.Team.findOne(shift.teamId)
+  collection.find(filter,{limit: limit}).forEach((signup) ->
+    team = share.Team.findOne(signup.teamId)
     users = []
-    sub = template.subscribe('Volunteers.shifts.byShift',shift._id)
+    sub = template.subscribe('Volunteers.shifts.byShift',signup._id)
     if sub.ready()
       users = share.Shifts.find(
-        {shiftId: shift._id,status: {$in: ["confirmed"]}}).map((s) -> s.userId)
-      console.log "AAA",users
-      sel = {shiftId: shift._id, type: type, userId: Meteor.userId()}
-      isChecked = if share.Shifts.findOne(sel) then "checked" else null
+        {shiftId: signup._id,status: {$in: ["confirmed"]}}).map((s) -> s.userId)
+      sel = {shiftId: signup._id, type: type, userId: Meteor.userId()}
+      shift = share.Shifts.findOne(sel)
+      console.log "AAA", shift
       sel =
         teamId: team._id
-        shiftId: shift._id
+        shiftId: signup._id
       mod =
         type: type
         teamName: team.name
         parentId: team.parentId
-        title: shift.title
-        description: shift.description
-        isChecked: isChecked
-        policy: shift.policy
+        title: signup.title
+        description: signup.description
+        status: if shift then shift.status else null
+        canBail: shift? and shift.status != 'bailed'
+        policy: signup.policy
         tags: team.tags
         rnd: Random.id()
         users: users
 
       if type == 'shift'
         _.extend(mod,
-          start: shift.start
-          end: shift.end
-          startTime: shift.startTime
-          endTime: shift.endTime)
+          start: signup.start
+          end: signup.end
+          startTime: signup.startTime
+          endTime: signup.endTime)
       if type == 'task'
         _.extend(mod,
-          dueDate : shift.dueDate
-          estimatedTime: shift.estimatedTime)
+          dueDate : signup.dueDate
+          estimatedTime: signup.estimatedTime)
       template.ShiftTaskLocal.upsert(sel,{$set: mod})
     )
 
