@@ -36,43 +36,48 @@ addLocalLeadsCollection = (template,filter,limit) ->
     template.ShiftTaskLocal.upsert(sel,{$set: mod})
   )
 
+signupCollections =
+  shift: share.ShiftSignups
+  task: share.TaskSignups
+
 addLocalShiftsCollection = (collection,template,type,filter,limit) ->
-  collection.find(filter,{limit: limit}).forEach((signup) ->
-    team = share.Team.findOne(signup.teamId)
+  collection.find(filter,{limit: limit}).forEach((job) ->
+    team = share.Team.findOne(job.teamId)
     users = []
-    sub = template.subscribe('Volunteers.shifts.byShift',signup._id)
-    if sub.ready()
-      users = share.Shifts.find(
-        {shiftId: signup._id,status: {$in: ["confirmed"]}}).map((s) -> s.userId)
-      sel = {shiftId: signup._id, type: type, userId: Meteor.userId()}
-      shift = share.Shifts.findOne(sel)
-      console.log "AAA", shift
+    shiftSignupsSub = template.subscribe('Volunteers.shiftSignups.byShift',job._id)
+    taskSignupsSub = template.subscribe('Volunteers.taskSignups.byShift',job._id)
+    if shiftSignupsSub.ready() and taskSignupsSub.ready()
+      signupCollection = signupCollections[type]
+      users = signupCollection.find(
+        {shiftId: job._id, status: {$in: ["confirmed"]}}
+      ).map((s) -> s.userId)
+      signup = signupCollection.findOne({shiftId: job._id, userId: Meteor.userId()})
+
       sel =
         teamId: team._id
-        shiftId: signup._id
+        shiftId: job._id
       mod =
         type: type
         teamName: team.name
         parentId: team.parentId
-        title: signup.title
-        description: signup.description
-        status: if shift then shift.status else null
-        canBail: shift? and shift.status != 'bailed'
-        policy: signup.policy
+        title: job.title
+        description: job.description
+        status: if signup then signup.status else null
+        canBail: signup? and signup.status != 'bailed'
+        policy: job.policy
         tags: team.tags
         rnd: Random.id()
         users: users
-
       if type == 'shift'
         _.extend(mod,
-          start: signup.start
-          end: signup.end
-          startTime: signup.startTime
-          endTime: signup.endTime)
+          start: job.start
+          end: job.end
+          startTime: job.startTime
+          endTime: job.endTime)
       if type == 'task'
         _.extend(mod,
-          dueDate : signup.dueDate
-          estimatedTime: signup.estimatedTime)
+          dueDate : job.dueDate
+          estimatedTime: job.estimatedTime)
       template.ShiftTaskLocal.upsert(sel,{$set: mod})
     )
 

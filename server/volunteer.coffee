@@ -24,47 +24,73 @@ Meteor.methods 'Volunteers.volunteerForm.insert': (doc) ->
     doc.userId = Meteor.userId()
     share.form.get().insert(doc)
 
-Meteor.methods 'Volunteers.shifts.remove': (shiftId) ->
-  console.log ["Volunteers.shifts.remove",shiftId]
+Meteor.methods 'Volunteers.shiftSignups.remove': (shiftId) ->
+  console.log ["Volunteers.shiftSignups.remove",shiftId]
   check(shiftId,String)
   userId = Meteor.userId()
   if Roles.userIsInRole(userId, [ 'manager' ])
-    share.Shifts.remove(shiftId)
+    share.ShiftSignups.remove(shiftId)
 
-Meteor.methods 'Volunteers.shifts.update': (doc) ->
-  console.log ["Volunteers.shifts.update",doc]
-  SimpleSchema.validate(doc.modifier,share.Schemas.Shifts,{ modifier: true })
+Meteor.methods 'Volunteers.shiftSignups.update': (doc) ->
+  console.log ["Volunteers.shiftSignups.update",doc]
+  SimpleSchema.validate(doc.modifier,share.Schemas.ShiftSignups,{ modifier: true })
   userId = Meteor.userId()
   if Roles.userIsInRole(userId, [ 'manager' ])
-    share.Shifts.update(doc._id, doc.modifier)
+    share.ShiftSignups.update(doc._id, doc.modifier)
 
-Meteor.methods 'Volunteers.shifts.insert': (doc) ->
-  console.log ["Volunteers.shifts.insert",doc]
-  SimpleSchema.validate(doc,share.Schemas.Shifts.omit('status'))
+Meteor.methods 'Volunteers.shiftSignups.insert': (doc) ->
+  console.log ["Volunteers.shiftSignups.insert",doc]
+  SimpleSchema.validate(doc,share.Schemas.ShiftSignups.omit('status'))
   userId = Meteor.userId()
   if (doc.userId == userId) || (Roles.userIsInRole(userId, [ 'manager' ]))
-    t = (
-      if doc.type == "shift"
-        share.TeamShifts.findOne(doc.shiftId)
-      else
-        share.TeamTasks.findOne(doc.shiftId))
-    console.log "aa",t
+    teamShift = share.TeamShifts.findOne(doc.shiftId)
     status = (
-      if t.policy == "public" then "confirmed"
-      else if t.policy == "requireApproval" then "pending")
-    console.log "aa",status
+      if teamShift.policy == "public" then "confirmed"
+      else if teamShift.policy == "requireApproval" then "pending")
     if status
       doc.status = status
-      console.log t,doc
-      share.Shifts.insert(doc)
+      share.ShiftSignups.insert(doc)
 
-Meteor.methods 'Volunteers.shifts.bail': (sel) ->
-  console.log ["Volunteers.shifts.bail",sel]
-  SimpleSchema.validate(sel,share.Schemas.Shifts.omit('status'))
+Meteor.methods 'Volunteers.shiftSignups.bail': (sel) ->
+  console.log ["Volunteers.shiftSignups.bail",sel]
+  SimpleSchema.validate(sel,share.Schemas.ShiftSignups.omit('status'))
   userId = Meteor.userId()
   if (sel.userId == userId) || (Roles.userIsInRole(userId, [ 'manager' ]))
-    console.log "AAAA"
-    share.Shifts.update(sel,{$set: {status: "bailed"}})
+    share.ShiftSignups.update(sel,{$set: {status: "bailed"}})
+
+Meteor.methods 'Volunteers.taskSignups.remove': (shiftId) ->
+  console.log ["Volunteers.taskSignups.remove",shiftId]
+  check(shiftId,String)
+  userId = Meteor.userId()
+  if Roles.userIsInRole(userId, [ 'manager' ])
+    share.TaskSignups.remove(shiftId)
+
+Meteor.methods 'Volunteers.taskSignups.update': (doc) ->
+  console.log ["Volunteers.taskSignups.update",doc]
+  SimpleSchema.validate(doc.modifier,share.Schemas.TaskSignups,{ modifier: true })
+  userId = Meteor.userId()
+  if Roles.userIsInRole(userId, [ 'manager' ])
+    share.TaskSignups.update(doc._id, doc.modifier)
+
+Meteor.methods 'Volunteers.taskSignups.insert': (doc) ->
+  console.log ["Volunteers.taskSignups.insert",doc]
+  SimpleSchema.validate(doc,share.Schemas.TaskSignups.omit('status'))
+  userId = Meteor.userId()
+  if (doc.userId == userId) || (Roles.userIsInRole(userId, [ 'manager' ]))
+    teamTask = share.TeamTasks.findOne(doc.shiftId)
+    status = (
+      if teamTask.policy == "public" then "confirmed"
+      else if teamTask.policy == "requireApproval" then "pending")
+    if status
+      doc.status = status
+      share.TaskSignups.insert(doc)
+
+Meteor.methods 'Volunteers.taskSignups.bail': (sel) ->
+  console.log ["Volunteers.taskSignups.bail",sel]
+  SimpleSchema.validate(sel,share.Schemas.TaskSignups.omit('status'))
+  userId = Meteor.userId()
+  if (sel.userId == userId) || (Roles.userIsInRole(userId, [ 'manager' ]))
+    share.TaskSignups.update(sel,{$set: {status: "bailed"}})
 
 # Meteor.methods 'Volunteers.tasks.remove': (taskId) ->
 #   console.log ["Volunteers.tasks.remove",taskId]

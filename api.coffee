@@ -20,7 +20,8 @@ Volunteers = () ->
     TeamShifts: share.TeamShifts
     TeamTasks: share.TeamTasks
     Lead: share.Lead
-    Shifts: share.Shifts
+    ShiftSignups: share.ShiftSignups
+    TaskSignups: share.TaskSignups
   Schemas: share.Schemas
   setPeriods: (periods) -> share.periods.set(periods)
 
