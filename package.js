@@ -52,8 +52,15 @@ Package.onUse(function(api) {
 
   api.add_files([
     'both/global.coffee',
-    "both/team.coffee",
-    "both/volunteer.coffee",
+
+    "both/collections/team.coffee",
+    "both/collections/volunteer.coffee",
+
+    'both/methods/volunteer.coffee',
+    'both/methods/team.coffee',
+    'both/methods/division.coffee',
+    'both/methods/department.coffee',
+
     "api.coffee"
   ], ["server","client"]);
 
@@ -90,10 +97,6 @@ Package.onUse(function(api) {
   ], "client");
 
   api.add_files([
-    'server/volunteer.coffee',
-    'server/team.coffee',
-    'server/division.coffee',
-    'server/department.coffee',
     'server/publications.coffee'
   ],"server");
 
