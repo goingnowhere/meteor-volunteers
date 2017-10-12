@@ -14,7 +14,7 @@ Template.teamDayViewGrid.helpers {
     {status:"overdue", isChecked:"checked"},
     {status:"done", isChecked:"checked"},
     {status:"archived"} ]
-  'allLeads': () -> a = share.Lead.find().fetch() ; console.log a ; a
+  'allLeads': () -> share.Lead.find()
   'allTasks': () ->
     status = Template.instance().taskFilter.get()
     share.TeamTasks.find({status: {$in: status}},{sort:{dueDate: 1}}).map((t) ->
@@ -61,10 +61,10 @@ Template.teamDayViewGrid.events
     Meteor.call "Volunteers.team.remove", id
   'click [data-action="addShift"]': (event,template) ->
     ModalShowWithTemplate("insertUpdateTemplate",
-      {form:{collection: share.TeamShifts}, data:{teamId: this._id}})
+      {form:{collection: share.TeamShifts}, data:{parentId: this._id}})
   'click [data-action="addTask"]': (event,template) ->
     ModalShowWithTemplate("insertUpdateTemplate",
-      {form:{collection: share.TeamTasks}, data:{teamId: this._id}})
+      {form:{collection: share.TeamTasks}, data:{parentId: this._id}})
   'click #taskStatus': ( event, template ) ->
     selected = template.findAll( "#taskStatus:checked")
     template.taskFilter.set(_.map(selected, (i) -> i.defaultValue))
@@ -101,7 +101,6 @@ Template.teamShiftsView.events
   'click [data-action="edit"]': (event,template) ->
     id = $(event.target).data('id')
     data = share.TeamShifts.findOne(id)
-    console.log data
     ModalShowWithTemplate("insertUpdateTemplate",
       {form:{collection: share.TeamShifts}, data:data})
   'click [data-action="delete"]': (event,template) ->

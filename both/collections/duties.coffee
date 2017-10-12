@@ -8,10 +8,10 @@ leadPolicy = ["public";"adminOnly","requireApproval"]
 share.Schemas = {}
 
 CommonTask = new SimpleSchema(
-  # teamId:
-  #   type: String
-    # autoform:
-    #   type: "hidden"
+  parentId:
+    type: String
+    autoform:
+      type: "hidden"
   title:
     type: String
     label: () -> TAPi18n.__("title")
@@ -40,11 +40,6 @@ CommonTask = new SimpleSchema(
     type: String
     label: () -> TAPi18n.__("policy")
     allowedValues: leadPolicy
-  parentId:
-    type: String
-    optional: true
-    # autoform:
-    #   omit: true
 )
 
 share.TeamTasks = new Mongo.Collection 'Volunteers.teamTasks'
@@ -148,15 +143,30 @@ share.Schemas.Lead = new SimpleSchema(
       options: () ->
         _.map(share.roles.get(), (e) -> {value: e, label: TAPi18n.__(e)})
       # defaultValue: "lead"
-  position:
+  title:
     type: String
-    optional: true # XXX
-    allowedValues: ["team","department","division"]
-    autoform:
-      type: "hidden"
+    label: () -> TAPi18n.__("title")
   description:
     type: String
     label: () -> TAPi18n.__("description")
+    optional: true
+    autoform:
+      rows: 5
+  responsibilities:
+    type: String
+    label: () -> TAPi18n.__("responsibilities")
+    optional: true
+    autoform:
+      rows: 5
+  qualificatons:
+    type: String
+    label: () -> TAPi18n.__("qualificatons")
+    optional: true
+    autoform:
+      rows: 5
+  notes:
+    type: String
+    label: () -> TAPi18n.__("notes")
     optional: true
     autoform:
       rows: 5

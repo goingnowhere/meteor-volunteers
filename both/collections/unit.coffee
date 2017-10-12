@@ -10,6 +10,10 @@ share.getTagList = (sel={}) ->
   _.map tags, (tag) -> {value: tag, label: tag}
 
 CommonUnit = new SimpleSchema(
+  parentId:
+    type: String
+    autoform:
+      type: "hidden"
   name:
     type: String
     label: () -> TAPi18n.__("name")
@@ -34,11 +38,6 @@ CommonUnit = new SimpleSchema(
   #   type: String
   #   label: () -> TAPi18n.__("policy")
   #   allowedValues: leadPolicy
-  parentId:
-    type: String
-    optional: true
-    # autoform:
-    #   omit: true
 )
 
 share.Team = new Mongo.Collection 'Volunteers.team'
@@ -50,5 +49,13 @@ share.Schemas.Department = CommonUnit
 share.Department.attachSchema(share.Schemas.Department)
 
 share.Division = new Mongo.Collection 'Volunteers.division'
-share.Schemas.Division = CommonUnit
+share.Schemas.Division = new SimpleSchema(CommonUnit)
+# a division (a top level unit) has 'top' as parentId
+share.Schemas.Division.extend(
+  parentId:
+    type: String
+    defaultValue: "TopEntity"
+    autoform:
+      type: "hidden"
+)
 share.Division.attachSchema(share.Schemas.Division)

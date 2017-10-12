@@ -42,7 +42,7 @@ signupCollections =
 
 addLocalShiftsCollection = (collection,template,type,filter,limit) ->
   collection.find(filter,{limit: limit}).forEach((job) ->
-    team = share.Team.findOne(job.teamId)
+    team = share.Team.findOne(job.parentId)
     users = []
     shiftSignupsSub = template.subscribe('Volunteers.shiftSignups.byShift',job._id)
     taskSignupsSub = template.subscribe('Volunteers.taskSignups.byShift',job._id)
