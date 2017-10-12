@@ -36,42 +36,48 @@ addLocalLeadsCollection = (template,filter,limit) ->
     template.ShiftTaskLocal.upsert(sel,{$set: mod})
   )
 
+signupCollections =
+  shift: share.ShiftSignups
+  task: share.TaskSignups
+
 addLocalShiftsCollection = (collection,template,type,filter,limit) ->
-  collection.find(filter,{limit: limit}).forEach((shift) ->
-    team = share.Team.findOne(shift.teamId)
+  collection.find(filter,{limit: limit}).forEach((job) ->
+    team = share.Team.findOne(job.teamId)
     users = []
-    sub = template.subscribe('Volunteers.shifts.byShift',shift._id)
-    if sub.ready()
-      users = share.Shifts.find(
-        {shiftId: shift._id,status: {$in: ["confirmed"]}}).map((s) -> s.userId)
-      console.log "AAA",users
-      sel = {shiftId: shift._id, type: type, userId: Meteor.userId()}
-      isChecked = if share.Shifts.findOne(sel) then "checked" else null
+    shiftSignupsSub = template.subscribe('Volunteers.shiftSignups.byShift',job._id)
+    taskSignupsSub = template.subscribe('Volunteers.taskSignups.byShift',job._id)
+    if shiftSignupsSub.ready() and taskSignupsSub.ready()
+      signupCollection = signupCollections[type]
+      users = signupCollection.find(
+        {shiftId: job._id, status: {$in: ["confirmed"]}}
+      ).map((s) -> s.userId)
+      signup = signupCollection.findOne({shiftId: job._id, userId: Meteor.userId()})
+
       sel =
         teamId: team._id
-        shiftId: shift._id
+        shiftId: job._id
       mod =
         type: type
         teamName: team.name
         parentId: team.parentId
-        title: shift.title
-        description: shift.description
-        isChecked: isChecked
-        policy: shift.policy
+        title: job.title
+        description: job.description
+        status: if signup then signup.status else null
+        canBail: signup? and signup.status != 'bailed'
+        policy: job.policy
         tags: team.tags
         rnd: Random.id()
         users: users
-
       if type == 'shift'
         _.extend(mod,
-          start: shift.start
-          end: shift.end
-          startTime: shift.startTime
-          endTime: shift.endTime)
+          start: job.start
+          end: job.end
+          startTime: job.startTime
+          endTime: job.endTime)
       if type == 'task'
         _.extend(mod,
-          dueDate : shift.dueDate
-          estimatedTime: shift.estimatedTime)
+          dueDate : job.dueDate
+          estimatedTime: job.estimatedTime)
       template.ShiftTaskLocal.upsert(sel,{$set: mod})
     )
 

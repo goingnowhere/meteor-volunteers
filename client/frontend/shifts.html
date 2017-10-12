@@ -26,18 +26,22 @@
       {{#if tags}}{{fa "tags"}} {{#each tag in tags}} {{tag}} {{/each}}{{/if}}
       {{#if users}}{{fa "users"}} {{#each user in users}} {{getUserName user}} {{/each}}{{/if}}
       <div class="pull-right">
-        {{#if isChecked}}
-          <button class="btn btn-default disabled">
-            {{#if $eq policy "public"}}{{_ "joined"}}{{/if}}
-            {{#if $eq policy "requireApproval"}}{{_ "applied"}}{{/if}}
+        {{#if status}}
+          <button class="btn btn-default disabled
+            {{#if $eq status 'confirmed'}}btn-success{{/if}}">
+            {{_ status }}
           </button>
-          <button class="btn" data-shiftid="{{shiftId}}" data-teamid="{{teamId}}"
-            data-action="bail" data-type={{type}}>{{_ "bail"}}</button>
         {{else}}
           <button class="btn btn-primary" data-shiftid="{{shiftId}}" data-teamid="{{teamId}}"
             data-action="apply" data-type={{type}}>
             {{#if $eq policy "public"}}{{_ "join"}}{{/if}}
             {{#if $eq policy "requireApproval"}}{{_ "apply"}}{{/if}}
+          </button>
+        {{/if}}
+        {{#if canBail}}
+          <button class="btn btn-danger" data-shiftid="{{shiftId}}" data-teamid="{{teamId}}"
+            data-action="bail" data-type={{type}}>
+            {{_ "bail"}}
           </button>
         {{/if}}
       </div>

@@ -3,7 +3,8 @@ Template.teamDayViewGrid.onCreated () ->
   template.subscribe('Volunteers.teamShifts.backend',template.data._id)
   template.subscribe('Volunteers.teamTasks.backend',template.data._id)
   template.subscribe('Volunteers.lead.backend',template.data._id)
-  template.subscribe('Volunteers.shifts')
+  template.subscribe('Volunteers.taskSignups')
+  template.subscribe('Volunteers.shiftSignups')
   template.subscribe('Volunteers.users')
   template.taskFilter = new ReactiveVar(["pending","overdue","done"])
 
@@ -17,7 +18,7 @@ Template.teamDayViewGrid.helpers {
   'allTasks': () ->
     status = Template.instance().taskFilter.get()
     share.TeamTasks.find({status: {$in: status}},{sort:{dueDate: 1}}).map((t) ->
-      confirmed = share.Shifts.find({shiftId: t._id}).count()
+      confirmed = share.TaskSignups.find({shiftId: t._id}).count()
       dueDate = moment(t.dueDate)
       _.extend(t,
         timeleft: dueDate.diff(moment(), 'days')
@@ -34,7 +35,7 @@ Template.teamDayViewGrid.helpers {
       totalConfirmed = 0
       vvl = _.map(_.sortBy(vl,'startTime'), (v) ->
         # status: confirmed
-        confirmed = share.Shifts.find({shiftId: v._id}).count()
+        confirmed = share.ShiftSignups.find({shiftId: v._id}).count()
         totalConfirmed =+ confirmed
         totalVacant =+ (v.max - confirmed)
         _.extend(v,

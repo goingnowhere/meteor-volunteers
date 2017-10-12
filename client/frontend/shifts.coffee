@@ -4,12 +4,12 @@ Template.shiftsTasksTableView.events
     teamId = $(event.target).data('teamid')
     type = $(event.target).data('type')
     userId = Meteor.userId()
-    doc = {teamId:teamId,shiftId:shiftId,userId: userId,type:type}
-    Meteor.call "Volunteers.shifts.insert", doc
+    doc = {teamId:teamId, shiftId:shiftId, userId: userId}
+    Meteor.call "Volunteers.#{type}Signups.insert", doc
   'click [data-action="bail"]': ( event, template ) ->
     shiftId = $(event.target).data('shiftid')
     teamId = $(event.target).data('teamid')
     type = $(event.target).data('type')
     userId = Meteor.userId()
-    doc = {teamId:teamId,shiftId:shiftId,userId: userId,type:type}
-    Meteor.call "Volunteers.shifts.bail", doc
+    doc = {teamId:teamId, shiftId:shiftId, userId: userId}
+    Meteor.call "Volunteers.#{type}Signups.bail", doc

@@ -37,8 +37,7 @@ share.VolunteerForm.attachSchema(share.Schemas.VolunteerForm)
 
 share.form = new ReactiveVar(share.VolunteerForm)
 
-share.Shifts = new Mongo.Collection 'Volunteers.shifts'
-share.Schemas.Shifts = new SimpleSchema(
+commonSignups = new SimpleSchema(
   teamId: String
   shiftId: String
   userId: String
@@ -48,11 +47,13 @@ share.Schemas.Shifts = new SimpleSchema(
     autoform:
       omit: true
       defaultValue: "pending"
-  type:
-    type: String
-    allowedValues: ["shift","task"]
 )
-share.Shifts.attachSchema(share.Schemas.Shifts)
+share.ShiftSignups = new Mongo.Collection 'Volunteers.shiftSignups'
+share.Schemas.ShiftSignups = commonSignups
+share.ShiftSignups.attachSchema(share.Schemas.ShiftSignups)
+share.TaskSignups = new Mongo.Collection 'Volunteers.taskSignups'
+share.Schemas.TaskSignups = commonSignups
+share.TaskSignups.attachSchema(share.Schemas.TaskSignups)
 
 # share.Tasks = new Mongo.Collection 'Volunteers.tasks'
 # share.Schemas.Tasks = new SimpleSchema(

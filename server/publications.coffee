@@ -60,23 +60,37 @@ Meteor.publish 'Volunteers.team.backend', (id) ->
     if Roles.userIsInRole(this.userId, [ 'manager' ])
       share.Team.find({parentId: id})
 
-Meteor.publish 'Volunteers.shifts', () ->
+Meteor.publish 'Volunteers.taskSignups', () ->
   if this.userId
     if Roles.userIsInRole(this.userId, [ 'manager' ])
-      share.Shifts.find()
+      share.TaskSignups.find()
     else
-      share.Shifts.find({usersId: this.userId})
+      share.TaskSignups.find({usersId: this.userId})
 
-Meteor.publish 'Volunteers.shifts.byShift', (shiftId) ->
+Meteor.publish 'Volunteers.shiftSignups', () ->
   if this.userId
     if Roles.userIsInRole(this.userId, [ 'manager' ])
-      share.Shifts.find({shiftId: shiftId})
+      share.ShiftSignups.find()
     else
-      share.Shifts.find({usersId: this.userId, shiftId: shiftId})
+      share.ShiftSignups.find({usersId: this.userId})
+
+Meteor.publish 'Volunteers.taskSignups.byShift', (shiftId) ->
+  if this.userId
+    if Roles.userIsInRole(this.userId, [ 'manager' ])
+      share.TaskSignups.find({shiftId: shiftId})
+    else
+      share.TaskSignups.find({usersId: this.userId, shiftId: shiftId})
+
+Meteor.publish 'Volunteers.shiftSignups.byShift', (shiftId) ->
+  if this.userId
+    if Roles.userIsInRole(this.userId, [ 'manager' ])
+      share.ShiftSignups.find({shiftId: shiftId})
+    else
+      share.ShiftSignups.find({usersId: this.userId, shiftId: shiftId})
 
 Meteor.publish 'Volunteers.teamShiftsUser', () ->
   if this.userId
-    l = share.Shifts.find({usersId: this.usersId}).map((e) -> e._id)
+    l = share.ShiftSignups.find({usersId: this.usersId}).map((e) -> e._id)
     share.TeamShifts.find({_id: {$in: l}})
 
 Meteor.publish 'Volunteers.volunteerForm', () ->
