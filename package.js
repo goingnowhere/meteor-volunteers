@@ -53,7 +53,8 @@ Package.onUse(function(api) {
   api.add_files([
     'both/global.coffee',
 
-    "both/collections/team.coffee",
+    "both/collections/signup.coffee",
+    "both/collections/unit.coffee",
     "both/collections/volunteer.coffee",
 
     'both/methods/volunteer.coffee',
