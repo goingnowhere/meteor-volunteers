@@ -42,7 +42,7 @@ Package.onUse(function(api) {
     'fortawesome:fontawesome',
     'natestrauser:select2@4.0.3',
     'drewy:datetimepicker',
-    'drewy:autoform-datetimepicker',
+    'abate:autoform-datetimepicker',
     // 'drblue:fullcalendar',
   ], 'client');
 

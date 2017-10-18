@@ -78,7 +78,7 @@ Template.teamTasksView.events
     id = $(event.target).data('id')
     data = share.TeamTasks.findOne(id)
     ModalShowWithTemplate("insertUpdateTemplate",
-      {form:{collection: share.TeamTasks}, data:data})
+      {form:{collection: share.TeamTasks}, data: data})
   'click [data-action="delete"]': (event,template) ->
     id = $(event.target).data('id')
     Meteor.call "Volunteers.teamTasks.remove", id
@@ -102,7 +102,7 @@ Template.teamShiftsView.events
     id = $(event.target).data('id')
     data = share.TeamShifts.findOne(id)
     ModalShowWithTemplate("insertUpdateTemplate",
-      {form:{collection: share.TeamShifts}, data:data})
+      {form:{collection: share.TeamShifts}, data: data})
   'click [data-action="delete"]': (event,template) ->
     id = $(event.target).data('id')
     Meteor.call "Volunteers.teamShifts.remove", id

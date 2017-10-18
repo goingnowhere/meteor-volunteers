@@ -15,11 +15,7 @@ Template.tasksTable.onCreated () ->
 Template.tasksTable.helpers
   'allTasks': () -> share.TeamTasks.find()
 
-AutoForm.addHooks ['UpdateTeamTasksFormId'], #,'InsertTeamTasksFormId'],
-  docToForm: (doc) ->
-    doc.dueDate = moment(doc.dueDate).format("DD-MM-YYYY HH:mm")
-    return doc
-
 AutoForm.addHooks ['InsertTeamTasksFormId','UpdateTeamTasksFormId'],
   onSuccess: (formType, result) ->
-    this.template.data.var.set({add: false, teamId: result.teamId})
+    if this.template.data.var
+      this.template.data.var.set({add: false, teamId: result.teamId})

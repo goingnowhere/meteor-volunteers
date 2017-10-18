@@ -20,12 +20,7 @@ Template.shiftsTable.helpers
 # we need this hook to transform the date from autoform in something
 # that the date picker can shallow. This should be done by the datetimepicker
 # parsing function, but I'm not able to make it work
-AutoForm.addHooks ['UpdateTeamShiftsFormId'],
-  docToForm: (doc) ->
-    doc.start = moment(doc.start).format("DD-MM-YYYY HH:mm")
-    doc.end = moment(doc.end).format("DD-MM-YYYY HH:mm")
-    return doc
-
 AutoForm.addHooks ['InsertTeamShiftsFormId','UpdateTeamShiftsFormId'],
   onSuccess: (formType, result) ->
-    this.template.data.var.set({add: false, teamId: result.teamId})
+    if this.template.data.var
+      this.template.data.var.set({add: false, teamId: result.teamId})

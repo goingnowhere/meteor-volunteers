@@ -77,8 +77,8 @@ share.Schemas.TeamShifts = new SimpleSchema(
   start:
     type: Date
     label: () -> TAPi18n.__("start")
-    autoValue: () ->
-      moment(this.field('start').value,"DD-MM-YYYY HH:mm").toDate()
+    # autoValue: () ->
+    #   moment(this.field('start').value,"DD-MM-YYYY HH:mm").toDate()
     autoform:
       afFieldInput:
         type: "datetimepicker"
@@ -92,11 +92,11 @@ share.Schemas.TeamShifts = new SimpleSchema(
   end:
     type: Date
     label: () -> TAPi18n.__("end")
-    autoValue: () ->
-      moment(this.field('end').value,"DD-MM-YYYY HH:mm").toDate()
+    # autoValue: () ->
+    #   moment(this.field('end').value,"DD-MM-YYYY HH:mm").toDate()
     autoform:
       afFieldInput:
-        validation: "none"
+        # validation: "none"
         type: "datetimepicker"
         placeholder: () -> TAPi18n.__("end")
         opts: () ->
@@ -107,11 +107,15 @@ share.Schemas.TeamShifts = new SimpleSchema(
           # maxDate:
   startTime:
     type: Number
+    optional: true
+    # custom: () -> if (!this.isSet && this.operator === '$set') return 'required'
     autoValue: () -> moment(this.field('start').value).hour()
     autoform:
       omit: true
   endTime:
     type: Number
+    optional: true
+    # custom: () -> if (!this.isSet && this.operator === '$set') return 'required'
     autoValue: () -> moment(this.field('end').value).hour() + 1
     autoform:
       omit: true
