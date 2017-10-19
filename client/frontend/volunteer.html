@@ -1,5 +1,7 @@
 <template name="addVolunteerForm">
-  {{> insertUpdateTemplate form=form data=data }}
+  {{#if Template.subscriptionsReady}}
+    {{> insertUpdateTemplate form=form data=data }}
+  {{/if}}
 </template>
 
 <template name="volunteerShiftsForm">

@@ -5,9 +5,11 @@ Template.addVolunteerForm.onCreated () ->
   template.subscribe('FormBuilder.dynamicForms')
   template.subscribe('Volunteers.volunteerForm')
 
+# XXX this should be modified to allow the admin to edit the data of any
+# user and not only display Meteor.userId() / the current user
 Template.addVolunteerForm.helpers
   'form': () -> { collection: share.form.get() }
-  'data': () -> share.VolunteerForm.findOne()
+  'data': () -> share.VolunteerForm.findOne({userId: Meteor.userId()})
 
 addLocalLeadsCollection = (template,filter,limit) ->
   share.Lead.find(filter,{limit: limit}).forEach((lead) ->
@@ -17,8 +19,6 @@ addLocalLeadsCollection = (template,filter,limit) ->
       team = share.Department.findOne(lead.parentId)
     else if lead.position == 'division'
       team = share.Division.findOne(lead.parentId)
-    console.log lead
-    console.log team
     isChecked = if lead.userId == Meteor.userId() then "checked" else null
     sel =
       teamId: team._id

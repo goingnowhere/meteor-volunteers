@@ -64,17 +64,13 @@ share.TaskSignups.attachSchema(share.Schemas.TaskSignups)
 # share.Tasks.attachSchema(share.Schemas.Tasks)
 
 share.extendVolunteerForm = (data) ->
-  console.log ["VolunteerForm extend", data.form]
+  # console.log ["VolunteerForm extend", data.form]
   schema = share.Schemas.VolunteerForm
   ss = FormBuilder.toSimpleSchema(data)
   schema.extend(ss)
   share.VolunteerForm.attachSchema(schema)
   share.form.set(share.VolunteerForm)
 
-# rerun both on client and server thanks to peerlibrary:server-autorun
-# if Meteor.isServer
-# Tracker.autorun () ->
-# console.log ["VolunteerForm extend autorun"]
 # Update the VolunteersForm schema each time the Form is updated. This should
 # both on client and server side.
 FormBuilder.Collections.DynamicForms.find({name: "VolunteerForm"}).observe(

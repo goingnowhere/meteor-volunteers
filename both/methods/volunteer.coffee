@@ -18,7 +18,6 @@ Meteor.methods 'Volunteers.volunteerForm.update': (doc) ->
 Meteor.methods 'Volunteers.volunteerForm.insert': (doc) ->
   console.log ["Volunteers.volunteerForm.insert",doc]
   schema = share.form.get().simpleSchema()
-  console.log schema
   SimpleSchema.validate(doc,schema)
   if Meteor.userId()
     doc.userId = Meteor.userId()
