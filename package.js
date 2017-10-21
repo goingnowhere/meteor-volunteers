@@ -31,6 +31,7 @@ Package.onUse(function(api) {
     'reactive-dict',
     'reactive-var',
     'random',
+    'iron:router',
     'abate:autoform-components',
     'abate:formbuilder'
   ], ['client', 'server']);
@@ -46,21 +47,16 @@ Package.onUse(function(api) {
     // 'drblue:fullcalendar',
   ], 'client');
 
-  // api.use( [
-  //   'peerlibrary:server-autorun',
-  // ], 'server');
-
   api.add_files([
     'both/global.coffee',
+    'both/router.coffee',
 
     "both/collections/duties.coffee",
     "both/collections/unit.coffee",
     "both/collections/volunteer.coffee",
+    "both/collections/initCollections.coffee",
 
-    'both/methods/volunteer.coffee',
-    'both/methods/team.coffee',
-    'both/methods/division.coffee',
-    'both/methods/department.coffee',
+    'both/methods/methods.coffee',
 
     "api.coffee"
   ], ["server","client"]);
@@ -103,7 +99,7 @@ Package.onUse(function(api) {
 
   // api.add_files([ "i18n/en.i18n.json", ], ["client", "server"]);
 
-  api.export([ 'Volunteers' ]);
+  api.export([ 'VolunteersClass' ]);
 });
 
 //Package.onTest(function(api) {

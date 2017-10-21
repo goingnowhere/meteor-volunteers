@@ -42,7 +42,6 @@ CommonTask = new SimpleSchema(
     allowedValues: leadPolicy
 )
 
-share.TeamTasks = new Mongo.Collection 'Volunteers.teamTasks'
 share.Schemas.TeamTasks = new SimpleSchema(
   estimatedTime:
     type: String
@@ -70,9 +69,7 @@ share.Schemas.TeamTasks = new SimpleSchema(
     allowedValues: ["done", "archived","pending"]
 )
 share.Schemas.TeamTasks.extend(CommonTask)
-share.TeamTasks.attachSchema(share.Schemas.TeamTasks)
 
-share.TeamShifts = new Mongo.Collection 'Volunteers.teamShifts'
 share.Schemas.TeamShifts = new SimpleSchema(
   start:
     type: Date
@@ -122,9 +119,7 @@ share.Schemas.TeamShifts = new SimpleSchema(
 )
 
 share.Schemas.TeamShifts.extend(CommonTask)
-share.TeamShifts.attachSchema(share.Schemas.TeamShifts)
 
-share.Lead = new Mongo.Collection 'Volunteers.lead'
 
 share.Schemas.Lead = new SimpleSchema(
   parentId:
@@ -181,4 +176,14 @@ share.Schemas.Lead = new SimpleSchema(
     autoform:
       defaultValue: "public"
 )
-share.Lead.attachSchema(share.Schemas.Lead)
+
+# InitCollection = (event) ->
+#   console.log "init #{event} collections"
+#   share.TeamTasks = new Mongo.Collection 'Volunteers.teamTasks'
+#   share.TeamTasks.attachSchema(share.Schemas.TeamTasks)
+#
+#   share.TeamShifts = new Mongo.Collection 'Volunteers.teamShifts'
+#   share.TeamShifts.attachSchema(share.Schemas.TeamShifts)
+#
+#   share.Lead = new Mongo.Collection 'Volunteers.lead'
+#   share.Lead.attachSchema(share.Schemas.Lead)

@@ -8,9 +8,9 @@
 
 Template.tasksTable.onCreated () ->
   template = this
-  template.subscribe('Volunteers.users')
+  share.templateSub(template,"users")
   if template.data?._id
-    template.subscribe('Volunteers.teamTasks.backend',template.data._id)
+    share.templateSub(template,"teamTasks.backend",template.data._id)
 
 Template.tasksTable.helpers
   'allTasks': () -> share.TeamTasks.find()

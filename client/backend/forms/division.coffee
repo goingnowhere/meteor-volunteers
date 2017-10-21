@@ -1,12 +1,12 @@
 Template.addDivision.onCreated () ->
   template = this
-  template.subscribe('Volunteers.users')
-  template.subscribe('Volunteers.division')
+  share.templateSub(template,"users")
+  share.templateSub(template,"division")
 
 Template.addDivision.events
   'click [data-action="removeDivision"]': (event,template) ->
     Id = $(event.target).data('id')
-    Meteor.call "Volunteers.division.remove", Id
+    share.meteorCall "division.remove", Id
 
 Template.divisionView.helpers
   'main': () ->
@@ -22,7 +22,7 @@ Template.divisionView.helpers
       tableFields: [ { name: 'name'} ]
       form: { collection: share.Department }
       subscription : (template) ->
-        [ template.subscribe('Volunteers.department.backend',parentId) ]
+        [ share.templateSub(template,"department.backend",parentId) ]
       }
     lead = {
       id: "leads"
@@ -33,8 +33,8 @@ Template.divisionView.helpers
       ]
       form: { collection: share.Lead }
       subscription : (template) ->
-        [ template.subscribe('Volunteers.users'),
-          template.subscribe('Volunteers.lead.backend',parentId)
+        [ share.templateSub(template,"users"),
+          share.templateSub(template,"lead.backend",parentId)
         ]
       }
     return [dept,lead]

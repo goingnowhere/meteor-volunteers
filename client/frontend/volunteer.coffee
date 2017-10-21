@@ -3,12 +3,14 @@ import SimpleSchema from 'simpl-schema'
 Template.addVolunteerForm.onCreated () ->
   template = this
   template.subscribe('FormBuilder.dynamicForms')
-  template.subscribe('Volunteers.volunteerForm')
+  share.templateSub(template,"volunteerForm")
 
 # XXX this should be modified to allow the admin to edit the data of any
 # user and not only display Meteor.userId() / the current user
 Template.addVolunteerForm.helpers
-  'form': () -> { collection: share.form.get() }
+  'form': () ->
+    form = share.form.get()
+    if form then { collection: form }
   'data': () -> share.VolunteerForm.findOne({userId: Meteor.userId()})
 
 addLocalLeadsCollection = (template,filter,limit) ->
@@ -36,23 +38,19 @@ addLocalLeadsCollection = (template,filter,limit) ->
     template.ShiftTaskLocal.upsert(sel,{$set: mod})
   )
 
-signupCollections =
-  shift: share.ShiftSignups
-  task: share.TaskSignups
-
 addLocalShiftsCollection = (collection,template,type,filter,limit) ->
   collection.find(filter,{limit: limit}).forEach((job) ->
     team = share.Team.findOne(job.parentId)
     users = []
-    shiftSignupsSub = template.subscribe('Volunteers.shiftSignups.byShift',job._id)
-    taskSignupsSub = template.subscribe('Volunteers.taskSignups.byShift',job._id)
+    shiftSignupsSub = share.templateSub(template,"shiftSignups.byShift",job._id)
+    taskSignupsSub = share.templateSub(template,"taskSignups.byShift",job._id)
     if shiftSignupsSub.ready() and taskSignupsSub.ready()
-      signupCollection = signupCollections[type]
+      # share.signupCollections is defined in both/collections/initCollections.coffee
+      signupCollection = share.signupCollections[type]
       users = signupCollection.find(
         {shiftId: job._id, status: {$in: ["confirmed"]}}
       ).map((s) -> s.userId)
       signup = signupCollection.findOne({shiftId: job._id, userId: Meteor.userId()})
-
       sel =
         teamId: team._id
         shiftId: job._id
@@ -98,11 +96,9 @@ Template.volunteerShiftsForm.onCreated () ->
   template.autorun () ->
     filter = makeFilter(template.searchQuery)
     limit = template.searchQuery.get('limit')
-    console.log filter
-    console.log limit
-    template.subscribe('Volunteers.division')
-    template.subscribe('Volunteers.department')
-    sub = template.subscribe('Volunteers.allDuties', filter, limit)
+    share.templateSub(template,"division")
+    share.templateSub(template,"department")
+    sub = share.templateSub(template,"allDuties", filter, limit)
 
     if sub.ready()
       addLocalShiftsCollection(share.TeamShifts,template,'shift',filter,limit)
@@ -116,7 +112,6 @@ Template.volunteerShiftsForm.helpers
     template = Template.instance()
     shifts = template.ShiftTaskLocal.find()
     limit = template.searchQuery.get("limit")
-    console.log "nomore does not work", shifts.count(), limit
     shifts.count() <= limit
   'allShiftsTasks': () ->
     template = Template.instance()

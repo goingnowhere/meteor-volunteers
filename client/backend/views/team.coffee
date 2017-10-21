@@ -1,11 +1,11 @@
 Template.teamDayViewGrid.onCreated () ->
   template = this
-  template.subscribe('Volunteers.teamShifts.backend',template.data._id)
-  template.subscribe('Volunteers.teamTasks.backend',template.data._id)
-  template.subscribe('Volunteers.lead.backend',template.data._id)
-  template.subscribe('Volunteers.taskSignups')
-  template.subscribe('Volunteers.shiftSignups')
-  template.subscribe('Volunteers.users')
+  share.templateSub(template,"teamShifts.backend",template.data._id)
+  share.templateSub(template,"teamTasks.backend",template.data._id)
+  share.templateSub(template,"lead.backend",template.data._id)
+  share.templateSub(template,"taskSignups")
+  share.templateSub(template,"shiftSignups")
+  share.templateSub(template,"users")
   template.taskFilter = new ReactiveVar(["pending","overdue","done"])
 
 Template.teamDayViewGrid.helpers {
@@ -46,7 +46,6 @@ Template.teamDayViewGrid.helpers {
           vacant: v.max - confirmed)
       )
       progress = ((totalVacant + totalConfirmed) / 100 ) * totalConfirmed
-      # console.log "ff", totalVacant, totalConfirmed, progress
       teamId = Template.currentData()._id
       {date:k, shifts: vvl, progress: progress, teamId: teamId}
     )
@@ -58,7 +57,7 @@ Template.teamDayViewGrid.events
       {form:{collection: share.Team}, data:this})
   'click [data-action="delete"]': (event,template) ->
     id = $(event.target).data('id')
-    Meteor.call "Volunteers.team.remove", id
+    share.meteorCall "team.remove", id
   'click [data-action="addShift"]': (event,template) ->
     ModalShowWithTemplate("insertUpdateTemplate",
       {form:{collection: share.TeamShifts}, data:{parentId: this._id}})
@@ -66,12 +65,12 @@ Template.teamDayViewGrid.events
     ModalShowWithTemplate("insertUpdateTemplate",
       {form:{collection: share.TeamTasks}, data:{parentId: this._id}})
   'click #taskStatus': ( event, template ) ->
-    selected = template.findAll( "#taskStatus:checked")
+    selected = template.findAll("#taskStatus:checked")
     template.taskFilter.set(_.map(selected, (i) -> i.defaultValue))
 
 Template.teamTasksView.onCreated () ->
   template = this
-  template.subscribe('Volunteers.teamTasks.backend',template.data.teamId)
+  share.templateSub(template,"teamTasks.backend",template.data.teamId)
 
 Template.teamTasksView.events
   'click [data-action="edit"]': (event,template) ->
@@ -81,21 +80,21 @@ Template.teamTasksView.events
       {form:{collection: share.TeamTasks}, data: data})
   'click [data-action="delete"]': (event,template) ->
     id = $(event.target).data('id')
-    Meteor.call "Volunteers.teamTasks.remove", id
+    share.meteorCall "teamTasks.remove", id
   'click [data-action="archive"]': (event,template) ->
     id = $(event.target).data('id')
     doc = {_id: id, modifier: {$set: {status: "archived"}}}
-    Meteor.call "Volunteers.teamTasks.update", doc
+    share.meteorCall "teamTasks.update", doc
   'click [data-action="toggle"]': (event,template) ->
     id = $(event.target).data('id')
     data = share.TeamTasks.findOne(id)
     status = if data.status == "done" then "pending" else "done"
     doc = {_id: id, modifier: {$set: {status: status}}}
-    Meteor.call "Volunteers.teamTasks.update", doc
+    share.meteorCall "teamTasks.update", doc
 
 Template.teamShiftsView.onCreated () ->
   template = this
-  template.subscribe('Volunteers.teamShifts.backend',template.data.teamId)
+  share.templateSub(template,"teamShifts.backend",template.data.teamId)
 
 Template.teamShiftsView.events
   'click [data-action="edit"]': (event,template) ->
@@ -105,4 +104,4 @@ Template.teamShiftsView.events
       {form:{collection: share.TeamShifts}, data: data})
   'click [data-action="delete"]': (event,template) ->
     id = $(event.target).data('id')
-    Meteor.call "Volunteers.teamShifts.remove", id
+    share.meteorCall "teamShifts.remove", id

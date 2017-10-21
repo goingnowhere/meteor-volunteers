@@ -1,18 +1,16 @@
-Template.addTeamShifts.onCreated () ->
-  template = this
-  template.subscribe('Volunteers.users')
-  template.subscribe('Volunteers.teamShifts')
-
-AutoForm.debug()
-
-Template.addTeamShifts.helpers
-  form: () -> { collection: share.TeamShifts }
-
+# Template.addTeamShifts.onCreated () ->
+#   template = this
+#   template.subscribe('Volunteers.users')
+#   template.subscribe('Volunteers.teamShifts')
+#
+# Template.addTeamShifts.helpers
+#   form: () -> { collection: share.TeamShifts }
+#
 Template.shiftsTable.onCreated () ->
   template = this
-  template.subscribe('Volunteers.users')
+  share.templateSub(template,"users")
   if template.data?._id
-    template.subscribe('Volunteers.teamShifts.backend',template.data._id)
+    share.templateSub(template,"teamShifts.backend",template.data._id)
 
 Template.shiftsTable.helpers
   'allShifts': () -> share.TeamShifts.find()

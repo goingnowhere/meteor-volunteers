@@ -1,19 +1,22 @@
 <template name="teamShiftsView">
   <div class="panel panel-default">
-    <div class="panel-heading"><h4>{{date}}</h4></div>
+    <div class="panel-heading clearfix">
+      <h4>{{date}}</h4>
+    </div>
     <div class="panel-body">
       <table class="table">
         <thead>
           <th class="col-md-2">{{_ "time"}}</th>
           <th class="col-md-4">{{_ "name"}}</th>
           <th class="col-md-2 pull-rigth">{{_ "positions"}}</th>
+          <th></th>
         </thead>
         {{#each shift in shifts}}
           <tr>
             <td class="col-md-5">{{shift.start}} - {{shift.end}}</td>
             <td class="col-md-6">{{shift.title}}</td>
             <td class="col-md-1 pull-rigth"><div class="badge">{{shift.vacant}} / {{shift.confirmed}}</div></td>
-            <td class="col-md-1 pull-rigth">
+            <td>
               <div class="btn-group pull-right">
                 <button type="button" class="btn btn-default btn-circle dropdown-toggle"
                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -48,11 +51,7 @@
         panel-default
       {{/if}}
     {{/if}}">
-    <div class="panel-heading">
-      {{#if $eq status "done"}}{{fa "check"}}{{/if}}
-      {{#if $eq status "archived"}}{{fa "archive"}}{{/if}}
-      {{#if $eq status "overdue"}}{{fa "danger"}}{{/if}}
-      {{title}}
+    <div class="panel-heading clearfix">
       <div class="btn-group pull-right">
         <button type="button" class="btn btn-default btn-circle dropdown-toggle"
           data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -72,6 +71,10 @@
             {{fa "archive"}} {{_ "archive"}}</a></li>
         </ul>
       </div>
+      {{#if $eq status "done"}}{{fa "check"}}{{/if}}
+      {{#if $eq status "archived"}}{{fa "archive"}}{{/if}}
+      {{#if $eq status "overdue"}}{{fa "danger"}}{{/if}}
+      <h4>{{title}}</h4>
     </div>
     <div class="panel-body">
       {{_ "due_date"}}: {{dueDate}}
@@ -82,25 +85,21 @@
 
 <template name="teamDayViewGrid">
   <div class="panel">
-    <table class="table">
-      <tr>
-        <td><h3>{{_ "team"}} : {{name}}</h3></td>
-        <td align="right">
-          <div class="btn-group">
-            <button type="button" class="btn btn-info btn-sm dropdown-toggle"
-              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <i class="fa fa-wrench fa-fw"></i>
-            </button>
-            <ul class="dropdown-menu">
-              <li class="dropdown-item"><a href="#" data-action="edit" data-id="{{_id}}">
-                {{fa "pencil-square-o"}} {{_ "edit"}}</a></li>
-              <li class="dropdown-item"><a href="#" data-action="delete" data-id="{{_id}}">
-                {{fa "trash-o"}} {{_ "remove"}}</a></li>
-            </ul>
-          </div>
-        </td>
-      </tr>
-    </table>
+    <div class="panel-heading clearfix">
+      <div class="btn-group pull-right">
+        <button type="button" class="btn btn-info btn-sm dropdown-toggle"
+          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fa fa-wrench fa-fw"></i>
+        </button>
+        <ul class="dropdown-menu">
+          <li class="dropdown-item"><a href="#" data-action="edit" data-id="{{_id}}">
+            {{fa "pencil-square-o"}} {{_ "edit"}}</a></li>
+          <li class="dropdown-item"><a href="#" data-action="delete" data-id="{{_id}}">
+            {{fa "trash-o"}} {{_ "remove"}}</a></li>
+        </ul>
+      </div>
+      <h4>{{_ "team"}} : {{name}}</h4>
+    </div>
   </div>
   {{_ "team_leads"}} :
   <ul class="inline">

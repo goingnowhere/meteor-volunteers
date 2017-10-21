@@ -101,12 +101,11 @@ Template.typePicker.events
 
 Template.tagsPicker.onRendered () ->
   template = this
-  sub = template.subscribe("Volunteers.team")
+  sub = share.templateSub(template,"team")
   template.autorun () ->
     if sub.ready()
       tags= template.data.searchQuery.get('tags')
       sel = if tags.length > 0 then {_id: {$in: tags}} else {}
-      console.log "tag",sel
       data = _.map(share.getTagList(sel),(t) ->
         id: t.value
         text: t.label)
@@ -118,12 +117,11 @@ Template.tagsPicker.events
   'change #tags': ( event, template ) ->
     val = template.$('#tags').val()
     val = unless val then [] else val
-    console.log val
     template.data.searchQuery.set('tags',val)
 
 Template.areasPicker.onRendered () ->
   template = this
-  sub = template.subscribe("Volunteers.team")
+  sub = share.templateSub(template,"team")
   template.autorun () ->
     if sub.ready()
       areas = template.data.searchQuery.get('areas')

@@ -3,7 +3,7 @@ checkNpmVersions { 'simpl-schema': '0.3.x' }, 'abate:volunteers'
 import SimpleSchema from 'simpl-schema'
 SimpleSchema.extendOptions(['autoform'])
 
-leadPolicy = ["public";"adminOnly","requireApproval"]
+unitPolicy = ["public";"private";"restricted"]
 
 share.getTagList = (sel={}) ->
   tags = _.union.apply null, share.Team.find(sel).map((team) -> team.tags)
@@ -34,21 +34,16 @@ CommonUnit = new SimpleSchema(
     optional: true
     autoform:
       rows: 5
-  # policy:
-  #   type: String
-  #   label: () -> TAPi18n.__("policy")
-  #   allowedValues: leadPolicy
+  # the unit policy should lock the policy of all entities below
+  policy:
+    type: String
+    label: () -> TAPi18n.__("policy")
+    allowedValues: unitPolicy
+    defaultValue: "public"
 )
 
-share.Team = new Mongo.Collection 'Volunteers.team'
 share.Schemas.Team = CommonUnit
-share.Team.attachSchema(share.Schemas.Team)
-
-share.Department = new Mongo.Collection 'Volunteers.department'
 share.Schemas.Department = CommonUnit
-share.Department.attachSchema(share.Schemas.Department)
-
-share.Division = new Mongo.Collection 'Volunteers.division'
 share.Schemas.Division = new SimpleSchema(CommonUnit)
 # a division (a top level unit) has 'top' as parentId
 share.Schemas.Division.extend(
@@ -58,4 +53,3 @@ share.Schemas.Division.extend(
     autoform:
       type: "hidden"
 )
-share.Division.attachSchema(share.Schemas.Division)

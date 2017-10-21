@@ -1,12 +1,12 @@
-Template.addDepartment.onCreated () ->
-  template = this
-  template.subscribe('Volunteers.users')
-  template.subscribe('Volunteers.department')
-
-Template.addDepartment.events
-  'click [data-action="removeDept"]': (event,template) ->
-    id = $(event.target).data('id')
-    Meteor.call "Volunteers.department.remove", id
+# Template.addDepartment.onCreated () ->
+#   template = this
+#   share.templateSub(template,"users")
+#   share.templateSub(template,"department")
+#
+# Template.addDepartment.events
+#   'click [data-action="removeDept"]': (event,template) ->
+#     id = $(event.target).data('id')
+#     share.meteoCall "department.remove", id
 
 Template.departmentView.helpers
   'main': () ->
@@ -22,7 +22,7 @@ Template.departmentView.helpers
       tableFields: [ { name: 'name'} ]
       form: { collection: share.Team }
       subscription : (template) ->
-        [ template.subscribe('Volunteers.team.backend',parentId) ]
+        [ share.templateSub(template,"team.backend",parentId) ]
       }
     lead =  {
       id: "leads"
@@ -33,9 +33,8 @@ Template.departmentView.helpers
       ]
       form: { collection: share.Lead }
       subscription : (template) ->
-        [ template.subscribe('Volunteers.users'),
-         template.subscribe('Volunteers.lead.backend',parentId)
-       ]
+        [ share.templateSub(template,"users"),
+          share.templateSub(template,"lead.backend",parentId) ]
       }
     return [team,lead]
 

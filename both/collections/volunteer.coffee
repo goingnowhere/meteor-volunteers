@@ -1,7 +1,5 @@
 import SimpleSchema from 'simpl-schema'
 
-share.VolunteerForm = new Mongo.Collection 'Volunteers.volunteerForm'
-
 share.Schemas.VolunteerForm = new SimpleSchema(
   userId:
     type: String
@@ -33,8 +31,6 @@ share.Schemas.VolunteerForm = new SimpleSchema(
   #     rows:2
 )
 
-share.VolunteerForm.attachSchema(share.Schemas.VolunteerForm)
-
 share.form = new ReactiveVar(share.VolunteerForm)
 
 commonSignups = new SimpleSchema(
@@ -48,12 +44,8 @@ commonSignups = new SimpleSchema(
       omit: true
       defaultValue: "pending"
 )
-share.ShiftSignups = new Mongo.Collection 'Volunteers.shiftSignups'
 share.Schemas.ShiftSignups = commonSignups
-share.ShiftSignups.attachSchema(share.Schemas.ShiftSignups)
-share.TaskSignups = new Mongo.Collection 'Volunteers.taskSignups'
 share.Schemas.TaskSignups = commonSignups
-share.TaskSignups.attachSchema(share.Schemas.TaskSignups)
 
 # share.Tasks = new Mongo.Collection 'Volunteers.tasks'
 # share.Schemas.Tasks = new SimpleSchema(

@@ -1,4 +1,4 @@
- 
+
 # Template.addTeam.onCreated () ->
 #   template = this
 #   template.subscribe('Volunteers.users')
@@ -23,7 +23,7 @@ Template.teamView.helpers
       tableFields: [ { name: 'title'}, {name: 'start',template: "shiftField"} ]
       form: { collection: share.TeamShifts }
       subscription : (template) ->
-        [ template.subscribe('Volunteers.teamShifts.backend',parentId) ]
+        [ share.templateSub(template,"teamShifts.backend",parentId) ]
       }
     task =  {
       id: "task"
@@ -31,7 +31,7 @@ Template.teamView.helpers
       tableFields: [ { name: 'title'}, {name: 'dueDate'} ]
       form: { collection: share.TeamTasks }
       subscription : (template) ->
-        [ template.subscribe('Volunteers.teamTasks.backend',parentId) ]
+        [ share.templateSub(template,"teamTasks.backend",parentId) ]
       }
     lead =  {
       id: "leads"
@@ -42,8 +42,8 @@ Template.teamView.helpers
       ]
       form: { collection: share.Lead }
       subscription : (template) ->
-        [ template.subscribe('Volunteers.users'),
-         template.subscribe('Volunteers.lead.backend',parentId)
+        [ share.templateSub(template,"users"),
+         share.templateSub(template,"lead.backend",parentId)
        ]
       }
     return [shift,task,lead]
