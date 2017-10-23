@@ -113,7 +113,6 @@ share.Schemas.TeamShifts = new SimpleSchema(
 
 share.Schemas.TeamShifts.extend(CommonTask)
 
-
 share.Schemas.Lead = new SimpleSchema(
   parentId:
     type: String

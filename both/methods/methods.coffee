@@ -90,8 +90,8 @@ share.initMethods = (eventName) ->
         if teamShift.policy == "public" then "confirmed"
         else if teamShift.policy == "requireApproval" then "pending")
       if status
-        doc.status = status
-        share.ShiftSignups.insert(doc)
+        if Meteor.isServer
+          share.ShiftSignups.upsert(doc, {$set : {status: status }})
 
   Meteor.methods "#{prefix}.shiftSignups.bail": (sel) ->
     console.log ["#{prefix}.shiftSignups.bail",sel]

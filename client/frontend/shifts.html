@@ -26,12 +26,17 @@
       {{#if tags}}{{fa "tags"}} {{#each tag in tags}} {{tag}} {{/each}}{{/if}}
       {{#if users}}{{fa "users"}} {{#each user in users}} {{getUserName user}} {{/each}}{{/if}}
       <div class="pull-right">
-        {{#if status}}
+        {{#if $and status ($neq status 'bailed')}}
           <button class="btn btn-default disabled
             {{#if $eq status 'confirmed'}}btn-success{{/if}}">
             {{_ status }}
           </button>
         {{else}}
+          {{#if $eq status 'bailed'}}
+            <button class="btn btn-default disabled">
+              {{_ status }}
+            </button>
+          {{/if}}
           <button class="btn btn-primary" data-shiftid="{{shiftId}}" data-teamid="{{teamId}}"
             data-action="apply" data-type={{type}}>
             {{#if $eq policy "public"}}{{_ "join"}}{{/if}}
