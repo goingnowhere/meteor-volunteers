@@ -1,0 +1,10 @@
+<template name="teamSignupsList">
+  <div class="panel">
+    <h3>{{_ "team"}} : {{name}}</h3>
+  </div>
+  <ul>
+    {{#each signup in allSignups}}
+      <li>{{displayName signup.applicant }} ({{ signup.status }})</li>
+    {{/each}}
+  </ul>
+</template>

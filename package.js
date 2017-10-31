@@ -92,6 +92,8 @@ Package.onUse(function(api) {
 
     "client/backend/views/team.html",
     "client/backend/views/team.coffee",
+    "client/backend/views/signups.html",
+    "client/backend/views/signups.js",
   ], "client");
 
   api.add_files([

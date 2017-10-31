@@ -148,4 +148,4 @@ share.initPulications = (eventName) ->
   Meteor.publish "#{eventName}.Volunteers.users", () ->
     if this.userId
       if Roles.userIsInRole(this.userId, [ "manager" ])
-        Meteor.users.find()
+        Meteor.users.find({}, { fields: { emails: 1, profile: 1, roles: 1 } })
