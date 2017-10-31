@@ -50,6 +50,7 @@ Package.onUse(function(api) {
   api.add_files([
     'both/global.coffee',
     'both/router.coffee',
+    'both/routeControllers.js',
 
     "both/collections/duties.coffee",
     "both/collections/unit.coffee",
@@ -99,7 +100,7 @@ Package.onUse(function(api) {
 
   // api.add_files([ "i18n/en.i18n.json", ], ["client", "server"]);
 
-  api.export([ 'VolunteersClass' ]);
+  api.export([ 'VolunteersClass', 'coffee' ]);
 });
 
 //Package.onTest(function(api) {

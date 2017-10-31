@@ -12,3 +12,5 @@ share.meteorSub = (name,args...) ->
 
 share.meteorCall = (name,args...) ->
   Meteor.call "#{share.eventName}.Volunteers.#{name}", args...
+
+coffee = share
