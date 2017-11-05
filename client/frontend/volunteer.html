@@ -55,6 +55,15 @@
   {{#if isInRole 'manager'}}
     <a href="{{pathFor teamEditEventName _id=team._id}}">{{ fa "pencil-square" }}</a>
   {{/if}}
+  <div>
+    {{#if division}}
+      <div>{{_ "division"}}: {{division.name}}</div>
+    {{/if}}
+    {{#if department}}
+      <div>{{_ "department"}}: {{department.name}}</div>
+    {{/if}}
+  </div>
+  <div>leads: xxx</div>
   <div>{{team.description}}</div>
 
   <h2>{{_ "team_shifts_and_tasks"}}</h2>

@@ -51,12 +51,16 @@ addLocalShiftsCollection = (collection,template,type,filter = {},limit = 0) ->
         {shiftId: job._id, status: {$in: ["confirmed"]}}
       ).map((s) -> s.userId)
       signup = signupCollection.findOne({shiftId: job._id, userId: Meteor.userId()})
+      department = if team.parentId? then share.Department.findOne(team.parentId)
+      division = if department?.parentId? then share.Division.findOne(department.parentId)
       sel =
         teamId: team._id
         shiftId: job._id
       mod =
         type: type
         teamName: team.name
+        departmentName: if department?.name? then department.name
+        divisionName: if division?.name? then division.name
         parentId: team.parentId
         title: job.title
         description: job.description
@@ -159,6 +163,8 @@ Template.volunteersTeamView.onCreated () ->
 
 Template.volunteersTeamView.helpers
   'team': () -> share.Team.findOne()
+  'division': () -> share.Division.findOne()
+  'department': () -> share.Department.findOne()
   'teamEditEventName': () -> 'teamEdit-'+share.eventName1.get()
   'allShiftsTasks': () ->
     template = Template.instance()

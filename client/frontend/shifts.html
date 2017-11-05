@@ -29,12 +29,12 @@
             {{description}}
           </div>
           <div class="col-md-4">
-            <div>
-              {{#if tags}}{{fa "tags"}} {{#each tag in tags}} {{tag}} {{/each}}{{/if}}
-            </div>
+            {{#if tags}}
+              <div>{{fa "tags"}} {{#each tag in tags}} {{tag}} {{/each}}</div>
+            {{/if}}
             {{#if users}}
               <div>
-                {{fa "users"}} <strong>{{_ "team_mates"}}: </strong>
+                {{fa "users"}} {{_ "team_mates"}}:
                 <ul>
                   {{#each user in users}}
                     <li>{{getUserName user}}</li>
@@ -58,11 +58,15 @@
               {{_ status }}
             </button>
           {{/if}}
-          <button class="btn btn-primary" data-shiftid="{{shiftId}}" data-teamid="{{teamId}}"
-            data-action="apply" data-type={{type}}>
-            {{#if $eq policy "public"}}{{_ "join"}}{{/if}}
-            {{#if $eq policy "requireApproval"}}{{_ "apply"}}{{/if}}
-          </button>
+          {{#unless $eq policy "adminOnly"}}
+            <button class="btn btn-primary" data-shiftid="{{shiftId}}" data-teamid="{{teamId}}"
+              data-action="apply" data-type={{type}}>
+              {{#if $eq policy "public"}}{{_ "join"}}{{/if}}
+              {{#if $eq policy "requireApproval"}}{{_ "apply"}}{{/if}}
+            </button>
+          {{else}}
+            {{_ "admin_only"}}
+          {{/unless}}
         {{/if}}
         {{#if canBail}}
           <button class="btn btn-danger" data-shiftid="{{shiftId}}" data-teamid="{{teamId}}"
@@ -76,29 +80,28 @@
 </template>
 
 <template name="shiftsTasksTableRowView">
-    <div>
-      <strong>
-        <a href="{{pathFor teamViewEventName _id=teamId}}">{{teamName}}</a>:
-        {{#if $eq type "lead"}}
-          {{_ role}} {{_ "position"}}
-        {{else}}
-          {{title}}
-        {{/if}}
-      </strong>
-    </div>
-    <div>
-      {{#if $eq type "shift"}}{{fa "calendar"}}{{/if}}
-      {{#if $eq type "task"}}{{fa "tasks"}}{{/if}}
-      {{#if $eq type "lead"}}{{fa "user-circle"}}{{/if}}
-      {{#if $eq type "task"}}
-        {{formatDate dueDate}} - {{_ "estimated_time"}} {{estimatedTime}}
+  <div>
+    <a href="{{pathFor teamViewEventName _id=teamId}}">{{teamName}}</a>:
+    {{#if $eq type "lead"}}
+      {{_ role}} {{_ "position"}}
+    {{else}}
+      {{title}}
+      {{#if $eq status "pending"}} {{fa "exclamation-triangle"}}{{/if}}
+    {{/if}}
+  </div>
+  <div>
+    {{#if $eq type "shift"}}{{fa "calendar"}}{{/if}}
+    {{#if $eq type "task"}}{{fa "tasks"}}{{/if}}
+    {{#if $eq type "lead"}}{{fa "user-circle"}}{{/if}}
+    {{#if $eq type "task"}}
+      {{formatDate dueDate}} - {{_ "estimated_time"}} {{estimatedTime}}
+    {{/if}}
+    {{#if $eq type "shift"}}
+      {{#if sameDay start end}}
+        {{formatDate start}} {{formatTime start}} - {{formatTime end}}
+      {{else}}
+        {{formatDateTime start}} - {{formatDateTime end}}
       {{/if}}
-      {{#if $eq type "shift"}}
-        {{#if sameDay start end}}
-          {{formatDate start}} {{formatTime start}} - {{formatTime end}}
-        {{else}}
-          {{formatDateTime start}} - {{formatDateTime end}}
-        {{/if}}
-      {{/if}}
-    </div>
+    {{/if}}
+  </div>
 </template>

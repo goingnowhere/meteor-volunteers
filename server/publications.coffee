@@ -38,34 +38,47 @@ share.initPulications = (eventName) ->
       t = share.TeamTasks.find(sel,{limit: limit / 3})
       l = share.Lead.find(sel,{limit: limit / 3})
       tt = share.Team.find(sel)
-      [s,t,l,tt]
+      d = share.Department.find()
+      dd = share.Division.find()
+      [s,t,l,tt,d,dd]
 
   Meteor.publish "#{eventName}.Volunteers.allDuties.byTeam", (teamId) ->
     if this.userId
       sel = {parentId: teamId}
+      # XXX: I'm tired. refactor here !
       sel.policy = {$in: ["requireApproval","public"]}
-      if Roles.userIsInRole(this.userId, [ 'manager' ]) then delete sel.policy
+      selt = {parentId: teamId, status: {$in: ["pending"]}}
+      selt.policy = {$in: ["requireApproval","public"]}
+      if Roles.userIsInRole(this.userId, [ 'manager' ])
+        delete sel.policy
+        delete selt.policy
+        delete selt.status
       tasks = share.TaskSignups.find({teamId: teamId})
       shifts = share.ShiftSignups.find({teamId: teamId})
       s = share.TeamShifts.find(sel)
-      t = share.TeamTasks.find(sel)
+      t = share.TeamTasks.find(selt)
       l = share.Lead.find({parentId: teamId})
       tt = share.Team.find({_id: teamId})
-      [tasks,shifts,s,t,l,tt]
+      # XXX: restrict to dept and div related to this team ...
+      d = share.Department.find()
+      dd = share.Division.find()
+      [tasks,shifts,s,t,l,tt,d,dd]
 
   Meteor.publish "#{eventName}.Volunteers.allDuties.byUser", () ->
     if this.userId
       # sel.policy = {$in: ["requireApproval","public"]}
       # if Roles.userIsInRole(this.userId, [ 'manager' ]) then delete sel.policy
-      tasks = share.TaskSignups.find({userId: this.userId})
-      shifts = share.ShiftSignups.find({userId: this.userId})
+      tasks = share.TaskSignups.find({userId: this.userId, status: {$in: ["confirmed", "pending","refused"]}})
+      shifts = share.ShiftSignups.find({userId: this.userId, status: {$in: ["confirmed", "pending","refused"]}})
       shiftIds = shifts.map((e) -> e.shiftId).concat(tasks.map((e) -> e.shiftId))
       teamIds = shifts.map((e) -> e.teamId).concat(tasks.map((e) -> e.teamId))
       s = share.TeamShifts.find({_id: {$in: shiftIds}})
       t = share.TeamTasks.find({_id: {$in: shiftIds}})
       l = share.Lead.find({parentId: {$in: teamIds}})
       tt = share.Team.find({_id: {$in: teamIds}})
-      [tasks,shifts,s,t,l,tt]
+      d = share.Department.find()
+      dd = share.Division.find()
+      [tasks,shifts,s,t,l,tt,d,dd]
 
   Meteor.publish "#{eventName}.Volunteers.teamShifts.backend", (id) ->
     if this.userId
