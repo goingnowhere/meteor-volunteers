@@ -1,15 +1,23 @@
 share.initRouters = (eventName) ->
   Router.route "#{eventName}/dashborad/team/:_id",
-    name: "teamDayViewGrid-#{eventName}"
+    name: "teamEdit-#{eventName}"
     template: 'teamDayViewGrid'
     waitOn: () -> [ share.meteorSub("team") ]
     data: () ->
       if this.params && this.params._id && this.ready()
         share.Team.findOne(this.params._id)
 
-  Router.route "#{eventName}/team/edit/:_id",
+  # Router.route "#{eventName}/team/edit/:_id",
+  #   name: "teamEdit-#{eventName}"
+  #   template: 'teamEdit'
+  #   waitOn: () -> [ share.meteorSub("team") ]
+  #   data: () ->
+  #     if this.params && this.params._id && this.ready()
+  #       share.Team.findOne(this.params._id)
+
+  Router.route "#{eventName}/team/view/:_id",
     name: "teamView-#{eventName}"
-    template: 'teamView'
+    template: 'volunteersTeamView'
     waitOn: () -> [ share.meteorSub("team") ]
     data: () ->
       if this.params && this.params._id && this.ready()

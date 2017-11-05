@@ -9,7 +9,7 @@
 #     teamId = $(event.target).data('id')
 #     Meteor.call "Team.remove", teamId
 
-Template.teamView.helpers
+Template.teamEdit.helpers
   'main': () ->
     id: "details"
     label: "details"

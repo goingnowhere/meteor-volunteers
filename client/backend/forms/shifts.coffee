@@ -6,14 +6,14 @@
 # Template.addTeamShifts.helpers
 #   form: () -> { collection: share.TeamShifts }
 #
-Template.shiftsTable.onCreated () ->
-  template = this
-  share.templateSub(template,"users")
-  if template.data?._id
-    share.templateSub(template,"teamShifts.backend",template.data._id)
-
-Template.shiftsTable.helpers
-  'allShifts': () -> share.TeamShifts.find()
+# Template.shiftsTable.onCreated () ->
+#   template = this
+#   share.templateSub(template,"users")
+#   if template.data?._id
+#     share.templateSub(template,"teamShifts.backend",template.data._id)
+#
+# Template.shiftsTable.helpers
+#   'allShifts': () -> share.TeamShifts.find()
 
 # we need this hook to transform the date from autoform in something
 # that the date picker can shallow. This should be done by the datetimepicker

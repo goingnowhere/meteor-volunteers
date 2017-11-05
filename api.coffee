@@ -10,6 +10,7 @@ periods =
 share.periods = new ReactiveVar(periods)
 
 share.roles = new ReactiveVar(["lead","co-lead"])
+share.eventName1 = new ReactiveVar()
 
 class VolunteersClass
   constructor: (@eventName) ->
@@ -21,6 +22,7 @@ class VolunteersClass
     share.initCollections(@eventName)
     share.initRouters(@eventName)
     share.initMethods(@eventName)
+    share.eventName1.set(@eventName)
     if Meteor.isServer
       share.initPulications(@eventName)
     @Schemas = share.Schemas

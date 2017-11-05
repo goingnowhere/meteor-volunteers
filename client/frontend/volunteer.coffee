@@ -132,8 +132,8 @@ Template.volunteerUserShifts.onCreated () ->
     sub = share.templateSub(template,"allDuties.byUser")
 
     if sub.ready()
-      addLocalShiftsCollection(share.TeamShifts,template,'shift',{},10)
-      addLocalShiftsCollection(share.TeamTasks,template,'task',{},10)
+      addLocalShiftsCollection(share.TeamShifts,template,'shift',{},100)
+      addLocalShiftsCollection(share.TeamTasks,template,'task',{},100)
       # addLocalLeadsCollection(template,filter,limit)
 
 Template.volunteerUserShifts.helpers
@@ -145,6 +145,24 @@ Template.volunteerUserShifts.helpers
     template = Template.instance()
     sort = {sort: {start: -1, dueDate:-1}}
     template.ShiftTaskLocal.find({type: "task"},sort)
+
+Template.volunteersTeamView.onCreated () ->
+  template = this
+  template.ShiftTaskLocal = new Mongo.Collection(null)
+  teamId = template.data._id
+
+  template.autorun () ->
+    sub = share.templateSub(template,"allDuties.byTeam", teamId)
+    if sub.ready()
+      addLocalShiftsCollection(share.TeamShifts,template,'shift',{},100)
+      addLocalShiftsCollection(share.TeamTasks,template,'task',{},100)
+
+Template.volunteersTeamView.helpers
+  'team': () -> share.Team.findOne()
+  'teamEditEventName': () -> 'teamEdit-'+share.eventName1.get()
+  'allShiftsTasks': () ->
+    template = Template.instance()
+    template.ShiftTaskLocal.find()
 
 # Template.volunteerList.helpers
 #   "isVolunteer": () ->

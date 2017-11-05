@@ -14,17 +14,38 @@
             {{formatDate dueDate}} - {{_ "estimated_time"}} {{estimatedTime}}
           {{/if}}
           {{#if $eq type "shift"}}
-            {{formatDate start}} {{startTime}}-{{endTime}}
+            {{#if sameDay start end}}
+              {{formatDate start}} {{formatTime start}} - {{formatTime end}}
+            {{else}}
+              {{formatDateTime start}} - {{formatDateTime end}}
+            {{/if}}
           {{/if}}
         </div>
       </h1>
     </div>
     <div class="panel-body">
-      {{description}}
+        <div class="row">
+          <div class="col-md-8">
+            {{description}}
+          </div>
+          <div class="col-md-4">
+            <div>
+              {{#if tags}}{{fa "tags"}} {{#each tag in tags}} {{tag}} {{/each}}{{/if}}
+            </div>
+            {{#if users}}
+              <div>
+                {{fa "users"}} <strong>{{_ "team_mates"}}: </strong>
+                <ul>
+                  {{#each user in users}}
+                    <li>{{getUserName user}}</li>
+                  {{/each}}
+                </ul>
+              </div>
+            {{/if}}
+          </div>
+        </div>
     </div>
     <div class="panel-footer clearfix">
-      {{#if tags}}{{fa "tags"}} {{#each tag in tags}} {{tag}} {{/each}}{{/if}}
-      {{#if users}}{{fa "users"}} {{#each user in users}} {{getUserName user}} {{/each}}{{/if}}
       <div class="pull-right">
         {{#if $and status ($neq status 'bailed')}}
           <button class="btn btn-default disabled
@@ -57,7 +78,12 @@
 <template name="shiftsTasksTableRowView">
     <div>
       <strong>
-        {{teamName}}: {{#if $eq type "lead"}}{{_ role}} {{_ "position"}}{{else}}{{title}}{{/if}}
+        <a href="{{pathFor teamViewEventName _id=teamId}}">{{teamName}}</a>:
+        {{#if $eq type "lead"}}
+          {{_ role}} {{_ "position"}}
+        {{else}}
+          {{title}}
+        {{/if}}
       </strong>
     </div>
     <div>

@@ -16,8 +16,8 @@
             <div class="col-sm-2">{{> periodPicker searchQuery=searchQuery}}</div>
             <div class="col-sm-2">{{> typePicker searchQuery=searchQuery}}</div>
             <div class="col-sm-2">{{> tagsPicker searchQuery=searchQuery}}</div>
-            <div class="col-sm-2">{{> areasPicker searchQuery=searchQuery}}</div>
-            <div class="col-sm-2">{{> moreFilters searchQuery=searchQuery}}</div>
+            <div class="col-sm-4">{{> areasPicker searchQuery=searchQuery}}</div>
+            <!-- <div class="col-sm-2">{{> moreFilters searchQuery=searchQuery}}</div> -->
           </div>
         </form>
       </div>
@@ -49,6 +49,38 @@
     {{> shiftsTasksTableRowView task }}
   {{/each}}
 </template>
+
+<template name="volunteersTeamView">
+  <h1>{{team.name}}</h1>
+  {{#if isInRole 'manager'}}
+    <a href="{{pathFor teamEditEventName _id=team._id}}">{{ fa "pencil-square" }}</a>
+  {{/if}}
+  <div>{{team.description}}</div>
+
+  <h2>{{_ "team_shifts_and_tasks"}}</h2>
+  <div class="panel panel-default">
+    <ul class="list-group">
+      {{#each shift in allShiftsTasks}}
+        <li class="list-group-item clearfix">
+          {{> shiftsTasksTableView shift }}
+        </li>
+      {{/each}}
+    </ul>
+  </div>
+</template>
+
+<!-- <template name="volunteersDepartmentView">
+  {{title}}
+  {{description}}
+  {{> shiftsTasksTableView }}
+</template>
+
+<template name="volunteersDivisionview">
+  {{title}}
+  {{description}}
+  {{> shiftsTasksTableView }}
+</template> -->
+
 
 <!--
 <template name="publicVolunteerCal">

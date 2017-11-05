@@ -13,8 +13,12 @@
         </thead>
         {{#each shift in shifts}}
           <tr>
-            <td class="col-md-5">{{shift.start}} - {{shift.end}}</td>
-            <td class="col-md-6">{{shift.title}}</td>
+            <td class="col-md-5">{{formatTime shift.start}} - {{formatTime shift.end}}</td>
+            <td class="col-md-6">
+              {{#if ($eq shift.policy 'public')}}{{fa 'globe'}}{{/if}}
+              {{#if ($eq shift.policy 'private')}}{{fa 'user-secret'}}{{/if}}
+              {{#if ($eq shift.policy 'requireApproval')}}{{fa 'lock'}}{{/if}}
+              {{shift.title}}</td>
             <td class="col-md-1 pull-rigth"><div class="badge">{{shift.vacant}} / {{shift.confirmed}}</div></td>
             <td>
               <div class="btn-group pull-right">
@@ -74,10 +78,15 @@
       {{#if $eq status "done"}}{{fa "check"}}{{/if}}
       {{#if $eq status "archived"}}{{fa "archive"}}{{/if}}
       {{#if $eq status "overdue"}}{{fa "danger"}}{{/if}}
+
+      {{#if ($eq policy 'public')}}{{fa 'globe'}}{{/if}}
+      {{#if ($eq policy 'private')}}{{fa 'user-secret'}}{{/if}}
+      {{#if ($eq policy 'requireApproval')}}{{fa 'lock'}}{{/if}}
+
       <h4>{{title}}</h4>
     </div>
     <div class="panel-body">
-      {{_ "due_date"}}: {{dueDate}}
+      {{_ "due_date"}}: {{formatDate dueDate}}
       <div class="badge pull-right">{{vacant}} / {{confirmed}}</div>
     </div>
   </div>

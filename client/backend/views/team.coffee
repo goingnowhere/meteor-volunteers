@@ -1,12 +1,9 @@
 Template.teamDayViewGrid.onCreated () ->
   template = this
-  share.templateSub(template,"teamShifts.backend",template.data._id)
-  share.templateSub(template,"teamTasks.backend",template.data._id)
-  share.templateSub(template,"lead.backend",template.data._id)
-  share.templateSub(template,"taskSignups")
-  share.templateSub(template,"shiftSignups")
-  share.templateSub(template,"users")
   template.taskFilter = new ReactiveVar(["pending","overdue","done"])
+  teamId = template.data._id
+  share.templateSub(template,"allDuties.byTeam", teamId)
+  share.templateSub(template,"users")
 
 Template.teamDayViewGrid.helpers {
   'taskStatus': () -> [
@@ -22,13 +19,14 @@ Template.teamDayViewGrid.helpers {
       dueDate = moment(t.dueDate)
       _.extend(t,
         timeleft: dueDate.diff(moment(), 'days')
-        dueDate: dueDate.format('ddd, MMM Do')
+        dueDate: dueDate #.format('ddd, MMM Do')
         confirmed: confirmed
         vacant: t.max - confirmed)
     )
   'allShifts': () ->
     shifts = share.TeamShifts.find().map((s) ->
-      _.extend(s,{day: moment(s.start).format('ddd, MMM Do')}))
+      #XXX this should be a moment date and the formatting should be done in the template
+      _.extend(s,{day: moment(s.start).format('MMMM Do YYYY')}))
     ss = _.groupBy(shifts, 'day')
     _.map(ss,(vl,k) ->
       totalVacant = 0
@@ -39,8 +37,9 @@ Template.teamDayViewGrid.helpers {
         totalConfirmed =+ confirmed
         totalVacant =+ (v.max - confirmed)
         _.extend(v,
-          start: moment(v.start).format('h:mm a')
-          end: moment(v.end).format('h:mm a')
+          start: v.start #moment(v.start).format('h:mm a')
+          end: v.end #moment(v.end).format('h:mm a')
+          policy: v.policy
           duration: moment.duration(v.end - v.start).humanize()
           confirmed: confirmed
           vacant: v.max - confirmed)

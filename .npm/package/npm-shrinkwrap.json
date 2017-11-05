@@ -1,9 +1,10 @@
 {
+  "lockfileVersion": 1,
   "dependencies": {
     "flatpickr": {
       "version": "2.4.8",
       "resolved": "https://registry.npmjs.org/flatpickr/-/flatpickr-2.4.8.tgz",
-      "from": "flatpickr@2.4.8"
+      "integrity": "sha1-FSE2xmVwieu3xq+M2WkFTFW9PdQ="
     }
   }
 }
