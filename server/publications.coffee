@@ -36,6 +36,17 @@ share.initPulications = (eventName) ->
       tt = share.Team.find(sel)
       [s,t,l,tt]
 
+  Meteor.publish "#{eventName}.Volunteers.allDuties.byUser", () ->
+    if this.userId
+      tasks = share.TaskSignups.find({userId: this.userId})
+      shifts = share.ShiftSignups.find({userId: this.userId})
+      # leads = share.LeadSignups.find({usersId: this.userId})
+      s = share.TeamShifts.find({_id: {$in: shifts.map((e) -> e.shiftId)}})
+      t = share.TeamTasks.find({_id: {$in: tasks.map((e) -> e.shiftId)}})
+      l = share.Lead.find()#{_id: {$in: leads.map((e) -> e.shiftId)}})
+      tt = share.Team.find()
+      [s,t,l,tt]
+
   Meteor.publish "#{eventName}.Volunteers.teamShifts.backend", (id) ->
     if this.userId
       if Roles.userIsInRole(this.userId, [ "manager" ])

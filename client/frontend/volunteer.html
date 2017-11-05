@@ -39,27 +39,18 @@
   </div>
 </template>
 
-<!-- <template name="volunteerList">
-  <div class="panel panel-default">
-    <div class="panel-body">
-      {{#if isVolunteer}}
-          {{#if hasLead}}
-            {{#markdown}}{{_ "volunteer_has_lead"}}{{/markdown}}
-            {{> reactiveTable settings=VolunteerCrewUserTableSettings }}
-          {{/if}}
-          {{#if hasShift}}
-            {{#markdown}}{{_ "volunteer_has_task"}}{{/markdown}}
-            {{> reactiveTable settings=VolunteerShiftUserTableSettings }}
-          {{else}}
-            {{#markdown}}{{_ "volunteer_wait_for_task"}}{{/markdown}}
-          {{/if}}
-      {{else}}
-          {{#markdown}}{{_ "create_volunteer_profile"}}{{/markdown}}
-      {{/if}}
-    </div>
-  </div>
+<template name="volunteerUserShifts">
+  <h3>{{_ "upcoming_shifts" }}</h3>
+  {{#each shift in allShifts}}
+    {{> shiftsTasksTableRowView shift }}
+  {{/each}}
+  <h3> {{_ "upcoming_tasks_deadlines" }} </h3>
+  {{#each task in allTasks}}
+    {{> shiftsTasksTableRowView task }}
+  {{/each}}
 </template>
 
+<!--
 <template name="publicVolunteerCal">
   <ul class="nav nav-tabs" role="tablist">
     {{#each areas}}

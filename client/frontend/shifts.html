@@ -5,7 +5,7 @@
     {{#if $eq type 'lead'}}panel-info{{/if}}">
     <div class="panel-heading">
       <h1 class="panel-title">
-        {{#if $eq type "shift"}}{{fa "clock-o"}}{{/if}}
+        {{#if $eq type "shift"}}{{fa "calendar"}}{{/if}}
         {{#if $eq type "task"}}{{fa "tasks"}}{{/if}}
         {{#if $eq type "lead"}}{{fa "user-circle"}}{{/if}}
         {{teamName}}: {{#if $eq type "lead"}}{{_ role}} {{_ "position"}}{{else}}{{title}}{{/if}}
@@ -52,4 +52,27 @@
       </div>
     </div>
   </div>
+</template>
+
+<template name="shiftsTasksTableRowView">
+    <div>
+      <strong>
+        {{teamName}}: {{#if $eq type "lead"}}{{_ role}} {{_ "position"}}{{else}}{{title}}{{/if}}
+      </strong>
+    </div>
+    <div>
+      {{#if $eq type "shift"}}{{fa "calendar"}}{{/if}}
+      {{#if $eq type "task"}}{{fa "tasks"}}{{/if}}
+      {{#if $eq type "lead"}}{{fa "user-circle"}}{{/if}}
+      {{#if $eq type "task"}}
+        {{formatDate dueDate}} - {{_ "estimated_time"}} {{estimatedTime}}
+      {{/if}}
+      {{#if $eq type "shift"}}
+        {{#if sameDay start end}}
+          {{formatDate start}} {{formatTime start}} - {{formatTime end}}
+        {{else}}
+          {{formatDateTime start}} - {{formatDateTime end}}
+        {{/if}}
+      {{/if}}
+    </div>
 </template>

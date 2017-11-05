@@ -38,7 +38,7 @@ addLocalLeadsCollection = (template,filter,limit) ->
     template.ShiftTaskLocal.upsert(sel,{$set: mod})
   )
 
-addLocalShiftsCollection = (collection,template,type,filter,limit) ->
+addLocalShiftsCollection = (collection,template,type,filter = {},limit = 0) ->
   collection.find(filter,{limit: limit}).forEach((job) ->
     team = share.Team.findOne(job.parentId)
     users = []
@@ -117,12 +117,34 @@ Template.volunteerShiftsForm.helpers
     template = Template.instance()
     sort = {sort: {isChecked:-1, start: -1, dueDate:-1}}
     sel = template.sel.get()
-    Template.instance().ShiftTaskLocal.find(sel,sort)
+    template.ShiftTaskLocal.find(sel,sort)
 
 Template.volunteerShiftsForm.events
   'click [data-action="loadMore"]': ( event, template ) ->
     limit = template.searchQuery.get("limit")
     template.searchQuery.set("limit",limit+10)
+
+Template.volunteerUserShifts.onCreated () ->
+  template = this
+  template.ShiftTaskLocal = new Mongo.Collection(null)
+
+  template.autorun () ->
+    sub = share.templateSub(template,"allDuties.byUser")
+
+    if sub.ready()
+      addLocalShiftsCollection(share.TeamShifts,template,'shift',{},10)
+      addLocalShiftsCollection(share.TeamTasks,template,'task',{},10)
+      # addLocalLeadsCollection(template,filter,limit)
+
+Template.volunteerUserShifts.helpers
+  'allShifts': () ->
+    template = Template.instance()
+    sort = {sort: {start: -1, dueDate:-1}}
+    template.ShiftTaskLocal.find({type: "shift"},sort)
+  'allTasks': () ->
+    template = Template.instance()
+    sort = {sort: {start: -1, dueDate:-1}}
+    template.ShiftTaskLocal.find({type: "task"},sort)
 
 # Template.volunteerList.helpers
 #   "isVolunteer": () ->
