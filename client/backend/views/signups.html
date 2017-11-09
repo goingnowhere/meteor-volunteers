@@ -4,18 +4,32 @@
   </div>
   <ul class="list-unstyled">
     {{#each signup in allSignups}}
-      <li class="panel panel-default">
-        <!-- <div class="col-md-6 panel panel-default"> -->
+      <li class="panel panel-default
+        {{#if $eq signup.type 'shift'}}panel-success{{/if}}
+        {{#if $eq signup.type 'task'}}panel-warning{{/if}}
+      ">
           <div class="panel-heading">
-            {{shiftDate signup.shift }} {{ signup.shift.title }}
+            {{#if $eq signup.type "shift"}}{{fa "calendar"}}{{/if}}
+            {{#if $eq signup.type "task"}}{{fa "tasks"}}{{/if}}
+            {{dutyDate signup.type signup.duty }} {{ signup.duty.title }}
           </div>
           <div class="panel-body">
             {{displayName signup.applicant}}
             <div class="pull-right">
-              <button class="btn btn-default" data-action="approve" data-signup="{{ signup._id }}">
+              <button
+                class="btn btn-default"
+                data-action="approve"
+                data-signup="{{ signup._id }}"
+                data-type="{{ signup.type }}"
+              >
                 {{_ 'approve' }}
               </button>
-              <button class="btn btn-default" data-action="reject" data-signup="{{ signup._id }}">
+              <button
+                class="btn btn-default"
+                data-action="reject"
+                data-signup="{{ signup._id }}"
+                data-type="{{ signup.type }}"
+              >
                 {{_ 'reject' }}
               </button>
             </div>

@@ -87,7 +87,7 @@ share.initPulications = (eventName) ->
 
   Meteor.publish "#{eventName}.Volunteers.teamTasks.backend", (id) ->
     if this.userId
-      if Roles.userIsInRole(this.userId, [ "manager" ])
+      # if Roles.userIsInRole(this.userId, [ "manager" ])
         share.TeamTasks.find({parentId: id})
 
   Meteor.publish "#{eventName}.Volunteers.lead.backend", (id) ->
@@ -107,10 +107,10 @@ share.initPulications = (eventName) ->
 
   Meteor.publish "#{eventName}.Volunteers.taskSignups", () ->
     if this.userId
-      if Roles.userIsInRole(this.userId, [ "manager" ])
+      # if Roles.userIsInRole(this.userId, [ "manager" ])
         share.TaskSignups.find()
-      else
-        share.TaskSignups.find({usersId: this.userId})
+      # else
+      #   share.TaskSignups.find({usersId: this.userId})
 
   Meteor.publish "#{eventName}.Volunteers.shiftSignups", () ->
     if this.userId

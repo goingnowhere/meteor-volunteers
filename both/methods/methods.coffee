@@ -122,7 +122,7 @@ share.initMethods = (eventName) ->
     SimpleSchema.validate(doc.modifier,share.Schemas.TaskSignups,{ modifier: true })
     userId = Meteor.userId()
     olddoc = share.TaskSignups.findOne(doc._id)
-    if (olddoc.userId == userId) || Roles.userIsInRole(userId, [ 'manager' ])
+    if Roles.userIsInRole(userId, [ 'manager' ]) || isRelevantLead(userId, olddoc.teamId)
       share.TaskSignups.update(doc._id, doc.modifier)
 
   Meteor.methods "#{prefix}.taskSignups.insert": (doc) ->
