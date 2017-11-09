@@ -1,5 +1,14 @@
 import SimpleSchema from 'simpl-schema'
 
+isRelevantLead = (userId, teamId) =>
+  lead = share.Lead.findOne({ userId: userId })
+  # This is a bit ugly but should be avoidable using roles
+  return true if lead.parentId == teamId
+  team = share.Team.findOne({ _id: teamId })
+  return true if team.parentId == lead.parentId
+  department = share.Department.findOne({ _id: team.parentId })
+  department.parentId == lead.parentId
+
 # Generic function to create insert,update,remove methods.
 # Security check : user must be manager
 createMethod = (collection,type) ->
@@ -77,7 +86,7 @@ share.initMethods = (eventName) ->
     SimpleSchema.validate(doc.modifier,share.Schemas.ShiftSignups,{ modifier: true })
     userId = Meteor.userId()
     olddoc = share.ShiftSignups.findOne(doc._id)
-    if (olddoc.userId == userId) || Roles.userIsInRole(userId, [ 'manager' ])
+    if Roles.userIsInRole(userId, [ 'manager' ]) || isRelevantLead(userId, olddoc.teamId)
       share.ShiftSignups.update(doc._id, doc.modifier)
 
   Meteor.methods "#{prefix}.shiftSignups.insert": (doc) ->

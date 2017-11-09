@@ -2,9 +2,25 @@
   <div class="panel">
     <h3>{{_ "team"}} : {{name}}</h3>
   </div>
-  <ul>
+  <ul class="list-unstyled">
     {{#each signup in allSignups}}
-      <li>{{displayName signup.applicant }} ({{ signup.status }})</li>
+      <li class="panel panel-default">
+        <!-- <div class="col-md-6 panel panel-default"> -->
+          <div class="panel-heading">
+            {{shiftDate signup.shift }} {{ signup.shift.title }}
+          </div>
+          <div class="panel-body">
+            {{displayName signup.applicant}}
+            <div class="pull-right">
+              <button class="btn btn-default" data-action="approve" data-signup="{{ signup._id }}">
+                {{_ 'approve' }}
+              </button>
+              <button class="btn btn-default" data-action="reject" data-signup="{{ signup._id }}">
+                {{_ 'reject' }}
+              </button>
+            </div>
+          </div>
+      </li>
     {{/each}}
   </ul>
 </template>

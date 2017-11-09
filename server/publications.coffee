@@ -26,7 +26,7 @@ share.initPulications = (eventName) ->
   Meteor.publish "#{eventName}.Volunteers.lead", (sel={},limit=1) ->
     if this.userId
       sel.policy = {$in: ["public","requireApproval"]}
-      share.Lead.find(sel,{limit: limit})
+      share.Lead.find(sel)
 
   Meteor.publish "#{eventName}.Volunteers.allDuties", (sel={},limit=1) ->
     # XXX sel can contain only a number of filters. I should checked
@@ -82,7 +82,7 @@ share.initPulications = (eventName) ->
 
   Meteor.publish "#{eventName}.Volunteers.teamShifts.backend", (id) ->
     if this.userId
-      if Roles.userIsInRole(this.userId, [ "manager" ])
+      # if Roles.userIsInRole(this.userId, [ "manager" ])
         share.TeamShifts.find({parentId: id})
 
   Meteor.publish "#{eventName}.Volunteers.teamTasks.backend", (id) ->
@@ -102,7 +102,7 @@ share.initPulications = (eventName) ->
 
   Meteor.publish "#{eventName}.Volunteers.team.backend", (id) ->
     if this.userId
-      if Roles.userIsInRole(this.userId, [ "manager" ])
+      # if Roles.userIsInRole(this.userId, [ "manager" ])
         share.Team.find({parentId: id})
 
   Meteor.publish "#{eventName}.Volunteers.taskSignups", () ->
@@ -114,10 +114,10 @@ share.initPulications = (eventName) ->
 
   Meteor.publish "#{eventName}.Volunteers.shiftSignups", () ->
     if this.userId
-      if Roles.userIsInRole(this.userId, [ "manager" ])
+      # if Roles.userIsInRole(this.userId, [ "manager" ])
         share.ShiftSignups.find()
-      else
-        share.ShiftSignups.find({usersId: this.userId})
+      # else
+      #   share.ShiftSignups.find({usersId: this.userId})
 
   Meteor.publish "#{eventName}.Volunteers.taskSignups.byShift", (shiftId) ->
     if this.userId
@@ -147,5 +147,5 @@ share.initPulications = (eventName) ->
 
   Meteor.publish "#{eventName}.Volunteers.users", () ->
     if this.userId
-      if Roles.userIsInRole(this.userId, [ "manager" ])
+      # if Roles.userIsInRole(this.userId, [ "manager" ])
         Meteor.users.find({}, { fields: { emails: 1, profile: 1, roles: 1 } })
