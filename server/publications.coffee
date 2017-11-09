@@ -15,17 +15,17 @@ share.initPulications = (eventName) ->
 
   Meteor.publish "#{eventName}.Volunteers.teamShifts", (sel={},limit=1) ->
     if this.userId
-      sel.policy = {$or: ["public","requireApproval"]}
+      sel.policy = {$in: ["public","requireApproval"]}
       share.TeamShifts.find(sel,{limit: limit})
 
   Meteor.publish "#{eventName}.Volunteers.teamTasks", (sel={},limit=1) ->
     if this.userId
-      sel.policy = {$or: ["public","requireApproval"]}
+      sel.policy = {$in: ["public","requireApproval"]}
       share.TeamTasks.find(sel,{limit: limit})
 
   Meteor.publish "#{eventName}.Volunteers.lead", (sel={},limit=1) ->
     if this.userId
-      sel.policy = {$or: ["public","requireApproval"]}
+      sel.policy = {$in: ["public","requireApproval"]}
       share.Lead.find(sel,{limit: limit})
 
   Meteor.publish "#{eventName}.Volunteers.allDuties", (sel={},limit=1) ->
