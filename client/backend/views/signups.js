@@ -1,10 +1,10 @@
 Template.teamSignupsList.onCreated(function () {
-  // FIXME need to somehow make 'test' passed in rather than hard-coded
-  this.subscribe('test.Volunteers.users')
-  this.subscribe("test.Volunteers.teamTasks.backend", this.data._id)
-  this.subscribe("test.Volunteers.taskSignups")
-  this.subscribe("test.Volunteers.teamShifts.backend", this.data._id)
-  this.subscribe("test.Volunteers.shiftSignups")
+  const template = this;
+  coffee.templateSub(template,"users")
+  coffee.templateSub(template,"teamTasks.backend",this.data._id)
+  coffee.templateSub(template,"teamShifts.backend",this.data._id)
+  coffee.templateSub(template,"taskSignups")
+  coffee.templateSub(template,"shiftSignups")
 })
 
 const fullName = ({ firstName, lastName }) => `${firstName} ${lastName}`
