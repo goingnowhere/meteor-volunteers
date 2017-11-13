@@ -9,6 +9,39 @@ isRelevantLead = (userId, teamId) =>
   department = share.Department.findOne({ _id: team.parentId })
   department.parentId == lead.parentId
 
+# Generic function to create insert,update,remove methods for groups within
+# the organisation, e.g. teams
+createOrgUnitMethod = (collection,type) ->
+  collectionName = collection._name
+  if type == "remove"
+  #   Meteor.methods "#{collectionName}.remove": (Id) ->
+  #     console.log ["#{collectionName}.remove", Id]
+  #     check(Id,String)
+  #     if Roles.userIsInRole(Meteor.userId(), [ 'manager' ])
+  #       collection.remove(Id)
+  else if type == "insert"
+    Meteor.methods "#{collectionName}.insert": (doc) ->
+      console.log ["#{collectionName}.insert",doc]
+      collection.simpleSchema().namedContext().validate(doc)
+      parents = []
+      if doc.parentId != 'TopEntity'
+        console.log('has parent', doc)
+        # FIXME add parents to roles array?
+      if Roles.userIsInRole(Meteor.userId(), [ 'manager' ])
+        insertResult = collection.insert(doc)
+        Roles.createRole("#{collectionName}-#{insertResult}")
+        parents.forEach((parent) =>
+          console.log('argh parents!', parent)
+        )
+  else if type == "update"
+  #   Meteor.methods "#{collectionName}.update": (doc) ->
+  #     console.log ["#{collectionName}.update",doc]
+  #     collection.simpleSchema().namedContext().validate(doc.modifier,{modifier:true})
+  #     if Roles.userIsInRole(Meteor.userId(), [ 'manager' ])
+  #       collection.update(doc._id,doc.modifier)
+  else
+    console.warn "type #{type} for #{collectionName} ERROR"
+
 # Generic function to create insert,update,remove methods.
 # Security check : user must be manager
 createMethod = (collection,type) ->
@@ -35,17 +68,22 @@ createMethod = (collection,type) ->
     console.warn "type #{type} for #{collectioName} ERROR"
 
 share.initMethods = (eventName) ->
-  collections = [
-    share.Department,
+  orgUnitCollections = [
     share.Division,
+    share.Department,
     share.Team,
+  ]
+  normalCollections = [
     share.Lead,
     share.TeamShifts,
     share.TeamTasks
   ]
   for type in ["remove","insert","update"]
     do ->
-      for collection in collections
+      for collection in orgUnitCollections
+        do =>
+          createOrgUnitMethod(collection, type)
+      for collection in normalCollections
         do ->
           createMethod(collection,type)
 
