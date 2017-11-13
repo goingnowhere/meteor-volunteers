@@ -11,9 +11,8 @@ isRelevantLead = (userId, teamId) =>
 
 # Generic function to create insert,update,remove methods for groups within
 # the organisation, e.g. teams
-createOrgUnitMethod = (collection, type, parentCollection) ->
+createOrgUnitMethod = (collection, type) ->
   collectionName = collection._name
-  parentCollectionName = parentCollection?._name
   if type == "remove"
   #   Meteor.methods "#{collectionName}.remove": (Id) ->
   #     console.log ["#{collectionName}.remove", Id]
@@ -26,13 +25,12 @@ createOrgUnitMethod = (collection, type, parentCollection) ->
       collection.simpleSchema().namedContext().validate(doc)
       allowedRoles = [ 'manager' ]
       if doc.parentId != 'TopEntity'
-        parentRole = "#{parentCollectionName}-#{doc.parentId}"
+        parentRole = doc.parentId
         allowedRoles.push(parentRole)
       if Roles.userIsInRole(Meteor.userId(), allowedRoles)
         insertResult = collection.insert(doc)
-        unitRole = "#{collectionName}-#{insertResult}"
-        Roles.createRole(unitRole)
-        Roles.addRolesToParent(unitRole, parentRole) if parentRole?
+        Roles.createRole(insertResult)
+        Roles.addRolesToParent(insertResult, parentRole) if parentRole?
   else if type == "update"
   #   Meteor.methods "#{collectionName}.update": (doc) ->
   #     console.log ["#{collectionName}.update",doc]
@@ -68,7 +66,6 @@ createMethod = (collection,type) ->
     console.warn "type #{type} for #{collectioName} ERROR"
 
 share.initMethods = (eventName) ->
-  # Must be in descending hierarchical order
   orgUnitCollections = [
     share.Division,
     share.Department,
@@ -81,9 +78,9 @@ share.initMethods = (eventName) ->
   ]
   for type in ["remove","insert","update"]
     do ->
-      for collection, index in orgUnitCollections
+      for collection in orgUnitCollections
         do =>
-          createOrgUnitMethod(collection, type, orgUnitCollections[index - 1])
+          createOrgUnitMethod(collection, type)
       for collection in normalCollections
         do ->
           createMethod(collection,type)
