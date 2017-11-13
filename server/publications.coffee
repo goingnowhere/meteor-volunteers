@@ -58,6 +58,7 @@ share.initPulications = (eventName) ->
       s = share.TeamShifts.find(sel)
       t = share.TeamTasks.find(selt)
       l = share.Lead.find({parentId: teamId})
+      console.log l.fetch()
       tt = share.Team.find({_id: teamId})
       # XXX: restrict to dept and div related to this team ...
       d = share.Department.find()

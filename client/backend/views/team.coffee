@@ -1,8 +1,8 @@
 Template.teamDayViewGrid.onCreated () ->
   template = this
   template.taskFilter = new ReactiveVar(["pending","overdue","done"])
-  teamId = template.data._id
-  share.templateSub(template,"allDuties.byTeam", teamId)
+  template.teamId = template.data._id
+  share.templateSub(template,"allDuties.byTeam", template.teamId)
   share.templateSub(template,"users")
 
 Template.teamDayViewGrid.helpers {
@@ -11,21 +11,26 @@ Template.teamDayViewGrid.helpers {
     {status:"overdue", isChecked:"checked"},
     {status:"done", isChecked:"checked"},
     {status:"archived"} ]
-  'allLeads': () -> share.Lead.find()
+  'allLeads': () ->
+    # XXX this should not be needed as the subscription for this template
+    # is only for leads whose parent id is teamId . maybe I misunderstood the
+    # use of template subscriptions ?
+    share.Lead.find({parentId: Template.instance().teamId})
   'allTasks': () ->
+    teamId = Template.instance().teamId
     status = Template.instance().taskFilter.get()
-    share.TeamTasks.find({status: {$in: status}},{sort:{dueDate: 1}}).map((t) ->
+    share.TeamTasks.find({parentId: teamId, status: {$in: status}},{sort:{dueDate: 1}}).map((t) ->
       confirmed = share.TaskSignups.find({shiftId: t._id}).count()
       dueDate = moment(t.dueDate)
       _.extend(t,
         timeleft: dueDate.diff(moment(), 'days')
-        dueDate: dueDate #.format('ddd, MMM Do')
+        dueDate: dueDate
         confirmed: confirmed
         vacant: t.max - confirmed)
     )
   'allShifts': () ->
-    shifts = share.TeamShifts.find().map((s) ->
-      #XXX this should be a moment date and the formatting should be done in the template
+    teamId = Template.instance().teamId
+    shifts = share.TeamShifts.find({parentId: teamId}).map((s) ->
       _.extend(s,{day: moment(s.start).format('MMMM Do YYYY')}))
     ss = _.groupBy(shifts, 'day')
     _.map(ss,(vl,k) ->
@@ -37,8 +42,8 @@ Template.teamDayViewGrid.helpers {
         totalConfirmed =+ confirmed
         totalVacant =+ (v.max - confirmed)
         _.extend(v,
-          start: v.start #moment(v.start).format('h:mm a')
-          end: v.end #moment(v.end).format('h:mm a')
+          start: v.start
+          end: v.end
           policy: v.policy
           duration: moment.duration(v.end - v.start).humanize()
           confirmed: confirmed
