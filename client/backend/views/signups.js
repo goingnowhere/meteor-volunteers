@@ -11,21 +11,20 @@ const fullName = ({ firstName, lastName }) => `${firstName} ${lastName}`
 
 Template.teamSignupsList.helpers({
   allSignups() {
-    const shifts = coffee.ShiftSignups.find({ teamId: this._id, status: 'pending' })
+    const shifts = coffee.ShiftSignups.find({ teamId: this._id, status: 'pending' }, {sort: {createdAt: -1}})
       .map(signup => ({
         ...signup,
         type: 'shift',
         duty: coffee.TeamShifts.findOne({ parentId: signup.teamId }),
         applicant: Meteor.users.findOne({ _id: signup.userId }),
       }))
-    const tasks = coffee.TaskSignups.find({ teamId: this._id, status: 'pending' })
+    const tasks = coffee.TaskSignups.find({ teamId: this._id, status: 'pending' }, {sort: {createdAt: -1}})
       .map(signup => ({
         ...signup,
         type: 'task',
         duty: coffee.TeamTasks.findOne({ parentId: signup.teamId }),
         applicant: Meteor.users.findOne({ _id: signup.userId }),
       }))
-    // TODO add a 'signup date' to signups and sort by this
     return shifts.concat(tasks)
   },
   displayName: ({ profile, emails }) =>

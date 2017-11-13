@@ -37,6 +37,14 @@ commonSignups = new SimpleSchema(
   teamId: String
   shiftId: String
   userId: String
+  createdAt:
+    type: Date
+    optional: true
+    autoValue: () ->
+      if this.isInsert then return new Date
+      else this.unset()
+    autoform:
+      omit: true
   status:
     type: String
     allowedValues: ["confirmed", "pending", "refused", "bailed"]
