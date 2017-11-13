@@ -2,6 +2,10 @@
   {{> insertUpdateTemplate form=form data=this}}
 </template> -->
 
+<template name="taskField">
+  {{formatDateTime dueDate}}
+</template>
+
 <!-- <template name="tasksTable">
   <table class="table">
     {{#each task in allTasks}}

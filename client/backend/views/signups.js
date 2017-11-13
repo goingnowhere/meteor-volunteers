@@ -7,31 +7,22 @@ Template.teamSignupsList.onCreated(function () {
   coffee.templateSub(template,"shiftSignups")
 })
 
-const fullName = ({ firstName, lastName }) => `${firstName} ${lastName}`
-
 Template.teamSignupsList.helpers({
   allSignups() {
     const shifts = coffee.ShiftSignups.find({ teamId: this._id, status: 'pending' }, {sort: {createdAt: -1}})
       .map(signup => ({
         ...signup,
         type: 'shift',
-        duty: coffee.TeamShifts.findOne({ parentId: signup.teamId }),
-        applicant: Meteor.users.findOne({ _id: signup.userId }),
+        duty: coffee.TeamShifts.findOne({ parentId: signup.teamId })
       }))
     const tasks = coffee.TaskSignups.find({ teamId: this._id, status: 'pending' }, {sort: {createdAt: -1}})
       .map(signup => ({
         ...signup,
         type: 'task',
-        duty: coffee.TeamTasks.findOne({ parentId: signup.teamId }),
-        applicant: Meteor.users.findOne({ _id: signup.userId }),
+        duty: coffee.TeamTasks.findOne({ parentId: signup.teamId })
       }))
     return shifts.concat(tasks)
-  },
-  displayName: ({ profile, emails }) =>
-    profile.alias || profile.firstName ? fullName(profile) : emails[0].address,
-  dutyDate: (type, { start, end, dueDate }) => type === 'shift' ?
-    `${moment(start).format('ddd DD MMM HH:mm')} - ${moment(end).format('HH:mm')}`
-    : moment(dueDate).format('ddd DD MMM HH:mm'),
+  }
 })
 
 Template.teamSignupsList.events({

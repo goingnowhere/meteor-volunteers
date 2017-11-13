@@ -5,7 +5,6 @@ share.getUserEmail = AutoFormComponents.getUserEmail
 @TAPi18n = { __: (n) -> n }
 
 share.templateSub = (template,name,args...) ->
-  console.log "name",args...
   template.subscribe("#{share.eventName}.Volunteers.#{name}",args...)
 
 share.meteorSub = (name,args...) ->

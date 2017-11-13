@@ -9,12 +9,18 @@
         {{#if $eq signup.type 'task'}}panel-warning{{/if}}
       ">
           <div class="panel-heading">
-            {{#if $eq signup.type "shift"}}{{fa "calendar"}}{{/if}}
-            {{#if $eq signup.type "task"}}{{fa "tasks"}}{{/if}}
-            {{dutyDate signup.type signup.duty }} {{ signup.duty.title }}
+            {{#if $eq signup.type "shift"}}
+              {{fa "calendar"}}
+              {{> shiftField signup.duty}}
+            {{/if}}
+            {{#if $eq signup.type "task"}}
+              {{fa "tasks"}}
+              {{> taskField signup.duty}}
+            {{/if}}
+            {{ signup.duty.title }}
           </div>
           <div class="panel-body">
-            {{displayName signup.applicant}}
+            {{getUserName signup.userId}}
             <div class="pull-right">
               <button
                 class="btn btn-default"
