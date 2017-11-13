@@ -11,8 +11,9 @@ isRelevantLead = (userId, teamId) =>
 
 # Generic function to create insert,update,remove methods for groups within
 # the organisation, e.g. teams
-createOrgUnitMethod = (collection,type) ->
+createOrgUnitMethod = (collection, type, parentCollection) ->
   collectionName = collection._name
+  parentCollectionName = parentCollection?._name
   if type == "remove"
   #   Meteor.methods "#{collectionName}.remove": (Id) ->
   #     console.log ["#{collectionName}.remove", Id]
@@ -23,16 +24,15 @@ createOrgUnitMethod = (collection,type) ->
     Meteor.methods "#{collectionName}.insert": (doc) ->
       console.log ["#{collectionName}.insert",doc]
       collection.simpleSchema().namedContext().validate(doc)
-      parents = []
+      allowedRoles = [ 'manager' ]
       if doc.parentId != 'TopEntity'
-        console.log('has parent', doc)
-        # FIXME add parents to roles array?
-      if Roles.userIsInRole(Meteor.userId(), [ 'manager' ])
+        parentRole = "#{parentCollectionName}-#{doc.parentId}"
+        allowedRoles.push(parentRole)
+      if Roles.userIsInRole(Meteor.userId(), allowedRoles)
         insertResult = collection.insert(doc)
-        Roles.createRole("#{collectionName}-#{insertResult}")
-        parents.forEach((parent) =>
-          console.log('argh parents!', parent)
-        )
+        unitRole = "#{collectionName}-#{insertResult}"
+        Roles.createRole(unitRole)
+        Roles.addRolesToParent(unitRole, parentRole) if parentRole?
   else if type == "update"
   #   Meteor.methods "#{collectionName}.update": (doc) ->
   #     console.log ["#{collectionName}.update",doc]
@@ -68,6 +68,7 @@ createMethod = (collection,type) ->
     console.warn "type #{type} for #{collectioName} ERROR"
 
 share.initMethods = (eventName) ->
+  # Must be in descending hierarchical order
   orgUnitCollections = [
     share.Division,
     share.Department,
@@ -80,9 +81,9 @@ share.initMethods = (eventName) ->
   ]
   for type in ["remove","insert","update"]
     do ->
-      for collection in orgUnitCollections
+      for collection, index in orgUnitCollections
         do =>
-          createOrgUnitMethod(collection, type)
+          createOrgUnitMethod(collection, type, orgUnitCollections[index - 1])
       for collection in normalCollections
         do ->
           createMethod(collection,type)
