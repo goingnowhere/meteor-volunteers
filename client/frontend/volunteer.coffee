@@ -169,6 +169,10 @@ Template.volunteersTeamView.helpers
   'allShiftsTasks': () ->
     template = Template.instance()
     template.ShiftTaskLocal.find()
+  canEditTeam: () =>
+    teamId = Template.instance().data._id
+    console.log(teamId, Roles.userIsInRole(Meteor.userId(), ['manager', teamId], share.eventName))
+    Roles.userIsInRole(Meteor.userId(), ['manager', teamId], share.eventName)
 
 # Template.volunteerList.helpers
 #   "isVolunteer": () ->

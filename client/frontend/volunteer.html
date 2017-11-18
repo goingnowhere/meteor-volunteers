@@ -52,7 +52,7 @@
 
 <template name="volunteersTeamView">
   <h1>{{team.name}}</h1>
-  {{#if isInRole 'manager'}}
+  {{#if canEditTeam}}
     <a href="{{pathFor teamEditEventName _id=team._id}}">{{ fa "pencil-square" }}</a>
   {{/if}}
   <div>
