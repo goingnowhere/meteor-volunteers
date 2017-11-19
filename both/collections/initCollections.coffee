@@ -1,3 +1,5 @@
+import SimpleSchema from 'simpl-schema'
+
 share.initCollections = (eventName) ->
   share.eventName = eventName
 
@@ -25,16 +27,37 @@ share.initCollections = (eventName) ->
   share.Division = new Mongo.Collection "#{prefix}Volunteers.division"
   share.Division.attachSchema(share.Schemas.Division)
 
-  # User
+  # User Form
 
   share.VolunteerForm = new Mongo.Collection "#{prefix}Volunteers.volunteerForm"
   share.VolunteerForm.attachSchema(share.Schemas.VolunteerForm)
+  share.form = new ReactiveVar(share.VolunteerForm)
+
+  share.extendVolunteerForm = (data) ->
+    form = share.form.get()
+    schema = new SimpleSchema(share.Schemas.VolunteerForm)
+    newschema = schema.extend(FormBuilder.toSimpleSchema(data))
+    form.attachSchema(newschema, {replace: true})
+    share.form.set(form)
+
+  # Update the VolunteersForm schema each time the Form is updated.
+  # XXX this should be called something like "eventName-VolunteerForm" XXX
+  FormBuilder.Collections.DynamicForms.find({name: "VolunteerForm"}).observe(
+    added:   (doc) -> share.extendVolunteerForm(doc)
+    changed: (doc) -> share.extendVolunteerForm(doc)
+    removed: (doc) -> share.extendVolunteerForm(doc)
+  )
+
+  # User duties
 
   share.ShiftSignups = new Mongo.Collection "#{prefix}Volunteers.shiftSignups"
   share.ShiftSignups.attachSchema(share.Schemas.ShiftSignups)
 
   share.TaskSignups = new Mongo.Collection "#{prefix}Volunteers.taskSignups"
   share.TaskSignups.attachSchema(share.Schemas.TaskSignups)
+
+  share.LeadSignups = new Mongo.Collection "#{prefix}Volunteers.leadSignups"
+  share.LeadSignups.attachSchema(share.Schemas.LeadSignups)
 
   if Meteor.isClient
     # this collection is used in client/frontend/volunteer.coffee

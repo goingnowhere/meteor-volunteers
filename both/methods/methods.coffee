@@ -55,15 +55,15 @@ share.initMethods = (eventName) ->
     check(formId,String)
     userId = Meteor.userId()
     if Roles.userIsInRole(userId, [ 'manager' ])
-      share.VolunteerForm.remove(formId)
+      share.form.get().remove(formId)
 
   Meteor.methods "#{prefix}.volunteerForm.update": (doc) ->
     console.log ["#{prefix}.volunteerForm.update",doc]
-    schema = share.VolunteerForm.simpleSchema()
+    schema = share.form.get().simpleSchema()
     SimpleSchema.validate(doc.modifier,schema,{ modifier: true })
     userId = Meteor.userId()
     if (userId == doc.userId) || Roles.userIsInRole(userId, [ 'manager' ])
-      share.VolunteerForm.update(doc._id,doc.modifier)
+      share.form.get().update(doc._id,doc.modifier)
 
   Meteor.methods "#{prefix}.volunteerForm.insert": (doc) ->
     console.log ["#{prefix}.volunteerForm.insert",doc]

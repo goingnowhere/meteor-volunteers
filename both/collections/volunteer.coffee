@@ -31,8 +31,6 @@ share.Schemas.VolunteerForm = new SimpleSchema(
   #     rows:2
 )
 
-share.form = new ReactiveVar(share.VolunteerForm)
-
 commonSignups = new SimpleSchema(
   teamId: String
   shiftId: String
@@ -54,27 +52,4 @@ commonSignups = new SimpleSchema(
 )
 share.Schemas.ShiftSignups = commonSignups
 share.Schemas.TaskSignups = commonSignups
-
-# share.Tasks = new Mongo.Collection 'Volunteers.tasks'
-# share.Schemas.Tasks = new SimpleSchema(
-#   teamId: String
-#   taskId: String
-#   userId: [String]
-# )
-# share.Tasks.attachSchema(share.Schemas.Tasks)
-
-share.extendVolunteerForm = (data) ->
-  # console.log ["VolunteerForm extend", data.form]
-  schema = share.Schemas.VolunteerForm
-  ss = FormBuilder.toSimpleSchema(data)
-  schema.extend(ss)
-  share.VolunteerForm.attachSchema(schema)
-  share.form.set(share.VolunteerForm)
-
-# Update the VolunteersForm schema each time the Form is updated. This should
-# both on client and server side.
-FormBuilder.Collections.DynamicForms.find({name: "VolunteerForm"}).observe(
-  added: (doc) -> share.extendVolunteerForm(doc)
-  changed: (doc) -> share.extendVolunteerForm(doc)
-  removed: (doc) -> share.extendVolunteerForm(doc)
-)
+share.Schemas.LeadSignups = commonSignups
