@@ -1,13 +1,24 @@
 import SimpleSchema from 'simpl-schema'
 
 isRelevantLead = (userId, teamId) =>
-  lead = share.Lead.findOne({ userId: userId })
-  # This is a bit ugly but should be avoidable using roles
-  return true if lead.parentId == teamId
+  lead = share.Lead.findOne({ userId: userId, parentId: teamId })
+  return true if lead? # this user is lead of this team
+
   team = share.Team.findOne({ _id: teamId })
-  return true if team.parentId == lead.parentId
+  lead = share.Lead.findOne({ userId: userId, parentId: team.parentId })
+  return true if lead? # this user is lead of the department of this team
+
   department = share.Department.findOne({ _id: team.parentId })
-  department.parentId == lead.parentId
+  lead = share.Lead.findOne({ userId: userId, parentId: department.parentId })
+  return true if lead? # this user is lead of the division of this team
+
+  return false
+
+checkForCollisions = (shift) ->
+  share.taskSignups.findOne({
+    userId: shift.userId,
+    start: { $leq: shift.start },
+    end: { $geq: shift.end }})?
 
 # Generic function to create insert,update,remove methods.
 # Security check : user must be manager

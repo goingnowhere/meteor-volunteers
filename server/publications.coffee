@@ -58,11 +58,13 @@ share.initPulications = (eventName) ->
       s = share.TeamShifts.find(sel)
       t = share.TeamTasks.find(selt)
       l = share.Lead.find({parentId: teamId})
-      console.log l.fetch()
-      tt = share.Team.find({_id: teamId})
+      # console.log l.fetch()
+      tt = share.Team.find(teamId)
+      team = share.Team.findOne(teamId)
       # XXX: restrict to dept and div related to this team ...
-      d = share.Department.find()
-      dd = share.Division.find()
+      d = share.Department.find(team.parentId)
+      department = share.Department.findOne(team.parentId)
+      dd = share.Division.find(department.parentId)
       [tasks,shifts,s,t,l,tt,d,dd]
 
   Meteor.publish "#{eventName}.Volunteers.allDuties.byUser", () ->
@@ -81,20 +83,20 @@ share.initPulications = (eventName) ->
       dd = share.Division.find()
       [tasks,shifts,s,t,l,tt,d,dd]
 
-  Meteor.publish "#{eventName}.Volunteers.teamShifts.backend", (id) ->
-    if this.userId
-      # if Roles.userIsInRole(this.userId, [ "manager" ])
-        share.TeamShifts.find({parentId: id})
-
-  Meteor.publish "#{eventName}.Volunteers.teamTasks.backend", (id) ->
-    if this.userId
-      # if Roles.userIsInRole(this.userId, [ "manager" ])
-        share.TeamTasks.find({parentId: id})
-
-  Meteor.publish "#{eventName}.Volunteers.lead.backend", (id) ->
-    if this.userId
-      if Roles.userIsInRole(this.userId, [ "manager" ])
-        share.Lead.find({parentId: id})
+  # Meteor.publish "#{eventName}.Volunteers.teamShifts.backend", (id) ->
+  #   if this.userId
+  #     # if Roles.userIsInRole(this.userId, [ "manager" ])
+  #       share.TeamShifts.find({parentId: id})
+  #
+  # Meteor.publish "#{eventName}.Volunteers.teamTasks.backend", (id) ->
+  #   if this.userId
+  #     # if Roles.userIsInRole(this.userId, [ "manager" ])
+  #       share.TeamTasks.find({parentId: id})
+  #
+  # Meteor.publish "#{eventName}.Volunteers.lead.backend", (id) ->
+  #   if this.userId
+  #     if Roles.userIsInRole(this.userId, [ "manager" ])
+  #       share.Lead.find({parentId: id})
 
   Meteor.publish "#{eventName}.Volunteers.department.backend", (id) ->
     if this.userId
@@ -106,33 +108,37 @@ share.initPulications = (eventName) ->
       # if Roles.userIsInRole(this.userId, [ "manager" ])
         share.Team.find({parentId: id})
 
-  Meteor.publish "#{eventName}.Volunteers.taskSignups", () ->
+  Meteor.publish "#{eventName}.Volunteers.signups", () ->
     if this.userId
       # if Roles.userIsInRole(this.userId, [ "manager" ])
-        share.TaskSignups.find()
+        s = share.ShiftSignups.find()
+        t = share.TaskSignups.find()
+        l = share.LeadSignups.find()
+        return [s,t,l]
       # else
       #   share.TaskSignups.find({usersId: this.userId})
 
-  Meteor.publish "#{eventName}.Volunteers.shiftSignups", () ->
-    if this.userId
-      # if Roles.userIsInRole(this.userId, [ "manager" ])
-        share.ShiftSignups.find()
-      # else
-      #   share.ShiftSignups.find({usersId: this.userId})
-
-  Meteor.publish "#{eventName}.Volunteers.taskSignups.byShift", (shiftId) ->
+  Meteor.publish "#{eventName}.Volunteers.signups.byShift", (shiftId) ->
     if this.userId
       if Roles.userIsInRole(this.userId, [ "manager" ])
-        share.TaskSignups.find({shiftId: shiftId})
+        sel = {shiftId: shiftId}
       else
-        share.TaskSignups.find({usersId: this.userId, shiftId: shiftId})
+        sel = {usersId: this.userId, shiftId: shiftId}
+      s = share.ShiftSignups.find(sel)
+      t = share.TaskSignups.find(sel)
+      l = share.LeadSignups.find(sel)
+      return [s,t,l]
 
-  Meteor.publish "#{eventName}.Volunteers.shiftSignups.byShift", (shiftId) ->
+  Meteor.publish "#{eventName}.Volunteers.signups.byTeam", (teamId) ->
     if this.userId
       if Roles.userIsInRole(this.userId, [ "manager" ])
-        share.ShiftSignups.find({shiftId: shiftId})
+        sel = {teamId: teamId}
       else
-        share.ShiftSignups.find({usersId: this.userId, shiftId: shiftId})
+        sel = {usersId: this.userId, shiftId: teamId}
+      s = share.ShiftSignups.find(sel)
+      t = share.TaskSignups.find(sel)
+      l = share.LeadSignups.find(sel)
+      return [s,t,l]
 
   Meteor.publish "#{eventName}.Volunteers.teamShiftsUser", () ->
     if this.userId
