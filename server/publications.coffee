@@ -17,19 +17,32 @@ share.initPulications = (eventName) ->
             ]
     sel
 
-  # console.log "publish #{eventName}"
+  isManagerOrLead = (userId) =>
+    allOrgUnitIds = Roles.getRolesForUser(Meteor.userId(), eventName)
+    Roles.userIsInRole(userId, 'manager', eventName) || allOrgUnitIds.length > 0
+
   Meteor.publish "#{eventName}.Volunteers.team", (sel={}) ->
     # XXX managers / leads, etc can access private teams, all others are public
-    if this.userId # FIXME
-      share.Team.find(sel)
+    if this.userId
+      if isManagerOrLead(this.userId)
+        share.Team.find(sel)
+      else
+        sel.policy = { $in: ["public", "requireApproval"] }
+        share.Team.find(sel)
 
   Meteor.publish "#{eventName}.Volunteers.division", () ->
-    if this.userId # FIXME
-      share.Division.find()
+    if this.userId
+      if isManagerOrLead(this.userId)
+        share.Division.find()
+      else
+        share.Division.find({ policy: { $in: ["public", "requireApproval"] } })
 
   Meteor.publish "#{eventName}.Volunteers.department", () ->
-    if this.userId # FIXME
-      share.Department.find()
+    if this.userId
+      if isManagerOrLead(this.userId)
+        share.Department.find()
+      else
+        share.Department.find({ policy: { $in: ["public", "requireApproval"] } })
 
   Meteor.publish "#{eventName}.Volunteers.teamShifts", (sel={},limit=1) ->
     if this.userId
@@ -50,13 +63,13 @@ share.initPulications = (eventName) ->
     # XXX sel can contain only a number of filters. I should checked
     # what we pass this this funtion
     if this.userId
-      # sel.policy = {$in: ["requireApproval","public"]}
-      # if Roles.userIsInRole(this.userId, [ 'manager' ]) then delete sel.policy
       sel = filterForPublic(this.userId, sel)
       s = share.TeamShifts.find(sel,{limit: limit / 3})
       t = share.TeamTasks.find(sel,{limit: limit / 3})
       l = share.Lead.find(sel,{limit: limit / 3})
-      tt = share.Team.find(sel) # FIXME
+      selTeam = Object.assign({}, sel)
+      selTeam.policy = {$in: ["requireApproval","public"]} unless isManagerOrLead(this.userId)
+      tt = share.Team.find(selTeam)
       d = share.Department.find()
       dd = share.Division.find()
       [s,t,l,tt,d,dd]
@@ -126,17 +139,17 @@ share.initPulications = (eventName) ->
 
   Meteor.publish "#{eventName}.Volunteers.taskSignups", () ->
     if this.userId
-      # if Roles.userIsInRole(this.userId, [ "manager" ])# FIXME
+      if isManagerOrLead(this.userId)
         share.TaskSignups.find()
-      # else
-      #   share.TaskSignups.find({userId: this.userId})
+      else
+        share.TaskSignups.find({userId: this.userId})
 
   Meteor.publish "#{eventName}.Volunteers.shiftSignups", () ->
     if this.userId
-      # if Roles.userIsInRole(this.userId, [ "manager" ])# FIXME
+      if isManagerOrLead(this.userId)
         share.ShiftSignups.find()
-      # else
-      #   share.ShiftSignups.find({userId: this.userId})
+      else
+        share.ShiftSignups.find({userId: this.userId})
 
   Meteor.publish "#{eventName}.Volunteers.taskSignups.byShift", (shiftId) ->
     if this.userId
@@ -161,12 +174,12 @@ share.initPulications = (eventName) ->
 
   Meteor.publish "#{eventName}.Volunteers.volunteerForm", () ->
     if this.userId
-      # if Roles.userIsInRole(this.userId, [ "manager" ])# FIXME
+      if isManagerOrLead(this.userId)
         share.VolunteerForm.find()
-      # else
-      #   share.VolunteerForm.find({userId: this.userId})
+      else
+        share.VolunteerForm.find({userId: this.userId})
 
   Meteor.publish "#{eventName}.Volunteers.users", () ->
     if this.userId
-      # if Roles.userIsInRole(this.userId, [ "manager" ])# FIXME
+      if isManagerOrLead(this.userId)
         Meteor.users.find({}, { fields: { emails: 1, profile: 1, roles: 1 } })
