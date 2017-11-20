@@ -28,10 +28,11 @@ CommonTask = new SimpleSchema(
     optional: true
     autoform:
       afFieldInput:
+        min: 1
         placeholder: "min"
   max:
     type: Number
-    label: () -> TAPi18n.__("min_members")
+    label: () -> TAPi18n.__("max_members")
     optional: true
     autoform:
       afFieldInput:

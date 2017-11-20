@@ -1,5 +1,11 @@
 import SimpleSchema from 'simpl-schema'
 
+checkForCollisions = (shift) ->
+  share.taskSignups.findOne({
+    userId: shift.userId,
+    start: { $leq: shift.start },
+    end: { $geq: shift.end }})?
+
 # Generic function to create insert,update,remove methods for groups within
 # the organisation, e.g. teams
 createOrgUnitMethod = (collection, type) ->

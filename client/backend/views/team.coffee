@@ -22,11 +22,12 @@ Template.teamDayViewGrid.helpers {
     share.TeamTasks.find({parentId: teamId, status: {$in: status}},{sort:{dueDate: 1}}).map((t) ->
       confirmed = share.TaskSignups.find({shiftId: t._id}).count()
       dueDate = moment(t.dueDate)
+      vacant = if t.max > 0 then t.max - confirmed else confirmed
       _.extend(t,
         timeleft: dueDate.diff(moment(), 'days')
         dueDate: dueDate
         confirmed: confirmed
-        vacant: t.max - confirmed)
+        vacant: vacant)
     )
   'allShifts': () ->
     teamId = Template.instance().teamId
@@ -53,6 +54,7 @@ Template.teamDayViewGrid.helpers {
       teamId = Template.currentData()._id
       {date:k, shifts: vvl, progress: progress, teamId: teamId}
     )
+  # pathFor
   'teamSignupList': () => "teamSignupsList-#{share.eventName1.get()}"
 
   }

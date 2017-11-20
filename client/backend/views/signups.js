@@ -1,10 +1,11 @@
 Template.teamSignupsList.onCreated(function () {
   const template = this;
   coffee.templateSub(template,"users")
-  coffee.templateSub(template,"teamTasks.backend",this.data._id)
-  coffee.templateSub(template,"teamShifts.backend",this.data._id)
-  coffee.templateSub(template,"taskSignups")
-  coffee.templateSub(template,"shiftSignups")
+  coffee.templateSub(template,"allDuties.byTeam",this.data._id)
+  // coffee.templateSub(template,"teamTasks.backend",this.data._id)
+  // coffee.templateSub(template,"teamShifts.backend",this.data._id)
+  // coffee.templateSub(template,"lead.backend",this.data._id)
+  // coffee.templateSub(template,"signups.byTeam")
 })
 
 Template.teamSignupsList.helpers({
@@ -21,7 +22,13 @@ Template.teamSignupsList.helpers({
         type: 'task',
         duty: coffee.TeamTasks.findOne({ parentId: signup.teamId })
       }))
-    return shifts.concat(tasks)
+    const leads = coffee.LeadSignups.find({ parentId: this._id, status: 'pending' }, {sort: {createdAt: -1}})
+      .map(signup => ({
+        ...signup,
+        type: 'lead',
+        duty: coffee.Lead.findOne({ parentId: signup.teamId })
+      }))
+    return shifts.concat(tasks).concat(leads)
   }
 })
 

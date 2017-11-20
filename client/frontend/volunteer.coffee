@@ -42,9 +42,8 @@ addLocalShiftsCollection = (collection,template,type,filter = {},limit = 0) ->
   collection.find(filter,{limit: limit}).forEach((job) ->
     team = share.Team.findOne(job.parentId)
     users = []
-    shiftSignupsSub = share.templateSub(template,"shiftSignups.byShift",job._id)
-    taskSignupsSub = share.templateSub(template,"taskSignups.byShift",job._id)
-    if shiftSignupsSub.ready() and taskSignupsSub.ready()
+    signupsSub = share.templateSub(template,"signups.byShift",job._id)
+    if signupsSub.ready()
       # share.signupCollections is defined in both/collections/initCollections.coffee
       signupCollection = share.signupCollections[type]
       users = signupCollection.find(
@@ -107,7 +106,7 @@ Template.volunteerShiftsForm.onCreated () ->
     if sub.ready()
       addLocalShiftsCollection(share.TeamShifts,template,'shift',filter,limit)
       addLocalShiftsCollection(share.TeamTasks,template,'task',filter,limit)
-      # addLocalLeadsCollection(template,filter,limit)
+      # addLocalLeadsCollection(share.Lead,template,'lead',filter,limit)
     template.sel.set(filter)
 
 Template.volunteerShiftsForm.helpers
@@ -138,7 +137,7 @@ Template.volunteerUserShifts.onCreated () ->
     if sub.ready()
       addLocalShiftsCollection(share.TeamShifts,template,'shift',{},100)
       addLocalShiftsCollection(share.TeamTasks,template,'task',{},100)
-      # addLocalLeadsCollection(template,filter,limit)
+      # addLocalLeadsCollection(share.Lead,template,'lead',{},100)
 
 Template.volunteerUserShifts.helpers
   'allShifts': () ->
@@ -153,18 +152,31 @@ Template.volunteerUserShifts.helpers
 Template.volunteersTeamView.onCreated () ->
   template = this
   template.ShiftTaskLocal = new Mongo.Collection(null)
-  teamId = template.data._id
+  template.teamId = template.data._id
 
   template.autorun () ->
-    sub = share.templateSub(template,"allDuties.byTeam", teamId)
-    if sub.ready()
+    template.sub = share.templateSub(template,"allDuties.byTeam", template.teamId)
+    if template.sub.ready()
       addLocalShiftsCollection(share.TeamShifts,template,'shift',{},100)
       addLocalShiftsCollection(share.TeamTasks,template,'task',{},100)
+      # addLocalLeadsCollection(share.Lead,template,'lead',{},100)
 
 Template.volunteersTeamView.helpers
-  'team': () -> share.Team.findOne()
-  'division': () -> share.Division.findOne()
-  'department': () -> share.Department.findOne()
+  'team': () ->
+    template = Template.instance()
+    if template.sub.ready()
+      share.Team.findOne(template.teamId)
+  'division': () ->
+    template = Template.instance()
+    if template.sub.ready()
+      team = share.Team.findOne(template.teamId)
+      department = share.Department.findOne(team.parentId)
+      share.Division.findOne(department.parentId)
+  'department': () ->
+    template = Template.instance()
+    if template.sub.ready()
+      team = share.Team.findOne(template.teamId)
+      share.Department.findOne(team.parentId)
   'teamEditEventName': () -> 'teamEdit-'+share.eventName1.get()
   'allShiftsTasks': () ->
     template = Template.instance()

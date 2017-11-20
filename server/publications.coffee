@@ -90,11 +90,13 @@ share.initPulications = (eventName) ->
       shifts = share.TeamShifts.find(selShifts)
       tasks = share.TeamTasks.find(selTasks)
       leads = share.Lead.find({parentId: teamId})
-      team = share.Team.find({_id: teamId})
+      teams = share.Team.find({_id: teamId})
       # XXX: restrict to dept and div related to this team ...
-      d = share.Department.find()
-      dd = share.Division.find()
-      [taskSignups,shiftSignups,shifts,tasks,leads,team,d,dd]
+      team = share.Team.findOne(teamId)
+      d = share.Department.find(team.parentId)
+      department = share.Department.findOne(team.parentId)
+      dd = share.Division.find(department.parentId)
+      [taskSignups,shiftSignups,shifts,tasks,leads,teams,d,dd]
 
   Meteor.publish "#{eventName}.Volunteers.allDuties.byUser", () ->
     if this.userId
@@ -112,20 +114,20 @@ share.initPulications = (eventName) ->
       dd = share.Division.find()
       [tasks,shifts,s,t,l,tt,d,dd]
 
-  Meteor.publish "#{eventName}.Volunteers.teamShifts.backend", (id) ->
-    if this.userId
-      if Roles.userIsInRole(this.userId, [ "manager", id ], eventName)
-        share.TeamShifts.find({parentId: id})
-
-  Meteor.publish "#{eventName}.Volunteers.teamTasks.backend", (id) ->
-    if this.userId
-      if Roles.userIsInRole(this.userId, [ "manager", id ], eventName)
-        share.TeamTasks.find({parentId: id})
-
-  Meteor.publish "#{eventName}.Volunteers.lead.backend", (id) ->
-    if this.userId
-      if Roles.userIsInRole(this.userId, [ "manager", id ], eventName)
-        share.Lead.find({parentId: id})
+  # Meteor.publish "#{eventName}.Volunteers.teamShifts.backend", (id) ->
+  #   if this.userId
+  #     if Roles.userIsInRole(this.userId, [ "manager", id ], eventName)
+  #       share.TeamShifts.find({parentId: id})
+  #
+  # Meteor.publish "#{eventName}.Volunteers.teamTasks.backend", (id) ->
+  #   if this.userId
+  #     if Roles.userIsInRole(this.userId, [ "manager", id ], eventName)
+  #       share.TeamTasks.find({parentId: id})
+  #
+  # Meteor.publish "#{eventName}.Volunteers.lead.backend", (id) ->
+  #   if this.userId
+  #     if Roles.userIsInRole(this.userId, [ "manager", id ], eventName)
+  #       share.Lead.find({parentId: id})
 
   Meteor.publish "#{eventName}.Volunteers.department.backend", (id) ->
     if this.userId
@@ -137,35 +139,35 @@ share.initPulications = (eventName) ->
       if Roles.userIsInRole(this.userId, [ "manager", id ], eventName)
         share.Team.find({parentId: id})
 
-  Meteor.publish "#{eventName}.Volunteers.taskSignups", () ->
+  signupCollections = [share.ShiftSignups, share.TaskSignups, share.LeadSignups]
+
+  Meteor.publish "#{eventName}.Volunteers.signups", () ->
     if this.userId
+      # TODO This is weird, we give every lead all access here, but only relevant
+      # ones by shift or team - Rich
       if isManagerOrLead(this.userId)
-        share.TaskSignups.find()
+        sel = {}
       else
-        share.TaskSignups.find({userId: this.userId})
+        sel = {usersId: this.userId}
+      return signupCollections.map(col => col.find(sel))
 
-  Meteor.publish "#{eventName}.Volunteers.shiftSignups", () ->
+  Meteor.publish "#{eventName}.Volunteers.signups.byShift", (shiftId) ->
     if this.userId
-      if isManagerOrLead(this.userId)
-        share.ShiftSignups.find()
-      else
-        share.ShiftSignups.find({userId: this.userId})
-
-  Meteor.publish "#{eventName}.Volunteers.taskSignups.byShift", (shiftId) ->
-    if this.userId
-      teamId = share.TeamTasks.findOne({ _id: shiftId })?.parentId
+      teamId = signupCollections.find(col => col.findOne({ _id: shiftId })?.parentId)
       if Roles.userIsInRole(this.userId, [ "manager", teamId ], eventName)
-        share.TaskSignups.find({shiftId: shiftId})
+        sel = {shiftId: shiftId}
       else
-        share.TaskSignups.find({userId: this.userId, shiftId: shiftId})
+        sel = {userId: this.userId, shiftId: shiftId}
+      return signupCollections.map(col => col.find(sel))
 
-  Meteor.publish "#{eventName}.Volunteers.shiftSignups.byShift", (shiftId) ->
+  Meteor.publish "#{eventName}.Volunteers.signups.byTeam", (teamId) ->
     if this.userId
-      teamId = share.TeamTasks.findOne({ _id: shiftId })?.parentId
+      teamId = signupCollections.find(col => col.findOne({ _id: shiftId })?.parentId)
       if Roles.userIsInRole(this.userId, [ "manager", teamId ], eventName)
-        share.ShiftSignups.find({shiftId: shiftId})
+        sel = {teamId: teamId}
       else
-        share.ShiftSignups.find({userId: this.userId, shiftId: shiftId})
+        sel = {userId: this.userId, shiftId: teamId}
+      return signupCollections.map(col => col.find(sel))
 
   Meteor.publish "#{eventName}.Volunteers.teamShiftsUser", () ->
     if this.userId
