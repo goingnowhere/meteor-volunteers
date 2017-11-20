@@ -149,25 +149,25 @@ share.initPulications = (eventName) ->
         sel = {}
       else
         sel = {usersId: this.userId}
-      return signupCollections.map(col => col.find(sel))
+      return signupCollections.map((col) => col.find(sel))
 
   Meteor.publish "#{eventName}.Volunteers.signups.byShift", (shiftId) ->
     if this.userId
-      teamId = signupCollections.find(col => col.findOne({ _id: shiftId })?.parentId)
+      teamId = signupCollections.map((col) => col.findOne({ _id: shiftId })?.parentId)
       if Roles.userIsInRole(this.userId, [ "manager", teamId ], eventName)
         sel = {shiftId: shiftId}
       else
         sel = {userId: this.userId, shiftId: shiftId}
-      return signupCollections.map(col => col.find(sel))
+      return signupCollections.map((col) => col.find(sel))
 
   Meteor.publish "#{eventName}.Volunteers.signups.byTeam", (teamId) ->
     if this.userId
-      teamId = signupCollections.find(col => col.findOne({ _id: shiftId })?.parentId)
+      teamId = signupCollections.map((col) => col.findOne({ _id: shiftId })?.parentId)
       if Roles.userIsInRole(this.userId, [ "manager", teamId ], eventName)
         sel = {teamId: teamId}
       else
         sel = {userId: this.userId, shiftId: teamId}
-      return signupCollections.map(col => col.find(sel))
+      return signupCollections.map((col) => col.find(sel))
 
   Meteor.publish "#{eventName}.Volunteers.teamShiftsUser", () ->
     if this.userId
