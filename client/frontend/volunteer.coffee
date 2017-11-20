@@ -10,7 +10,13 @@ Template.addVolunteerForm.onCreated () ->
 Template.addVolunteerForm.helpers
   'form': () ->
     form = share.form.get()
-    if form then { collection: form }
+    if form then {
+      collection: form
+      insert:
+        label: TAPi18n.__("create_volunteer_profile")
+      update:
+        label: TAPi18n.__("update_volunteer_profile")
+    }
   'data': () -> share.VolunteerForm.findOne({userId: Meteor.userId()})
 
 addLocalLeadsCollection = (template,filter,limit) ->
