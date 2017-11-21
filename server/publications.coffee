@@ -1,4 +1,4 @@
-share.initPulications = (eventName) ->
+share.initPublications = (eventName) ->
 
   filterForPublic = (userId, sel) =>
     if !Roles.userIsInRole(userId, 'manager', eventName)

@@ -6,7 +6,8 @@ checkForCollisions = (shift) ->
     start: { $leq: shift.start },
     end: { $geq: shift.end }})?
 
-share.initMethods = (eventName) ->
+share.initMethods = (eventName, fixtures) ->
+  initialising = true
   # Generic function to create insert,update,remove methods for groups within
   # the organisation, e.g. teams
   createOrgUnitMethod = (collection, type) ->
@@ -25,7 +26,7 @@ share.initMethods = (eventName) ->
         if doc.parentId != 'TopEntity'
           parentRole = doc.parentId
           allowedRoles.push(parentRole)
-        if Roles.userIsInRole(Meteor.userId(), allowedRoles, eventName)
+        if Roles.userIsInRole(Meteor.userId(), allowedRoles, eventName) || initialising
           insertResult = collection.insert(doc)
           Roles.createRole(insertResult)
           Roles.addRolesToParent(insertResult, parentRole) if parentRole?
@@ -53,7 +54,7 @@ share.initMethods = (eventName) ->
       Meteor.methods "#{collectioName}.insert": (doc) ->
         console.log ["#{collectioName}.insert",doc]
         collection.simpleSchema().namedContext().validate(doc)
-        if Roles.userIsInRole(Meteor.userId(), [ 'manager', doc.parentId ], eventName)
+        if Roles.userIsInRole(Meteor.userId(), [ 'manager', doc.parentId ], eventName) || initialising
           collection.insert(doc)
     else if type == "update"
       Meteor.methods "#{collectioName}.update": (doc) ->
@@ -61,7 +62,8 @@ share.initMethods = (eventName) ->
         collection.simpleSchema().namedContext().validate(doc.modifier,{modifier:true})
         olddoc = collection.findOne(doc._id)
         # If the update changes the parentId, user must be a manager or in both teams
-        if doc.parentId? && (doc.parentId != olddoc.parentId) && !(Roles.userIsInRole(Meteor.userId, [ 'manager', doc.parentId ], eventName))
+        if doc.parentId? && (doc.parentId != olddoc.parentId) &&
+            !(Roles.userIsInRole(Meteor.userId, [ 'manager', doc.parentId ], eventName))
           return
         if Roles.userIsInRole(Meteor.userId(), [ 'manager', olddoc.parentId ], eventName)
           collection.update(doc._id,doc.modifier)
@@ -107,7 +109,7 @@ share.initMethods = (eventName) ->
     console.log ["#{prefix}.volunteerForm.insert",doc]
     schema = share.form.get().simpleSchema()
     SimpleSchema.validate(doc,schema)
-    if Meteor.userId()
+    if Meteor.userId() || initialising
       doc.userId = Meteor.userId()
       share.form.get().insert(doc)
 
@@ -132,7 +134,9 @@ share.initMethods = (eventName) ->
     SimpleSchema.validate(doc,share.Schemas.ShiftSignups.omit('status'))
     userId = Meteor.userId()
     teamShift = share.TeamShifts.findOne(doc.shiftId)
-    if (doc.userId == userId) || (Roles.userIsInRole(userId, [ 'manager', teamShift.parentId ], eventName))
+    if (doc.userId == userId) ||
+        (Roles.userIsInRole(userId, [ 'manager', teamShift.parentId ], eventName)) ||
+        initialising
       status = (
         if teamShift.policy == "public" then "confirmed"
         else if teamShift.policy == "requireApproval" then "pending")
@@ -168,7 +172,9 @@ share.initMethods = (eventName) ->
     SimpleSchema.validate(doc,share.Schemas.TaskSignups.omit('status'))
     userId = Meteor.userId()
     teamTask = share.TeamTasks.findOne(doc.shiftId)
-    if (doc.userId == userId) || (Roles.userIsInRole(userId, [ 'manager', teamTask.parentId ], eventName))
+    if (doc.userId == userId) ||
+        (Roles.userIsInRole(userId, [ 'manager', teamTask.parentId ], eventName)) ||
+        initialising
       status = (
         if teamTask.policy == "public" then "confirmed"
         else if teamTask.policy == "requireApproval" then "pending")
@@ -182,3 +188,19 @@ share.initMethods = (eventName) ->
     userId = Meteor.userId()
     if (sel.userId == userId) || (Roles.userIsInRole(userId, [ 'manager', sel.teamId ], eventName))
       share.TaskSignups.update(sel,{$set: {status: "bailed"}})
+
+  # A bit hacky but check if there are any divisions to avoid re-running fixtures
+  if fixtures? && Meteor.isServer && share.Division.find().count() == 0
+    _.map(fixtures, (instances, collectionName) =>
+      instances.forEach((instance) =>
+        console.log('inst', instance)
+        if instance.parent
+          thing = orgUnitCollections.reduce(((lastId, col) =>
+            lastId || col.findOne({ name: instance.parent })?._id), null)
+          console.log('thing', thing)
+          instance.parentId = thing
+          delete instance.parent
+        Meteor.call("test.Volunteers.#{collectionName}.insert", instance)
+      )
+    )
+  initialising = false
