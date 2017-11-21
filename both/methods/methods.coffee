@@ -6,68 +6,68 @@ checkForCollisions = (shift) ->
     start: { $leq: shift.start },
     end: { $geq: shift.end }})?
 
-# Generic function to create insert,update,remove methods for groups within
-# the organisation, e.g. teams
-createOrgUnitMethod = (collection, type) ->
-  collectionName = collection._name
-  if type == "remove"
-  #   Meteor.methods "#{collectionName}.remove": (Id) ->
-  #     console.log ["#{collectionName}.remove", Id]
-  #     check(Id,String)
-  #     if Roles.userIsInRole(Meteor.userId(), [ 'manager' ])
-  #       collection.remove(Id)
-  else if type == "insert"
-    Meteor.methods "#{collectionName}.insert": (doc) ->
-      console.log ["#{collectionName}.insert",doc]
-      collection.simpleSchema().namedContext().validate(doc)
-      allowedRoles = [ 'manager' ]
-      if doc.parentId != 'TopEntity'
-        parentRole = doc.parentId
-        allowedRoles.push(parentRole)
-      if Roles.userIsInRole(Meteor.userId(), allowedRoles, eventName)
-        insertResult = collection.insert(doc)
-        Roles.createRole(insertResult)
-        Roles.addRolesToParent(insertResult, parentRole) if parentRole?
-  else if type == "update"
-  #   Meteor.methods "#{collectionName}.update": (doc) ->
-  #     console.log ["#{collectionName}.update",doc]
-  #     collection.simpleSchema().namedContext().validate(doc.modifier,{modifier:true})
-  #     if Roles.userIsInRole(Meteor.userId(), [ 'manager' ])
-  #       collection.update(doc._id,doc.modifier)
-  else
-    console.warn "type #{type} for #{collectionName} ERROR"
-
-# Generic function to create insert,update,remove methods.
-# Security check : user must be manager
-createMethod = (collection,type) ->
-  collectioName = collection._name
-  if type == "remove"
-    Meteor.methods "#{collectioName}.remove": (Id) ->
-      console.log ["#{collectioName}.remove", Id]
-      check(Id,String)
-      doc = collection.findOne(Id)
-      if Roles.userIsInRole(Meteor.userId(), [ 'manager', doc.parentId ], eventName)
-        collection.remove(Id)
-  else if type == "insert"
-    Meteor.methods "#{collectioName}.insert": (doc) ->
-      console.log ["#{collectioName}.insert",doc]
-      collection.simpleSchema().namedContext().validate(doc)
-      if Roles.userIsInRole(Meteor.userId(), [ 'manager', doc.parentId ], eventName)
-        collection.insert(doc)
-  else if type == "update"
-    Meteor.methods "#{collectioName}.update": (doc) ->
-      console.log ["#{collectioName}.update",doc]
-      collection.simpleSchema().namedContext().validate(doc.modifier,{modifier:true})
-      olddoc = collection.findOne(doc._id)
-      # If the update changes the parentId, user must be a manager or in both teams
-      if doc.parentId? && (doc.parentId != olddoc.parentId) && !(Roles.userIsInRole(Meteor.userId, [ 'manager', doc.parentId ], eventName))
-        return
-      if Roles.userIsInRole(Meteor.userId(), [ 'manager', olddoc.parentId ], eventName)
-        collection.update(doc._id,doc.modifier)
-  else
-    console.warn "type #{type} for #{collectioName} ERROR"
-
 share.initMethods = (eventName) ->
+  # Generic function to create insert,update,remove methods for groups within
+  # the organisation, e.g. teams
+  createOrgUnitMethod = (collection, type) ->
+    collectionName = collection._name
+    if type == "remove"
+    #   Meteor.methods "#{collectionName}.remove": (Id) ->
+    #     console.log ["#{collectionName}.remove", Id]
+    #     check(Id,String)
+    #     if Roles.userIsInRole(Meteor.userId(), [ 'manager' ])
+    #       collection.remove(Id)
+    else if type == "insert"
+      Meteor.methods "#{collectionName}.insert": (doc) ->
+        console.log ["#{collectionName}.insert",doc]
+        collection.simpleSchema().namedContext().validate(doc)
+        allowedRoles = [ 'manager' ]
+        if doc.parentId != 'TopEntity'
+          parentRole = doc.parentId
+          allowedRoles.push(parentRole)
+        if Roles.userIsInRole(Meteor.userId(), allowedRoles, eventName)
+          insertResult = collection.insert(doc)
+          Roles.createRole(insertResult)
+          Roles.addRolesToParent(insertResult, parentRole) if parentRole?
+    else if type == "update"
+    #   Meteor.methods "#{collectionName}.update": (doc) ->
+    #     console.log ["#{collectionName}.update",doc]
+    #     collection.simpleSchema().namedContext().validate(doc.modifier,{modifier:true})
+    #     if Roles.userIsInRole(Meteor.userId(), [ 'manager' ])
+    #       collection.update(doc._id,doc.modifier)
+    else
+      console.warn "type #{type} for #{collectionName} ERROR"
+
+  # Generic function to create insert,update,remove methods.
+  # Security check : user must be manager
+  createMethod = (collection,type) ->
+    collectioName = collection._name
+    if type == "remove"
+      Meteor.methods "#{collectioName}.remove": (Id) ->
+        console.log ["#{collectioName}.remove", Id]
+        check(Id,String)
+        doc = collection.findOne(Id)
+        if Roles.userIsInRole(Meteor.userId(), [ 'manager', doc.parentId ], eventName)
+          collection.remove(Id)
+    else if type == "insert"
+      Meteor.methods "#{collectioName}.insert": (doc) ->
+        console.log ["#{collectioName}.insert",doc]
+        collection.simpleSchema().namedContext().validate(doc)
+        if Roles.userIsInRole(Meteor.userId(), [ 'manager', doc.parentId ], eventName)
+          collection.insert(doc)
+    else if type == "update"
+      Meteor.methods "#{collectioName}.update": (doc) ->
+        console.log ["#{collectioName}.update",doc]
+        collection.simpleSchema().namedContext().validate(doc.modifier,{modifier:true})
+        olddoc = collection.findOne(doc._id)
+        # If the update changes the parentId, user must be a manager or in both teams
+        if doc.parentId? && (doc.parentId != olddoc.parentId) && !(Roles.userIsInRole(Meteor.userId, [ 'manager', doc.parentId ], eventName))
+          return
+        if Roles.userIsInRole(Meteor.userId(), [ 'manager', olddoc.parentId ], eventName)
+          collection.update(doc._id,doc.modifier)
+    else
+      console.warn "type #{type} for #{collectioName} ERROR"
+
   orgUnitCollections = [
     share.Division,
     share.Department,
