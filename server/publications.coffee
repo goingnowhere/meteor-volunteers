@@ -12,11 +12,7 @@ share.initPublications = (eventName) ->
       allOrgUnitIds = Roles.getRolesForUser(Meteor.userId(), eventName)
       sel = _.extend(sel,dutiesPublicPolicy)
       if allOrgUnitIds.length > 0
-        if sel.parentId?
-        else
-          # XXX Probably the logic can be reworked to avoid this delete
-          delete sel.policy if sel.parentId in allOrgUnitIds
-          sel = { $or: [ parentId: { $in: allOrgUnitIds }, sel ] }
+        sel = { $or: [ parentId: { $in: allOrgUnitIds }, sel ] }
     sel
 
   isManagerOrLead = (userId) =>
@@ -81,7 +77,6 @@ share.initPublications = (eventName) ->
       selShifts = {parentId: teamId}
       selTasks = {parentId: teamId}
       unless Roles.userIsInRole(this.userId, [ 'manager', teamId ], eventName)
-        selTasks = _.extend(selTasks, { status: {$in: ["pending"]}})
         selTasks = _.extend(selTasks,dutiesPublicPolicy)
         selShifts = dutiesPublicPolicy
       taskSignups = share.TaskSignups.find({teamId: teamId})
