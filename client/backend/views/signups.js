@@ -2,10 +2,6 @@ Template.teamSignupsList.onCreated(function () {
   const template = this;
   coffee.templateSub(template,"users")
   coffee.templateSub(template,"allDuties.byTeam",this.data._id)
-  // coffee.templateSub(template,"teamTasks.backend",this.data._id)
-  // coffee.templateSub(template,"teamShifts.backend",this.data._id)
-  // coffee.templateSub(template,"lead.backend",this.data._id)
-  // coffee.templateSub(template,"signups.byTeam")
 })
 
 Template.teamSignupsList.helpers({

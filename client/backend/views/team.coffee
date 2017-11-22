@@ -11,11 +11,7 @@ Template.teamDayViewGrid.helpers {
     {status:"overdue", isChecked:"checked"},
     {status:"done", isChecked:"checked"},
     {status:"archived"} ]
-  'allLeads': () ->
-    # XXX this should not be needed as the subscription for this template
-    # is only for leads whose parent id is teamId . maybe I misunderstood the
-    # use of template subscriptions ?
-    share.Lead.find({parentId: Template.instance().teamId})
+  'allLeads': () -> share.Lead.find({parentId: Template.instance().teamId})
   'allTasks': () ->
     teamId = Template.instance().teamId
     status = Template.instance().taskFilter.get()
