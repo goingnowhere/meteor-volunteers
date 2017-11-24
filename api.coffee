@@ -13,7 +13,7 @@ share.roles = new ReactiveVar(["lead","co-lead"])
 share.eventName1 = new ReactiveVar()
 
 class VolunteersClass
-  constructor: (@eventName, fixtures) ->
+  constructor: (@eventName) ->
     # XXX this is a nasty side effect. I initialize these collecions,
     # I make them available thought global variables (share.xxx) and
     # and then I use them all over the places in this package.
@@ -21,7 +21,7 @@ class VolunteersClass
     # parent application as everythin is relative to this module
     share.initCollections(@eventName)
     share.initRouters(@eventName)
-    share.initMethods(@eventName, fixtures)
+    share.initMethods(@eventName)
     share.eventName1.set(@eventName)
     if Meteor.isServer
       share.initPublications(@eventName)
