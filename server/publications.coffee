@@ -1,20 +1,18 @@
 share.initPublications = (eventName) ->
 
+  dutiesPublicPolicy = { policy: { $in: ["public", "requireApproval"] } }
+  unitPublicPolicy = { policy: { $in: ["public"] } }
+
+  # if the user id logged in
+  #
   filterForPublic = (userId, sel) =>
-    if !Roles.userIsInRole(userId, 'manager', eventName)
+    unless Roles.userIsInRole(userId, 'manager', eventName)
       # getRolesForUser includes all roles, e.g. if user is lead of a department,
       # returns the department and all teams within it
       allOrgUnitIds = Roles.getRolesForUser(Meteor.userId(), eventName)
-      sel.policy = { $in: ["public", "requireApproval"] }
+      sel = _.extend(sel,dutiesPublicPolicy)
       if allOrgUnitIds.length > 0
-        if sel.parentId?
-          delete sel.policy if sel.parentId in allOrgUnitIds
-        else
-          sel =
-            $or: [
-              parentId: { $in: allOrgUnitIds },
-              sel
-            ]
+        sel = { $or: [ parentId: { $in: allOrgUnitIds }, sel ] }
     sel
 
   isManagerOrLead = (userId) =>
@@ -22,27 +20,25 @@ share.initPublications = (eventName) ->
     Roles.userIsInRole(userId, 'manager', eventName) || allOrgUnitIds.length > 0
 
   Meteor.publish "#{eventName}.Volunteers.team", (sel={}) ->
-    # XXX managers / leads, etc can access private teams, all others are public
     if this.userId
       if isManagerOrLead(this.userId)
         share.Team.find(sel)
       else
-        sel.policy = { $in: ["public", "requireApproval"] }
-        share.Team.find(sel)
+        share.Team.find(_.extend(sel,unitPublicPolicy))
 
   Meteor.publish "#{eventName}.Volunteers.division", () ->
     if this.userId
       if isManagerOrLead(this.userId)
         share.Division.find()
       else
-        share.Division.find({ policy: { $in: ["public", "requireApproval"] } })
+        share.Division.find(unitPublicPolicy)
 
   Meteor.publish "#{eventName}.Volunteers.department", () ->
     if this.userId
       if isManagerOrLead(this.userId)
         share.Department.find()
       else
-        share.Department.find({ policy: { $in: ["public", "requireApproval"] } })
+        share.Department.find(unitPublicPolicy)
 
   Meteor.publish "#{eventName}.Volunteers.teamShifts", (sel={},limit=1) ->
     if this.userId
@@ -61,14 +57,16 @@ share.initPublications = (eventName) ->
 
   Meteor.publish "#{eventName}.Volunteers.allDuties", (sel={},limit=1) ->
     # XXX sel can contain only a number of filters. I should checked
-    # what we pass this this funtion
+    # what we pass this this funtion. We can use the module 'check' to
+    # do this by providing an object like simpleschema. This should be
+    # done whenever we accept an input from the outside
     if this.userId
       sel = filterForPublic(this.userId, sel)
       s = share.TeamShifts.find(sel,{limit: limit / 3})
       t = share.TeamTasks.find(sel,{limit: limit / 3})
       l = share.Lead.find(sel,{limit: limit / 3})
-      selTeam = Object.assign({}, sel)
-      selTeam.policy = {$in: ["requireApproval","public"]} unless isManagerOrLead(this.userId)
+      selTeam = _.clone(sel)
+      selTeam = _.extend(selTeam,unitPublicPolicy) unless isManagerOrLead(this.userId)
       tt = share.Team.find(selTeam)
       d = share.Department.find()
       dd = share.Division.find()
@@ -77,14 +75,10 @@ share.initPublications = (eventName) ->
   Meteor.publish "#{eventName}.Volunteers.allDuties.byTeam", (teamId) ->
     if this.userId
       selShifts = {parentId: teamId}
-      # XXX: I'm tired. refactor here !
-      selShifts.policy = {$in: ["requireApproval","public"]}
-      selTasks = {parentId: teamId, status: {$in: ["pending"]}}
-      selTasks.policy = {$in: ["requireApproval","public"]}
-      if Roles.userIsInRole(this.userId, [ 'manager', teamId ], eventName)
-        delete selShifts.policy
-        delete selTasks.policy
-        delete selTasks.status
+      selTasks = {parentId: teamId}
+      unless Roles.userIsInRole(this.userId, [ 'manager', teamId ], eventName)
+        selTasks = _.extend(selTasks,dutiesPublicPolicy)
+        selShifts = dutiesPublicPolicy
       taskSignups = share.TaskSignups.find({teamId: teamId})
       shiftSignups = share.ShiftSignups.find({teamId: teamId})
       shifts = share.TeamShifts.find(selShifts)
@@ -114,6 +108,7 @@ share.initPublications = (eventName) ->
       dd = share.Division.find()
       [tasks,shifts,s,t,l,tt,d,dd]
 
+# XXX if these are not used anymore, we can remove this chunk of code
   # Meteor.publish "#{eventName}.Volunteers.teamShifts.backend", (id) ->
   #   if this.userId
   #     if Roles.userIsInRole(this.userId, [ "manager", id ], eventName)
@@ -141,15 +136,16 @@ share.initPublications = (eventName) ->
 
   signupCollections = [share.ShiftSignups, share.TaskSignups, share.LeadSignups]
 
-  Meteor.publish "#{eventName}.Volunteers.signups", () ->
-    if this.userId
-      # TODO This is weird, we give every lead all access here, but only relevant
-      # ones by shift or team - Rich
-      if isManagerOrLead(this.userId)
-        sel = {}
-      else
-        sel = {usersId: this.userId}
-      return signupCollections.map((col) => col.find(sel))
+  # XXX I don't this this is used anymore. Can't be wrong ...
+  # Meteor.publish "#{eventName}.Volunteers.signups", () ->
+  #   if this.userId
+  #     # TODO This is weird, we give every lead all access here, but only relevant
+  #     # ones by shift or team - Rich
+  #     if isManagerOrLead(this.userId)
+  #       sel = {}
+  #     else
+  #       sel = {usersId: this.userId}
+  #     return signupCollections.map((col) => col.find(sel))
 
   Meteor.publish "#{eventName}.Volunteers.signups.byShift", (shiftId) ->
     if this.userId
@@ -159,7 +155,7 @@ share.initPublications = (eventName) ->
         sel = {shiftId: shiftId}
       else
         sel = {userId: this.userId, shiftId: shiftId}
-      return signupCollections.map((col) => col.find(sel))
+      signupCollections.map((col) => col.find(sel))
 
   Meteor.publish "#{eventName}.Volunteers.signups.byTeam", (teamId) ->
     if this.userId
