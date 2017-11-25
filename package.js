@@ -7,7 +7,9 @@ Package.describe({
 });
 
 Npm.depends({
-  'flatpickr':'2.4.8'
+  'flatpickr':'2.4.8',
+  'jquery': '3.2.1',
+  'bootstrap': '3.3.7'
 // "awesome-bootstrap-checkbox": "1.0.0-alpha.4"
 });
 
@@ -39,7 +41,6 @@ Package.onUse(function(api) {
   api.use( [
     'templating',
     'tracker',
-    'twbs:bootstrap',
     'fortawesome:fontawesome',
     'natestrauser:select2@4.0.3',
     'drewy:datetimepicker',

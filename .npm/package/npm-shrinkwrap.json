@@ -1,10 +1,20 @@
 {
   "lockfileVersion": 1,
   "dependencies": {
+    "bootstrap": {
+      "version": "3.3.7",
+      "resolved": "https://registry.npmjs.org/bootstrap/-/bootstrap-3.3.7.tgz",
+      "integrity": "sha1-WjiTlFSfIzMIdaOxUGVldPip63E="
+    },
     "flatpickr": {
       "version": "2.4.8",
       "resolved": "https://registry.npmjs.org/flatpickr/-/flatpickr-2.4.8.tgz",
       "integrity": "sha1-FSE2xmVwieu3xq+M2WkFTFW9PdQ="
+    },
+    "jquery": {
+      "version": "3.2.1",
+      "resolved": "https://registry.npmjs.org/jquery/-/jquery-3.2.1.tgz",
+      "integrity": "sha1-XE2d5lKvbNCncBVKYxu6ErAVx4c="
     }
   }
 }
