@@ -10,7 +10,13 @@ periods =
 share.periods = new ReactiveVar(periods)
 
 share.roles = new ReactiveVar(["lead","co-lead"])
+# XXX why do I need this variable ???
 share.eventName1 = new ReactiveVar()
+
+initAuthorization = (eventName) ->
+  share.isManagerOrLead = (userId) ->
+    allOrgUnitIds = Roles.getRolesForUser(Meteor.userId(), eventName)
+    Roles.userIsInRole(userId, 'manager', eventName) || allOrgUnitIds.length > 0
 
 class VolunteersClass
   constructor: (@eventName) ->
@@ -23,6 +29,7 @@ class VolunteersClass
     share.initRouters(@eventName)
     share.initMethods(@eventName)
     share.eventName1.set(@eventName)
+    initAuthorization(@eventName)
     if Meteor.isServer
       share.initPublications(@eventName)
     @Schemas = share.Schemas
@@ -36,4 +43,5 @@ class VolunteersClass
       Lead: share.Lead
       ShiftSignups: share.ShiftSignups
       TaskSignups: share.TaskSignups
-  setPeriods: (periods) => share.periods.set(periods)
+  setPeriods: (periods) -> share.periods.set(periods)
+  isManagerOrLead: (userId) -> share.isManagerOrLead(userId)

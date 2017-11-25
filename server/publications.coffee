@@ -15,30 +15,35 @@ share.initPublications = (eventName) ->
         sel = { $or: [ parentId: { $in: allOrgUnitIds }, sel ] }
     sel
 
-  isManagerOrLead = (userId) =>
-    allOrgUnitIds = Roles.getRolesForUser(Meteor.userId(), eventName)
-    Roles.userIsInRole(userId, 'manager', eventName) || allOrgUnitIds.length > 0
-
   Meteor.publish "#{eventName}.Volunteers.team", (sel={}) ->
     if this.userId
-      if isManagerOrLead(this.userId)
+      if share.isManagerOrLead(this.userId)
         share.Team.find(sel)
       else
         share.Team.find(_.extend(sel,unitPublicPolicy))
 
   Meteor.publish "#{eventName}.Volunteers.division", () ->
     if this.userId
-      if isManagerOrLead(this.userId)
+      if share.isManagerOrLead(this.userId)
         share.Division.find()
       else
         share.Division.find(unitPublicPolicy)
 
   Meteor.publish "#{eventName}.Volunteers.department", () ->
     if this.userId
-      if isManagerOrLead(this.userId)
+      if share.isManagerOrLead(this.userId)
         share.Department.find()
       else
         share.Department.find(unitPublicPolicy)
+
+  Meteor.publish "#{eventName}.Volunteers.organization", () ->
+    sel = {}
+    unless (not this.userId) || share.isManagerOrLead(this.userId)
+      sel = unitPublicPolicy
+    dp = share.Department.find(sel)
+    t = share.Team.find(sel)
+    dv = share.Division.find(sel)
+    [dv,dp,t]
 
   Meteor.publish "#{eventName}.Volunteers.teamShifts", (sel={},limit=1) ->
     if this.userId
@@ -66,7 +71,7 @@ share.initPublications = (eventName) ->
       t = share.TeamTasks.find(sel,{limit: limit / 3})
       l = share.Lead.find(sel,{limit: limit / 3})
       selTeam = _.clone(sel)
-      selTeam = _.extend(selTeam,unitPublicPolicy) unless isManagerOrLead(this.userId)
+      selTeam = _.extend(selTeam,unitPublicPolicy) unless share.isManagerOrLead(this.userId)
       tt = share.Team.find(selTeam)
       d = share.Department.find()
       dd = share.Division.find()
@@ -172,12 +177,12 @@ share.initPublications = (eventName) ->
 
   Meteor.publish "#{eventName}.Volunteers.volunteerForm", () ->
     if this.userId
-      if isManagerOrLead(this.userId)
+      if share.isManagerOrLead(this.userId)
         share.VolunteerForm.find()
       else
         share.VolunteerForm.find({userId: this.userId})
 
   Meteor.publish "#{eventName}.Volunteers.users", () ->
     if this.userId
-      if isManagerOrLead(this.userId)
+      if share.isManagerOrLead(this.userId)
         Meteor.users.find({}, { fields: { emails: 1, profile: 1, roles: 1 } })
