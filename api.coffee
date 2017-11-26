@@ -15,12 +15,13 @@ share.eventName1 = new ReactiveVar()
 
 initAuthorization = (eventName) ->
   share.isManagerOrLead = (userId) ->
-    f = () ->
-      allOrgUnitIds = Roles.getRolesForUser(userId, eventName)
-      Roles.userIsInRole(userId, 'manager', eventName) || allOrgUnitIds.length > 0
-    if userId == Meteor.userId() then f()
-    else if Roles.userIsInRole(userId, [ 'manager' ], eventName) then f()
+    if Roles.userIsInRole(userId, [ 'manager' ], eventName)
+      return true
+    else if userId == Meteor.userId()
+      Roles.getRolesForUser(userId, eventName).length > 0
     else return false
+  share.isManager = (userId) ->
+    Roles.userIsInRole(userId, [ 'manager' ], eventName)
 
 saveVolunteerForm = (eventName,data) ->
   Meteor.call('FormBuilder.dynamicForms.upsert',{name: "VolunteerForm"}, data)
@@ -54,3 +55,4 @@ class VolunteersClass
   setPeriods: (periods) -> share.periods.set(periods)
   setUserForm: (data) -> saveVolunteerForm(@eventName,data)
   isManagerOrLead: (userId) -> share.isManagerOrLead(userId)
+  isManager: (userId) -> share.isManager(userId)

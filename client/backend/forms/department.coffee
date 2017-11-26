@@ -1,13 +1,3 @@
-# Template.addDepartment.onCreated () ->
-#   template = this
-#   share.templateSub(template,"users")
-#   share.templateSub(template,"department")
-#
-# Template.addDepartment.events
-#   'click [data-action="removeDept"]': (event,template) ->
-#     id = $(event.target).data('id')
-#     share.meteoCall "department.remove", id
-
 Template.departmentView.helpers
   'main': () ->
     id: "details"

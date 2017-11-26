@@ -25,6 +25,8 @@ Package.onUse(function(api) {
     'aldeed:collection2-core',
     'aldeed:autoform@6.2.0',
     'aldeed:autoform-select2',
+    'ostrio:autoform-files',
+    'ostrio:files',
     'check',
     'underscore',
     'benmgreene:moment-range',
@@ -103,7 +105,7 @@ Package.onUse(function(api) {
 
   // api.add_files([ "i18n/en.i18n.json", ], ["client", "server"]);
 
-  api.export([ 'VolunteersClass', 'coffee' ]);
+  api.export([ 'VolunteersClass']);
 });
 
 //Package.onTest(function(api) {
