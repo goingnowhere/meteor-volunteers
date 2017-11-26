@@ -2,16 +2,16 @@ Template.volunteerFormBuilder.onCreated () ->
   template = this
   template.formUid = new ReactiveVar("VolunteerForm")
   template.colName = "Volunteers.volunteerForm"
-  
+
 Template.volunteerFormBuilder.helpers
   'formUid': () -> Template.instance().formUid
   'colName': () -> Template.instance().colName
   'name': () -> Template.instance().formUid.get()
 
-Template.volunteerFormBuilder.events
-  'click [data-action="form-edit"]': (event, template) ->
-    formId = $(event.target).data('uid')
-    template.formUid.set formId
+# Template.volunteerFormBuilder.events
+#   'click [data-action="form-edit"]': (event, template) ->
+#     formId = $(event.target).data('uid')
+#     template.formUid.set formId
 
 # rowApplicationStatus = (vol) ->
 #   crew = VolunteerCrew.find({userId:vol.userId}).count()
