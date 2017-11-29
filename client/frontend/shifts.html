@@ -8,7 +8,7 @@
         {{#if $eq type "shift"}}{{fa "calendar"}}{{/if}}
         {{#if $eq type "task"}}{{fa "tasks"}}{{/if}}
         {{#if $eq type "lead"}}{{fa "user-circle"}}{{/if}}
-        {{teamName}}: {{#if $eq type "lead"}}{{_ role}} {{_ "position"}}{{else}}{{title}}{{/if}}
+        {{teamName}}: {{title}}
         <div class="pull-right">
           {{#if $eq type "task"}}
             {{formatDate dueDate}} - {{_ "estimated_time"}} {{estimatedTime}}
@@ -82,12 +82,8 @@
 <template name="shiftsTasksTableRowView">
   <div>
     <a href="{{pathFor teamViewEventName _id=teamId}}">{{teamName}}</a>:
-    {{#if $eq type "lead"}}
-      {{_ role}} {{_ "position"}}
-    {{else}}
-      {{title}}
-      {{#if $eq status "pending"}} {{fa "exclamation-triangle"}}{{/if}}
-    {{/if}}
+    {{title}}
+    {{#if $and ($eq type "lead") ($eq status "pending")}} {{fa "exclamation-triangle"}}{{/if}}
   </div>
   <div>
     {{#if $eq type "shift"}}{{fa "calendar"}}{{/if}}

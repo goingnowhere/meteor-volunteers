@@ -9,7 +9,6 @@ periods =
   'evening': {start:20,end:24}
 share.periods = new ReactiveVar(periods)
 
-share.roles = new ReactiveVar(["lead","co-lead"])
 # XXX why do I need this variable ???
 share.eventName1 = new ReactiveVar()
 

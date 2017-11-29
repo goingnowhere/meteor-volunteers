@@ -3,8 +3,6 @@ share.initPublications = (eventName) ->
   dutiesPublicPolicy = { policy: { $in: ["public", "requireApproval"] } }
   unitPublicPolicy = { policy: { $in: ["public"] } }
 
-  # if the user id logged in
-  #
   filterForPublic = (userId, sel) =>
     unless Roles.userIsInRole(userId, 'manager', eventName)
       # getRolesForUser includes all roles, e.g. if user is lead of a department,
@@ -86,6 +84,7 @@ share.initPublications = (eventName) ->
         selShifts = dutiesPublicPolicy
       taskSignups = share.TaskSignups.find({teamId: teamId})
       shiftSignups = share.ShiftSignups.find({teamId: teamId})
+      leadSignups = share.LeadSignups.find({teamId: teamId})
       shifts = share.TeamShifts.find(selShifts)
       tasks = share.TeamTasks.find(selTasks)
       leads = share.Lead.find({parentId: teamId})
@@ -95,7 +94,7 @@ share.initPublications = (eventName) ->
       d = share.Department.find(team.parentId)
       department = share.Department.findOne(team.parentId)
       dd = share.Division.find(department.parentId)
-      [taskSignups,shiftSignups,shifts,tasks,leads,teams,d,dd]
+      [taskSignups,shiftSignups,leadSignups,shifts,tasks,leads,teams,d,dd]
 
   Meteor.publish "#{eventName}.Volunteers.allDuties.byUser", () ->
     if this.userId
@@ -114,20 +113,22 @@ share.initPublications = (eventName) ->
       [tasks,shifts,s,t,l,tt,d,dd]
 
 # XXX if these are not used anymore, we can remove this chunk of code
-  # Meteor.publish "#{eventName}.Volunteers.teamShifts.backend", (id) ->
-  #   if this.userId
-  #     if Roles.userIsInRole(this.userId, [ "manager", id ], eventName)
-  #       share.TeamShifts.find({parentId: id})
-  #
-  # Meteor.publish "#{eventName}.Volunteers.teamTasks.backend", (id) ->
-  #   if this.userId
-  #     if Roles.userIsInRole(this.userId, [ "manager", id ], eventName)
-  #       share.TeamTasks.find({parentId: id})
-  #
-  # Meteor.publish "#{eventName}.Volunteers.lead.backend", (id) ->
-  #   if this.userId
-  #     if Roles.userIsInRole(this.userId, [ "manager", id ], eventName)
-  #       share.Lead.find({parentId: id})
+  # ^^ (You were referring to the next 3 publications) but they do seem to be used
+  # so I'm uncommenting them - Rich
+  Meteor.publish "#{eventName}.Volunteers.teamShifts.backend", (id) ->
+    if this.userId
+      if Roles.userIsInRole(this.userId, [ "manager", id ], eventName)
+        share.TeamShifts.find({parentId: id})
+
+  Meteor.publish "#{eventName}.Volunteers.teamTasks.backend", (id) ->
+    if this.userId
+      if Roles.userIsInRole(this.userId, [ "manager", id ], eventName)
+        share.TeamTasks.find({parentId: id})
+
+  Meteor.publish "#{eventName}.Volunteers.lead.backend", (id) ->
+    if this.userId
+      if Roles.userIsInRole(this.userId, [ "manager", id ], eventName)
+        share.Lead.find({parentId: id})
 
   Meteor.publish "#{eventName}.Volunteers.department.backend", (id) ->
     if this.userId
@@ -140,17 +141,6 @@ share.initPublications = (eventName) ->
         share.Team.find({parentId: id})
 
   signupCollections = [share.ShiftSignups, share.TaskSignups, share.LeadSignups]
-
-  # XXX I don't this this is used anymore. Can't be wrong ...
-  # Meteor.publish "#{eventName}.Volunteers.signups", () ->
-  #   if this.userId
-  #     # TODO This is weird, we give every lead all access here, but only relevant
-  #     # ones by shift or team - Rich
-  #     if isManagerOrLead(this.userId)
-  #       sel = {}
-  #     else
-  #       sel = {usersId: this.userId}
-  #     return signupCollections.map((col) => col.find(sel))
 
   Meteor.publish "#{eventName}.Volunteers.signups.byShift", (shiftId) ->
     if this.userId

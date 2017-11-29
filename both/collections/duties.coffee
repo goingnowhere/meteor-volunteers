@@ -3,7 +3,7 @@ checkNpmVersions { 'simpl-schema': '0.3.x' }, 'abate:volunteers'
 import SimpleSchema from 'simpl-schema'
 SimpleSchema.extendOptions(['autoform'])
 
-leadPolicy = ["public";"adminOnly","requireApproval"]
+policyValues = ["public", "adminOnly", "requireApproval"]
 
 share.Schemas = {}
 
@@ -15,7 +15,6 @@ CommonTask = new SimpleSchema(
   title:
     type: String
     label: () -> TAPi18n.__("title")
-    optional: true
   description:
     type: String
     label: () -> TAPi18n.__("description")
@@ -40,7 +39,9 @@ CommonTask = new SimpleSchema(
   policy:
     type: String
     label: () -> TAPi18n.__("policy")
-    allowedValues: leadPolicy
+    allowedValues: policyValues
+    autoform:
+      defaultValue: "requireApproval"
 )
 
 share.Schemas.TeamTasks = new SimpleSchema(
@@ -115,35 +116,6 @@ share.Schemas.TeamShifts = new SimpleSchema(
 share.Schemas.TeamShifts.extend(CommonTask)
 
 share.Schemas.Lead = new SimpleSchema(
-  parentId:
-    type: String
-    autoform:
-      type: "hidden"
-  userId:
-    type: String
-    label: () -> TAPi18n.__("user")
-    optional: true
-    autoform:
-      type: "select2"
-      options: () ->
-        Meteor.users.find().map((e) ->
-          {value: e._id, label: (share.getUserName(e._id,true))})
-  role:
-    type: String
-    label: () -> TAPi18n.__("role")
-    autoform:
-      options: () ->
-        _.map(share.roles.get(), (e) -> {value: e, label: TAPi18n.__(e)})
-      # defaultValue: "lead"
-  title:
-    type: String
-    label: () -> TAPi18n.__("title")
-  description:
-    type: String
-    label: () -> TAPi18n.__("description")
-    optional: true
-    autoform:
-      rows: 5
   responsibilities:
     type: String
     label: () -> TAPi18n.__("responsibilities")
@@ -162,10 +134,5 @@ share.Schemas.Lead = new SimpleSchema(
     optional: true
     autoform:
       rows: 5
-  policy:
-    type: String
-    label: () -> TAPi18n.__("policy")
-    allowedValues: leadPolicy
-    autoform:
-      defaultValue: "public"
 )
+share.Schemas.Lead.extend(CommonTask)

@@ -10,21 +10,25 @@ Template.teamSignupsList.helpers({
       .map(signup => ({
         ...signup,
         type: 'shift',
-        duty: coffee.TeamShifts.findOne({ parentId: signup.teamId })
+        duty: coffee.TeamShifts.findOne(signup.shiftId)
       }))
     const tasks = coffee.TaskSignups.find({ teamId: this._id, status: 'pending' }, {sort: {createdAt: -1}})
       .map(signup => ({
         ...signup,
         type: 'task',
-        duty: coffee.TeamTasks.findOne({ parentId: signup.teamId })
+        duty: coffee.TeamTasks.findOne(signup.shiftId)
       }))
     const leads = coffee.LeadSignups.find({ parentId: this._id, status: 'pending' }, {sort: {createdAt: -1}})
       .map(signup => ({
         ...signup,
         type: 'lead',
-        duty: coffee.Lead.findOne({ parentId: signup.teamId })
+        duty: coffee.Lead.findOne(signup.shiftId)
       }))
-    return shifts.concat(tasks).concat(leads)
+    return [
+      ...shifts,
+      ...tasks,
+      ...leads,
+    ]// TODO sort
   }
 })
 

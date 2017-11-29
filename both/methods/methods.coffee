@@ -71,6 +71,48 @@ share.initMethods = (eventName) ->
     else
       console.warn "type #{type} for #{collectionName} ERROR"
 
+  createSignupMethod = (collectionKey, parentCollection, type) =>
+    collection = share[collectionKey]
+    schema = share.Schemas[collectionKey]
+    collectionName = collection._name
+    if type == "remove"
+      Meteor.methods "#{prefix}.#{collectionName}.remove": (shiftId) ->
+        console.log ["#{prefix}.#{collectionName}.remove", shiftId]
+        check(shiftId, String)
+        userId = Meteor.userId()
+        olddoc = collection.findOne(shiftId)
+        if Roles.userIsInRole(userId, [ 'manager', olddoc.teamId ], eventName)
+          collection.remove(shiftId)
+    else if type == "update"
+      Meteor.methods "#{prefix}.#{collectionName}.update": (doc) ->
+        console.log ["#{prefix}.#{collectionName}.update", doc]
+        SimpleSchema.validate(doc.modifier, schema, { modifier: true })
+        userId = Meteor.userId()
+        olddoc = collection.findOne(doc._id)
+        if Roles.userIsInRole(userId, [ 'manager', olddoc.teamId ], eventName)
+          collection.update(doc._id, doc.modifier)
+    else if type == "insert"
+      Meteor.methods "#{prefix}.#{collectionName}.insert": (doc) ->
+        console.log ["#{prefix}.#{collectionName}.insert", doc]
+        SimpleSchema.validate(doc, schema.omit('status'))
+        userId = Meteor.userId()
+        parentDoc = parentCollection.findOne(doc.shiftId)
+        if (doc.userId == userId) ||
+            (Roles.userIsInRole(userId, [ 'manager', parentDoc.parentId ], eventName))
+          status = (
+            if parentDoc.policy == "public" then "confirmed"
+            else if parentDoc.policy == "requireApproval" then "pending")
+          if status
+            if Meteor.isServer
+              collection.upsert(doc, {$set : {status: status}})
+    else if type == "bail"
+      Meteor.methods "#{prefix}.#{collectionName}.bail": (sel) ->
+        console.log ["#{prefix}.#{collectionName}.bail", sel]
+        SimpleSchema.validate(sel, schema.omit('status'))
+        userId = Meteor.userId()
+        if (sel.userId == userId) || (Roles.userIsInRole(userId, [ 'manager', sel.teamId ], eventName))
+          collection.update(sel, {$set: {status: "bailed"}})
+
   orgUnitCollections = [
     share.Division,
     share.Department,
@@ -89,6 +131,11 @@ share.initMethods = (eventName) ->
       for collection in normalCollections
         do ->
           createMethod(collection,type)
+
+  for type in ['remove', 'update', 'insert', 'bail']
+    do =>
+      createSignupMethod('ShiftSignups', share.teamShifts, type)
+      createSignupMethod('TaskSignups', share.teamTasks, type)
 
   prefix = "#{eventName}.Volunteers"
   Meteor.methods "#{prefix}.volunteerForm.remove": (formId) ->
@@ -114,92 +161,47 @@ share.initMethods = (eventName) ->
       doc.userId = Meteor.userId()
       share.form.get().insert(doc)
 
-  Meteor.methods "#{prefix}.shiftSignups.remove": (shiftId) ->
-    console.log ["#{prefix}.shiftSignups.remove",shiftId]
+  Meteor.methods "#{prefix}.leadSignups.remove": (shiftId) ->
+    console.log ["#{prefix}.leadSignups.remove",shiftId]
     check(shiftId,String)
     userId = Meteor.userId()
-    olddoc = share.ShiftSignups.findOne(shiftId)
+    olddoc = share.LeadSignups.findOne(shiftId)
     if Roles.userIsInRole(userId, [ 'manager', olddoc.teamId ], eventName)
-      share.ShiftSignups.remove(shiftId)
+      Roles.removeUsersFromRoles(olddoc.userId, olddoc.teamId, eventName)
+      share.LeadSignups.remove(shiftId)
 
-  Meteor.methods "#{prefix}.shiftSignups.update": (doc) ->
-    console.log ["#{prefix}.shiftSignups.update",doc]
-    SimpleSchema.validate(doc.modifier,share.Schemas.ShiftSignups,{ modifier: true })
+  Meteor.methods "#{prefix}.leadSignups.update": (doc) ->
+    console.log ["#{prefix}.leadSignups.update",doc]
+    SimpleSchema.validate(doc.modifier,share.Schemas.LeadSignups,{ modifier: true })
     userId = Meteor.userId()
-    olddoc = share.ShiftSignups.findOne(doc._id)
+    olddoc = share.LeadSignups.findOne(doc._id)
     if Roles.userIsInRole(userId, [ 'manager', olddoc.teamId ], eventName)
-      share.ShiftSignups.update(doc._id, doc.modifier)
+      if doc.status == "confirmed"
+        Roles.addUsersToRoles(doc.userId, doc.teamId, eventName)
+        unless doc.teamId == olddoc.teamId && doc.userId == olddoc.userId
+          Roles.removeUsersFromRoles(olddoc.userId, olddoc.teamId, eventName)
+      share.LeadSignups.update(doc._id, doc.modifier)
 
-  Meteor.methods "#{prefix}.shiftSignups.insert": (doc) ->
-    console.log ["#{prefix}.shiftSignups.insert",doc]
-    SimpleSchema.validate(doc,share.Schemas.ShiftSignups.omit('status'))
+  Meteor.methods "#{prefix}.leadSignups.insert": (doc) ->
+    console.log ["#{prefix}.leadSignups.insert",doc]
+    SimpleSchema.validate(doc,share.Schemas.LeadSignups.omit('status'))
     userId = Meteor.userId()
-    teamShift = share.TeamShifts.findOne(doc.shiftId)
+    lead = share.Lead.findOne(doc.shiftId)
     if (doc.userId == userId) ||
-        (Roles.userIsInRole(userId, [ 'manager', teamShift.parentId ], eventName))
-      status = (
-        if teamShift.policy == "public" then "confirmed"
-        else if teamShift.policy == "requireApproval" then "pending")
+        (Roles.userIsInRole(userId, [ 'manager', lead.parentId ], eventName))
+      if lead.policy == "public"
+        status = "confirmed"
+        Roles.addUsersToRoles(doc.userId, lead.teamId, eventName)
+      if lead.policy == "requireApproval"
+        status = "pending"
       if status
         if Meteor.isServer
-          share.ShiftSignups.upsert(doc, {$set : {status: status }})
+          share.LeadSignups.upsert(doc, {$set : {status: status }})
 
-  Meteor.methods "#{prefix}.shiftSignups.bail": (sel) ->
-    console.log ["#{prefix}.shiftSignups.bail",sel]
-    SimpleSchema.validate(sel,share.Schemas.ShiftSignups.omit('status'))
+  Meteor.methods "#{prefix}.leadSignups.bail": (sel) ->
+    console.log ["#{prefix}.leadSignups.bail",sel]
+    SimpleSchema.validate(sel,share.Schemas.LeadSignups.omit('status'))
     userId = Meteor.userId()
     if (sel.userId == userId) || (Roles.userIsInRole(userId, [ 'manager', sel.teamId ], eventName))
-      share.ShiftSignups.update(sel,{$set: {status: "bailed"}})
-
-  Meteor.methods "#{prefix}.taskSignups.remove": (shiftId) ->
-    console.log ["#{prefix}.taskSignups.remove",shiftId]
-    check(shiftId,String)
-    userId = Meteor.userId()
-    olddoc = share.TaskSignups.findOne(shiftId)
-    if Roles.userIsInRole(userId, [ 'manager', olddoc.teamId ], eventName)
-      share.TaskSignups.remove(shiftId)
-
-  Meteor.methods "#{prefix}.taskSignups.update": (doc) ->
-    console.log ["#{prefix}.taskSignups.update",doc]
-    SimpleSchema.validate(doc.modifier,share.Schemas.TaskSignups,{ modifier: true })
-    userId = Meteor.userId()
-    olddoc = share.TaskSignups.findOne(doc._id)
-    if Roles.userIsInRole(userId, [ 'manager', olddoc.teamId ], eventName)
-      share.TaskSignups.update(doc._id, doc.modifier)
-
-  Meteor.methods "#{prefix}.taskSignups.insert": (doc) ->
-    console.log ["#{prefix}.taskSignups.insert",doc]
-    SimpleSchema.validate(doc,share.Schemas.TaskSignups.omit('status'))
-    userId = Meteor.userId()
-    teamTask = share.TeamTasks.findOne(doc.shiftId)
-    if (doc.userId == userId) ||
-        (Roles.userIsInRole(userId, [ 'manager', teamTask.parentId ], eventName))
-      status = (
-        if teamTask.policy == "public" then "confirmed"
-        else if teamTask.policy == "requireApproval" then "pending")
-      if status
-        doc.status = status
-        share.TaskSignups.insert(doc)
-
-  Meteor.methods "#{prefix}.taskSignups.bail": (sel) ->
-    console.log ["#{prefix}.taskSignups.bail",sel]
-    SimpleSchema.validate(sel,share.Schemas.TaskSignups.omit('status'))
-    userId = Meteor.userId()
-    if (sel.userId == userId) || (Roles.userIsInRole(userId, [ 'manager', sel.teamId ], eventName))
-      share.TaskSignups.update(sel,{$set: {status: "bailed"}})
-<<<<<<< HEAD
-=======
-
-  # A bit hacky but check if there are any divisions to avoid re-running fixtures
-  if fixtures? && Meteor.isServer && share.Division.find().count() == 0
-    _.map(fixtures, (instances, collectionName) =>
-      instances.forEach((instance) =>
-        if instance.parent
-          instance.parentId = orgUnitCollections.reduce(((lastId, col) =>
-            lastId || col.findOne({ name: instance.parent })?._id), null)
-          delete instance.parent
-        Meteor.call("test.Volunteers.#{collectionName}.insert", instance)
-      )
-    )
-  initialising = false
->>>>>>> Add in remaining methods for orgUnits
+      Roles.removeUsersFromRoles(sel.userId, sel.teamId, eventName)
+      share.LeadSignups.update(sel,{$set: {status: "bailed"}})

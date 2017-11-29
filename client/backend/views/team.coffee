@@ -11,7 +11,11 @@ Template.teamDayViewGrid.helpers {
     {status:"overdue", isChecked:"checked"},
     {status:"done", isChecked:"checked"},
     {status:"archived"} ]
-  'allLeads': () -> share.Lead.find({parentId: Template.instance().teamId})
+  'allLeads': () ->
+    share.Lead.find({parentId: Template.instance().teamId}).map((lead) => {
+      title: lead.title,
+      userId: share.LeadSignups.findOne({ shiftId: lead._id })?.userId
+    })
   'allTasks': () ->
     teamId = Template.instance().teamId
     status = Template.instance().taskFilter.get()

@@ -20,13 +20,10 @@ Template.addVolunteerForm.helpers
   'data': () -> share.VolunteerForm.findOne({userId: Meteor.userId()})
 
 addLocalLeadsCollection = (template,filter,limit) ->
+  orgUnitCollections = [share.Team, share.Department, share.Division]
   share.Lead.find(filter,{limit: limit}).forEach((lead) ->
-    if lead.position == 'team'
-      team = share.Team.findOne(lead.parentId)
-    else if lead.position == 'department'
-      team = share.Department.findOne(lead.parentId)
-    else if lead.position == 'division'
-      team = share.Division.findOne(lead.parentId)
+    team = orgUnitCollections.reduce(((lastId, col) =>
+      lastId || col.findOne(lead.parentId)?.parentId), null)
     isChecked = if lead.userId == Meteor.userId() then "checked" else null
     sel =
       teamId: team._id
@@ -35,11 +32,10 @@ addLocalLeadsCollection = (template,filter,limit) ->
       type: 'lead'
       teamName: team.name
       parentId: team.parentId
-      title: lead.role
-      role: lead.role
-      description: shift.description
+      title: lead.title
+      description: lead.description
+      policy: lead.policy
       isChecked: isChecked
-      rnd: Random.id()
 
     template.ShiftTaskLocal.upsert(sel,{$set: mod})
   )
@@ -73,7 +69,6 @@ addLocalShiftsCollection = (collection,template,type,filter = {},limit = 0) ->
         canBail: signup? and signup.status != 'bailed'
         policy: job.policy
         tags: team.tags
-        rnd: Random.id()
         users: users
       if type == 'shift'
         _.extend(mod,
@@ -112,7 +107,7 @@ Template.volunteerShiftsForm.onCreated () ->
     if sub.ready()
       addLocalShiftsCollection(share.TeamShifts,template,'shift',filter,limit)
       addLocalShiftsCollection(share.TeamTasks,template,'task',filter,limit)
-      # addLocalLeadsCollection(share.Lead,template,'lead',filter,limit)
+      addLocalLeadsCollection(template,filter,limit)
     template.sel.set(filter)
 
 Template.volunteerShiftsForm.helpers
@@ -143,7 +138,7 @@ Template.volunteerUserShifts.onCreated () ->
     if sub.ready()
       addLocalShiftsCollection(share.TeamShifts,template,'shift',{},100)
       addLocalShiftsCollection(share.TeamTasks,template,'task',{},100)
-      # addLocalLeadsCollection(share.Lead,template,'lead',{},100)
+      addLocalLeadsCollection(template,{},100)
 
 Template.volunteerUserShifts.helpers
   'allShifts': () ->
@@ -165,7 +160,7 @@ Template.volunteersTeamView.onCreated () ->
     if template.sub.ready()
       addLocalShiftsCollection(share.TeamShifts,template,'shift',{},100)
       addLocalShiftsCollection(share.TeamTasks,template,'task',{},100)
-      # addLocalLeadsCollection(share.Lead,template,'lead',{},100)
+      addLocalLeadsCollection(template,{},100)
 
 Template.volunteersTeamView.helpers
   'team': () ->
