@@ -22,8 +22,8 @@ Template.addVolunteerForm.helpers
 addLocalLeadsCollection = (template,filter,limit) ->
   orgUnitCollections = [share.Team, share.Department, share.Division]
   share.Lead.find(filter,{limit: limit}).forEach((lead) ->
-    team = orgUnitCollections.reduce(((lastId, col) =>
-      lastId || col.findOne(lead.parentId)?.parentId), null)
+    team = orgUnitCollections.reduce(((lastUnit, col) =>
+      lastUnit || col.findOne(lead.parentId)), null)
     isChecked = if lead.userId == Meteor.userId() then "checked" else null
     sel =
       teamId: team._id
@@ -31,7 +31,7 @@ addLocalLeadsCollection = (template,filter,limit) ->
     mod =
       type: 'lead'
       teamName: team.name
-      parentId: team.parentId
+      parentId: team._id
       title: lead.title
       description: lead.description
       policy: lead.policy

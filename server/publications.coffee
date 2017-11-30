@@ -82,9 +82,9 @@ share.initPublications = (eventName) ->
       unless Roles.userIsInRole(this.userId, [ 'manager', teamId ], eventName)
         selTasks = _.extend(selTasks,dutiesPublicPolicy)
         selShifts = dutiesPublicPolicy
-      taskSignups = share.TaskSignups.find({teamId: teamId})
-      shiftSignups = share.ShiftSignups.find({teamId: teamId})
-      leadSignups = share.LeadSignups.find({teamId: teamId})
+      taskSignups = share.TaskSignups.find({parentId: teamId})
+      shiftSignups = share.ShiftSignups.find({parentId: teamId})
+      leadSignups = share.LeadSignups.find({parentId: teamId})
       shifts = share.TeamShifts.find(selShifts)
       tasks = share.TeamTasks.find(selTasks)
       leads = share.Lead.find({parentId: teamId})
@@ -152,12 +152,12 @@ share.initPublications = (eventName) ->
         sel = {userId: this.userId, shiftId: shiftId}
       signupCollections.map((col) => col.find(sel))
 
-  Meteor.publish "#{eventName}.Volunteers.signups.byTeam", (teamId) ->
+  Meteor.publish "#{eventName}.Volunteers.signups.byTeam", (parentId) ->
     if this.userId
-      if Roles.userIsInRole(this.userId, [ "manager", teamId ], eventName)
-        sel = {teamId: teamId}
+      if Roles.userIsInRole(this.userId, [ "manager", parentId ], eventName)
+        sel = {parentId: parentId}
       else
-        sel = {userId: this.userId, teamId: teamId}
+        sel = {userId: this.userId, parentId: parentId}
       return signupCollections.map((col) => col.find(sel))
 
   Meteor.publish "#{eventName}.Volunteers.teamShiftsUser", () ->

@@ -6,13 +6,13 @@ Template.teamSignupsList.onCreated(function () {
 
 Template.teamSignupsList.helpers({
   allSignups() {
-    const shifts = coffee.ShiftSignups.find({ teamId: this._id, status: 'pending' }, {sort: {createdAt: -1}})
+    const shifts = coffee.ShiftSignups.find({ parentId: this._id, status: 'pending' }, {sort: {createdAt: -1}})
       .map(signup => ({
         ...signup,
         type: 'shift',
         duty: coffee.TeamShifts.findOne(signup.shiftId)
       }))
-    const tasks = coffee.TaskSignups.find({ teamId: this._id, status: 'pending' }, {sort: {createdAt: -1}})
+    const tasks = coffee.TaskSignups.find({ parentId: this._id, status: 'pending' }, {sort: {createdAt: -1}})
       .map(signup => ({
         ...signup,
         type: 'task',
@@ -28,7 +28,7 @@ Template.teamSignupsList.helpers({
       ...shifts,
       ...tasks,
       ...leads,
-    ]// TODO sort
+    ].sort((a, b) => a.createdAt && b.createdAt && a.createdAt.getTime() - b.createdAt.getTime())
   }
 })
 

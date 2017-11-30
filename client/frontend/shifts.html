@@ -59,7 +59,7 @@
             </button>
           {{/if}}
           {{#unless $eq policy "adminOnly"}}
-            <button class="btn btn-primary" data-shiftid="{{shiftId}}" data-teamid="{{teamId}}"
+            <button class="btn btn-primary" data-shiftid="{{shiftId}}" data-parentid="{{teamId}}"
               data-action="apply" data-type={{type}}>
               {{#if $eq policy "public"}}{{_ "join"}}{{/if}}
               {{#if $eq policy "requireApproval"}}{{_ "apply"}}{{/if}}
@@ -69,7 +69,7 @@
           {{/unless}}
         {{/if}}
         {{#if canBail}}
-          <button class="btn btn-danger" data-shiftid="{{shiftId}}" data-teamid="{{teamId}}"
+          <button class="btn btn-danger" data-shiftid="{{shiftId}}" data-parentid="{{teamId}}"
             data-action="bail" data-type={{type}}>
             {{_ "bail"}}
           </button>

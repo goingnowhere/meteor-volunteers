@@ -32,7 +32,7 @@ share.Schemas.VolunteerForm = new SimpleSchema(
 )
 
 commonSignups = new SimpleSchema(
-  teamId: String
+  parentId: String
   shiftId: String
   userId: String
   createdAt:
