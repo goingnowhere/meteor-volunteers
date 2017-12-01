@@ -105,8 +105,7 @@ Package.onUse(function(api) {
 
   // api.add_files([ "i18n/en.i18n.json", ], ["client", "server"]);
 
-  // Coffee export is to make the special 'share' variable in coffeescript available to JS
-  api.export([ 'VolunteersClass', 'coffee']);
+  api.export([ 'VolunteersClass' ]);
 });
 
 //Package.onTest(function(api) {

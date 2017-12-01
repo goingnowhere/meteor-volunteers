@@ -1,4 +1,5 @@
-share.initRouters = (eventName) ->
+toShare = {}
+toShare.initRouters = (eventName) ->
   Router.route "#{eventName}/dashboard/team/:_id",
     name: "teamEdit-#{eventName}"
     template: 'teamDayViewGrid'
@@ -44,3 +45,6 @@ share.initRouters = (eventName) ->
     data: () ->
       if this.params && this.params._id && this.ready()
         share.Department.findOne(this.params._id)
+
+module.exports = toShare
+_.extend(share, toShare)

@@ -1,28 +1,31 @@
+import { templateSub, meteorCall } from '../../../both/global'
+import { collections } from '../../../both/collections/initCollections'
+
 Template.teamSignupsList.onCreated(function () {
   const template = this;
-  coffee.templateSub(template,"users")
-  coffee.templateSub(template,"allDuties.byTeam",this.data._id)
+  templateSub(template,"users")
+  templateSub(template,"allDuties.byTeam",this.data._id)
 })
 
 Template.teamSignupsList.helpers({
   allSignups() {
-    const shifts = coffee.ShiftSignups.find({ parentId: this._id, status: 'pending' }, {sort: {createdAt: -1}})
+    const shifts = collections.ShiftSignups.find({ parentId: this._id, status: 'pending' }, {sort: {createdAt: -1}})
       .map(signup => ({
         ...signup,
         type: 'shift',
-        duty: coffee.TeamShifts.findOne(signup.shiftId)
+        duty: collections.TeamShifts.findOne(signup.shiftId)
       }))
-    const tasks = coffee.TaskSignups.find({ parentId: this._id, status: 'pending' }, {sort: {createdAt: -1}})
+    const tasks = collections.TaskSignups.find({ parentId: this._id, status: 'pending' }, {sort: {createdAt: -1}})
       .map(signup => ({
         ...signup,
         type: 'task',
-        duty: coffee.TeamTasks.findOne(signup.shiftId)
+        duty: collections.TeamTasks.findOne(signup.shiftId)
       }))
-    const leads = coffee.LeadSignups.find({ parentId: this._id, status: 'pending' }, {sort: {createdAt: -1}})
+    const leads = collections.LeadSignups.find({ parentId: this._id, status: 'pending' }, {sort: {createdAt: -1}})
       .map(signup => ({
         ...signup,
         type: 'lead',
-        duty: coffee.Lead.findOne(signup.shiftId)
+        duty: collections.Lead.findOne(signup.shiftId)
       }))
     return [
       ...shifts,
@@ -37,12 +40,12 @@ Template.teamSignupsList.events({
     const type = $(event.target).data('type')
     const signupId = $(event.target).data('signup')
     const signup = {_id: signupId, modifier: {$set: {status: 'confirmed'}}}
-    coffee.meteorCall(`${type}Signups.update`, signup)
+    meteorCall(`${type}Signups.update`, signup)
   },
   'click [data-action="reject"]'(event) {
     const type = $(event.target).data('type')
     const signupId = $(event.target).data('signup')
     const signup = {_id: signupId, modifier: {$set: {status: 'refused'}}}
-    coffee.meteorCall(`${type}Signups.update`, signup)
+    meteorCall(`${type}Signups.update`, signup)
   },
 })

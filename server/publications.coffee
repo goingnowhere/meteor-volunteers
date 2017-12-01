@@ -1,4 +1,5 @@
-share.initPublications = (eventName) ->
+toShare = {}
+toShare.initPublications = (eventName) ->
 
   dutiesPublicPolicy = { policy: { $in: ["public", "requireApproval"] } }
   unitPublicPolicy = { policy: { $in: ["public"] } }
@@ -176,3 +177,6 @@ share.initPublications = (eventName) ->
     if this.userId
       if share.isManagerOrLead(this.userId)
         Meteor.users.find({}, { fields: { emails: 1, profile: 1, roles: 1 } })
+
+module.exports = toShare
+_.extend(share, toShare)

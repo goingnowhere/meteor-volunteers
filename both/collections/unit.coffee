@@ -5,11 +5,13 @@ SimpleSchema.extendOptions(['autoform'])
 
 unitPolicy = ["public";"private";"restricted"]
 
-share.getTagList = (sel={}) ->
+toShare = {}
+
+toShare.getTagList = (sel={}) ->
   tags = _.union.apply null, share.Team.find(sel).map((team) -> team.tags)
   _.map tags, (tag) -> {value: tag, label: tag}
 
-share.getLocationList = (sel={}) ->
+toShare.getLocationList = (sel={}) ->
   locations = _.union.apply null, share.Team.find(sel).map((team) -> team.location)
   _.map locations, (loc) -> {value: loc, label: loc}
 
@@ -27,7 +29,7 @@ CommonUnit = new SimpleSchema(
     optional: true
     autoform:
       type: "select2"
-      options: share.getTagList
+      options: toShare.getTagList
       afFieldInput:
         multiple: true
         select2Options: () -> {tags: true}
@@ -70,3 +72,6 @@ share.Schemas.Division.extend(
     autoform:
       type: "hidden"
 )
+
+module.exports = toShare
+_.extend(share, toShare)

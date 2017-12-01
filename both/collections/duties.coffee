@@ -6,6 +6,7 @@ SimpleSchema.extendOptions(['autoform'])
 policyValues = ["public", "adminOnly", "requireApproval"]
 
 share.Schemas = {}
+module.exports = { Schemas: share.Schemas }
 
 CommonTask = new SimpleSchema(
   parentId:

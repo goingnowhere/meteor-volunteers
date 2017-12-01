@@ -1,66 +1,76 @@
 import SimpleSchema from 'simpl-schema'
 
-share.initCollections = (eventName) ->
-  share.eventName = eventName
+toShare = {
+  collections: {}
+}
+
+toShare.initCollections = (eventName) ->
+  toShare.collections.eventName = eventName
 
   prefix = "#{eventName}."
 
   # duties
 
-  share.TeamTasks = new Mongo.Collection "#{prefix}Volunteers.teamTasks"
-  share.TeamTasks.attachSchema(share.Schemas.TeamTasks)
+  toShare.collections.TeamTasks = new Mongo.Collection "#{prefix}Volunteers.teamTasks"
+  toShare.collections.TeamTasks.attachSchema(share.Schemas.TeamTasks)
 
-  share.TeamShifts = new Mongo.Collection "#{prefix}Volunteers.teamShifts"
-  share.TeamShifts.attachSchema(share.Schemas.TeamShifts)
+  toShare.collections.TeamShifts = new Mongo.Collection "#{prefix}Volunteers.teamShifts"
+  toShare.collections.TeamShifts.attachSchema(share.Schemas.TeamShifts)
 
-  share.Lead = new Mongo.Collection "#{prefix}Volunteers.lead"
-  share.Lead.attachSchema(share.Schemas.Lead)
+  toShare.collections.Lead = new Mongo.Collection "#{prefix}Volunteers.lead"
+  toShare.collections.Lead.attachSchema(share.Schemas.Lead)
 
   # Orga
 
-  share.Team = new Mongo.Collection "#{prefix}Volunteers.team"
-  share.Team.attachSchema(share.Schemas.Team)
+  toShare.collections.Team = new Mongo.Collection "#{prefix}Volunteers.team"
+  toShare.collections.Team.attachSchema(share.Schemas.Team)
 
-  share.Department = new Mongo.Collection "#{prefix}Volunteers.department"
-  share.Department.attachSchema(share.Schemas.Department)
+  toShare.collections.Department = new Mongo.Collection "#{prefix}Volunteers.department"
+  toShare.collections.Department.attachSchema(share.Schemas.Department)
 
-  share.Division = new Mongo.Collection "#{prefix}Volunteers.division"
-  share.Division.attachSchema(share.Schemas.Division)
+  toShare.collections.Division = new Mongo.Collection "#{prefix}Volunteers.division"
+  toShare.collections.Division.attachSchema(share.Schemas.Division)
 
   # User Form
 
-  share.VolunteerForm = new Mongo.Collection "#{prefix}Volunteers.volunteerForm"
-  share.VolunteerForm.attachSchema(share.Schemas.VolunteerForm)
-  share.form = new ReactiveVar(share.VolunteerForm)
+  toShare.collections.VolunteerForm = new Mongo.Collection "#{prefix}Volunteers.volunteerForm"
+  toShare.collections.VolunteerForm.attachSchema(share.Schemas.VolunteerForm)
+  toShare.collections.form = new ReactiveVar(toShare.collections.VolunteerForm)
 
-  share.extendVolunteerForm = (data) ->
-    form = share.form.get()
+  toShare.collections.extendVolunteerForm = (data) ->
+    form = toShare.collections.form.get()
     schema = new SimpleSchema(share.Schemas.VolunteerForm)
     newschema = schema.extend(FormBuilder.toSimpleSchema(data))
     form.attachSchema(newschema, {replace: true})
-    share.form.set(form)
+    toShare.collections.form.set(form)
 
   # Update the VolunteersForm schema each time the Form is updated.
   # XXX this should be called something like "eventName-VolunteerForm" XXX
   FormBuilder.Collections.DynamicForms.find({name: "VolunteerForm"}).observe(
-    added:   (doc) -> share.extendVolunteerForm(doc)
-    changed: (doc) -> share.extendVolunteerForm(doc)
-    removed: (doc) -> share.extendVolunteerForm(doc)
+    added:   (doc) -> toShare.collections.extendVolunteerForm(doc)
+    changed: (doc) -> toShare.collections.extendVolunteerForm(doc)
+    removed: (doc) -> toShare.collections.extendVolunteerForm(doc)
   )
 
   # User duties
 
-  share.ShiftSignups = new Mongo.Collection "#{prefix}Volunteers.shiftSignups"
-  share.ShiftSignups.attachSchema(share.Schemas.ShiftSignups)
+  toShare.collections.ShiftSignups = new Mongo.Collection "#{prefix}Volunteers.shiftSignups"
+  toShare.collections.ShiftSignups.attachSchema(share.Schemas.ShiftSignups)
 
-  share.TaskSignups = new Mongo.Collection "#{prefix}Volunteers.taskSignups"
-  share.TaskSignups.attachSchema(share.Schemas.TaskSignups)
+  toShare.collections.TaskSignups = new Mongo.Collection "#{prefix}Volunteers.taskSignups"
+  toShare.collections.TaskSignups.attachSchema(share.Schemas.TaskSignups)
 
-  share.LeadSignups = new Mongo.Collection "#{prefix}Volunteers.leadSignups"
-  share.LeadSignups.attachSchema(share.Schemas.LeadSignups)
+  toShare.collections.LeadSignups = new Mongo.Collection "#{prefix}Volunteers.leadSignups"
+  toShare.collections.LeadSignups.attachSchema(share.Schemas.LeadSignups)
 
   if Meteor.isClient
     # this collection is used in client/frontend/volunteer.coffee
-    share.signupCollections =
-      shift: share.ShiftSignups
-      task: share.TaskSignups
+    toShare.collections.signupCollections =
+      shift: toShare.collections.ShiftSignups
+      task: toShare.collections.TaskSignups
+
+  # We need to add 'toShare.collections' to share to include the new additions
+  _.extend(share, toShare.collections)
+
+module.exports = toShare
+_.extend(share, toShare)

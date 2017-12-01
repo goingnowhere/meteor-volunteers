@@ -1,26 +1,29 @@
+toShare = {}
 
-share.form = new ReactiveVar(share.VolunteerForm)
+toShare.form = new ReactiveVar(share.VolunteerForm)
 periods =
   'night': {start:0,end:4},
-  'dusk': {start:4,end:8},
+  'dawn': {start:4,end:8},
   'morning': {start:8,end:12},
   'afternoon': {start:12,end:16},
-  'dawn': {start:16,end:20},
+  'dusk': {start:16,end:20},
   'evening': {start:20,end:24}
-share.periods = new ReactiveVar(periods)
+toShare.periods = new ReactiveVar(periods)
 
 # XXX why do I need this variable ???
-share.eventName1 = new ReactiveVar()
+toShare.eventName1 = new ReactiveVar()
 
 initAuthorization = (eventName) ->
-  share.isManagerOrLead = (userId) ->
+  toShare.isManagerOrLead = (userId) ->
     if Roles.userIsInRole(userId, [ 'manager' ], eventName)
       return true
     else if userId == Meteor.userId()
       Roles.getRolesForUser(userId, eventName).length > 0
     else return false
-  share.isManager = (userId) ->
+  toShare.isManager = (userId) ->
     Roles.userIsInRole(userId, [ 'manager' ], eventName)
+  module.exports = toShare
+  _.extend(share, toShare)
 
 saveVolunteerForm = (eventName,data) ->
   Meteor.call('FormBuilder.dynamicForms.upsert',{name: "VolunteerForm"}, data)
@@ -36,7 +39,7 @@ class VolunteersClass
     share.initCollections(@eventName)
     share.initRouters(@eventName)
     share.initMethods(@eventName)
-    share.eventName1.set(@eventName)
+    toShare.eventName1.set(@eventName)
     initAuthorization(@eventName)
     if Meteor.isServer
       share.initPublications(@eventName)
@@ -51,7 +54,10 @@ class VolunteersClass
       Lead: share.Lead
       ShiftSignups: share.ShiftSignups
       TaskSignups: share.TaskSignups
-  setPeriods: (periods) -> share.periods.set(periods)
+  setPeriods: (periods) -> toShare.periods.set(periods)
   setUserForm: (data) -> saveVolunteerForm(@eventName,data)
-  isManagerOrLead: (userId) -> share.isManagerOrLead(userId)
-  isManager: (userId) -> share.isManager(userId)
+  isManagerOrLead: (userId) -> toShare.isManagerOrLead(userId)
+  isManager: (userId) -> toShare.isManager(userId)
+
+module.exports = toShare
+_.extend(share, toShare)

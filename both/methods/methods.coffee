@@ -6,7 +6,8 @@ checkForCollisions = (shift) ->
     start: { $leq: shift.start },
     end: { $geq: shift.end }})?
 
-share.initMethods = (eventName) ->
+toShare = {}
+toShare.initMethods = (eventName) ->
   # Generic function to create insert,update,remove methods for groups within
   # the organisation, e.g. teams
   createOrgUnitMethod = (collection, type) ->
@@ -203,3 +204,6 @@ share.initMethods = (eventName) ->
     if (sel.userId == userId) || (Roles.userIsInRole(userId, [ 'manager', sel.parentId ], eventName))
       Roles.removeUsersFromRoles(sel.userId, sel.parentId, eventName)
       share.LeadSignups.update(sel,{$set: {status: "bailed"}})
+
+module.exports = toShare
+_.extend(share, toShare)
