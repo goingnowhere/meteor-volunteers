@@ -32,3 +32,10 @@ AutoForm.addHooks ['InsertDepartmentFormId'],
   onSuccess: (formType, result) ->
     console.log this.template
     # this.template.currentLead.set({teamId:result._id})
+
+Template.departmentsList.onCreated () =>
+  share.meteorSub('department')
+
+Template.departmentsList.helpers
+  departments: () => share.Department.find()
+  departmentView: () => "departmentView-#{share.eventName1.get()}"
