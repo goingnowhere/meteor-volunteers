@@ -24,20 +24,29 @@ addLocalLeadsCollection = (template,filter,limit) ->
   share.Lead.find(filter,{limit: limit}).forEach((lead) ->
     team = orgUnitCollections.reduce(((lastUnit, col) =>
       lastUnit || col.findOne(lead.parentId)), null)
-    isChecked = if lead.userId == Meteor.userId() then "checked" else null
-    sel =
-      teamId: team._id
-      shiftId: lead._id
-    mod =
-      type: 'lead'
-      teamName: team.name
-      parentId: team._id
-      title: lead.title
-      description: lead.description
-      policy: lead.policy
-      isChecked: isChecked
+    signupsSub = share.templateSub(template,"signups.byShift", lead._id)
+    if signupsSub.ready()
+      users = share.LeadSignups.find(
+        {shiftId: lead._id, status: {$in: ["confirmed"]}}
+      ).map((s) -> s.userId)
+      isChecked = if Meteor.userId() in users then "checked" else null
+      signup = share.LeadSignups.findOne({shiftId: lead._id, userId: Meteor.userId()})
+      sel =
+        teamId: team._id
+        shiftId: lead._id
+      mod =
+        type: 'lead'
+        teamName: team.name
+        parentId: team._id
+        title: lead.title
+        description: lead.description
+        policy: lead.policy
+        status: if signup then signup.status else null
+        canBail: signup? and signup.status != 'bailed'
+        isChecked: isChecked
+        users: users
 
-    template.ShiftTaskLocal.upsert(sel,{$set: mod})
+      template.ShiftTaskLocal.upsert(sel,{$set: mod})
   )
 
 addLocalShiftsCollection = (collection,template,type,filter = {},limit = 0) ->
