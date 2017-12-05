@@ -64,11 +64,14 @@ toShare.initCollections = (eventName) ->
   toShare.collections.LeadSignups.attachSchema(share.Schemas.LeadSignups)
 
   if Meteor.isClient
-    # this collection is used in client/frontend/volunteer.coffee
     toShare.collections.signupCollections =
       shift: toShare.collections.ShiftSignups
       task: toShare.collections.TaskSignups
       lead: toShare.collections.LeadSignups
+    toShare.collections.orgUnitCollections =
+      team: toShare.collections.Team
+      department: toShare.collections.Department
+      division: toShare.collections.Division
 
   # We need to add 'toShare.collections' to share to include the new additions
   _.extend(share, toShare.collections)

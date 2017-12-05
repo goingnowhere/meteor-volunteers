@@ -92,6 +92,8 @@ Package.onUse(function(api) {
     "client/backend/forms/department.coffee",
     "client/backend/forms/division.html",
     "client/backend/forms/division.coffee",
+    "client/backend/forms/orgUnit.html",
+    "client/backend/forms/orgUnit.js",
 
     "client/backend/views/team.html",
     "client/backend/views/team.coffee",

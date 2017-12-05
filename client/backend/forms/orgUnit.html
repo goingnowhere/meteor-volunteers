@@ -1,0 +1,9 @@
+<template name="orgUnitList">
+  <ul>
+    {{#each orgUnits}}
+      <li>
+        <a href="{{pathFor unitDashboard _id=_id}}">{{name}}</a> <a href="{{pathFor orgUnitView _id=_id}}">(edit)</a>
+      </li>
+    {{/each}}
+  </ul>
+</template>

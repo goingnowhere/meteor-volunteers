@@ -3,11 +3,5 @@
 </template>
 
 <template name="departmentsList">
-  <ul>
-    {{#each departments}}
-      <li>
-        <a href="{{pathFor unitDashboard _id=_id}}">{{name}}</a> <a href="{{pathFor departmentView _id=_id}}">(edit)</a>
-      </li>
-    {{/each}}
-  </ul>
+  {{> orgUnitList unitType='department'}}
 </template>
