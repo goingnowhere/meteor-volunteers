@@ -1,4 +1,5 @@
 import SimpleSchema from 'simpl-schema'
+import { getOrgUnit } from '../../both/collections/unit'
 
 Template.addVolunteerForm.onCreated () ->
   template = this
@@ -21,7 +22,7 @@ Template.addVolunteerForm.helpers
 
 addLocalShiftsCollection = (collection,template,type,filter = {},limit = 0) ->
   collection.find(filter,{limit: limit}).forEach((job) ->
-    orgUnit = share.getOrgUnit(job.parentId)
+    orgUnit = getOrgUnit(job.parentId)
     team = orgUnit.lowest
     users = []
     signupsSub = share.templateSub(template,"signups.byShift",job._id)
