@@ -170,17 +170,23 @@ toShare.initMethods = (eventName) ->
       Roles.removeUsersFromRoles(olddoc.userId, olddoc.parentId, eventName)
       share.LeadSignups.remove(shiftId)
 
-  Meteor.methods "#{prefix}.leadSignups.update": (doc) ->
-    console.log ["#{prefix}.leadSignups.update",doc]
-    SimpleSchema.validate(doc.modifier,share.Schemas.LeadSignups,{ modifier: true })
+  Meteor.methods "#{prefix}.leadSignups.confirm": (shiftId) ->
+    console.log ["#{prefix}.leadSignups.confirm",shiftId]
+    check(shiftId,String)
     userId = Meteor.userId()
-    olddoc = share.LeadSignups.findOne(doc._id)
+    olddoc = share.LeadSignups.findOne(shiftId)
     if Roles.userIsInRole(userId, [ 'manager', olddoc.parentId ], eventName)
-      if doc.status == "confirmed"
-        Roles.addUsersToRoles(doc.userId, doc.parentId, eventName)
-        unless doc.parentId == olddoc.parentId && doc.userId == olddoc.userId
-          Roles.removeUsersFromRoles(olddoc.userId, olddoc.parentId, eventName)
-      share.LeadSignups.update(doc._id, doc.modifier)
+      Roles.addUsersToRoles(olddoc.userId, olddoc.parentId, eventName)
+      share.LeadSignups.update(shiftId, { $set: { status: 'confirmed' } })
+
+  Meteor.methods "#{prefix}.leadSignups.refuse": (shiftId) ->
+    console.log ["#{prefix}.leadSignups.refuse",shiftId]
+    check(shiftId,String)
+    userId = Meteor.userId()
+    olddoc = share.LeadSignups.findOne(shiftId)
+    if Roles.userIsInRole(userId, [ 'manager', olddoc.parentId ], eventName)
+      Roles.removeUsersFromRoles(olddoc.userId, olddoc.parentId, eventName)
+      share.LeadSignups.update(shiftId, { $set: { status: 'refused' } })
 
   Meteor.methods "#{prefix}.leadSignups.insert": (doc) ->
     console.log ["#{prefix}.leadSignups.insert",doc]
@@ -201,8 +207,9 @@ toShare.initMethods = (eventName) ->
     console.log ["#{prefix}.leadSignups.bail",sel]
     SimpleSchema.validate(sel,share.Schemas.LeadSignups.omit('status'))
     userId = Meteor.userId()
-    if (sel.userId == userId) || (Roles.userIsInRole(userId, [ 'manager', sel.parentId ], eventName))
-      Roles.removeUsersFromRoles(sel.userId, sel.parentId, eventName)
+    olddoc = share.LeadSignups.findOne(sel._id)
+    if (sel.userId == userId) || (Roles.userIsInRole(userId, [ 'manager', olddoc.parentId ], eventName))
+      Roles.removeUsersFromRoles(olddoc.userId, olddoc.parentId, eventName)
       share.LeadSignups.update(sel,{$set: {status: "bailed"}})
 
 module.exports = toShare
