@@ -22,14 +22,14 @@ Template.addVolunteerForm.helpers
 addLocalLeadsCollection = (template,filter,limit) ->
   orgUnitCollections = [share.Team, share.Department, share.Division]
   share.Lead.find(filter,{limit: limit}).forEach((lead) ->
-    team = orgUnitCollections.reduce(((lastUnit, col) =>
-      lastUnit || col.findOne(lead.parentId)), null)
-    signupsSub = share.templateSub(template,"signups.byShift", lead._id)
+    orgUnit = share.getOrgUnit(lead.parentId)
+    team = orgUnit.lowest
+    users = []
+    signupsSub = share.templateSub(template, "signups.byShift", lead._id)
     if signupsSub.ready()
       users = share.LeadSignups.find(
         {shiftId: lead._id, status: {$in: ["confirmed"]}}
       ).map((s) -> s.userId)
-      isChecked = if Meteor.userId() in users then "checked" else null
       signup = share.LeadSignups.findOne({shiftId: lead._id, userId: Meteor.userId()})
       sel =
         teamId: team._id
@@ -38,12 +38,14 @@ addLocalLeadsCollection = (template,filter,limit) ->
         type: 'lead'
         teamName: team.name
         parentId: team._id
+        departmentName: orgUnit?.department?.name
+        divisionName: orgUnit?.division?.name
         title: lead.title
         description: lead.description
         policy: lead.policy
         status: if signup then signup.status else null
         canBail: signup? and signup.status != 'bailed'
-        isChecked: isChecked
+        isChecked: if Meteor.userId() in users then "checked" else null
         users: users
 
       template.ShiftTaskLocal.upsert(sel,{$set: mod})
@@ -51,7 +53,8 @@ addLocalLeadsCollection = (template,filter,limit) ->
 
 addLocalShiftsCollection = (collection,template,type,filter = {},limit = 0) ->
   collection.find(filter,{limit: limit}).forEach((job) ->
-    team = share.Team.findOne(job.parentId)
+    orgUnit = share.getOrgUnit(job.parentId)
+    team = orgUnit.lowest
     users = []
     signupsSub = share.templateSub(template,"signups.byShift",job._id)
     if signupsSub.ready()
@@ -61,17 +64,14 @@ addLocalShiftsCollection = (collection,template,type,filter = {},limit = 0) ->
         {shiftId: job._id, status: {$in: ["confirmed"]}}
       ).map((s) -> s.userId)
       signup = signupCollection.findOne({shiftId: job._id, userId: Meteor.userId()})
-      department = if team.parentId? then share.Department.findOne(team.parentId)
-      division = if department?.parentId? then share.Division.findOne(department.parentId)
       sel =
         teamId: team._id
         shiftId: job._id
       mod =
         type: type
         teamName: team.name
-        departmentName: if department?.name? then department.name
-        divisionName: if division?.name? then division.name
-        parentId: team.parentId
+        departmentName: orgUnit?.department?.name
+        divisionName: orgUnit?.division?.name
         title: job.title
         description: job.description
         status: if signup then signup.status else null
