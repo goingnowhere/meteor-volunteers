@@ -68,6 +68,7 @@ toShare.initCollections = (eventName) ->
     toShare.collections.signupCollections =
       shift: toShare.collections.ShiftSignups
       task: toShare.collections.TaskSignups
+      lead: toShare.collections.LeadSignups
 
   # We need to add 'toShare.collections' to share to include the new additions
   _.extend(share, toShare.collections)

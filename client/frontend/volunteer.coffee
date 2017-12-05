@@ -19,38 +19,6 @@ Template.addVolunteerForm.helpers
     }
   'data': () -> share.VolunteerForm.findOne({userId: Meteor.userId()})
 
-addLocalLeadsCollection = (template,filter,limit) ->
-  orgUnitCollections = [share.Team, share.Department, share.Division]
-  share.Lead.find(filter,{limit: limit}).forEach((lead) ->
-    orgUnit = share.getOrgUnit(lead.parentId)
-    team = orgUnit.lowest
-    users = []
-    signupsSub = share.templateSub(template, "signups.byShift", lead._id)
-    if signupsSub.ready()
-      users = share.LeadSignups.find(
-        {shiftId: lead._id, status: {$in: ["confirmed"]}}
-      ).map((s) -> s.userId)
-      signup = share.LeadSignups.findOne({shiftId: lead._id, userId: Meteor.userId()})
-      sel =
-        teamId: team._id
-        shiftId: lead._id
-      mod =
-        type: 'lead'
-        teamName: team.name
-        parentId: team._id
-        departmentName: orgUnit?.department?.name
-        divisionName: orgUnit?.division?.name
-        title: lead.title
-        description: lead.description
-        policy: lead.policy
-        status: if signup then signup.status else null
-        canBail: signup? and signup.status != 'bailed'
-        isChecked: if Meteor.userId() in users then "checked" else null
-        users: users
-
-      template.ShiftTaskLocal.upsert(sel,{$set: mod})
-  )
-
 addLocalShiftsCollection = (collection,template,type,filter = {},limit = 0) ->
   collection.find(filter,{limit: limit}).forEach((job) ->
     orgUnit = share.getOrgUnit(job.parentId)
@@ -58,7 +26,6 @@ addLocalShiftsCollection = (collection,template,type,filter = {},limit = 0) ->
     users = []
     signupsSub = share.templateSub(template,"signups.byShift",job._id)
     if signupsSub.ready()
-      # share.signupCollections is defined in both/collections/initCollections.coffee
       signupCollection = share.signupCollections[type]
       users = signupCollection.find(
         {shiftId: job._id, status: {$in: ["confirmed"]}}
@@ -89,6 +56,10 @@ addLocalShiftsCollection = (collection,template,type,filter = {},limit = 0) ->
         _.extend(mod,
           dueDate : job.dueDate
           estimatedTime: job.estimatedTime)
+      if type == 'lead'
+        # I'm not sure if the below is used anywhere - Rich
+        _.extend(mod,
+          isChecked: if Meteor.userId() in users then "checked" else null)
       template.ShiftTaskLocal.upsert(sel,{$set: mod})
     )
 
@@ -116,7 +87,7 @@ Template.volunteerShiftsForm.onCreated () ->
     if sub.ready()
       addLocalShiftsCollection(share.TeamShifts,template,'shift',filter,limit)
       addLocalShiftsCollection(share.TeamTasks,template,'task',filter,limit)
-      addLocalLeadsCollection(template,filter,limit)
+      addLocalShiftsCollection(share.Lead,template,'lead',filter,limit)
     template.sel.set(filter)
 
 Template.volunteerShiftsForm.helpers
@@ -147,7 +118,7 @@ Template.volunteerUserShifts.onCreated () ->
     if sub.ready()
       addLocalShiftsCollection(share.TeamShifts,template,'shift',{},100)
       addLocalShiftsCollection(share.TeamTasks,template,'task',{},100)
-      addLocalLeadsCollection(template,{},100)
+      addLocalShiftsCollection(share.Lead,template,'lead',{},100)
 
 Template.volunteerUserShifts.helpers
   'allShifts': () ->
@@ -169,7 +140,7 @@ Template.volunteersTeamView.onCreated () ->
     if template.sub.ready()
       addLocalShiftsCollection(share.TeamShifts,template,'shift',{},100)
       addLocalShiftsCollection(share.TeamTasks,template,'task',{},100)
-      addLocalLeadsCollection(template,{},100)
+      addLocalShiftsCollection(share.Lead,template,'lead',{},100)
 
 Template.volunteersTeamView.helpers
   'team': () ->
