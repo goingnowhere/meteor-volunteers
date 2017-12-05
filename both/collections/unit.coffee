@@ -2,6 +2,8 @@ import { checkNpmVersions } from 'meteor/tmeasday:check-npm-versions'
 checkNpmVersions { 'simpl-schema': '0.3.x' }, 'abate:volunteers'
 import SimpleSchema from 'simpl-schema'
 SimpleSchema.extendOptions(['autoform'])
+# Workaround default file loading order
+import './duties'
 
 unitPolicy = ["public";"private";"restricted"]
 
@@ -13,7 +15,7 @@ export getOrgUnit = (unitId) =>
     team: team,
     department: department,
     division: division,
-    lowest: [team, department, division].find((unit) => unit?)
+    unit: [team, department, division].find((unit) => unit?)
   }
 
 share.getTagList = (sel={}) ->

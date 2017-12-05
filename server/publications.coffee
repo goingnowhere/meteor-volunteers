@@ -89,13 +89,7 @@ toShare.initPublications = (eventName) ->
       shifts = share.TeamShifts.find(selShifts)
       tasks = share.TeamTasks.find(selTasks)
       leads = share.Lead.find({parentId: teamId})
-      teams = share.Team.find({_id: teamId})
-      # XXX: restrict to dept and div related to this team ...
-      team = share.Team.findOne(teamId)
-      d = share.Department.find(team.parentId)
-      department = share.Department.findOne(team.parentId)
-      dd = share.Division.find(department.parentId)
-      [taskSignups,shiftSignups,leadSignups,shifts,tasks,leads,teams,d,dd]
+      [taskSignups,shiftSignups,leadSignups,shifts,tasks,leads]
 
   Meteor.publish "#{eventName}.Volunteers.allDuties.byUser", () ->
     if this.userId

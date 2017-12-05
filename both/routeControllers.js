@@ -1,9 +1,12 @@
 import { collections } from './collections/initCollections'
+import { getOrgUnit } from './collections/unit'
+import { meteorSub } from './global'
 
-SingleTeamController = eventName => RouteController.extend({
+SingleUnitController = eventName => RouteController.extend({
   waitOn() {return [
-    Meteor.subscribe(`${eventName}.Volunteers.team`),
+    meteorSub('organization'),
   ]},
-  data() {return this.params && this.params._id && this.ready() &&
-      collections.Team.findOne(this.params._id)},
+  data() {
+    return this.params && this.params._id && this.ready() && getOrgUnit(this.params._id)
+  },
 })

@@ -23,7 +23,7 @@ Template.addVolunteerForm.helpers
 addLocalShiftsCollection = (collection,template,type,filter = {},limit = 0) ->
   collection.find(filter,{limit: limit}).forEach((job) ->
     orgUnit = getOrgUnit(job.parentId)
-    team = orgUnit.lowest
+    team = orgUnit.unit
     users = []
     signupsSub = share.templateSub(template,"signups.byShift",job._id)
     if signupsSub.ready()
@@ -164,6 +164,5 @@ Template.volunteersTeamView.helpers
     template.ShiftTaskLocal.find()
   canEditTeam: () =>
     teamId = Template.instance().data._id
-    # console.log(teamId, Roles.userIsInRole(Meteor.userId(), ['manager', teamId], share.eventName))
     Roles.userIsInRole(Meteor.userId(), ['manager', teamId], share.eventName)
-  'teamEditEventName': () -> 'teamEdit-'+share.eventName1.get()
+  unitDashboardEventName: () -> "unitDashboard-#{share.eventName1.get()}"

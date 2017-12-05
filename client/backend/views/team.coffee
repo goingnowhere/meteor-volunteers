@@ -1,7 +1,7 @@
 Template.teamDayViewGrid.onCreated () ->
   template = this
   template.taskFilter = new ReactiveVar(["pending","overdue","done"])
-  template.teamId = template.data._id
+  template.teamId = template.data.unit._id
   share.templateSub(template,"allDuties.byTeam", template.teamId)
   share.templateSub(template,"users")
 
@@ -38,7 +38,6 @@ Template.teamDayViewGrid.helpers {
       totalVacant = 0
       totalConfirmed = 0
       vvl = _.map(_.sortBy(vl,'startTime'), (v) ->
-        # status: confirmed
         confirmed = share.ShiftSignups.find({shiftId: v._id}).count()
         totalConfirmed =+ confirmed
         totalVacant =+ (v.max - confirmed)
@@ -54,24 +53,22 @@ Template.teamDayViewGrid.helpers {
       teamId = Template.currentData()._id
       {date:k, shifts: vvl, progress: progress, teamId: teamId}
     )
-  # pathFor
-  'teamSignupList': () => "teamSignupsList-#{share.eventName1.get()}"
-
-  }
+  'teamSignupsList': () => "teamSignupsList-#{share.eventName1.get()}"
+}
 
 Template.teamDayViewGrid.events
   'click [data-action="edit"]': (event,template) ->
     ModalShowWithTemplate("insertUpdateTemplate",
-      {form:{collection: share.Team}, data:this})
+      {form:{collection: share.Team}, data:this.unit})
   'click [data-action="delete"]': (event,template) ->
     id = $(event.target).data('id')
     share.meteorCall "team.remove", id
   'click [data-action="addShift"]': (event,template) ->
     ModalShowWithTemplate("insertUpdateTemplate",
-      {form:{collection: share.TeamShifts}, data:{parentId: this._id}})
+      {form:{collection: share.TeamShifts}, data:{parentId: this.unit._id}})
   'click [data-action="addTask"]': (event,template) ->
     ModalShowWithTemplate("insertUpdateTemplate",
-      {form:{collection: share.TeamTasks}, data:{parentId: this._id}})
+      {form:{collection: share.TeamTasks}, data:{parentId: this.unit._id}})
   'click #taskStatus': ( event, template ) ->
     selected = template.findAll("#taskStatus:checked")
     template.taskFilter.set(_.map(selected, (i) -> i.defaultValue))

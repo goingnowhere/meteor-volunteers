@@ -1,14 +1,14 @@
 toShare = {}
 toShare.initRouters = (eventName) ->
-  Router.route "#{eventName}/dashboard/team/:_id",
-    name: "teamEdit-#{eventName}"
+  Router.route "#{eventName}/dashboard/:_id",
+    name: "unitDashboard-#{eventName}"
     template: 'teamDayViewGrid'
-    controller: SingleTeamController(eventName)
+    controller: SingleUnitController(eventName)
 
   Router.route "#{eventName}/dashboard/team/:_id/signups",
     name: "teamSignupsList-#{eventName}"
     template: 'teamSignupsList'
-    controller: SingleTeamController(eventName)
+    controller: SingleUnitController(eventName)
 
   # Router.route "#{eventName}/team/edit/:_id",
   #   name: "teamEdit-#{eventName}"

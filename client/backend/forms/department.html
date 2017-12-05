@@ -6,7 +6,7 @@
   <ul>
     {{#each departments}}
       <li>
-        {{name}} <a href="{{pathFor departmentView _id=_id}}">(edit)</a>
+        <a href="{{pathFor unitDashboard _id=_id}}">{{name}}</a> <a href="{{pathFor departmentView _id=_id}}">(edit)</a>
       </li>
     {{/each}}
   </ul>

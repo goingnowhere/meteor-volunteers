@@ -96,7 +96,7 @@
   <div class="panel">
     <div class="panel-heading clearfix">
       <div class="btn-group pull-right">
-        <a href="{{pathFor teamSignupList _id}}" class="btn btn-default btn-sm" >
+        <a href="{{pathFor teamSignupsList _id=unit._id}}" class="btn btn-default btn-sm" >
           {{_ "signups" }}
         </a>
         <button type="button" class="btn btn-info btn-sm dropdown-toggle"
@@ -104,13 +104,13 @@
           <i class="fa fa-wrench fa-fw"></i>
         </button>
         <ul class="dropdown-menu">
-          <li class="dropdown-item"><a href="#" data-action="edit" data-id="{{_id}}">
+          <li class="dropdown-item"><a href="#" data-action="edit" data-id="{{teamId}}">
             {{fa "pencil-square-o"}} {{_ "edit"}}</a></li>
-          <li class="dropdown-item"><a href="#" data-action="delete" data-id="{{_id}}">
+          <li class="dropdown-item"><a href="#" data-action="delete" data-id="{{teamId}}">
             {{fa "trash-o"}} {{_ "remove"}}</a></li>
         </ul>
       </div>
-      <h4>{{_ "team"}} : {{name}}</h4>
+      <h4>{{_ "team"}} : {{unit.name}}</h4>
     </div>
   </div>
   {{_ "team_leads"}} :

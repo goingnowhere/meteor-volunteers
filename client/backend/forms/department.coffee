@@ -39,3 +39,4 @@ Template.departmentsList.onCreated () =>
 Template.departmentsList.helpers
   departments: () => share.Department.find()
   departmentView: () => "departmentView-#{share.eventName1.get()}"
+  unitDashboard: () => "unitDashboard-#{share.eventName1.get()}"
