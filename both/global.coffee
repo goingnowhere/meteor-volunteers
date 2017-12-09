@@ -1,19 +1,26 @@
-toShare = {}
-
-toShare.getUserName  = AutoFormComponents.getUserName
-toShare.getUserEmail = AutoFormComponents.getUserEmail
+share.getUserName  = AutoFormComponents.getUserName
+share.getUserEmail = AutoFormComponents.getUserEmail
 
 # waiting for this package to be fixed
 @TAPi18n = { __: (n) -> n }
 
-toShare.templateSub = (template,name,args...) ->
+share.templateSub = (template,name,args...) ->
   template.subscribe("#{share.eventName}.Volunteers.#{name}",args...)
 
-toShare.meteorSub = (name,args...) ->
+share.meteorSub = (name,args...) ->
   Meteor.subscribe("#{share.eventName}.Volunteers.#{name}",args...)
 
-toShare.meteorCall = (name,args...) ->
+share.meteorCall = (name,args...) ->
   Meteor.call "#{share.eventName}.Volunteers.#{name}", args...
 
-module.exports = toShare
-_.extend(share, toShare)
+share.getOrgUnit = (unitId) ->
+  if unitId
+    team = share.Team.findOne(unitId)
+    department = share.Department.findOne(team?.parentId || unitId)
+    division = share.Division.findOne(department?.parentId || unitId)
+    {
+      team: team,
+      department: department,
+      division: division,
+      unit: [team, department, division].find((unit) => unit?)
+    }

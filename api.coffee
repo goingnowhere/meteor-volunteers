@@ -1,29 +1,24 @@
-toShare = {}
 
-toShare.form = new ReactiveVar(share.VolunteerForm)
+share.form = new ReactiveVar(share.VolunteerForm)
 periods =
   'night': {start:0,end:4},
-  'dawn': {start:4,end:8},
+  'dusk': {start:4,end:8},
   'morning': {start:8,end:12},
   'afternoon': {start:12,end:16},
-  'dusk': {start:16,end:20},
+  'dawn': {start:16,end:20},
   'evening': {start:20,end:24}
-toShare.periods = new ReactiveVar(periods)
-
-# XXX why do I need this variable ???
-toShare.eventName1 = new ReactiveVar()
+share.periods = new ReactiveVar(periods)
 
 initAuthorization = (eventName) ->
-  toShare.isManagerOrLead = (userId) ->
+  share.isManagerOrLead = (userId, unitId) ->
     if Roles.userIsInRole(userId, [ 'manager' ], eventName)
       return true
     else if userId == Meteor.userId()
-      Roles.getRolesForUser(userId, eventName).length > 0
+      l = Roles.getRolesForUser(userId, eventName)
+      (unitId && unitId in l) || (l.length > 0)
     else return false
-  toShare.isManager = (userId) ->
+  share.isManager = (userId) ->
     Roles.userIsInRole(userId, [ 'manager' ], eventName)
-  module.exports = toShare
-  _.extend(share, toShare)
 
 saveVolunteerForm = (eventName,data) ->
   Meteor.call('FormBuilder.dynamicForms.upsert',{name: "VolunteerForm"}, data)
@@ -39,7 +34,6 @@ class VolunteersClass
     share.initCollections(@eventName)
     share.initRouters(@eventName)
     share.initMethods(@eventName)
-    toShare.eventName1.set(@eventName)
     initAuthorization(@eventName)
     if Meteor.isServer
       share.initPublications(@eventName)
@@ -54,10 +48,7 @@ class VolunteersClass
       Lead: share.Lead
       ShiftSignups: share.ShiftSignups
       TaskSignups: share.TaskSignups
-  setPeriods: (periods) -> toShare.periods.set(periods)
+  setPeriods: (periods) -> share.periods.set(periods)
   setUserForm: (data) -> saveVolunteerForm(@eventName,data)
-  isManagerOrLead: (userId) -> toShare.isManagerOrLead(userId)
-  isManager: (userId) -> toShare.isManager(userId)
-
-module.exports = toShare
-_.extend(share, toShare)
+  isManagerOrLead: (userId) -> share.isManagerOrLead(userId)
+  isManager: (userId) -> share.isManager(userId)

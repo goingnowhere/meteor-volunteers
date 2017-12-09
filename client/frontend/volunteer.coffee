@@ -1,5 +1,4 @@
 import SimpleSchema from 'simpl-schema'
-import { getOrgUnit } from '../../both/collections/unit'
 
 Template.addVolunteerForm.onCreated () ->
   template = this
@@ -20,9 +19,9 @@ Template.addVolunteerForm.helpers
     }
   'data': () -> share.VolunteerForm.findOne({userId: Meteor.userId()})
 
-addLocalShiftsCollection = (collection,template,type,filter = {},limit = 0) ->
+addLocalShiftsCollection = (collection,template,type,filter = {},limit = 10,userId = Meteor.userId()) ->
   collection.find(filter,{limit: limit}).forEach((job) ->
-    orgUnit = getOrgUnit(job.parentId)
+    orgUnit = share.getOrgUnit(job.parentId)
     team = orgUnit.unit
     users = []
     signupsSub = share.templateSub(template,"signups.byShift",job._id)
@@ -31,7 +30,7 @@ addLocalShiftsCollection = (collection,template,type,filter = {},limit = 0) ->
       users = signupCollection.find(
         {shiftId: job._id, status: {$in: ["confirmed"]}}
       ).map((s) -> s.userId)
-      signup = signupCollection.findOne({shiftId: job._id, userId: Meteor.userId()})
+      signup = signupCollection.findOne({shiftId: job._id, userId: userId})
       sel =
         teamId: team._id
         shiftId: job._id
@@ -115,11 +114,10 @@ Template.volunteerUserShifts.onCreated () ->
 
   template.autorun () ->
     sub = share.templateSub(template,"allDuties.byUser")
-
     if sub.ready()
-      addLocalShiftsCollection(share.TeamShifts,template,'shift',{},100)
-      addLocalShiftsCollection(share.TeamTasks,template,'task',{},100)
-      addLocalShiftsCollection(share.Lead,template,'lead',{},100)
+      addLocalShiftsCollection(share.TeamShifts,template,'shift')
+      addLocalShiftsCollection(share.TeamTasks,template,'task')
+      addLocalShiftsCollection(share.Lead,template,'lead')
 
 Template.volunteerUserShifts.helpers
   'allShifts': () ->
@@ -131,38 +129,29 @@ Template.volunteerUserShifts.helpers
     sort = {sort: {start: -1, dueDate:-1}}
     template.ShiftTaskLocal.find({type: "task"},sort)
 
-Template.volunteersTeamView.onCreated () ->
-  template = this
-  template.ShiftTaskLocal = new Mongo.Collection(null)
-  template.teamId = template.data._id
-
-  template.autorun () ->
-    template.sub = share.templateSub(template,"allDuties.byTeam", template.teamId)
-    if template.sub.ready()
-      addLocalShiftsCollection(share.TeamShifts,template,'shift',{},100)
-      addLocalShiftsCollection(share.TeamTasks,template,'task',{},100)
-      addLocalShiftsCollection(share.Lead,template,'lead',{},100)
-
-Template.volunteersTeamView.helpers
-  'team': () ->
-    template = Template.instance()
-    if template.sub.ready()
-      share.Team.findOne(template.teamId)
-  'division': () ->
-    template = Template.instance()
-    if template.sub.ready()
-      team = share.Team.findOne(template.teamId)
-      department = share.Department.findOne(team.parentId)
-      share.Division.findOne(department.parentId)
-  'department': () ->
-    template = Template.instance()
-    if template.sub.ready()
-      team = share.Team.findOne(template.teamId)
-      share.Department.findOne(team.parentId)
-  'allShiftsTasks': () ->
-    template = Template.instance()
-    template.ShiftTaskLocal.find()
-  canEditTeam: () =>
-    teamId = Template.instance().data._id
-    Roles.userIsInRole(Meteor.userId(), ['manager', teamId], share.eventName)
-  unitDashboardEventName: () -> "unitDashboard-#{share.eventName1.get()}"
+# Template.volunteersTeamView.onCreated () ->
+#   template = this
+#   template.ShiftTaskLocal = new Mongo.Collection(null)
+#   template.teamId = template.data._id
+#
+#   template.autorun () ->
+#     template.subOrg = share.templateSub(template,"organization")
+#     template.subSig = share.templateSub(template,"allDuties.byTeam", template.teamId)
+#     filter = {parentId : template.teamId}
+#     if template.subSig.ready()
+#       addLocalShiftsCollection(share.TeamShifts,template,'shift',filter)
+#       addLocalShiftsCollection(share.TeamTasks,template,'task',filter)
+#       addLocalShiftsCollection(share.Lead,template,'lead',filter)
+#
+# Template.volunteersTeamView.helpers
+#   'orgUnit': () ->
+#     template = Template.instance()
+#     if template.subOrg.ready()
+#       share.getOrgUnit(template.teamId)
+#   'allShiftsTasks': () ->
+#     template = Template.instance()
+#     template.ShiftTaskLocal.find()
+#   canEditTeam: () =>
+#     template = Template.instance()
+#     share.isManagerOrLead(Meteor.userId(),template.teamId)
+#   unitDashboardEventName: () -> "unitDashboard-#{share.eventName}"

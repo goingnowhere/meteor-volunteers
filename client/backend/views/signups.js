@@ -1,31 +1,30 @@
-import { templateSub, meteorCall } from '../../../both/global'
-import { collections } from '../../../both/collections/initCollections'
+let share = __coffeescriptShare;
 
 Template.teamSignupsList.onCreated(function () {
   const template = this;
-  templateSub(template,"users")
-  templateSub(template,"allDuties.byTeam",this.data.unit._id)
+  share.templateSub(template,"users")
+  share.templateSub(template,"allDuties.byTeam",this.data.unit._id)
 })
 
 Template.teamSignupsList.helpers({
   allSignups() {
-    const shifts = collections.ShiftSignups.find({ parentId: this.unit._id, status: 'pending' }, {sort: {createdAt: -1}})
+    const shifts = share.ShiftSignups.find({ parentId: this.unit._id, status: 'pending' }, {sort: {createdAt: -1}})
       .map(signup => ({
         ...signup,
         type: 'shift',
-        duty: collections.TeamShifts.findOne(signup.shiftId)
+        duty: share.TeamShifts.findOne(signup.shiftId)
       }))
-    const tasks = collections.TaskSignups.find({ parentId: this.unit._id, status: 'pending' }, {sort: {createdAt: -1}})
+    const tasks = share.TaskSignups.find({ parentId: this.unit._id, status: 'pending' }, {sort: {createdAt: -1}})
       .map(signup => ({
         ...signup,
         type: 'task',
-        duty: collections.TeamTasks.findOne(signup.shiftId)
+        duty: share.TeamTasks.findOne(signup.shiftId)
       }))
-    const leads = collections.LeadSignups.find({ parentId: this.unit._id, status: 'pending' }, {sort: {createdAt: -1}})
+    const leads = share.LeadSignups.find({ parentId: this.unit._id, status: 'pending' }, {sort: {createdAt: -1}})
       .map(signup => ({
         ...signup,
         type: 'lead',
-        duty: collections.Lead.findOne(signup.shiftId)
+        duty: share.Lead.findOne(signup.shiftId)
       }))
     return [
       ...shifts,
@@ -40,20 +39,20 @@ Template.teamSignupsList.events({
     const type = $(event.target).data('type')
     const signupId = $(event.target).data('signup')
     if (type === 'lead') {
-      meteorCall(`${type}Signups.confirm`, signupId)
+      share.meteorCall(`${type}Signups.confirm`, signupId)
     } else {
       const signup = {_id: signupId, modifier: {$set: {status: 'confirmed'}}}
-      meteorCall(`${type}Signups.update`, signup)
+      share.meteorCall(`${type}Signups.update`, signup)
     }
   },
   'click [data-action="refuse"]'(event) {
     const type = $(event.target).data('type')
     const signupId = $(event.target).data('signup')
     if (type === 'lead') {
-      meteorCall(`${type}Signups.refuse`, signupId)
+      share.meteorCall(`${type}Signups.refuse`, signupId)
     } else {
       const signup = {_id: signupId, modifier: {$set: {status: 'refused'}}}
-      meteorCall(`${type}Signups.update`, signup)
+      share.meteorCall(`${type}Signups.update`, signup)
     }
   },
 })

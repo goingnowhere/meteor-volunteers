@@ -50,10 +50,11 @@ Package.onUse(function(api) {
     // 'drblue:fullcalendar',
   ], 'client');
 
+  // Order Matters !
   api.add_files([
     'both/global.coffee',
     'both/router.coffee',
-    'both/routeControllers.js',
+    'both/routerControllers.js',
 
     "both/collections/duties.coffee",
     "both/collections/unit.coffee",
@@ -107,7 +108,8 @@ Package.onUse(function(api) {
 
   // api.add_files([ "i18n/en.i18n.json", ], ["client", "server"]);
 
-  api.export([ 'VolunteersClass' ]);
+  // Coffee export is to make the special 'share' variable in coffeescript available to JS
+  api.export([ 'VolunteersClass']);
 });
 
 //Package.onTest(function(api) {

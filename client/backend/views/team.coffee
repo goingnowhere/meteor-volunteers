@@ -53,7 +53,7 @@ Template.teamDayViewGrid.helpers {
       teamId = Template.currentData()._id
       {date:k, shifts: vvl, progress: progress, teamId: teamId}
     )
-  'teamSignupsList': () => "teamSignupsList-#{share.eventName1.get()}"
+  'teamSignupsList': () => "teamSignupsList-#{share.eventName}"
 }
 
 Template.teamDayViewGrid.events

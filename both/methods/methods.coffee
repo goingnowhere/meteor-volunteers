@@ -6,8 +6,7 @@ checkForCollisions = (shift) ->
     start: { $leq: shift.start },
     end: { $geq: shift.end }})?
 
-toShare = {}
-toShare.initMethods = (eventName) ->
+share.initMethods = (eventName) ->
   # Generic function to create insert,update,remove methods for groups within
   # the organisation, e.g. teams
   createOrgUnitMethod = (collection, type) ->
@@ -17,7 +16,7 @@ toShare.initMethods = (eventName) ->
         console.log ["#{collectionName}.remove", Id]
         check(Id,String)
         if Roles.userIsInRole(Meteor.userId(), [ 'manager', Id ], eventName)
-          Roles.deleteRole(Id)
+          if Meteor.isServer then Roles.deleteRole(Id)
           collection.remove(Id)
     else if type == "insert"
       Meteor.methods "#{collectionName}.insert": (doc) ->
@@ -29,8 +28,9 @@ toShare.initMethods = (eventName) ->
           allowedRoles.push(parentRole)
         if Roles.userIsInRole(Meteor.userId(), allowedRoles, eventName)
           insertResult = collection.insert(doc)
-          Roles.createRole(insertResult)
-          Roles.addRolesToParent(insertResult, parentRole) if parentRole?
+          if Meteor.isServer
+            Roles.createRole(insertResult)
+            Roles.addRolesToParent(insertResult, parentRole) if parentRole?
     else if type == "update"
       Meteor.methods "#{collectionName}.update": (doc) ->
         console.log ["#{collectionName}.update",doc]
@@ -39,8 +39,9 @@ toShare.initMethods = (eventName) ->
           updatedParentId = doc.modifier.parentId || doc.modifier.$set?.updatedParentId
           if updatedParentId?
             oldDoc = collection.findOne(doc._id)
-            Roles.removeRolesFromParent(doc._id, oldDoc.parentId)
-            Roles.addRolesToParent(doc._id, updatedParentId)
+            if Meteor.isServer
+              Roles.removeRolesFromParent(doc._id, oldDoc.parentId)
+              Roles.addRolesToParent(doc._id, updatedParentId)
           collection.update(doc._id,doc.modifier)
     else
       console.warn "type #{type} for #{collectionName} ERROR"
@@ -113,27 +114,18 @@ toShare.initMethods = (eventName) ->
         if (sel.userId == userId) || (Roles.userIsInRole(userId, [ 'manager', sel.parentId ], eventName))
           collection.update(sel, {$set: {status: "bailed"}})
 
-  orgUnitCollections = [
-    share.Division,
-    share.Department,
-    share.Team,
-  ]
-  normalCollections = [
-    share.Lead,
-    share.TeamShifts,
-    share.TeamTasks
-  ]
   for type in ["remove","insert","update"]
     do ->
-      for collection in orgUnitCollections
-        do =>
+      for k,collection of share.orgUnitCollections
+        do ->
           createOrgUnitMethod(collection, type)
-      for collection in normalCollections
+      for k,collection of share.dutiesCollections
         do ->
           createMethod(collection,type)
 
   for type in ['remove', 'update', 'insert', 'bail']
-    do =>
+    do ->
+      # XXX I think here we can do the same using share.dutiesCollections
       createSignupMethod('ShiftSignups', share.TeamShifts, type)
       createSignupMethod('TaskSignups', share.TeamTasks, type)
 
@@ -167,7 +159,8 @@ toShare.initMethods = (eventName) ->
     userId = Meteor.userId()
     olddoc = share.LeadSignups.findOne(shiftId)
     if Roles.userIsInRole(userId, [ 'manager', olddoc.parentId ], eventName)
-      Roles.removeUsersFromRoles(olddoc.userId, olddoc.parentId, eventName)
+      if Meteor.isServer
+        Roles.removeUsersFromRoles(olddoc.userId, olddoc.parentId, eventName)
       share.LeadSignups.remove(shiftId)
 
   Meteor.methods "#{prefix}.leadSignups.confirm": (shiftId) ->
@@ -176,7 +169,8 @@ toShare.initMethods = (eventName) ->
     userId = Meteor.userId()
     olddoc = share.LeadSignups.findOne(shiftId)
     if Roles.userIsInRole(userId, [ 'manager', olddoc.parentId ], eventName)
-      Roles.addUsersToRoles(olddoc.userId, olddoc.parentId, eventName)
+      if Meteor.isServer
+        Roles.addUsersToRoles(olddoc.userId, olddoc.parentId, eventName)
       share.LeadSignups.update(shiftId, { $set: { status: 'confirmed' } })
 
   Meteor.methods "#{prefix}.leadSignups.refuse": (shiftId) ->
@@ -185,7 +179,8 @@ toShare.initMethods = (eventName) ->
     userId = Meteor.userId()
     olddoc = share.LeadSignups.findOne(shiftId)
     if Roles.userIsInRole(userId, [ 'manager', olddoc.parentId ], eventName)
-      Roles.removeUsersFromRoles(olddoc.userId, olddoc.parentId, eventName)
+      if Meteor.isServer
+        Roles.removeUsersFromRoles(olddoc.userId, olddoc.parentId, eventName)
       share.LeadSignups.update(shiftId, { $set: { status: 'refused' } })
 
   Meteor.methods "#{prefix}.leadSignups.insert": (doc) ->
@@ -197,7 +192,8 @@ toShare.initMethods = (eventName) ->
         (Roles.userIsInRole(userId, [ 'manager', lead.parentId ], eventName))
       if lead.policy == "public"
         doc.status = "confirmed"
-        Roles.addUsersToRoles(doc.userId, lead.parentId, eventName)
+        if Meteor.isServer
+          Roles.addUsersToRoles(doc.userId, lead.parentId, eventName)
       if lead.policy == "requireApproval"
         doc.status = "pending"
       if doc.status
@@ -209,8 +205,6 @@ toShare.initMethods = (eventName) ->
     userId = Meteor.userId()
     olddoc = share.LeadSignups.findOne(sel._id)
     if (sel.userId == userId) || (Roles.userIsInRole(userId, [ 'manager', olddoc.parentId ], eventName))
-      Roles.removeUsersFromRoles(olddoc.userId, olddoc.parentId, eventName)
+      if Meteor.isServer
+        Roles.removeUsersFromRoles(olddoc.userId, olddoc.parentId, eventName)
       share.LeadSignups.update(sel,{$set: {status: "bailed"}})
-
-module.exports = toShare
-_.extend(share, toShare)

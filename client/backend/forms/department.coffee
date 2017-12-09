@@ -1,4 +1,4 @@
-Template.departmentView.helpers
+Template.departmentEdit.helpers
   'main': () ->
     id: "details"
     label: "details"

@@ -1,5 +1,4 @@
-toShare = {}
-toShare.initPublications = (eventName) ->
+share.initPublications = (eventName) ->
 
   dutiesPublicPolicy = { policy: { $in: ["public", "requireApproval"] } }
   unitPublicPolicy = { policy: { $in: ["public"] } }
@@ -98,7 +97,7 @@ toShare.initPublications = (eventName) ->
       tasks = share.TaskSignups.find({userId: this.userId, status: {$in: ["confirmed", "pending","refused"]}})
       shifts = share.ShiftSignups.find({userId: this.userId, status: {$in: ["confirmed", "pending","refused"]}})
       shiftIds = shifts.map((e) -> e.shiftId).concat(tasks.map((e) -> e.shiftId))
-      teamIds = shifts.map((e) -> e.teamId).concat(tasks.map((e) -> e.teamId))
+      teamIds = shifts.map((e) -> e.parentId).concat(tasks.map((e) -> e.parentId))
       s = share.TeamShifts.find({_id: {$in: shiftIds}})
       t = share.TeamTasks.find({_id: {$in: shiftIds}})
       l = share.Lead.find({parentId: {$in: teamIds}})
@@ -171,6 +170,3 @@ toShare.initPublications = (eventName) ->
     if this.userId
       if share.isManagerOrLead(this.userId)
         Meteor.users.find({}, { fields: { emails: 1, profile: 1, roles: 1 } })
-
-module.exports = toShare
-_.extend(share, toShare)

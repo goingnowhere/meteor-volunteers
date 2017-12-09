@@ -8,7 +8,7 @@ Template.addDivision.events
     Id = $(event.target).data('id')
     share.meteorCall "division.remove", Id
 
-Template.divisionView.helpers
+Template.divisionEdit.helpers
   'main': () ->
     id: "details"
     label: "details"

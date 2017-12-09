@@ -19,7 +19,7 @@ Template.shiftsTasksTableView.events events
 
 helpers =
   'sameDay': (start, end) -> moment(start).isSame(moment(end),"day")
-  'teamViewEventName': () -> 'teamView-'+share.eventName1.get()
+  'teamViewEventName': () -> 'teamView-'+share.eventName
 
 Template.shiftsTasksTableView.helpers helpers
 Template.shiftsTasksTableRowView.helpers helpers

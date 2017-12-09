@@ -1,15 +1,14 @@
-import { eventName1 } from '../../../api'
-import { meteorSub } from '../../../both/global'
-import { collections } from '../../../both/collections/initCollections'
+let share = __coffeescriptShare;
 
-let template
 Template.orgUnitList.onCreated(function() {
   template = this
-  meteorSub(template.data.unitType)
+  share.meteorSub(template.data.unitType)
 })
 
 Template.orgUnitList.helpers({
-  orgUnits: () => collections.orgUnitCollections[template.data.unitType].find(),
-  orgUnitView: () => `${template.data.unitType}View-${eventName1.get()}`,
-  unitDashboard: () => `unitDashboard-${eventName1.get()}`,
+  orgUnits: () => share.orgUnitCollections[template.data.unitType].find(),
+  orgUnitView: () => {
+    return `${template.data.unitType}View-${share.eventName}`;
+  },
+  unitDashboard: () => `unitDashboard-${share.eventName}`,
 })
