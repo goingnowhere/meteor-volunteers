@@ -69,13 +69,22 @@ Template.volunteerShiftsForm.onCreated () ->
   template.ShiftTaskLocal = new Mongo.Collection(null)
   template.sel = new ReactiveVar({})
 
-  template.searchQuery.set('range',[])
-  template.searchQuery.set('days',[])
-  template.searchQuery.set('period',[])
-  template.searchQuery.set('tags',[])
-  template.searchQuery.set('types',[])
-  template.searchQuery.set('areas',[])
-  template.searchQuery.set('limit',10)
+  searchQuery =
+    range: []
+    days: []
+    period: []
+    tags: []
+    duties: []
+    teams: []
+    limit: 10
+  if template.data then searchQuery = template.data
+  template.searchQuery.set('range',searchQuery.range)
+  template.searchQuery.set('days',searchQuery.days)
+  template.searchQuery.set('period',searchQuery.period)
+  template.searchQuery.set('tags',searchQuery.tags)
+  template.searchQuery.set('duties',searchQuery.duties)
+  template.searchQuery.set('teams',searchQuery.teams)
+  template.searchQuery.set('limit',searchQuery.limit)
 
   template.autorun () ->
     filter = makeFilter(template.searchQuery)

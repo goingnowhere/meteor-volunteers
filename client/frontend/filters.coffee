@@ -38,11 +38,11 @@ import 'flatpickr/dist/flatpickr.css'
   tags = searchQuery.get('tags')
   if tags.length > 0 then sel.push {tags: { $in: tags }}
 
-  types = searchQuery.get('types')
-  if types.length > 0 then sel.push {type: { $in: types }}
+  duties = searchQuery.get('duties')
+  if duties.length > 0 then sel.push {type: { $in: duties }}
 
-  areas = searchQuery.get('areas')
-  if areas.length > 0 then sel.push {teamId: { $in: areas }}
+  teams = searchQuery.get('teams')
+  if teams.length > 0 then sel.push {teamId: { $in: teams }}
 
   return if sel.length > 0 then {"$and": sel} else {}
 
@@ -85,19 +85,19 @@ Template.periodPicker.events
     val = unless val then [] else val
     template.data.searchQuery.set('period',val)
 
-Template.typePicker.onRendered () ->
+Template.dutiesPicker.onRendered () ->
   data = _.map(["shift","task","lead"],(t) ->
     id: t
     text: (TAPi18n.__ t))
-  $("#type").select2({
+  $("#duties").select2({
     data: data,
     multiple: true})
 
-Template.typePicker.events
-  'change #type': ( event, template ) ->
-    val = template.$('#type').val()
+Template.dutiesPicker.events
+  'change #duties': ( event, template ) ->
+    val = template.$('#duties').val()
     val = unless val then [] else val
-    template.data.searchQuery.set('types',val)
+    template.data.searchQuery.set('duties',val)
 
 Template.tagsPicker.onRendered () ->
   template = this
@@ -119,23 +119,23 @@ Template.tagsPicker.events
     val = unless val then [] else val
     template.data.searchQuery.set('tags',val)
 
-Template.areasPicker.onRendered () ->
+Template.teamsPicker.onRendered () ->
   template = this
   sub = share.templateSub(template,"team")
   template.autorun () ->
     if sub.ready()
-      areas = template.data.searchQuery.get('areas')
-      sel = if areas.length > 0 then {areas: {$in: areas}} else {}
-      areas = share.Team.find(sel).fetch()
-      data = _.map(areas,(t) ->
+      teams = template.data.searchQuery.get('teams')
+      sel = if teams.length > 0 then {teams: {$in: teams}} else {}
+      teams = share.Team.find(sel).fetch()
+      data = _.map(teams,(t) ->
         id: t._id
         text: t.name)
-      $("#areas").select2({
+      $("#teams").select2({
         data: data,
         multiple: true})
 
-Template.areasPicker.events
-  'change #areas': ( event, template ) ->
-    val = template.$('#areas').val()
+Template.teamsPicker.events
+  'change #teams': ( event, template ) ->
+    val = template.$('#teams').val()
     val = unless val then [] else val
-    template.data.searchQuery.set('areas',val)
+    template.data.searchQuery.set('teams',val)
