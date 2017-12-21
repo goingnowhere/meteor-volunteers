@@ -2,10 +2,10 @@
 share.form = new ReactiveVar(share.VolunteerForm)
 periods =
   'night': {start:0,end:4},
-  'dusk': {start:4,end:8},
+  'dawn': {start:4,end:8},
   'morning': {start:8,end:12},
   'afternoon': {start:12,end:16},
-  'dawn': {start:16,end:20},
+  'dusk': {start:16,end:20},
   'evening': {start:20,end:24}
 share.periods = new ReactiveVar(periods)
 

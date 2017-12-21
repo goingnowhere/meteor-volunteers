@@ -116,13 +116,6 @@ share.Schemas.TeamShifts = new SimpleSchema(
 share.Schemas.TeamShifts.extend(CommonTask)
 
 share.Schemas.Lead = new SimpleSchema(
-  parentId:
-    type: String
-    autoform:
-      type: "hidden"
-  title:
-    type: String
-    label: () -> TAPi18n.__("title")
   responsibilities:
     type: String
     label: () -> TAPi18n.__("responsibilities")
@@ -141,10 +134,5 @@ share.Schemas.Lead = new SimpleSchema(
     optional: true
     autoform:
       rows: 5
-  policy:
-    type: String
-    label: () -> TAPi18n.__("policy")
-    allowedValues: policyValues
-    autoform:
-      defaultValue: "requireApproval"
 )
+share.Schemas.Lead.extend(CommonTask)
