@@ -46,6 +46,12 @@
         </div>
     </div>
     <div class="panel-footer clearfix">
+      {{#if isManagerOrLead }}
+        <div>
+          <select class="select-users form-control" data-shiftid="{{shiftId}}" data-parentid="{{teamId}}">
+          </select>
+        </div>
+      {{/if}}
       <div class="pull-right">
         {{#if $and status ($neq status 'bailed')}}
           <button class="btn btn-default disabled

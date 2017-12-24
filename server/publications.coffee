@@ -168,5 +168,6 @@ share.initPublications = (eventName) ->
 
   Meteor.publish "#{eventName}.Volunteers.users", () ->
     if this.userId
+      # XXX restrict to user for this event !
       if share.isManagerOrLead(this.userId)
         Meteor.users.find({}, { fields: { emails: 1, profile: 1, roles: 1 } })
