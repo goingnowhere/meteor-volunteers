@@ -68,6 +68,7 @@ Template.volunteerShiftsForm.onCreated () ->
   template.searchQuery = new ReactiveDict()
   template.ShiftTaskLocal = new Mongo.Collection(null)
   template.sel = new ReactiveVar({})
+  template.isCustumSearch = template.data?.searchQuery?
 
   searchQuery =
     range: []
@@ -77,16 +78,19 @@ Template.volunteerShiftsForm.onCreated () ->
     duties: []
     teams: []
     limit: 10
-  if template.data then searchQuery = template.data
-  template.searchQuery.set('range',searchQuery.range)
-  template.searchQuery.set('days',searchQuery.days)
-  template.searchQuery.set('period',searchQuery.period)
-  template.searchQuery.set('tags',searchQuery.tags)
-  template.searchQuery.set('duties',searchQuery.duties)
-  template.searchQuery.set('teams',searchQuery.teams)
-  template.searchQuery.set('limit',searchQuery.limit)
 
   template.autorun () ->
+    if template.isCustumSearch
+      searchQuery = _.extend(searchQuery,template.data.searchQuery.get())
+
+    template.searchQuery.set('range',searchQuery.range)
+    template.searchQuery.set('days',searchQuery.days)
+    template.searchQuery.set('period',searchQuery.period)
+    template.searchQuery.set('tags',searchQuery.tags)
+    template.searchQuery.set('duties',searchQuery.duties)
+    template.searchQuery.set('teams',searchQuery.teams)
+    template.searchQuery.set('limit',searchQuery.limit)
+
     filter = makeFilter(template.searchQuery)
     limit = template.searchQuery.get('limit')
     share.templateSub(template,"division")
@@ -100,6 +104,7 @@ Template.volunteerShiftsForm.onCreated () ->
     template.sel.set(filter)
 
 Template.volunteerShiftsForm.helpers
+  'isCustumSearch': () -> Template.instance().isCustumSearch
   'searchQuery': () -> Template.instance().searchQuery
   'loadMore': () ->
     template = Template.instance()

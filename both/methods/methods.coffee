@@ -99,11 +99,14 @@ share.initMethods = (eventName) ->
         SimpleSchema.validate(doc, schema.omit('status'))
         userId = Meteor.userId()
         parentDoc = parentCollection.findOne(doc.shiftId)
+        # XXX In this case only the manager or the lead of the team can add a
+        # volunteer to a shift. Can the lead of a Department add a volunteer to
+        # of a team of its Department ? .
         if (doc.userId == userId) ||
             (Roles.userIsInRole(userId, [ 'manager', parentDoc.parentId ], eventName))
-          doc.status = (
+          doc.status =
             if parentDoc.policy == "public" then "confirmed"
-            else if parentDoc.policy == "requireApproval" then "pending")
+            else if parentDoc.policy == "requireApproval" then "pending"
           if doc.status
             collection.insert(doc)
     else if type == "bail"

@@ -8,6 +8,7 @@
 
 <template name="volunteerShiftsForm">
   <div class="container-fluid">
+    {{#unless isCustumSearch }}
     <div class="row">
       <div class="panel panel-default">
         <form class="form-horizontal">
@@ -22,6 +23,7 @@
         </form>
       </div>
     </div>
+    {{/unless}}
     <div class="row">
       <ul class="list-group">
         {{#each shift in allShiftsTasks}}
