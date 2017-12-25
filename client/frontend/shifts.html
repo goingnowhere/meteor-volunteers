@@ -8,7 +8,7 @@
         {{#if $eq type "shift"}}{{fa "calendar"}}{{/if}}
         {{#if $eq type "task"}}{{fa "tasks"}}{{/if}}
         {{#if $eq type "lead"}}{{fa "user-circle"}}{{/if}}
-        {{teamName}}: {{title}}
+        {{unitName}}: {{title}}
         <div class="pull-right">
           {{#if $eq type "task"}}
             {{formatDate dueDate}} - {{_ "estimated_time"}} {{estimatedTime}}
@@ -48,7 +48,7 @@
     <div class="panel-footer clearfix">
       {{#if isManagerOrLead }}
         <div>
-          <select class="select-users form-control" data-shiftid="{{shiftId}}" data-parentid="{{teamId}}">
+          <select class="select-users form-control" data-shiftid="{{shiftId}}" data-parentid="{{unitId}}">
           </select>
         </div>
       {{/if}}
@@ -65,7 +65,7 @@
             </button>
           {{/if}}
           {{#unless $eq policy "adminOnly"}}
-            <button class="btn btn-primary" data-shiftid="{{shiftId}}" data-parentid="{{teamId}}"
+            <button class="btn btn-primary" data-shiftid="{{shiftId}}" data-parentid="{{unitId}}"
               data-action="apply" data-type={{type}}>
               {{#if $eq policy "public"}}{{_ "join"}}{{/if}}
               {{#if $eq policy "requireApproval"}}{{_ "apply"}}{{/if}}
@@ -75,7 +75,7 @@
           {{/unless}}
         {{/if}}
         {{#if canBail}}
-          <button class="btn btn-danger" data-shiftid="{{shiftId}}" data-parentid="{{teamId}}"
+          <button class="btn btn-danger" data-shiftid="{{shiftId}}" data-parentid="{{unitId}}"
             data-action="bail" data-type={{type}}>
             {{_ "bail"}}
           </button>

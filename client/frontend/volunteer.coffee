@@ -22,7 +22,7 @@ Template.addVolunteerForm.helpers
 addLocalShiftsCollection = (collection,template,type,filter = {},limit = 10,userId = Meteor.userId()) ->
   collection.find(filter,{limit: limit}).forEach((job) ->
     orgUnit = share.getOrgUnit(job.parentId)
-    team = orgUnit.unit
+    unit = orgUnit.unit
     users = []
     signupsSub = share.templateSub(template,"signups.byShift",job._id)
     if signupsSub.ready()
@@ -32,19 +32,17 @@ addLocalShiftsCollection = (collection,template,type,filter = {},limit = 10,user
       ).map((s) -> s.userId)
       signup = signupCollection.findOne({shiftId: job._id, userId: userId})
       sel =
-        teamId: team._id
+        unitId: unit._id
         shiftId: job._id
       mod =
         type: type
-        teamName: team.name
-        departmentName: orgUnit?.department?.name
-        divisionName: orgUnit?.division?.name
+        unitName: unit.name
         title: job.title
         description: job.description
         status: if signup then signup.status else null
         canBail: signup? and signup.status != 'bailed'
         policy: job.policy
-        tags: team.tags
+        tags: unit.tags
         users: users
       if type == 'shift'
         _.extend(mod,
@@ -65,31 +63,24 @@ addLocalShiftsCollection = (collection,template,type,filter = {},limit = 10,user
 
 Template.volunteerShiftsForm.onCreated () ->
   template = this
-  template.searchQuery = new ReactiveDict()
+  template.searchQuery = new ReactiveDict({})
   template.ShiftTaskLocal = new Mongo.Collection(null)
   template.sel = new ReactiveVar({})
   template.isCustumSearch = template.data?.searchQuery?
 
-  searchQuery =
-    range: []
-    days: []
-    period: []
-    tags: []
-    duties: []
-    teams: []
-    limit: 10
+  if template.isCustumSearch
+    template.autorun () ->
+      searchQuery = template.data.searchQuery.get()
+      template.searchQuery.set('range',searchQuery.range)
+      template.searchQuery.set('days',searchQuery.days)
+      template.searchQuery.set('period',searchQuery.period)
+      template.searchQuery.set('tags',searchQuery.tags)
+      template.searchQuery.set('duties',searchQuery.duties)
+      template.searchQuery.set('teams',searchQuery.teams)
+      template.searchQuery.set('departments',searchQuery.departments)
+      template.searchQuery.set('limit',searchQuery.limit)
 
   template.autorun () ->
-    if template.isCustumSearch
-      searchQuery = _.extend(searchQuery,template.data.searchQuery.get())
-
-    template.searchQuery.set('range',searchQuery.range)
-    template.searchQuery.set('days',searchQuery.days)
-    template.searchQuery.set('period',searchQuery.period)
-    template.searchQuery.set('tags',searchQuery.tags)
-    template.searchQuery.set('duties',searchQuery.duties)
-    template.searchQuery.set('teams',searchQuery.teams)
-    template.searchQuery.set('limit',searchQuery.limit)
 
     filter = makeFilter(template.searchQuery)
     limit = template.searchQuery.get('limit')

@@ -4,7 +4,7 @@ import 'flatpickr/dist/flatpickr.css'
 @makeFilter = (searchQuery) ->
   sel = []
   rangeList = searchQuery.get('range')
-  if rangeList.length > 0
+  if rangeList?.length > 0
     range = _.map(rangeList,(d) -> moment(d, 'YYYY-MM-DD'))
     range = moment.range(rangeList)
     sel.push
@@ -26,7 +26,7 @@ import 'flatpickr/dist/flatpickr.css'
   # console.log "days",sel
 
   periodList = searchQuery.get('period')
-  if periodList && periodList.length > 0
+  if periodList?.length > 0
     periods = share.periods.get()
     for p in periodList
       sel.push
@@ -36,13 +36,16 @@ import 'flatpickr/dist/flatpickr.css'
         ]
 
   tags = searchQuery.get('tags')
-  if tags.length > 0 then sel.push {tags: { $in: tags }}
+  if tags?.length > 0 then sel.push {tags: { $in: tags }}
 
   duties = searchQuery.get('duties')
-  if duties.length > 0 then sel.push {type: { $in: duties }}
+  if duties?.length > 0 then sel.push {type: { $in: duties }}
 
   teams = searchQuery.get('teams')
-  if teams.length > 0 then sel.push {teamId: { $in: teams }}
+  if teams?.length > 0 then sel.push {unitId: { $in: teams }}
+
+  departments = searchQuery.get('departments')
+  if departments?.length > 0 then sel.push {unitId: { $in: departments }}
 
   return if sel.length > 0 then {"$and": sel} else {}
 
@@ -105,7 +108,7 @@ Template.tagsPicker.onRendered () ->
   template.autorun () ->
     if sub.ready()
       tags= template.data.searchQuery.get('tags')
-      sel = if tags.length > 0 then {_id: {$in: tags}} else {}
+      sel = if tags?.length > 0 then {_id: {$in: tags}} else {}
       data = _.map(share.getTagList(sel),(t) ->
         id: t.value
         text: t.label)
@@ -125,9 +128,9 @@ Template.teamsPicker.onRendered () ->
   template.autorun () ->
     if sub.ready()
       teams = template.data.searchQuery.get('teams')
-      sel = if teams.length > 0 then {teams: {$in: teams}} else {}
-      teams = share.Team.find(sel).fetch()
-      data = _.map(teams,(t) ->
+      sel = if teams?.length > 0 then {_id: {$in: teams}} else {}
+      units = share.Team.find(sel).fetch()
+      data = _.map(units,(t) ->
         id: t._id
         text: t.name)
       $("#teams").select2({
@@ -139,3 +142,25 @@ Template.teamsPicker.events
     val = template.$('#teams').val()
     val = unless val then [] else val
     template.data.searchQuery.set('teams',val)
+
+# XXX to be refactor with teams and divisoion picker
+Template.departmentsPicker.onRendered () ->
+  template = this
+  sub = share.templateSub(template,"department")
+  template.autorun () ->
+    if sub.ready()
+      departments = template.data.searchQuery.get('departments')
+      sel = if departments?.length > 0 then {_id: {$in: departments}} else {}
+      units = share.Department.find(sel).fetch()
+      data = _.map(units,(t) ->
+        id: t._id
+        text: t.name)
+      $("#departments").select2({
+        data: data,
+        multiple: true})
+
+Template.departmentsPicker.events
+  'change #departments': ( event, template ) ->
+    val = template.$('#departments').val()
+    val = unless val then [] else val
+    template.data.searchQuery.set('departments',val)
