@@ -36,6 +36,10 @@ CommonTask = new SimpleSchema(
     autoform:
       afFieldInput:
         placeholder: "max"
+  priority:
+    type: String
+    allowedValues: [ "essential", "important", "normal"]
+    defaultValue: "normal"
   policy:
     type: String
     label: () -> TAPi18n.__("policy")

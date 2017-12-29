@@ -100,6 +100,7 @@ Package.onUse(function(api) {
     "client/backend/views/team.coffee",
     "client/backend/views/signups.html",
     "client/backend/views/signups.js",
+    "client/backend/stats.coffee",
   ], "client");
 
   api.add_files([

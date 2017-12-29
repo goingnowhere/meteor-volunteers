@@ -26,11 +26,6 @@ saveVolunteerForm = (eventName,data) ->
 
 class VolunteersClass
   constructor: (@eventName) ->
-    # XXX this is a nasty side effect. I initialize these collecions,
-    # I make them available thought global variables (share.xxx) and
-    # and then I use them all over the places in this package.
-    # in theory there should be any leak in the global name space of the
-    # parent application as everythin is relative to this module
     share.initCollections(@eventName)
     share.initRouters(@eventName)
     share.initMethods(@eventName)
@@ -52,3 +47,4 @@ class VolunteersClass
   setUserForm: (data) -> saveVolunteerForm(@eventName,data)
   isManagerOrLead: (userId) -> share.isManagerOrLead(userId)
   isManager: (userId) -> share.isManager(userId)
+  teamStats: (teamId) -> share.TeamStats(teamId)
