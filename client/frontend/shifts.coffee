@@ -4,18 +4,19 @@ share.eventUsers = () ->
 
 Template.shiftsTasksTableView.onRendered () ->
   template = this
-  sub = share.templateSub(template,"users")
-  template.autorun () ->
-    if sub.ready()
-      data = _.reduce(share.eventUsers(),((acc,t) ->
-        acc.push {id: t._id, text: share.getUserName t}
-        return acc),
-        [{id: "-1", text: (TAPi18n.__ "enroll_user")}]
-      )
-      $(".select-users").select2({
-        placeholder: 'Select an user to Enroll',
-        data: data
-      })
+  if share.isManagerOrLead(Meteor.userId())
+    sub = share.templateSub(template,"users")
+    template.autorun () ->
+      if sub.ready()
+        data = _.reduce(share.eventUsers(),((acc,t) ->
+          acc.push {id: t._id, text: share.getUserName t}
+          return acc),
+          [{id: "-1", text: (TAPi18n.__ "enroll_user")}]
+        )
+        $(".select-users").select2({
+          placeholder: 'Select an user to Enroll',
+          data: data
+        })
 
 events =
   'click [data-action="apply"]': ( event, template ) ->

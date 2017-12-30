@@ -2,25 +2,27 @@ let share = __coffeescriptShare;
 
 Template.teamSignupsList.onCreated(function () {
   const template = this;
+  template.teamId = this.data._id
   share.templateSub(template,"users")
-  share.templateSub(template,"allDuties.byTeam",this.data.unit._id)
+  share.templateSub(template,"allDuties.byTeam",template.teamId)
 })
 
 Template.teamSignupsList.helpers({
   allSignups() {
-    const shifts = share.ShiftSignups.find({ parentId: this.unit._id, status: 'pending' }, {sort: {createdAt: -1}})
+    teamId = Template.instance().teamId
+    const shifts = share.ShiftSignups.find({ parentId: teamId , status: 'pending' }, {sort: {createdAt: -1}})
       .map(signup => ({
         ...signup,
         type: 'shift',
         duty: share.TeamShifts.findOne(signup.shiftId)
       }))
-    const tasks = share.TaskSignups.find({ parentId: this.unit._id, status: 'pending' }, {sort: {createdAt: -1}})
+    const tasks = share.TaskSignups.find({ parentId: teamId, status: 'pending' }, {sort: {createdAt: -1}})
       .map(signup => ({
         ...signup,
         type: 'task',
         duty: share.TeamTasks.findOne(signup.shiftId)
       }))
-    const leads = share.LeadSignups.find({ parentId: this.unit._id, status: 'pending' }, {sort: {createdAt: -1}})
+    const leads = share.LeadSignups.find({ parentId: teamId, status: 'pending' }, {sort: {createdAt: -1}})
       .map(signup => ({
         ...signup,
         type: 'lead',
