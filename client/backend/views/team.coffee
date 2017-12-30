@@ -1,7 +1,35 @@
+Template.teamShiftsTable.onCreated () ->
+  template = this
+  teamId = template.data._id
+  sub = share.templateSub(template,"allDuties.byTeam",teamId)
+  template.shifts = new ReactiveVar([])
+  template.autorun () ->
+    if sub.ready()
+      template.shifts.set(share.getShifts({parentId: teamId}))
+
+Template.teamShiftsTable.helpers
+  'shifts': () -> Template.instance().shifts.get()
+
+Template.teamShiftsTable.events
+  'click [data-action="edit"]': (event,template) ->
+    id = $(event.target).data('id')
+    shift = share.TeamShifts.findOne(id)
+    ModalShowWithTemplate("insertUpdateTemplate",
+      {form:{collection: share.TeamShifts}, data: shift})
+  'click [data-action="delete"]': (event,template) ->
+    id = $(event.target).data('id')
+    share.meteorCall "teamShifts.remove", id
+  'click [data-action="clone"]': (event,template) ->
+    id = $(event.target).data('id')
+    shift = share.TeamShifts.findOne(id)
+    delete shift._id
+    ModalShowWithTemplate("insertUpdateTemplate",
+      {form:{collection: share.TeamShifts}, data: shift})
+
 Template.teamDayViewGrid.onCreated () ->
   template = this
   template.taskFilter = new ReactiveVar(["pending","overdue","done"])
-  template.teamId = template.data.unit._id
+  template.teamId = template.data._id
   share.templateSub(template,"allDuties.byTeam", template.teamId)
   share.templateSub(template,"users")
 
@@ -22,53 +50,34 @@ Template.teamDayViewGrid.helpers {
     share.TeamTasks.find({parentId: teamId, status: {$in: status}},{sort:{dueDate: 1}}).map((t) ->
       confirmed = share.TaskSignups.find({shiftId: t._id}).count()
       dueDate = moment(t.dueDate)
-      vacant = if t.max > 0 then t.max - confirmed else confirmed
+      needed = if t.min > 0 then t.min - confirmed else confirmed
       _.extend(t,
         timeleft: dueDate.diff(moment(), 'days')
         dueDate: dueDate
         confirmed: confirmed
-        vacant: vacant)
+        needed: needed)
     )
-  'allShifts': () ->
+  'allDates': () ->
     teamId = Template.instance().teamId
-    shifts = share.TeamShifts.find({parentId: teamId}).map((s) ->
-      _.extend(s,{day: moment(s.start).format('MMMM Do YYYY')}))
-    ss = _.groupBy(shifts, 'day')
-    _.map(ss,(vl,k) ->
-      totalVacant = 0
-      totalConfirmed = 0
-      vvl = _.map(_.sortBy(vl,'startTime'), (v) ->
-        confirmed = share.ShiftSignups.find({shiftId: v._id}).count()
-        totalConfirmed =+ confirmed
-        totalVacant =+ (v.max - confirmed)
-        _.extend(v,
-          start: v.start
-          end: v.end
-          policy: v.policy
-          duration: moment.duration(v.end - v.start).humanize()
-          confirmed: confirmed
-          vacant: v.max - confirmed)
-      )
-      progress = ((totalVacant + totalConfirmed) / 100 ) * totalConfirmed
-      teamId = Template.currentData()._id
-      {date:k, shifts: vvl, progress: progress, teamId: teamId}
-    )
+    _.unique(share.TeamShifts.find({parentId: teamId}).map((s) ->
+      moment(s.start).format('MMMM Do YYYY')
+      ))
   'teamSignupsList': () => "teamSignupsList-#{share.eventName}"
 }
 
 Template.teamDayViewGrid.events
   'click [data-action="edit"]': (event,template) ->
     ModalShowWithTemplate("insertUpdateTemplate",
-      {form:{collection: share.Team}, data:this.unit})
+      {form:{collection: share.Team}, data: template.data})
   'click [data-action="delete"]': (event,template) ->
     id = $(event.target).data('id')
     share.meteorCall "team.remove", id
   'click [data-action="addShift"]': (event,template) ->
     ModalShowWithTemplate("insertUpdateTemplate",
-      {form:{collection: share.TeamShifts}, data:{parentId: this.unit._id}})
+      {form:{collection: share.TeamShifts}, data:{parentId: template.data._id}})
   'click [data-action="addTask"]': (event,template) ->
     ModalShowWithTemplate("insertUpdateTemplate",
-      {form:{collection: share.TeamTasks}, data:{parentId: this.unit._id}})
+      {form:{collection: share.TeamTasks}, data:{parentId: template.data._id}})
   'click #taskStatus': ( event, template ) ->
     selected = template.findAll("#taskStatus:checked")
     template.taskFilter.set(_.map(selected, (i) -> i.defaultValue))
@@ -99,7 +108,7 @@ Template.teamTasksView.events
 
 Template.teamShiftsView.onCreated () ->
   template = this
-  share.templateSub(template,"teamShifts.backend",template.data.teamId)
+  share.templateSub(template,"teamShifts.backend", template.data.teamId)
 
 Template.teamShiftsView.events
   'click [data-action="edit"]': (event,template) ->

@@ -1,50 +1,51 @@
+<template name="teamShiftsTable">
+  <table class="table">
+    <thead>
+      <th></th>
+      <th class="col-md-2">{{_ "time"}}</th>
+      <th class="col-md-4">{{_ "name"}}</th>
+      <th class="col-md-2 pull-rigth">{{_ "positions"}}</th>
+      <th></th>
+    </thead>
+    {{#each shift in shifts}}
+      <tr>
+        <td>{{#if $eq shift.priority "essential"}}{{fa "exclamation-circle"}}{{/if}}</td>
+        <td class="col-md-5">{{formatTime shift.start}} - {{formatTime shift.end}}</td>
+        <td class="col-md-6">{{shift.title}}
+          {{#if ($eq shift.policy 'public')}}{{fa 'globe'}}{{/if}}
+          {{#if ($eq shift.policy 'private')}}{{fa 'user-secret'}}{{/if}}
+          {{#if ($eq shift.policy 'requireApproval')}}{{fa 'lock'}}{{/if}}
+        </td>
+        <td class="col-md-1 pull-rigth"><div class="badge">{{shift.needed}} / {{shift.confirmed}}</div></td>
+        <td>
+          <div class="btn-group pull-right">
+            <button type="button" class="btn btn-default btn-circle dropdown-toggle"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li class="dropdown-item"><a href="#" data-action="edit" data-id="{{shift._id}}">
+                {{fa "pencil-square-o"}} {{_ "edit"}}</a></li>
+              <li class="dropdown-item"><a href="#" data-action="delete" data-id="{{shift._id}}">
+                {{fa "trash-o"}} {{_ "remove"}}</a></li>
+              <li class="dropdown-item"><a href="#" data-action="clone" data-id="{{shift._id}}">
+                {{fa "clone"}} {{_ "clone"}}</a></li>
+            </ul>
+          </div>
+        </td>
+      </tr>
+    {{/each}}
+  </table>
+</template>
+
 <template name="teamShiftsView">
   <div class="panel panel-default">
     <div class="panel-heading clearfix">
       <h4>{{date}}</h4>
     </div>
     <div class="panel-body">
-      <table class="table">
-        <thead>
-          <th class="col-md-2">{{_ "time"}}</th>
-          <th class="col-md-4">{{_ "name"}}</th>
-          <th class="col-md-2 pull-rigth">{{_ "positions"}}</th>
-          <th></th>
-        </thead>
-        {{#each shift in shifts}}
-          <tr>
-            <td class="col-md-5">{{formatTime shift.start}} - {{formatTime shift.end}}</td>
-            <td class="col-md-6">
-              {{#if ($eq shift.policy 'public')}}{{fa 'globe'}}{{/if}}
-              {{#if ($eq shift.policy 'private')}}{{fa 'user-secret'}}{{/if}}
-              {{#if ($eq shift.policy 'requireApproval')}}{{fa 'lock'}}{{/if}}
-              {{shift.title}}</td>
-            <td class="col-md-1 pull-rigth"><div class="badge">{{shift.vacant}} / {{shift.confirmed}}</div></td>
-            <td>
-              <div class="btn-group pull-right">
-                <button type="button" class="btn btn-default btn-circle dropdown-toggle"
-                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                  <li class="dropdown-item"><a href="#" data-action="edit" data-id="{{shift._id}}">
-                    {{fa "pencil-square-o"}} {{_ "edit"}}</a></li>
-                  <li class="dropdown-item"><a href="#" data-action="delete" data-id="{{shift._id}}">
-                    {{fa "trash-o"}} {{_ "remove"}}</a></li>
-                </ul>
-              </div>
-            </td>
-          </tr>
-        {{/each}}
-      </table>
+      {{> teamShiftsTable _id=_id}}
     </div>
-    <!-- <div class="panel-footer">
-      <div class="progress">
-        <div style="width: 5%;" aria-valuemax="100" aria-valuemin="0"
-          aria-valuenow="{{progress}}" role="progressbar" class="progress-bar  ">
-        </div>
-      </div>
-    </div> -->
   </div>
 </template>
 
@@ -96,7 +97,7 @@
   <div class="panel">
     <div class="panel-heading clearfix">
       <div class="btn-group pull-right">
-        <a href="{{pathFor teamSignupsList _id=unit._id}}" class="btn btn-default btn-sm" >
+        <a href="{{pathFor teamSignupsList _id=_id}}" class="btn btn-default btn-sm" >
           {{_ "signups" }}
         </a>
         <button type="button" class="btn btn-info btn-sm dropdown-toggle"
@@ -110,7 +111,7 @@
             {{fa "trash-o"}} {{_ "remove"}}</a></li>
         </ul>
       </div>
-      <h4>{{_ "team"}} : {{unit.name}}</h4>
+      <h4>{{_ "team"}} : {{name}}</h4>
     </div>
   </div>
   {{_ "team_leads"}} :
@@ -131,8 +132,8 @@
           </td>
         </tr>
       </table>
-      {{#each shift in allShifts}}
-          {{> teamShiftsView shift}}
+      {{#each date in allDates}}
+          {{> teamShiftsView _id=_id date=date}}
       {{/each}}
     </div>
     <div class="col-md-6">
