@@ -5,6 +5,8 @@ share.initCollections = (eventName) ->
 
   prefix = "#{eventName}."
 
+  share.TimeSeries = new Mongo.Collection "#{prefix}Volunteers.timeSeries"
+  share.TimeSeries.attachSchema(share.Schemas.TimeSeries)
   # duties
 
   share.TeamTasks = new Mongo.Collection "#{prefix}Volunteers.teamTasks"
