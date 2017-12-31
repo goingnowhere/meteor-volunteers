@@ -11,7 +11,16 @@ share.meteorSub = (name,args...) ->
   Meteor.subscribe("#{share.eventName}.Volunteers.#{name}",args...)
 
 share.meteorCall = (name,args...) ->
-  Meteor.call "#{share.eventName}.Volunteers.#{name}", args...
+  Meteor.call("#{share.eventName}.Volunteers.#{name}", args... , (err,res) ->
+    if err
+      Bert.alert({
+        title: 'Now Playing',
+        message: err,
+        type: 'info',
+        style: 'growl-top-right',
+        icon: 'fa-music'
+      })
+    )
 
 share.getOrgUnit = (unitId) ->
   if unitId

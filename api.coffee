@@ -10,15 +10,15 @@ periods =
 share.periods = new ReactiveVar(periods)
 
 initAuthorization = (eventName) ->
-  share.isManagerOrLead = (userId, unitId) ->
-    if Roles.userIsInRole(userId, [ 'manager' ], eventName)
-      return true
+  share.isManager = () ->
+    Roles.userIsInRole(Meteor.userId(), [ 'manager', 'admin' ], eventName)
+  share.isManagerOrLead = (userId, unitIdList) ->
+    if share.isManager() then return true
     else if userId == Meteor.userId()
       l = Roles.getRolesForUser(userId, eventName)
-      (unitId && unitId in l) || (l.length > 0)
+      # check only if a user is a lead for the given list of units
+      _.intersection(unitIdList,l).length > 0
     else return false
-  share.isManager = (userId) ->
-    Roles.userIsInRole(userId, [ 'manager' ], eventName)
 
 saveVolunteerForm = (eventName,data) ->
   Meteor.call('FormBuilder.dynamicForms.upsert',{name: "VolunteerForm"}, data)
@@ -45,6 +45,6 @@ class VolunteersClass
       TaskSignups: share.TaskSignups
   setPeriods: (periods) -> share.periods.set(periods)
   setUserForm: (data) -> saveVolunteerForm(@eventName,data)
-  isManagerOrLead: (userId) -> share.isManagerOrLead(userId)
-  isManager: (userId) -> share.isManager(userId)
+  isManagerOrLead: (userId,unitId) -> share.isManagerOrLead(userId,unitId)
+  isManager: () -> share.isManager()
   teamStats: (teamId) -> share.TeamStats(teamId)

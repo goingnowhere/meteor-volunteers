@@ -6,5 +6,7 @@ share.Schemas.TimeSeries = new SimpleSchema(
   tag2: String
   tag3: String
   values: Array
-  "values.$": Object
+  "values.$":
+    type: Object
+    blackbox: true
 )

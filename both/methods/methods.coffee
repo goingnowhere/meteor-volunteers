@@ -1,10 +1,12 @@
 import SimpleSchema from 'simpl-schema'
 
-checkForCollisions = (shift) ->
-  share.taskSignups.findOne({
-    userId: shift.userId,
-    start: { $leq: shift.start },
-    end: { $geq: shift.end }})?
+throwError = (error, reason, details) ->
+  error = new (Meteor.Error)(error, reason, details)
+  if Meteor.isClient
+    return error
+  else if Meteor.isServer
+    throw error
+  return
 
 share.initMethods = (eventName) ->
   # Generic function to create insert,update,remove methods for groups within
@@ -18,6 +20,8 @@ share.initMethods = (eventName) ->
         if Roles.userIsInRole(Meteor.userId(), [ 'manager', Id ], eventName)
           if Meteor.isServer then Roles.deleteRole(Id)
           collection.remove(Id)
+        else
+          return throwError(403, 'Insufficient Permission');
     else if type == "insert"
       Meteor.methods "#{collectionName}.insert": (doc) ->
         console.log ["#{collectionName}.insert",doc]
@@ -27,22 +31,33 @@ share.initMethods = (eventName) ->
           parentRole = doc.parentId
           allowedRoles.push(parentRole)
         if Roles.userIsInRole(Meteor.userId(), allowedRoles, eventName)
-          insertResult = collection.insert(doc)
-          if Meteor.isServer
-            Roles.createRole(insertResult)
-            Roles.addRolesToParent(insertResult, parentRole) if parentRole?
+          collection.insert(doc, (err,newDocId) ->
+            unless err
+              if Meteor.isServer
+                Roles.createRole(newDocId)
+                Roles.addRolesToParent(newDocId, parentRole) if parentRole?
+            else
+              return throwError(501, 'Cannot Insert');
+            )
+        else
+          return throwError(403, 'Insufficient Permission');
     else if type == "update"
       Meteor.methods "#{collectionName}.update": (doc) ->
-        console.log ["#{collectionName}.update",doc]
+        console.log ["#{collectionName}.update",doc.modifier]
         collection.simpleSchema().namedContext().validate(doc.modifier,{modifier:true})
         if Roles.userIsInRole(Meteor.userId(), [ 'manager', doc._id ], eventName)
-          updatedParentId = doc.modifier.parentId || doc.modifier.$set?.updatedParentId
-          if updatedParentId?
-            oldDoc = collection.findOne(doc._id)
-            if Meteor.isServer
-              Roles.removeRolesFromParent(doc._id, oldDoc.parentId)
-              Roles.addRolesToParent(doc._id, updatedParentId)
-          collection.update(doc._id,doc.modifier)
+          oldDoc = collection.findOne(doc._id)
+          collection.update(doc._id,doc.modifier, (err,res) ->
+            unless err
+              if Meteor.isServer
+                if oldDoc.parentId != doc.modifier.$set.parentId
+                  Roles.removeRolesFromParent(doc._id, oldDoc.parentId)
+                  Roles.addRolesToParent(doc._id, doc.modifier.$set.parentId)
+            else
+              return throwError(501, 'Cannot Update');
+            )
+        else
+          return throwError(403, 'Insufficient Permission');
     else
       console.warn "type #{type} for #{collectionName} ERROR"
 
@@ -57,12 +72,16 @@ share.initMethods = (eventName) ->
         doc = collection.findOne(Id)
         if Roles.userIsInRole(Meteor.userId(), [ 'manager', doc.parentId ], eventName)
           collection.remove(Id)
+        else
+          throwError(403, 'Insufficient Permission')
     else if type == "insert"
       Meteor.methods "#{collectionName}.insert": (doc) ->
         console.log ["#{collectionName}.insert",doc]
         collection.simpleSchema().namedContext().validate(doc)
         if Roles.userIsInRole(Meteor.userId(), [ 'manager', doc.parentId ], eventName)
           collection.insert(doc)
+        else
+          throwError(403, 'Insufficient Permission')
     else if type == "update"
       Meteor.methods "#{collectionName}.update": (doc) ->
         console.log ["#{collectionName}.update",doc]
@@ -70,6 +89,8 @@ share.initMethods = (eventName) ->
         olddoc = collection.findOne(doc._id)
         if Roles.userIsInRole(Meteor.userId(), [ 'manager', olddoc.parentId ], eventName)
           collection.update(doc._id,doc.modifier)
+        else
+          throwError(403, 'Insufficient Permission')
     else
       console.warn "type #{type} for #{collectionName} ERROR"
 
@@ -85,6 +106,8 @@ share.initMethods = (eventName) ->
         olddoc = collection.findOne(shiftId)
         if Roles.userIsInRole(userId, [ 'manager', olddoc.parentId ], eventName)
           collection.remove(shiftId)
+        else
+          return throwError(403, 'Insufficient Permission');
     else if type == "update"
       Meteor.methods "#{collectionName}.update": (doc) ->
         console.log ["#{collectionName}.update", doc]
@@ -93,6 +116,8 @@ share.initMethods = (eventName) ->
         olddoc = collection.findOne(doc._id)
         if Roles.userIsInRole(userId, [ 'manager', olddoc.parentId ], eventName)
           collection.update(doc._id, doc.modifier)
+        else
+          return throwError(403, 'Insufficient Permission');
     else if type == "insert"
       Meteor.methods "#{collectionName}.insert": (doc) ->
         console.log ["#{collectionName}.insert", doc]
@@ -109,6 +134,8 @@ share.initMethods = (eventName) ->
             else if parentDoc.policy == "requireApproval" then "pending"
           if doc.status
             collection.insert(doc)
+        else
+          return throwError(403, 'Insufficient Permission');
     else if type == "bail"
       Meteor.methods "#{collectionName}.bail": (sel) ->
         console.log ["#{collectionName}.bail", sel]
@@ -116,6 +143,8 @@ share.initMethods = (eventName) ->
         userId = Meteor.userId()
         if (sel.userId == userId) || (Roles.userIsInRole(userId, [ 'manager', sel.parentId ], eventName))
           collection.update(sel, {$set: {status: "bailed"}})
+        else
+          return throwError(403, 'Insufficient Permission');
 
   for type in ["remove","insert","update"]
     do ->
@@ -139,6 +168,8 @@ share.initMethods = (eventName) ->
     userId = Meteor.userId()
     if Roles.userIsInRole(userId, [ 'manager' ], eventName)
       share.form.get().remove(formId)
+    else
+      return throwError(403, 'Insufficient Permission');
 
   Meteor.methods "#{prefix}.volunteerForm.update": (doc) ->
     console.log ["#{prefix}.volunteerForm.update",doc]
@@ -147,6 +178,8 @@ share.initMethods = (eventName) ->
     userId = Meteor.userId()
     if (userId == doc.userId) || Roles.userIsInRole(userId, [ 'manager' ], eventName)
       share.form.get().update(doc._id,doc.modifier)
+    else
+      return throwError(403, 'Insufficient Permission');
 
   Meteor.methods "#{prefix}.volunteerForm.insert": (doc) ->
     console.log ["#{prefix}.volunteerForm.insert",doc]
@@ -155,6 +188,8 @@ share.initMethods = (eventName) ->
     if Meteor.userId()
       doc.userId = Meteor.userId()
       share.form.get().insert(doc)
+    else
+      return throwError(403, 'Insufficient Permission');
 
   Meteor.methods "#{prefix}.leadSignups.remove": (shiftId) ->
     console.log ["#{prefix}.leadSignups.remove",shiftId]
@@ -162,9 +197,15 @@ share.initMethods = (eventName) ->
     userId = Meteor.userId()
     olddoc = share.LeadSignups.findOne(shiftId)
     if Roles.userIsInRole(userId, [ 'manager', olddoc.parentId ], eventName)
-      if Meteor.isServer
-        Roles.removeUsersFromRoles(olddoc.userId, olddoc.parentId, eventName)
-      share.LeadSignups.remove(shiftId)
+      share.LeadSignups.remove(shiftId, (err,res) ->
+        unless err
+          if Meteor.isServer
+            Roles.removeUsersFromRoles(olddoc.userId, olddoc.parentId, eventName)
+        else
+          return throwError(501, 'Cannot Remove');
+        )
+    else
+      return throwError(403, 'Insufficient Permission');
 
   Meteor.methods "#{prefix}.leadSignups.confirm": (shiftId) ->
     console.log ["#{prefix}.leadSignups.confirm",shiftId]
@@ -172,9 +213,15 @@ share.initMethods = (eventName) ->
     userId = Meteor.userId()
     olddoc = share.LeadSignups.findOne(shiftId)
     if Roles.userIsInRole(userId, [ 'manager', olddoc.parentId ], eventName)
-      if Meteor.isServer
-        Roles.addUsersToRoles(olddoc.userId, olddoc.parentId, eventName)
-      share.LeadSignups.update(shiftId, { $set: { status: 'confirmed' } })
+      share.LeadSignups.update(shiftId, { $set: { status: 'confirmed' } }, (err,res) ->
+        unless err
+          if Meteor.isServer
+            Roles.addUsersToRoles(olddoc.userId, olddoc.parentId, eventName)
+        else
+          return throwError(501, 'Cannot Update');
+        )
+    else
+      return throwError(403, 'Insufficient Permission');
 
   Meteor.methods "#{prefix}.leadSignups.refuse": (shiftId) ->
     console.log ["#{prefix}.leadSignups.refuse",shiftId]
@@ -182,9 +229,15 @@ share.initMethods = (eventName) ->
     userId = Meteor.userId()
     olddoc = share.LeadSignups.findOne(shiftId)
     if Roles.userIsInRole(userId, [ 'manager', olddoc.parentId ], eventName)
-      if Meteor.isServer
-        Roles.removeUsersFromRoles(olddoc.userId, olddoc.parentId, eventName)
-      share.LeadSignups.update(shiftId, { $set: { status: 'refused' } })
+      share.LeadSignups.update(shiftId, { $set: { status: 'refused' } }, (err,res) ->
+        unless err
+          if Meteor.isServer
+            Roles.removeUsersFromRoles(olddoc.userId, olddoc.parentId, eventName)
+        else
+          return throwError(501, 'Cannot Update');
+        )
+    else
+      return throwError(403, 'Insufficient Permission');
 
   Meteor.methods "#{prefix}.leadSignups.insert": (doc) ->
     console.log ["#{prefix}.leadSignups.insert",doc]
@@ -195,12 +248,18 @@ share.initMethods = (eventName) ->
         (Roles.userIsInRole(userId, [ 'manager', lead.parentId ], eventName))
       if lead.policy == "public"
         doc.status = "confirmed"
-        if Meteor.isServer
-          Roles.addUsersToRoles(doc.userId, lead.parentId, eventName)
       if lead.policy == "requireApproval"
         doc.status = "pending"
       if doc.status
-        share.LeadSignups.insert(doc)
+        share.LeadSignups.insert(doc, (err,res) ->
+          unless err
+            if Meteor.isServer
+              Roles.addUsersToRoles(doc.userId, lead.parentId, eventName)
+          else
+            return throwError(501, 'Cannot Insert');
+          )
+    else
+      return throwError(403, 'Insufficient Permission');
 
   Meteor.methods "#{prefix}.leadSignups.bail": (sel) ->
     console.log ["#{prefix}.leadSignups.bail",sel]
@@ -208,6 +267,12 @@ share.initMethods = (eventName) ->
     userId = Meteor.userId()
     olddoc = share.LeadSignups.findOne(sel._id)
     if (sel.userId == userId) || (Roles.userIsInRole(userId, [ 'manager', olddoc.parentId ], eventName))
-      if Meteor.isServer
-        Roles.removeUsersFromRoles(olddoc.userId, olddoc.parentId, eventName)
-      share.LeadSignups.update(sel,{$set: {status: "bailed"}})
+      share.LeadSignups.update(sel,{$set: {status: "bailed"}}, (err,res) ->
+        unless err
+          if Meteor.isServer
+            Roles.removeUsersFromRoles(olddoc.userId, olddoc.parentId, eventName)
+        else
+          return throwError(501, 'Cannot Update');
+        )
+    else
+      return throwError(403, 'Insufficient Permission');

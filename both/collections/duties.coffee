@@ -33,13 +33,15 @@ CommonTask = new SimpleSchema(
     type: Number
     label: () -> TAPi18n.__("max_members")
     optional: true
+    # TODO: if max is not set, it should be equal to min
     autoform:
       afFieldInput:
         placeholder: "max"
   priority:
     type: String
     allowedValues: [ "essential", "important", "normal"]
-    defaultValue: "normal"
+    autoform:
+      defaultValue: "normal"
   policy:
     type: String
     label: () -> TAPi18n.__("policy")
