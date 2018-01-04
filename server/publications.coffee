@@ -4,7 +4,7 @@ share.initPublications = (eventName) ->
   unitPublicPolicy = { policy: { $in: ["public"] } }
 
   filterForPublic = (userId, sel) =>
-    unless Roles.userIsInRole(userId, 'manager', eventName)
+    unless share.isManager() #Roles.userIsInRole(userId, 'manager', eventName)
       # getRolesForUser includes all roles, e.g. if user is lead of a department,
       # returns the department and all teams within it
       allOrgUnitIds = Roles.getRolesForUser(Meteor.userId(), eventName)
@@ -65,9 +65,9 @@ share.initPublications = (eventName) ->
     # done whenever we accept an input from the outside
     if this.userId
       sel = filterForPublic(this.userId, sel)
-      s = share.TeamShifts.find(sel,{limit: limit / 3})
-      t = share.TeamTasks.find(sel,{limit: limit / 3})
-      l = share.Lead.find(sel,{limit: limit / 3})
+      s = share.TeamShifts.find(sel,{limit: limit})
+      t = share.TeamTasks.find(sel,{limit: limit})
+      l = share.Lead.find(sel,{limit: limit})
       selTeam = _.clone(sel)
       selTeam = _.extend(selTeam,unitPublicPolicy) unless share.isManagerOrLead(this.userId)
       tt = share.Team.find(selTeam)
@@ -79,7 +79,7 @@ share.initPublications = (eventName) ->
     if this.userId
       selShifts = {parentId: teamId}
       selTasks = {parentId: teamId}
-      unless Roles.userIsInRole(this.userId, [ 'manager', teamId ], eventName)
+      unless share.isManagerOrLead(this.userId,[ teamId ])
         selTasks = _.extend(selTasks,dutiesPublicPolicy)
         selShifts = dutiesPublicPolicy
       taskSignups = share.TaskSignups.find({parentId: teamId})
@@ -111,17 +111,17 @@ share.initPublications = (eventName) ->
   # so I'm uncommenting them - Rich
   Meteor.publish "#{eventName}.Volunteers.teamShifts.backend", (id) ->
     if this.userId
-      if Roles.userIsInRole(this.userId, [ "manager", id ], eventName)
+      if share.isManagerOrLead(this.userId,[ id ])
         share.TeamShifts.find({parentId: id})
 
   Meteor.publish "#{eventName}.Volunteers.teamTasks.backend", (id) ->
     if this.userId
-      if Roles.userIsInRole(this.userId, [ "manager", id ], eventName)
+      if share.isManagerOrLead(this.userId,[ id ])
         share.TeamTasks.find({parentId: id})
 
   Meteor.publish "#{eventName}.Volunteers.lead.backend", (id) ->
     if this.userId
-      if Roles.userIsInRole(this.userId, [ "manager", id ], eventName)
+      if share.isManagerOrLead(this.userId,[ id ])
         share.Lead.find({parentId: id})
 
   Meteor.publish "#{eventName}.Volunteers.department.backend", (id) ->
@@ -131,7 +131,7 @@ share.initPublications = (eventName) ->
 
   Meteor.publish "#{eventName}.Volunteers.team.backend", (id) ->
     if this.userId
-      if Roles.userIsInRole(this.userId, [ "manager", id ], eventName)
+      if share.isManagerOrLead(this.userId,[ id ])
         share.Team.find({parentId: id})
 
   signupCollections = [share.ShiftSignups, share.TaskSignups, share.LeadSignups]
@@ -140,7 +140,7 @@ share.initPublications = (eventName) ->
     if this.userId
       teamId = signupCollections.reduce(((lastId, col) =>
         lastId || col.findOne({ _id: shiftId })?.parentId), null)
-      if Roles.userIsInRole(this.userId, [ "manager", teamId ], eventName)
+      if share.isManagerOrLead(this.userId,[ teamId ])
         sel = {shiftId: shiftId}
       else
         sel = {userId: this.userId, shiftId: shiftId}
@@ -148,7 +148,7 @@ share.initPublications = (eventName) ->
 
   Meteor.publish "#{eventName}.Volunteers.signups.byTeam", (parentId) ->
     if this.userId
-      if Roles.userIsInRole(this.userId, [ "manager", parentId ], eventName)
+      if share.isManagerOrLead(this.userId,[ parentId ])
         sel = {parentId: parentId}
       else
         sel = {userId: this.userId, parentId: parentId}
