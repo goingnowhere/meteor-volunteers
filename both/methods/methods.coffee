@@ -17,7 +17,7 @@ share.initMethods = (eventName) ->
       Meteor.methods "#{collectionName}.remove": (Id) ->
         console.log ["#{collectionName}.remove", Id]
         check(Id,String)
-        if Roles.userIsInRole(Meteor.userId(), [ 'manager', Id ], eventName)
+        if share.isManagerOrLead(Meteor.userId(),[Id])
           if Meteor.isServer then Roles.deleteRole(Id)
           collection.remove(Id)
         else
@@ -30,7 +30,7 @@ share.initMethods = (eventName) ->
         if doc.parentId != 'TopEntity'
           parentRole = doc.parentId
           allowedRoles.push(parentRole)
-        if Roles.userIsInRole(Meteor.userId(), allowedRoles, eventName)
+        if share.isManagerOrLead(Meteor.userId(),allowedRoles)
           collection.insert(doc, (err,newDocId) ->
             unless err
               if Meteor.isServer
@@ -45,7 +45,7 @@ share.initMethods = (eventName) ->
       Meteor.methods "#{collectionName}.update": (doc) ->
         console.log ["#{collectionName}.update",doc.modifier]
         collection.simpleSchema().namedContext().validate(doc.modifier,{modifier:true})
-        if Roles.userIsInRole(Meteor.userId(), [ 'manager', doc._id ], eventName)
+        if share.isManagerOrLead(Meteor.userId(),[doc._id])
           oldDoc = collection.findOne(doc._id)
           collection.update(doc._id,doc.modifier, (err,res) ->
             unless err
@@ -70,7 +70,7 @@ share.initMethods = (eventName) ->
         console.log ["#{collectionName}.remove", Id]
         check(Id,String)
         doc = collection.findOne(Id)
-        if Roles.userIsInRole(Meteor.userId(), [ 'manager', doc.parentId ], eventName)
+        if share.isManagerOrLead(Meteor.userId(),[doc.parentId])
           collection.remove(Id)
         else
           throwError(403, 'Insufficient Permission')
@@ -78,7 +78,7 @@ share.initMethods = (eventName) ->
       Meteor.methods "#{collectionName}.insert": (doc) ->
         console.log ["#{collectionName}.insert",doc]
         collection.simpleSchema().namedContext().validate(doc)
-        if Roles.userIsInRole(Meteor.userId(), [ 'manager', doc.parentId ], eventName)
+        if share.isManagerOrLead(Meteor.userId(),[doc.parentId])
           collection.insert(doc)
         else
           throwError(403, 'Insufficient Permission')
@@ -87,7 +87,7 @@ share.initMethods = (eventName) ->
         console.log ["#{collectionName}.update",doc]
         collection.simpleSchema().namedContext().validate(doc.modifier,{modifier:true})
         olddoc = collection.findOne(doc._id)
-        if Roles.userIsInRole(Meteor.userId(), [ 'manager', olddoc.parentId ], eventName)
+        if share.isManagerOrLead(Meteor.userId(),[olddoc.parentId])
           collection.update(doc._id,doc.modifier)
         else
           throwError(403, 'Insufficient Permission')
@@ -102,9 +102,8 @@ share.initMethods = (eventName) ->
       Meteor.methods "#{collectionName}.remove": (shiftId) ->
         console.log ["#{collectionName}.remove", shiftId]
         check(shiftId, String)
-        userId = Meteor.userId()
         olddoc = collection.findOne(shiftId)
-        if Roles.userIsInRole(userId, [ 'manager', olddoc.parentId ], eventName)
+        if share.isManagerOrLead(Meteor.userId(),[olddoc.parentId])
           collection.remove(shiftId)
         else
           return throwError(403, 'Insufficient Permission');
@@ -112,9 +111,8 @@ share.initMethods = (eventName) ->
       Meteor.methods "#{collectionName}.update": (doc) ->
         console.log ["#{collectionName}.update", doc]
         SimpleSchema.validate(doc.modifier, schema, { modifier: true })
-        userId = Meteor.userId()
         olddoc = collection.findOne(doc._id)
-        if Roles.userIsInRole(userId, [ 'manager', olddoc.parentId ], eventName)
+        if share.isManagerOrLead(Meteor.userId(),[olddoc.parentId])
           collection.update(doc._id, doc.modifier)
         else
           return throwError(403, 'Insufficient Permission');
@@ -127,8 +125,7 @@ share.initMethods = (eventName) ->
         # XXX In this case only the manager or the lead of the team can add a
         # volunteer to a shift. Can the lead of a Department add a volunteer to
         # of a team of its Department ? .
-        if (doc.userId == userId) ||
-            (Roles.userIsInRole(userId, [ 'manager', parentDoc.parentId ], eventName))
+        if (doc.userId == userId) || (share.isManagerOrLead(userId,[parentDoc.parentId]))
           doc.status =
             if parentDoc.policy == "public" then "confirmed"
             else if parentDoc.policy == "requireApproval" then "pending"
@@ -141,7 +138,7 @@ share.initMethods = (eventName) ->
         console.log ["#{collectionName}.bail", sel]
         SimpleSchema.validate(sel, schema.omit('status'))
         userId = Meteor.userId()
-        if (sel.userId == userId) || (Roles.userIsInRole(userId, [ 'manager', sel.parentId ], eventName))
+        if (sel.userId == userId) || (share.isManagerOrLead(userId,[sel.parentId]))
           collection.update(sel, {$set: {status: "bailed"}})
         else
           return throwError(403, 'Insufficient Permission');
@@ -165,8 +162,7 @@ share.initMethods = (eventName) ->
   Meteor.methods "#{prefix}.volunteerForm.remove": (formId) ->
     console.log ["#{prefix}.volunteerForm.remove",formId]
     check(formId,String)
-    userId = Meteor.userId()
-    if Roles.userIsInRole(userId, [ 'manager' ], eventName)
+    if share.isManager()
       share.form.get().remove(formId)
     else
       return throwError(403, 'Insufficient Permission');
@@ -175,8 +171,7 @@ share.initMethods = (eventName) ->
     console.log ["#{prefix}.volunteerForm.update",doc]
     schema = share.form.get().simpleSchema()
     SimpleSchema.validate(doc.modifier,schema,{ modifier: true })
-    userId = Meteor.userId()
-    if (userId == doc.userId) || Roles.userIsInRole(userId, [ 'manager' ], eventName)
+    if (Meteor.userId() == doc.userId) || share.isManager()
       share.form.get().update(doc._id,doc.modifier)
     else
       return throwError(403, 'Insufficient Permission');
@@ -194,9 +189,8 @@ share.initMethods = (eventName) ->
   Meteor.methods "#{prefix}.leadSignups.remove": (shiftId) ->
     console.log ["#{prefix}.leadSignups.remove",shiftId]
     check(shiftId,String)
-    userId = Meteor.userId()
     olddoc = share.LeadSignups.findOne(shiftId)
-    if Roles.userIsInRole(userId, [ 'manager', olddoc.parentId ], eventName)
+    if share.isManagerOrLead(Meteor.userId(),[olddoc.parentId])
       share.LeadSignups.remove(shiftId, (err,res) ->
         unless err
           if Meteor.isServer
@@ -210,9 +204,8 @@ share.initMethods = (eventName) ->
   Meteor.methods "#{prefix}.leadSignups.confirm": (shiftId) ->
     console.log ["#{prefix}.leadSignups.confirm",shiftId]
     check(shiftId,String)
-    userId = Meteor.userId()
     olddoc = share.LeadSignups.findOne(shiftId)
-    if Roles.userIsInRole(userId, [ 'manager', olddoc.parentId ], eventName)
+    if share.isManagerOrLead(Meteor.userId(),[olddoc.parentId])
       share.LeadSignups.update(shiftId, { $set: { status: 'confirmed' } }, (err,res) ->
         unless err
           if Meteor.isServer
@@ -226,9 +219,8 @@ share.initMethods = (eventName) ->
   Meteor.methods "#{prefix}.leadSignups.refuse": (shiftId) ->
     console.log ["#{prefix}.leadSignups.refuse",shiftId]
     check(shiftId,String)
-    userId = Meteor.userId()
     olddoc = share.LeadSignups.findOne(shiftId)
-    if Roles.userIsInRole(userId, [ 'manager', olddoc.parentId ], eventName)
+    if share.isManagerOrLead(Meteor.userId(),[olddoc.parentId])
       share.LeadSignups.update(shiftId, { $set: { status: 'refused' } }, (err,res) ->
         unless err
           if Meteor.isServer
@@ -244,8 +236,7 @@ share.initMethods = (eventName) ->
     SimpleSchema.validate(doc,share.Schemas.LeadSignups.omit('status'))
     userId = Meteor.userId()
     lead = share.Lead.findOne(doc.shiftId)
-    if (doc.userId == userId) ||
-        (Roles.userIsInRole(userId, [ 'manager', lead.parentId ], eventName))
+    if (doc.userId == userId) || (share.isManagerOrLead(userId,[lead.parentId]))
       if lead.policy == "public"
         doc.status = "confirmed"
       if lead.policy == "requireApproval"
@@ -266,7 +257,7 @@ share.initMethods = (eventName) ->
     SimpleSchema.validate(sel,share.Schemas.LeadSignups.omit('status'))
     userId = Meteor.userId()
     olddoc = share.LeadSignups.findOne(sel._id)
-    if (sel.userId == userId) || (Roles.userIsInRole(userId, [ 'manager', olddoc.parentId ], eventName))
+    if (sel.userId == userId) || (share.isManagerOrLead(userId,[olddoc.parentId]))
       share.LeadSignups.update(sel,{$set: {status: "bailed"}}, (err,res) ->
         unless err
           if Meteor.isServer
