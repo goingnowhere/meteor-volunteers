@@ -126,11 +126,12 @@ share.initMethods = (eventName) ->
         # volunteer to a shift. Can the lead of a Department add a volunteer to
         # of a team of its Department ? .
         if (doc.userId == userId) || (share.isManagerOrLead(userId,[parentDoc.parentId]))
-          doc.status =
+          status =
             if parentDoc.policy == "public" then "confirmed"
             else if parentDoc.policy == "requireApproval" then "pending"
-          if doc.status
-            collection.insert(doc)
+          if status
+            if Meteor.isServer
+              collection.upsert(doc,{$set: {status: status}})
         else
           return throwError(403, 'Insufficient Permission');
     else if type == "bail"

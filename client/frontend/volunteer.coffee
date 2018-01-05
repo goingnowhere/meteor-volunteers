@@ -44,6 +44,7 @@ addLocalShiftsCollection = (collection,template,type,filter = {},limit = 10,user
         policy: job.policy
         tags: unit.tags
         users: users
+        enroll: template.data?.enroll?
       if type == 'shift'
         _.extend(mod,
           start: job.start
@@ -83,7 +84,7 @@ Template.volunteerShiftsForm.onCreated () ->
   template.autorun () ->
 
     filter = makeFilter(template.searchQuery)
-    limit = template.searchQuery.get('limit')
+    limit = template.searchQuery.get('limit') || 10
     share.templateSub(template,"division")
     share.templateSub(template,"department")
     sub = share.templateSub(template,"allDuties", filter, limit)
@@ -133,30 +134,3 @@ Template.volunteerUserShifts.helpers
     template = Template.instance()
     sort = {sort: {start: -1, dueDate:-1}}
     template.ShiftTaskLocal.find({type: "task"},sort)
-
-# Template.volunteersTeamView.onCreated () ->
-#   template = this
-#   template.ShiftTaskLocal = new Mongo.Collection(null)
-#   template.teamId = template.data._id
-#
-#   template.autorun () ->
-#     template.subOrg = share.templateSub(template,"organization")
-#     template.subSig = share.templateSub(template,"allDuties.byTeam", template.teamId)
-#     filter = {parentId : template.teamId}
-#     if template.subSig.ready()
-#       addLocalShiftsCollection(share.TeamShifts,template,'shift',filter)
-#       addLocalShiftsCollection(share.TeamTasks,template,'task',filter)
-#       addLocalShiftsCollection(share.Lead,template,'lead',filter)
-#
-# Template.volunteersTeamView.helpers
-#   'orgUnit': () ->
-#     template = Template.instance()
-#     if template.subOrg.ready()
-#       share.getOrgUnit(template.teamId)
-#   'allShiftsTasks': () ->
-#     template = Template.instance()
-#     template.ShiftTaskLocal.find()
-#   canEditTeam: () =>
-#     template = Template.instance()
-#     share.isManagerOrLead(Meteor.userId(),template.teamId)
-#   unitDashboardEventName: () -> "unitDashboard-#{share.eventName}"

@@ -4,6 +4,7 @@ import SimpleSchema from 'simpl-schema'
 SimpleSchema.extendOptions(['autoform'])
 
 policyValues = ["public", "adminOnly", "requireApproval"]
+taskPriority = [ "essential", "important", "normal"]
 
 share.Schemas = {}
 
@@ -39,7 +40,8 @@ CommonTask = new SimpleSchema(
         placeholder: "max"
   priority:
     type: String
-    allowedValues: [ "essential", "important", "normal"]
+    label: () -> TAPi18n.__("priority")
+    allowedValues: taskPriority
     autoform:
       defaultValue: "normal"
   policy:
@@ -78,11 +80,17 @@ share.Schemas.TeamTasks = new SimpleSchema(
 )
 share.Schemas.TeamTasks.extend(CommonTask)
 
+getUniqueShifts = () ->
+  allShifts = share.TeamShifts.find({},{sort: {title: 1}}).fetch()
+  _.uniq(allShifts, false, (s) -> s.title).map((s) -> {label: s.title, value: s._id})
+
 share.Schemas.TeamShifts = new SimpleSchema(
   start:
     type: Date
     label: () -> TAPi18n.__("start")
     autoform:
+      # defaultValue: () ->
+      #   AutoForm.getFieldValue('start')
       afFieldInput:
         type: "datetimepicker"
         placeholder: () -> TAPi18n.__("start")
@@ -117,6 +125,17 @@ share.Schemas.TeamShifts = new SimpleSchema(
     autoValue: () -> moment(this.field('end').value).hour() + 1
     autoform:
       omit: true
+  # group:
+  #   type: Array
+  #   label: () -> TAPi18n.__("group")
+  #   optional: true
+  #   autoform:
+  #     type: "select2"
+  #     options: () -> getUniqueShifts(AutoForm.getFieldValue('parentId'))
+  #     afFieldInput:
+  #       multiple: true
+  #       select2Options: () -> {multiple: true}
+  # "group.$": String
 )
 
 share.Schemas.TeamShifts.extend(CommonTask)

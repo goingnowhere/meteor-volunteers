@@ -55,18 +55,18 @@ share.initCollections = (eventName) ->
 
   share.ShiftSignups = new Mongo.Collection "#{prefix}Volunteers.shiftSignups"
   share.ShiftSignups.attachSchema(share.Schemas.ShiftSignups)
-  if Meteor.isServer
-    share.ShiftSignups._ensureIndex( { userId: 1, shiftId: 1 }, { unique: 1 } )
+  # if Meteor.isServer
+  #   share.ShiftSignups._ensureIndex( { userId: 1, shiftId: 1 }, { unique: 1 } )
 
   share.TaskSignups = new Mongo.Collection "#{prefix}Volunteers.taskSignups"
   share.TaskSignups.attachSchema(share.Schemas.TaskSignups)
-  if Meteor.isServer
-    share.TaskSignups._ensureIndex( { userId: 1, shiftId: 1 }, { unique: 1 } )
+  # if Meteor.isServer
+  #   share.TaskSignups._ensureIndex( { userId: 1, shiftId: 1 }, { unique: 1 } )
 
   share.LeadSignups = new Mongo.Collection "#{prefix}Volunteers.leadSignups"
   share.LeadSignups.attachSchema(share.Schemas.LeadSignups)
-  if Meteor.isServer
-    share.LeadSignups._ensureIndex( { userId: 1, shiftId: 1 }, { unique: 1 } )
+  # if Meteor.isServer
+  #   share.LeadSignups._ensureIndex( { userId: 1, shiftId: 1 }, { unique: 1 } )
 
   # shortcut to recover all related collections more easily
   share.signupCollections =
