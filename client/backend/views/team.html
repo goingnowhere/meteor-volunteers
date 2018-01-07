@@ -1,4 +1,12 @@
 <template name="teamShiftsTable">
+  {{#if grouping}}
+  <div class="btn-group pull-right">
+    <button type="button" class="btn btn-default" data-action="groupDone"
+      aria-haspopup="true" aria-expanded="false">
+      {{fa "check"}} {{_ "done"}}
+    </button>
+  </div>
+  {{/if}}
   <table class="table">
     <thead>
       <th></th>
@@ -8,7 +16,7 @@
       <th></th>
     </thead>
     {{#each shift in shifts}}
-      <tr>
+      <tr class="shift" data-id="{{shift._id}}">
         <td>{{#if $eq shift.priority "essential"}}{{fa "exclamation-circle"}}{{/if}}</td>
         <td class="col-md-5">{{formatTime shift.start}} - {{formatTime shift.end}}</td>
         <td class="col-md-6">{{shift.title}}
@@ -19,7 +27,7 @@
         <td class="col-md-1 pull-rigth"><div class="badge">{{shift.needed}} / {{shift.confirmed}}</div></td>
         <td>
           <div class="btn-group pull-right">
-            <button type="button" class="btn btn-default btn-circle dropdown-toggle"
+            <button type="button" class="btn btn-default btn-circle dropdown-toggle {{#if grouping}}disabled{{/if}}"
               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <span class="caret"></span>
             </button>
@@ -30,6 +38,12 @@
                 {{fa "trash-o"}} {{_ "remove"}}</a></li>
               <li class="dropdown-item"><a href="#" data-action="clone" data-id="{{shift._id}}">
                 {{fa "clone"}} {{_ "clone"}}</a></li>
+              <li class="dropdown-item"><a href="#" data-action="group" data-id="{{shift._id}}">
+                {{fa "object-group"}} {{_ "group"}}</a></li>
+              {{#if shift.groupId }}
+                <li class="dropdown-item"><a href="#" data-action="removeFromGroup" data-id="{{shift._id}}">
+                  {{fa "object-ungroup"}} {{_ "remove from group"}}</a></li>
+              {{/if}}
             </ul>
           </div>
         </td>

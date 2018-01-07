@@ -3,12 +3,14 @@ Template.teamShiftsTable.onCreated () ->
   teamId = template.data._id
   sub = share.templateSub(template,"allDuties.byTeam",teamId)
   template.shifts = new ReactiveVar([])
+  template.grouping = new ReactiveVar(new Set())
   template.autorun () ->
     if sub.ready()
       template.shifts.set(share.getShifts({parentId: teamId}))
 
 Template.teamShiftsTable.helpers
   'shifts': () -> Template.instance().shifts.get()
+  'grouping': () -> Template.instance().grouping.get().size > 0
 
 Template.teamShiftsTable.events
   'click [data-action="edit"]': (event,template) ->
@@ -25,6 +27,40 @@ Template.teamShiftsTable.events
     delete shift._id
     ModalShowWithTemplate("insertUpdateTemplate",
       {form:{collection: share.TeamShifts}, data: shift})
+  'click tr.shift': (event,template) ->
+    g = template.grouping.get()
+    if g.size > 0
+      tr = $(event.target).parent()
+      id = tr.data('id')
+      # this "if" is needed because the action "group" triggers also this event
+      # and I don't understand how to prenvent the propagation without killing
+      # the dropdown
+      if id
+        if tr.hasClass('bg-info')
+          g = g.delete(id)
+          tr.removeClass('bg-info')
+        else
+          g = g.add(id)
+          tr.addClass('bg-info')
+        template.grouping.set(g)
+  'click [data-action="group"]': (event,template) ->
+    # event.stopPropagation()
+    # event.preventDefault()
+    g = template.grouping.get()
+    id = $(event.target).data('id')
+    $("tr.shift[data-id='#{id}']").addClass('bg-info')
+    template.grouping.set((new Set()).add(id))
+  'click [data-action="groupDone"]': (event,template) ->
+    $("tr.shift").removeClass('bg-info')
+    groupId = Random.id()
+    template.grouping.get().forEach (id) ->
+      doc = {_id: id, modifier: {$set: {groupId: groupId}}}
+      share.meteorCall "teamShifts.update", doc
+    template.grouping.set(new Set())
+  'click [data-action="removeFromGroup"]': (event,template) ->
+    id = $(event.target).data('id')
+    doc = {_id: id, modifier: {$unset: {groupId: ""}}}
+    share.meteorCall "teamShifts.update", doc
 
 Template.teamDayViewGrid.onCreated () ->
   template = this
