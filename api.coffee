@@ -15,9 +15,7 @@ initAuthorization = (eventName) ->
   share.isManagerOrLead = (userId, unitIdList) ->
     if share.isManager() then return true
     else if userId == Meteor.userId()
-      l = Roles.getRolesForUser(userId, eventName)
-      # check only if a user is a lead for the given list of units
-      _.intersection(unitIdList,l).length > 0
+      Roles.userIsInRole(userId, unitIdList, eventName)
     else return false
 
 saveVolunteerForm = (eventName,data) ->

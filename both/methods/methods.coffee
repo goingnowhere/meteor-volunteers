@@ -245,7 +245,7 @@ share.initMethods = (eventName) ->
       if doc.status
         share.LeadSignups.insert(doc, (err,res) ->
           unless err
-            if Meteor.isServer
+            if Meteor.isServer && lead.policy == "public"
               Roles.addUsersToRoles(doc.userId, lead.parentId, eventName)
           else
             return throwError(501, 'Cannot Insert');
