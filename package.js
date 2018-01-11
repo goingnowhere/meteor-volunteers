@@ -31,6 +31,7 @@ Package.onUse(function(api) {
     'underscore',
     'benmgreene:moment-range',
     'momentjs:moment',
+    'reywood:publish-composite',
     'piemonkey:roles',
     'reactive-dict',
     'reactive-var',

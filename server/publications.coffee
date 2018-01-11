@@ -75,6 +75,53 @@ share.initPublications = (eventName) ->
       dd = share.Division.find()
       [s,t,l,tt,d,dd]
 
+  createPubblicationTeam = (type,signups,duties) ->
+    Meteor.publishComposite("#{eventName}.Volunteers.#{type}.byTeam", (id) ->
+      userId = this.userId
+      return {
+        find: () ->
+          sel = {parentId: id}
+          unless share.isManagerOrLead(userId,[ id ])
+            sel = _.extend(sel,dutiesPublicPolicy)
+          duties.find(sel)
+        children: [
+          { find: (duty) ->
+            signups.find({shiftId: duty._id})
+          }
+        ]
+      }
+    )
+
+  createPubblicationTeam("allShifts",share.ShiftSignups,share.TeamShifts)
+  createPubblicationTeam("allTasks",share.TaskSignups,share.TeamTasks)
+  createPubblicationTeam("allLeads",share.LeadSignups,share.Lead)
+
+  createPubblicationDept = (type,signups,duty) ->
+    Meteor.publishComposite("#{eventName}.Volunteers.#{type}.byDepartment", (id) ->
+      userId = this.userId
+      return {
+        find: () -> share.Team.find({parentId: id}),
+        children: [
+          {
+            find: (team) ->
+              sel = {parentId: team._id}
+              unless share.isManagerOrLead(userId,[ id ])
+                sel = _.extend(sel,dutiesPublicPolicy)
+              duties.find(sel)
+            children: [
+              { find: (team, duty) ->
+                signups.find({shiftId: duty._id})
+              }
+            ]
+          }
+        ]
+      }
+    )
+
+  createPubblicationDept("allShifts",share.ShiftSignups,share.TeamShifts)
+  createPubblicationDept("allTasks",share.TaskSignups,share.TeamTasks)
+  createPubblicationDept("allLeads",share.LeadSignups,share.Lead)
+
   Meteor.publish "#{eventName}.Volunteers.allDuties.byTeam", (teamId) ->
     if this.userId
       selShifts = {parentId: teamId}
