@@ -73,12 +73,17 @@ Package.onUse(function(api) {
     'client/global_helpers.coffee',
     // 'client/css/awesome-bootstrap-checkbox.css',
     'client/css/custom.css',
-    "client/frontend/filters.html",
-    "client/frontend/filters.coffee",
-    "client/frontend/shifts.html",
-    "client/frontend/shifts.coffee",
-    "client/frontend/volunteer.html",
-    "client/frontend/volunteer.coffee",
+    "client/shifts/filters.html",
+    "client/shifts/filters.coffee",
+    "client/shifts/shifts.html",
+    "client/shifts/shifts.coffee",
+    "client/shifts/volunteer.html",
+    "client/shifts/volunteer.coffee",
+
+    "client/volunteers/volunteers.html",
+    "client/volunteers/volunteers.coffee",
+    "client/volunteers/userform.html",
+    "client/volunteers/userform.coffee",
 
     "client/backend/forms/volunteer.html",
     "client/backend/forms/volunteer.coffee",
@@ -98,15 +103,16 @@ Package.onUse(function(api) {
     "client/backend/forms/orgUnit.html",
     "client/backend/forms/orgUnit.js",
 
-    "client/backend/views/team.html",
-    "client/backend/views/team.coffee",
-    "client/backend/views/signups.html",
-    "client/backend/views/signups.js",
+    "client/signups/team.html",
+    "client/signups/team.coffee",
+    "client/signups/signups.html",
+    "client/signups/signups.js",
     "client/backend/stats.coffee",
   ], "client");
 
   api.add_files([
-    'server/publications.coffee'
+    'server/publications.coffee',
+    'server/publications1.coffee',
   ],"server");
 
   // api.add_files([ "i18n/en.i18n.json", ], ["client", "server"]);

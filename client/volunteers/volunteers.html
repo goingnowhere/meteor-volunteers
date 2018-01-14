@@ -1,0 +1,39 @@
+<template name="shiftsUserRowView">
+  <tr>
+    <td> {{fa "calendar"}} {{> shiftDate shift }}</td>
+    <td>{{team.name}} {{shift.title}}</td>
+    <td> {{_ signup.status }}</td>
+    <td>
+      <div class="btn-group pull-right">
+        <button type="button" class="btn btn-default btn-circle dropdown-toggle"
+          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu">
+          <li class="dropdown-item"><a href="#" data-action="bail"
+            data-shiftId="{{signup.shiftId}}" data-parentId="{{signup.parentId}}">
+            {{fa "pencil-square-o"}} {{_ "bail"}}</a></li>
+        </ul>
+      </div>
+    </td>
+  </tr>
+</template>
+
+<template name="tasksUserRowView">
+  <tr>
+    <td>{{team.name}} {{task.title}}</td>
+    <td>
+      {{fa "task"}}
+      {formatDate task.dueDate}} - {{_ "estimated_time"}} {{task.estimatedTime}}
+    </td>
+  </tr>
+</template>
+
+<template name="leadsUserRowView">
+  <tr>
+    <td>{{unit.name}}</td>
+    <td>
+      {{fa "user-circle"}} {{lead.title}}
+    </td>
+  </tr>
+</template>

@@ -1,0 +1,82 @@
+<template name="shiftDate">
+  {{#if sameDay start end}}
+    {{formatDate start}} {{formatTime start}} - {{formatTime end}}
+  {{else}}
+    {{formatDateTime start}} - {{formatDateTime end}}
+  {{/if}}
+</template>
+
+<template name="shiftsListItem">
+  <div class="panel panel-success">
+    <div class="panel-heading">
+      <h1 class="panel-title">
+        {{fa "calendar"}} {{team.name}}: {{shift.title}}
+        <div class="pull-right">
+          {{> shiftDate shift}}
+        </div>
+      </h1>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+          <div class="col-md-8">
+            {{shift.description}}
+          </div>
+          <div class="col-md-4">
+            {{#if team.tags}}
+              <div>{{fa "tags"}} {{#each tag in team.tags}} {{tag}} {{/each}}</div>
+            {{/if}}
+          </div>
+        </div>
+    </div>
+    <div class="panel-footer clearfix">
+      <div class="pull-right">
+        {{#if $and signup.status ($neq signup.status 'bailed')}}
+          <button class="btn btn-default disabled
+            {{#if $eq signup.status 'confirmed'}}btn-success{{/if}}">
+            {{_ signup.status }}
+          </button>
+        {{else}}
+          {{#if $eq signup.status 'bailed'}}
+            <button class="btn btn-default disabled">
+              {{_ signup.status }}
+            </button>
+          {{/if}}
+          {{#unless $eq shift.policy "adminOnly"}}
+            <button class="btn btn-primary" data-shiftid="{{shift._id}}"
+              data-parentid="{{team._id}}" data-action="apply">
+              {{#if $eq shift.policy "public"}}{{_ "join"}}{{/if}}
+              {{#if $eq shift.policy "requireApproval"}}{{_ "apply"}}{{/if}}
+            </button>
+          {{else}}
+            {{_ "admin_only"}}
+          {{/unless}}
+        {{/if}}
+        {{#if canBail}}
+          <button class="btn btn-danger" data-shiftid="{{shiftId}}" data-parentid="{{unitId}}"
+            data-action="bail" data-type={{type}}>
+            {{_ "bail"}}
+          </button>
+        {{/if}}
+      </div>
+    </div>
+  </div>
+</template>
+
+<template name="shiftsTasksTableRowView">
+  <div>
+    <a href="{{pathFor teamViewEventName _id=teamId}}">{{teamName}}</a>:
+    {{title}}
+    {{#if $and ($eq type "lead") ($eq status "pending")}} {{fa "exclamation-triangle"}}{{/if}}
+  </div>
+  <div>
+    {{#if $eq type "shift"}}{{fa "calendar"}}{{/if}}
+    {{#if $eq type "task"}}{{fa "tasks"}}{{/if}}
+    {{#if $eq type "lead"}}{{fa "user-circle"}}{{/if}}
+    {{#if $eq type "task"}}
+      {{formatDate dueDate}} - {{_ "estimated_time"}} {{estimatedTime}}
+    {{/if}}
+    {{#if $eq type "shift"}}
+      {{> shiftDate shift}}
+    {{/if}}
+  </div>
+</template>

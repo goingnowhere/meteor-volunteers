@@ -1,0 +1,7 @@
+<template name="addVolunteerForm">
+  {{#if Template.subscriptionsReady}}
+    {{#if form }}
+      {{> insertUpdateTemplate form=form data=data }}
+    {{/if}}
+  {{/if}}
+</template>

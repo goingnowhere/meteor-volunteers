@@ -1,0 +1,33 @@
+
+<template name="volunteerShiftsList">
+    <!-- {{#unless isCustumSearch }}
+    <div class="row">
+      <div class="col-md-12">
+        <div class="panel panel-default">
+          <form class="form-horizontal">
+            <div class="form-group">
+            <div class="col-sm-2">{{> rangePicker searchQuery=searchQuery}}</div>
+              <div class="col-sm-2">{{> periodPicker searchQuery=searchQuery}}</div>
+              <div class="col-sm-2">{{> dutiesPicker searchQuery=searchQuery}}</div>
+              <div class="col-sm-2">{{> tagsPicker searchQuery=searchQuery}}</div>
+              <div class="col-sm-4">{{> teamsPicker searchQuery=searchQuery}}</div>
+              <div class="col-sm-2">{{> moreFilters searchQuery=searchQuery}}</div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    {{/unless}} -->
+  <ul class="list-group">
+    {{#each duty in allDuties}}
+      <li class="list-group-item clearfix">
+        {{> shiftsListItem duty }}
+      </li>
+    {{/each}}
+  </ul>
+  {{#if loadMore}}
+    <div class="col-sm-offset-5 col-sm-2 text-center">
+      <button class="btn btn-primary" data-action="loadMore">{{_ "load_more"}}</button>
+    </div>
+  {{/if}}
+</template>

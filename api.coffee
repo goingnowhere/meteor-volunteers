@@ -30,6 +30,7 @@ class VolunteersClass
     initAuthorization(@eventName)
     if Meteor.isServer
       share.initPublications(@eventName)
+      share.initPublications1(@eventName)
     @Schemas = share.Schemas
     @Collections =
       VolunteerForm: share.VolunteerForm
@@ -41,8 +42,10 @@ class VolunteersClass
       Lead: share.Lead
       ShiftSignups: share.ShiftSignups
       TaskSignups: share.TaskSignups
+      LeadSignups: share.LeadSignups
   setPeriods: (periods) -> share.periods.set(periods)
   setUserForm: (data) -> saveVolunteerForm(@eventName,data)
   isManagerOrLead: (userId,unitId) -> share.isManagerOrLead(userId,unitId)
   isManager: () -> share.isManager()
-  teamStats: (teamId) -> share.TeamStats(teamId)
+  teamStats: (id) -> share.TeamStats(id)
+  deptStats: (id) -> share.DepartmentStats(id)

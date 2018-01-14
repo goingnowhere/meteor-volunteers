@@ -28,6 +28,8 @@ getUnit = (sel,unit,type) ->
       {status: "confirmed", parentId: u._id}
       ).map((s) -> return s.userId)
     if type = "team"
+      console.log u
+      console.log share.getShifts({parentId: u._id})
       u.shiftRate = rate(share.getShifts({parentId: u._id}))
     return u
     )
@@ -60,11 +62,12 @@ class DepartmentStatsClass
   # the list of teams of this Department with associated leads
   # can get the number by counting and order by teams without lead
   # or by the shiftRate or pendingRequests
-  teams: () -> getUnit({parentId: @departmentId},share.Team)
+  teams: () -> getUnit({parentId: @departmentId},share.Team,"team")
   leadsActivity: () -> []
+  pendingRequests: () -> []
   # total number of volunteers involved with this Department
   volunteerRate: () ->
-    _.reduce(getUnit({parentId: @departmentId},share.Team),
+    _.reduce(getUnit({parentId: @departmentId},share.Team,"team"),
       (acc,t) -> {
         needed: acc.needed + t.shiftRate.needed,
         confirmed: acc.confirmed + t.shiftRate.confirmed

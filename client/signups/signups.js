@@ -3,8 +3,9 @@ let share = __coffeescriptShare;
 Template.teamSignupsList.onCreated(function () {
   const template = this;
   template.teamId = this.data._id
-  share.templateSub(template,"users")
-  share.templateSub(template,"allDuties.byTeam",template.teamId)
+  share.templateSub(template,"ShiftSignups.byTeam",template.teamId)
+  share.templateSub(template,"TaskSignups.byTeam",template.teamId)
+  share.templateSub(template,"LeadSignups.byTeam",template.teamId)
 })
 
 Template.teamSignupsList.helpers({
