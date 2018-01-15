@@ -9,7 +9,8 @@ Package.describe({
 Npm.depends({
   'flatpickr':'2.4.8',
   'jquery': '3.2.1',
-  'bootstrap': '3.3.7'
+  'bootstrap': '4.0.0-beta.3',
+  'popper.js': '1.12.9'
 // "awesome-bootstrap-checkbox": "1.0.0-alpha.4"
 });
 
