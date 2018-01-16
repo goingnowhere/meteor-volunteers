@@ -22,7 +22,6 @@ Package.onUse(function(api) {
     'coffeescript',
     'ecmascript',
     'tmeasday:check-npm-versions',
-    // 'tap:i18n@1.8.2',
     'aldeed:collection2-core',
     'aldeed:autoform@6.2.0',
     'aldeed:autoform-select2',
@@ -32,7 +31,7 @@ Package.onUse(function(api) {
     'underscore',
     'benmgreene:moment-range',
     'momentjs:moment',
-    'reywood:publish-composite',
+    'reywood:publish-composite@1.5.2',
     'piemonkey:roles',
     'reactive-dict',
     'reactive-var',
@@ -49,7 +48,7 @@ Package.onUse(function(api) {
     'natestrauser:select2@4.0.3',
     'drewy:datetimepicker',
     'abate:autoform-datetimepicker',
-    // 'drblue:fullcalendar',
+    'peppelg:bootstrap-3-modal',
   ], 'client');
 
   // Order Matters !
