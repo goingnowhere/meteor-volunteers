@@ -7,16 +7,16 @@
 </template>
 
 <template name="shiftsListItem">
-  <div class="panel panel-success">
-    <div class="panel-heading">
-      <h1 class="panel-title">
+  <div class="card">
+    <div class="card-heading">
+      <div class="card-title">
         {{fa "calendar"}} {{team.name}}: {{shift.title}}
         <div class="pull-right">
           {{> shiftDate shift}}
         </div>
-      </h1>
+      </div>
     </div>
-    <div class="panel-body">
+    <div class="card-body">
         <div class="row">
           <div class="col-md-8">
             {{shift.description}}
@@ -28,7 +28,7 @@
           </div>
         </div>
     </div>
-    <div class="panel-footer clearfix">
+    <div class="card-footer">
       <div class="pull-right">
         {{#if $and signup.status ($neq signup.status 'bailed')}}
           <button class="btn btn-default disabled

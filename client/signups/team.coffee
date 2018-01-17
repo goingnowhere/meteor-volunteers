@@ -14,7 +14,7 @@ Template.teamShiftsTable.events
   'click [data-action="edit"]': (event,template) ->
     id = $(event.target).data('id')
     shift = share.TeamShifts.findOne(id)
-    ModalShowWithTemplate("insertUpdateTemplate",
+    AutoFormComponents.ModalShowWithTemplate("insertUpdateTemplate",
       {form:{collection: share.TeamShifts}, data: shift})
   'click [data-action="delete"]': (event,template) ->
     id = $(event.target).data('id')
@@ -23,7 +23,7 @@ Template.teamShiftsTable.events
     id = $(event.target).data('id')
     shift = share.TeamShifts.findOne(id)
     delete shift._id
-    ModalShowWithTemplate("insertUpdateTemplate",
+    AutoFormComponents.ModalShowWithTemplate("insertUpdateTemplate",
       {form:{collection: share.TeamShifts}, data: shift})
 
 Template.teamDayViewGrid.onCreated () ->
@@ -67,16 +67,16 @@ Template.teamDayViewGrid.helpers {
 
 Template.teamDayViewGrid.events
   'click [data-action="edit"]': (event,template) ->
-    ModalShowWithTemplate("insertUpdateTemplate",
+    AutoFormComponents.ModalShowWithTemplate("insertUpdateTemplate",
       {form:{collection: share.Team}, data: template.data})
   'click [data-action="delete"]': (event,template) ->
     id = $(event.target).data('id')
     share.meteorCall "team.remove", id
   'click [data-action="addShift"]': (event,template) ->
-    ModalShowWithTemplate("insertUpdateTemplate",
+    AutoFormComponents.ModalShowWithTemplate("insertUpdateTemplate",
       {form:{collection: share.TeamShifts}, data:{parentId: template.data._id}})
   'click [data-action="addTask"]': (event,template) ->
-    ModalShowWithTemplate("insertUpdateTemplate",
+    AutoFormComponents.ModalShowWithTemplate("insertUpdateTemplate",
       {form:{collection: share.TeamTasks}, data:{parentId: template.data._id}})
   'click #taskStatus': ( event, template ) ->
     selected = template.findAll("#taskStatus:checked")
@@ -90,7 +90,7 @@ Template.teamTasksView.events
   'click [data-action="edit"]': (event,template) ->
     id = $(event.target).data('id')
     data = share.TeamTasks.findOne(id)
-    ModalShowWithTemplate("insertUpdateTemplate",
+    AutoFormComponents.ModalShowWithTemplate("insertUpdateTemplate",
       {form:{collection: share.TeamTasks}, data: data})
   'click [data-action="delete"]': (event,template) ->
     id = $(event.target).data('id')
@@ -114,7 +114,7 @@ Template.teamShiftsView.events
   'click [data-action="edit"]': (event,template) ->
     id = $(event.target).data('id')
     data = share.TeamShifts.findOne(id)
-    ModalShowWithTemplate("insertUpdateTemplate",
+    AutoFormComponents.ModalShowWithTemplate("insertUpdateTemplate",
       {form:{collection: share.TeamShifts}, data: data})
   'click [data-action="delete"]': (event,template) ->
     id = $(event.target).data('id')

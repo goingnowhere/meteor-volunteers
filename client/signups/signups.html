@@ -1,51 +1,37 @@
 <template name="teamSignupsList">
-  <div class="panel">
-    <h3>{{_ "team"}} : {{name}}</h3>
-  </div>
-  <ul class="list-unstyled">
+  <h3>{{_ "team"}} : {{name}}</h3>
+  <table class="table">
     {{#each signup in allSignups}}
-      <li class="panel panel-default
-        {{#if $eq signup.type 'shift'}}panel-success{{/if}}
-        {{#if $eq signup.type 'task'}}panel-warning{{/if}}
-        {{#if $eq signup.type 'lead'}}panel-info{{/if}}
-      ">
-          <div class="panel-heading">
-            {{#if $eq signup.type "shift"}}
-              {{fa "calendar"}}
-              {{> shiftField signup.duty}}
-            {{/if}}
-            {{#if $eq signup.type "task"}}
-              {{fa "tasks"}}
-              {{> taskField signup.duty}}
-            {{/if}}
-            {{#if $eq signup.type "lead"}}
-              {{fa "user-circle"}}
-              {{> leadField signup.duty}}
-            {{/if}}
-            {{ signup.duty.title }}
-          </div>
-          <div class="panel-body">
-            {{getUserName signup.userId}}
-            <div class="pull-right">
-              <button
-                class="btn btn-default"
-                data-action="approve"
-                data-signup="{{ signup._id }}"
-                data-type="{{ signup.type }}"
-              >
-                {{_ 'approve' }}
-              </button>
-              <button
-                class="btn btn-default"
-                data-action="refuse"
-                data-signup="{{ signup._id }}"
-                data-type="{{ signup.type }}"
-              >
-                {{_ 'refuse' }}
-              </button>
-            </div>
-          </div>
-      </li>
+    <tr>
+      <td>
+        {{#if $eq signup.type "shift"}}
+          {{fa "calendar"}}
+          {{> shiftField signup.duty}}
+        {{/if}}
+        {{#if $eq signup.type "task"}}
+          {{fa "tasks"}}
+          {{> taskField signup.duty}}
+        {{/if}}
+        {{#if $eq signup.type "lead"}}
+          {{fa "user-circle"}}
+          {{> leadField signup.duty}}
+        {{/if}}
+      </td>
+      <td>
+        {{ signup.duty.title }}
+      </td>
+      <td>{{getUserName signup.userId}}</td>
+      <td>
+        <button class="btn btn-default btn-sm" data-action="approve"
+          data-signup="{{ signup._id }}" data-type="{{ signup.type }}">
+            {{_ 'approve' }}
+        </button>
+        <button class="btn btn-default btn-sm" data-action="refuse"
+          data-signup="{{ signup._id }}" data-type="{{ signup.type }}">
+            {{_ 'refuse' }}
+        </button>
+      </td>
+    </tr>
     {{/each}}
-  </ul>
+  </table>
 </template>

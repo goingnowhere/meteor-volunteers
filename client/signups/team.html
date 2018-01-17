@@ -2,24 +2,26 @@
   <table class="table">
     <thead>
       <th></th>
-      <th class="col-md-2">{{_ "time"}}</th>
-      <th class="col-md-4">{{_ "name"}}</th>
-      <th class="col-md-2 pull-rigth">{{_ "positions"}}</th>
+      <th>{{_ "time"}}</th>
+      <th>{{_ "name"}}</th>
+      <th>{{_ "positions"}}</th>
       <th></th>
     </thead>
     {{#each shift in shifts}}
       <tr>
-        <td>{{#if $eq shift.priority "essential"}}{{fa "exclamation-circle"}}{{/if}}</td>
-        <td class="col-md-5">{{formatTime shift.start}} - {{formatTime shift.end}}</td>
-        <td class="col-md-6">{{shift.title}}
+        <td>{{#if $eq shift.priority "essential"}}<div class="text-danger">{{fa "exclamation-circle"}}</div>{{/if}}</td>
+        <td>{{formatTime shift.start}} - {{formatTime shift.end}}</td>
+        <td>{{shift.title}}
           {{#if ($eq shift.policy 'public')}}{{fa 'globe'}}{{/if}}
           {{#if ($eq shift.policy 'private')}}{{fa 'user-secret'}}{{/if}}
           {{#if ($eq shift.policy 'requireApproval')}}{{fa 'lock'}}{{/if}}
         </td>
-        <td class="col-md-1 pull-rigth"><div class="badge">{{shift.needed}} / {{shift.confirmed}}</div></td>
+        <td class="pull-rigth">
+          <span class="badge badge-pill badge-primary">{{shift.needed}} / {{shift.confirmed}}</span>
+        </td>
         <td>
           <div class="btn-group pull-right">
-            <button type="button" class="btn btn-default btn-circle dropdown-toggle"
+            <button type="button" class="btn btn-default dropdown-toggle"
               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <span class="caret"></span>
             </button>
