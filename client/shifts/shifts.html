@@ -2,7 +2,7 @@
   {{#if sameDay start end}}
     {{formatDate start}} {{formatTime start}} - {{formatTime end}}
   {{else}}
-    {{formatDateTime start}} - {{formatDateTime end}}
+    {{formatDateTime start}} - {{formatTime end}} {{differenceTime start end}}
   {{/if}}
 </template>
 

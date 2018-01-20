@@ -73,6 +73,7 @@ Package.onUse(function(api) {
     'client/global_helpers.coffee',
     // 'client/css/awesome-bootstrap-checkbox.css',
     'client/css/custom.css',
+
     "client/shifts/filters.html",
     "client/shifts/filters.coffee",
     "client/shifts/shifts.html",
@@ -84,34 +85,26 @@ Package.onUse(function(api) {
     "client/volunteers/volunteers.coffee",
     "client/volunteers/userform.html",
     "client/volunteers/userform.coffee",
+    "client/volunteers/volunteerForm.html",
+    "client/volunteers/volunteerForm.coffee",
 
-    "client/backend/forms/volunteer.html",
-    "client/backend/forms/volunteer.coffee",
-    "client/backend/forms/tasks.html",
-    "client/backend/forms/tasks.coffee",
-    "client/backend/forms/shifts.html",
-    "client/backend/forms/shifts.coffee",
-    "client/backend/forms/leads.html",
-    "client/backend/forms/leads.coffee",
-
-    "client/backend/forms/team.html",
-    "client/backend/forms/team.coffee",
-    "client/backend/forms/department.html",
-    "client/backend/forms/department.coffee",
-    "client/backend/forms/division.html",
-    "client/backend/forms/division.coffee",
-    "client/backend/forms/orgUnit.html",
-    "client/backend/forms/orgUnit.js",
+    "client/units/team.html",
+    "client/units/team.coffee",
+    "client/units/department.html",
+    "client/units/department.coffee",
+    "client/units/division.html",
+    "client/units/division.coffee",
 
     "client/signups/team.html",
     "client/signups/team.coffee",
     "client/signups/signups.html",
     "client/signups/signups.js",
-    "client/backend/stats.coffee",
+    
+    "client/stats.coffee",
   ], "client");
 
   api.add_files([
-    'server/publications.coffee',
+    // 'server/publications.coffee',
     'server/publications1.coffee',
   ],"server");
 

@@ -32,3 +32,8 @@ Template.shiftsListItem.helpers
 
 Template.shiftDate.helpers
   'sameDay': (start, end) -> moment(start).isSame(moment(end),"day")
+
+AutoForm.addHooks ['InsertTeamShiftsFormId','UpdateTeamShiftsFormId'],
+  onSuccess: (formType, result) ->
+    if this.template.data.var
+      this.template.data.var.set({add: false, teamId: result.teamId})

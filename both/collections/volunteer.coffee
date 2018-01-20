@@ -1,5 +1,6 @@
 import SimpleSchema from 'simpl-schema'
 
+# this is the base Volunteers form schema
 share.Schemas.VolunteerForm = new SimpleSchema(
   userId:
     type: String
@@ -15,20 +16,13 @@ share.Schemas.VolunteerForm = new SimpleSchema(
       else this.unset()
     autoform:
       omit: true
-  # notes:
-  #   type: String
-  #   label: () -> TAPi18n.__("notes")
-  #   optional: true
-  #   max: 1000
-  #   autoform:
-  #     rows:4
-  # private_notes:
-  #   type: String
-  #   label: () -> TAPi18n.__("private_notes")
-  #   optional: true
-  #   max: 1000
-  #   autoform:
-  #     rows:2
+  private_notes:
+    type: String
+    label: () -> TAPi18n.__("notes")
+    optional: true
+    max: 1000
+    autoform:
+      rows:4
 )
 
 commonSignups = new SimpleSchema(

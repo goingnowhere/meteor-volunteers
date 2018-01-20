@@ -31,6 +31,7 @@ share.initCollections = (eventName) ->
 
   # User Form
 
+  # Data for the volunteer Form
   share.VolunteerForm = new Mongo.Collection "#{prefix}Volunteers.volunteerForm"
   share.VolunteerForm.attachSchema(share.Schemas.VolunteerForm)
   share.form = new ReactiveVar(share.VolunteerForm)

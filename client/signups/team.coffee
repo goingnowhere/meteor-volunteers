@@ -1,7 +1,9 @@
 Template.teamShiftsTable.onCreated () ->
   template = this
   teamId = template.data._id
-  sub = share.templateSub(template,"allDuties.byTeam",teamId)
+  sub = share.templateSub(template,"ShiftSignups.byTeam",teamId)
+  sub = share.templateSub(template,"LeadSignups.byTeam",teamId)
+  sub = share.templateSub(template,"TaskSignups.byTeam",teamId)
   template.shifts = new ReactiveVar([])
   template.autorun () ->
     if sub.ready()
@@ -30,7 +32,9 @@ Template.teamDayViewGrid.onCreated () ->
   template = this
   template.taskFilter = new ReactiveVar(["pending","overdue","done"])
   template.teamId = template.data._id
-  share.templateSub(template,"allDuties.byTeam", template.teamId)
+  sub = share.templateSub(template,"ShiftSignups.byTeam",template.teamId)
+  sub = share.templateSub(template,"LeadSignups.byTeam",template.teamId)
+  sub = share.templateSub(template,"TaskSignups.byTeam",template.teamId)
   share.templateSub(template,"users")
 
 Template.teamDayViewGrid.helpers {

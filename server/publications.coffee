@@ -14,25 +14,22 @@ share.initPublications = (eventName) ->
     sel
 
   Meteor.publish "#{eventName}.Volunteers.team", (sel={}) ->
-    if this.userId
-      if share.isManagerOrLead(this.userId)
-        share.Team.find(sel)
-      else
-        share.Team.find(_.extend(sel,unitPublicPolicy))
+    if share.isManagerOrLead(this.userId)
+      share.Team.find(sel)
+    else
+      share.Team.find(_.extend(sel,unitPublicPolicy))
 
   Meteor.publish "#{eventName}.Volunteers.division", () ->
-    if this.userId
-      if share.isManagerOrLead(this.userId)
-        share.Division.find()
-      else
-        share.Division.find(unitPublicPolicy)
+    if share.isManagerOrLead(this.userId)
+      share.Division.find()
+    else
+      share.Division.find(unitPublicPolicy)
 
   Meteor.publish "#{eventName}.Volunteers.department", () ->
-    if this.userId
-      if share.isManagerOrLead(this.userId)
-        share.Department.find()
-      else
-        share.Department.find(unitPublicPolicy)
+    if share.isManagerOrLead(this.userId)
+      share.Department.find()
+    else
+      share.Department.find(unitPublicPolicy)
 
   Meteor.publish "#{eventName}.Volunteers.organization", () ->
     sel = {}

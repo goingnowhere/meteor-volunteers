@@ -123,3 +123,43 @@ share.initPublications1 = (eventName) ->
     if this.userId
       sel = filterForPublic(this.userId, sel)
     return share.TeamShifts.find(sel,{limit: limit})
+
+  Meteor.publish "#{eventName}.Volunteers.volunteerForm", (sel={}) ->
+    if this.userId
+      if share.isManagerOrLead(this.userId)
+        share.VolunteerForm.find(sel)
+      else
+        sel = _.extend(sel,{userId: this.userId})
+        share.VolunteerForm.find(sel,{fields: {private_notes: 0}})
+
+  ######################################
+  # Below here, all public information #
+  ######################################
+
+  # not reactive
+  Meteor.publish "#{eventName}.Volunteers.organization", () ->
+    sel = {}
+    unless (not this.userId) || share.isManagerOrLead(this.userId)
+      sel = unitPublicPolicy
+    dp = share.Department.find(sel)
+    t = share.Team.find(sel)
+    dv = share.Division.find(sel)
+    return [dv,dp,t]
+
+  Meteor.publish "#{eventName}.Volunteers.team", (sel={}) ->
+    if this.userId && share.isManagerOrLead(this.userId)
+      share.Team.find(sel)
+    else
+      share.Team.find(_.extend(sel,unitPublicPolicy))
+
+  Meteor.publish "#{eventName}.Volunteers.division", (sel={}) ->
+    if this.userId && share.isManagerOrLead(this.userId)
+      share.Division.find(sel)
+    else
+      share.Division.find(_.extend(sel,unitPublicPolicy))
+
+  Meteor.publish "#{eventName}.Volunteers.department", (sel={}) ->
+    if this.userId && share.isManagerOrLead(this.userId)
+      share.Department.find(sel)
+    else
+      share.Department.find(_.extend(sel,unitPublicPolicy))

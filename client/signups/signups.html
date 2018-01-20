@@ -6,15 +6,15 @@
       <td>
         {{#if $eq signup.type "shift"}}
           {{fa "calendar"}}
-          {{> shiftField signup.duty}}
+          {{> shiftDate signup.duty}}
         {{/if}}
         {{#if $eq signup.type "task"}}
           {{fa "tasks"}}
-          {{> taskField signup.duty}}
+          {formatDateTime signup.dueDate}}
         {{/if}}
         {{#if $eq signup.type "lead"}}
           {{fa "user-circle"}}
-          {{> leadField signup.duty}}
+          {{#if signup.userId}}{{getUserName signupuserId}}{{else}}{{_ "vacant"}}{{/if}}
         {{/if}}
       </td>
       <td>
