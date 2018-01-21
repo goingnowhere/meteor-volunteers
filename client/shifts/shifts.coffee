@@ -1,34 +1,60 @@
-
-Template.shiftsListItem.onCreated () ->
+Template.dutiesListItem.onCreated () ->
   template = this
-  template.shift = template.data
-  template.shiftId = template.shift._id
-  template.parentId = template.shift.parentId
-  share.templateSub(template,"TeamShifts.byShift", template.shiftId, Meteor.userId())
+  template.duty = template.data
+  share.templateSub(template,"TeamShifts.byDuty", template.duty._id, Meteor.userId())
+  share.templateSub(template,"TeamTasks.byDuty", template.duty._id, Meteor.userId())
+  share.templateSub(template,"Lead.byDuty", template.duty._id, Meteor.userId())
 
-Template.shiftsListItem.events
+Template.dutiesListItem.events
   'click [data-action="apply"]': ( event, template ) ->
     shiftId = $(event.target).data('shiftid')
+    type = $(event.target).data('type')
     parentId = $(event.target).data('parentid')
     selectedUser = $(".select-users[data-shiftId='#{shiftId}']").val()
     userId = if selectedUser && (selectedUser != "-1") then selectedUser else Meteor.userId()
     doc = {parentId: parentId, shiftId: shiftId, userId: userId}
-    share.meteorCall "shiftSignups.insert", doc
+    if type == "shift"
+      share.meteorCall "shiftSignups.insert", doc
+    else if type == "task"
+      share.meteorCall "taskSignups.insert", doc
+    else if type == "lead"
+      share.meteorCall "leadSignups.insert", doc
   'click [data-action="bail"]': ( event, template ) ->
     shiftId = $(event.target).data('shiftid')
+    type = $(event.target).data('type')
     parentId = $(event.target).data('parentid')
     selectedUser = $("[data-shiftId='#{shiftId}']").val()
     userId = if selectedUser && (selectedUser != "-1") then selectedUser else Meteor.userId()
     doc = {parentId: parentId, shiftId: shiftId, userId: userId}
-    share.meteorCall "shiftSignups.bail", doc
+    if type == "shift"
+      share.meteorCall "shiftSignups.bail", doc
+    else if type == "task"
+      share.meteorCall "taskSignups.bail", doc
+    else if type == "lead"
+      share.meteorCall "leadSignups.bail", doc
 
-Template.shiftsListItem.helpers
-  'shift': () -> share.TeamShifts.findOne(Template.instance().shiftId)
-  'team': () -> share.Team.findOne(Template.instance().parentId)
+Template.dutiesListItem.helpers
+  'duty': () -> Template.instance().duty
+  'team': () ->
+    duty = Template.instance().duty
+    if duty.type == "shift" ||  duty.type == "task"
+      share.Team.findOne(duty.parentId)
+    else
+      t = share.Team.findOne(duty.parentId)
+      if t then return _.extend(t,{type: "team"}) else
+        dt = share.Department.findOne(duty.parentId)
+      if dt then return _.extend(dt,{type: "department"}) else
+        dv = share.Division.findOne(duty.parentId)
+        return _.extend(dv,{type: "division"})
   'signup': () ->
     userId = Meteor.userId()
-    shiftId = Template.instance().shiftId
-    share.ShiftSignups.findOne({userId: userId, shiftId: shiftId})
+    duty = Template.instance().duty
+    if duty.type == "shift"
+      return share.ShiftSignups.findOne({userId: userId, shiftId: duty._id})
+    else if duty.type == "task"
+      return share.TaskSignups.findOne({userId: userId, shiftId: duty._id})
+    else if duty.type == "lead"
+      return share.LeadSignups.findOne({userId: userId, shiftId: duty._id})
 
 Template.shiftDate.helpers
   'sameDay': (start, end) -> moment(start).isSame(moment(end),"day")

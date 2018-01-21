@@ -1,3 +1,19 @@
+<!-- Update an existing given team
+   args: Team
+-->
 <template name="teamEdit">
   {{> multiAddView main=main tabs=tabs}}
+</template>
+
+<!-- Create a new team give for a given department
+   args: Department
+-->
+<template name="addTeam">
+  {{> insertUpdateTemplate form=form data=data }}
+</template>
+
+<!--  Helper template used in teamEdit template -->
+<template name="teamLeadField">
+  {{debug signup}}
+  {{#if signup.userId}}{{getUserName signup.userId}}{{else}}{{_ "vacant"}}{{/if}}
 </template>

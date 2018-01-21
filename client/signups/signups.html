@@ -10,7 +10,7 @@
         {{/if}}
         {{#if $eq signup.type "task"}}
           {{fa "tasks"}}
-          {formatDateTime signup.dueDate}}
+          {{> taskDate signup.duty}}
         {{/if}}
         {{#if $eq signup.type "lead"}}
           {{fa "user-circle"}}
@@ -20,6 +20,7 @@
       <td>
         {{ signup.duty.title }}
       </td>
+      <td>{{formatDate signup.createdAt}}</td>
       <td>{{getUserName signup.userId}}</td>
       <td>
         <button class="btn btn-default btn-sm" data-action="approve"
@@ -28,6 +29,32 @@
         </button>
         <button class="btn btn-default btn-sm" data-action="refuse"
           data-signup="{{ signup._id }}" data-type="{{ signup.type }}">
+            {{_ 'refuse' }}
+        </button>
+      </td>
+    </tr>
+    {{/each}}
+  </table>
+</template>
+
+<template name="departmentSignupsList">
+  <table class="table">
+    {{#each signup in allSignups}}
+    <tr>
+      <td>
+          {{fa "user-circle"}}
+          {{#if signup.userId}}{{getUserName signupuserId}}{{else}}{{_ "vacant"}}{{/if}}
+      </td>
+      <td>{{ signup.duty.title }}</td>
+      <td>{{formatDate signup.createdAt}}</td>
+      <td>{{getUserName signup.userId}}</td>
+      <td>
+        <button class="btn btn-default btn-sm" data-action="approve"
+          data-signup="{{ signup._id }}">
+            {{_ 'approve' }}
+        </button>
+        <button class="btn btn-default btn-sm" data-action="refuse"
+          data-signup="{{ signup._id }}">
             {{_ 'refuse' }}
         </button>
       </td>

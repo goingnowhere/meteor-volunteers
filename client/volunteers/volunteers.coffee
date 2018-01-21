@@ -1,4 +1,3 @@
-
 events =
   'click [data-action="bail"]': ( event, template ) ->
     shiftId = $(event.target).data('shiftid')
@@ -7,6 +6,13 @@ events =
     userId = Meteor.userId()
     doc = {parentId: parentId, shiftId: shiftId, userId: userId}
     share.meteorCall "shiftSignups.bail", doc
+
+Template.bookedTable.helpers
+  'allShifts': (userId) ->
+    return share.ShiftSignups.find(
+      {userId: Meteor.userId(), status: {$in: ["confirmed","pending"]}})
+
+Template.bookedTable.events events
 
 # this template is called with a shiftSignups
 Template.shiftsUserRowView.onCreated () ->

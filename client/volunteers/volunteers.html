@@ -1,19 +1,34 @@
+<!-- All Shifts, Leads and tasks booked by a user -->
+<template name="bookedTable">
+  <table class="table">
+    <thead>
+      <th></th>
+      <th>{{_ "time"}}</th>
+      <th>{{_ "name"}}</th>
+      <th>{{_ "location"}}</th>
+      <th></th>
+    </thead>
+    {{#each shift in allShifts }}
+      {{> shiftsUserRowView shift}}
+    {{/each}}
+  </table>
+</template>
+
 <template name="shiftsUserRowView">
   <tr>
-    <td> {{fa "calendar"}} {{> shiftDate shift }}</td>
+    <td>
+      {{#if $eq signup.status "confirmed"}}<div class="text-success">{{fa "check"}}</div>{{/if}}
+      {{#if $eq signup.status "pending"}}<div class="text-warning">{{fa "clock-o"}}</div>{{/if}}
+    </td>
+    <td>{{> shiftDate shift }}</td>
     <td>{{team.name}} {{shift.title}}</td>
-    <td> {{_ signup.status }}</td>
+    <td>{{team.location}}</td>
     <td>
       <div class="btn-group pull-right">
-        <button type="button" class="btn btn-default btn-circle dropdown-toggle"
-          data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <span class="caret"></span>
+        <button type="button" class="btn btn-default btn-circle" data-action="bail"
+          data-shiftId="{{signup.shiftId}}" data-parentId="{{signup.parentId}}">
+          {{fa "pencil-square-o"}} {{_ "bail"}}
         </button>
-        <ul class="dropdown-menu">
-          <li class="dropdown-item"><a href="#" data-action="bail"
-            data-shiftId="{{signup.shiftId}}" data-parentId="{{signup.parentId}}">
-            {{fa "pencil-square-o"}} {{_ "bail"}}</a></li>
-        </ul>
       </div>
     </td>
   </tr>
@@ -30,10 +45,8 @@
 </template>
 
 <template name="leadsUserRowView">
-  <tr>
-    <td>{{unit.name}}</td>
-    <td>
-      {{fa "user-circle"}} {{lead.title}}
-    </td>
-  </tr>
+  <div class="row">
+    <div class="col">{{unit.name}}</div>
+    <div class="col">{{fa "user-circle"}} {{lead.title}}</div>
+  </div>
 </template>

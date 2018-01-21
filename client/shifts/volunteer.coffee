@@ -1,55 +1,48 @@
 import SimpleSchema from 'simpl-schema'
 
-Template.volunteerShiftsList.onCreated () ->
+addLocalDutiesCollection = (collection,template,type,filter = {},limit = 10) ->
+  collection.find(filter,{limit: limit}).forEach((duty) ->
+    duty.type = type
+    template.DutiesLocal.insert(duty)
+  )
+
+Template.signupsList.onCreated () ->
   template = this
-  share.templateSub(template,"TeamShifts",10)
+  template.searchQuery = new ReactiveDict({})
+  template.DutiesLocal = new Mongo.Collection(null)
+  template.sel = new ReactiveVar({})
+  template.isCustumSearch = template.data?.searchQuery?
 
-Template.volunteerShiftsList.helpers
-  'allDuties': () -> share.TeamShifts.find()
+  if template.isCustumSearch
+    template.autorun () ->
+      searchQuery = template.data.searchQuery.get()
+      template.searchQuery.set('range',searchQuery.range)
+      template.searchQuery.set('days',searchQuery.days)
+      template.searchQuery.set('period',searchQuery.period)
+      template.searchQuery.set('tags',searchQuery.tags)
+      template.searchQuery.set('duties',searchQuery.duties)
+      template.searchQuery.set('teams',searchQuery.teams)
+      template.searchQuery.set('departments',searchQuery.departments)
+      template.searchQuery.set('limit',searchQuery.limit)
 
-# addLocalShiftsCollection = (collection,template,type,filter = {},limit = 10,userId = Meteor.userId()) ->
-#   collection.find(filter,{limit: limit}).forEach((job) ->
-#     orgUnit = share.getOrgUnit(job.parentId)
-#     unit = orgUnit.unit
-#     users = []
-#     signupsSub = share.templateSub(template,"signups.byShift",job._id)
-#     if signupsSub.ready()
-#       signupCollection = share.signupCollections[type]
-#       users = signupCollection.find(
-#         {shiftId: job._id, status: {$in: ["confirmed"]}}
-#       ).map((s) -> s.userId)
-#       signup = signupCollection.findOne({shiftId: job._id, userId: userId})
-#       sel =
-#         unitId: unit._id
-#         shiftId: job._id
-#       mod =
-#         type: type
-#         unitName: unit.name
-#         title: job.title
-#         description: job.description
-#         status: if signup then signup.status else null
-#         canBail: signup? and signup.status != 'bailed'
-#         policy: job.policy
-#         tags: unit.tags
-#         users: users
-#         enroll: template.data?.enroll?
-#       if type == 'shift'
-#         _.extend(mod,
-#           start: job.start
-#           end: job.end
-#           startTime: job.startTime
-#           endTime: job.endTime)
-#       if type == 'task'
-#         _.extend(mod,
-#           dueDate : job.dueDate
-#           estimatedTime: job.estimatedTime)
-#       if type == 'lead'
-#         # I'm not sure if the below is used anywhere - Rich
-#         _.extend(mod,
-#           isChecked: if Meteor.userId() in users then "checked" else null)
-#       template.ShiftTaskLocal.upsert(sel,{$set: mod})
-#     )
+  template.autorun () ->
+    filter = makeFilter(template.searchQuery)
+    limit = template.searchQuery.get('limit') || 10
+    sub1 = share.templateSub(template,"TeamShifts",limit)
+    sub2 = share.templateSub(template,"TeamTasks",limit)
+    sub3 = share.templateSub(template,"Lead",limit)
 
+    # if sub1.ready() && sub2.ready() && sub3.ready()
+    if sub1.ready()
+      addLocalDutiesCollection(share.TeamShifts,template,'shift',filter,limit)
+    if sub2.ready()
+      addLocalDutiesCollection(share.TeamTasks,template,'task',filter,limit)
+    if sub3.ready()
+      addLocalDutiesCollection(share.Lead,template,'lead',filter,limit)
+    template.sel.set(filter)
+
+Template.signupsList.helpers
+  'allDuties': () -> Template.instance().DutiesLocal.find()
 
 # Template.volunteerShiftsForm.onCreated () ->
 #   template = this

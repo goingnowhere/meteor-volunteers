@@ -1,63 +1,119 @@
+<!-- helper display to format the date of a shift. used in dutiesListItem and ... -->
 <template name="shiftDate">
   {{#if sameDay start end}}
-    {{formatDate start}} {{formatTime start}} - {{formatTime end}}
+    <div class="row">{{formatDate start}}</div>
+    <div class="row">{{formatTime start}} - {{formatTime end}}</div>
   {{else}}
-    {{formatDateTime start}} - {{formatTime end}} {{differenceTime start end}}
+    <div class="row">{{formatDateTime start}}</div>
+    <div class="row">{{formatTime end}} {{differenceTime start end}}</div>
   {{/if}}
 </template>
 
-<template name="shiftsListItem">
-  <div class="card">
-    <div class="card-heading">
-      <div class="card-title">
-        {{fa "calendar"}} {{team.name}}: {{shift.title}}
-        <div class="pull-right">
-          {{> shiftDate shift}}
-        </div>
-      </div>
-    </div>
-    <div class="card-body">
-        <div class="row">
-          <div class="col-md-8">
-            {{shift.description}}
-          </div>
-          <div class="col-md-4">
-            {{#if team.tags}}
-              <div>{{fa "tags"}} {{#each tag in team.tags}} {{tag}} {{/each}}</div>
-            {{/if}}
-          </div>
-        </div>
-    </div>
-    <div class="card-footer">
-      <div class="pull-right">
-        {{#if $and signup.status ($neq signup.status 'bailed')}}
-          <button class="btn btn-default disabled
-            {{#if $eq signup.status 'confirmed'}}btn-success{{/if}}">
+<!-- helper display to format the date of a task. used in dutiesListItem and ... -->
+<template name="taskDate">
+  <div class="row">{{formatDate dueDate}}</div>
+  <div class="row">{{_ "estimated_time"}} {{estimatedTime}}</div>
+</template>
+
+<template name="shiftTitle">
+  <div class="d-flex w-100 justify-content-between">
+    <small>{{fa "calendar"}} </small>
+    <h5 class="mb-1">{{team.name}}: {{duty.title}}</h5>
+    <small> {{> shiftDate duty}} </small>
+  </div>
+</template>
+
+<template name="taskTitle">
+  <div class="d-flex w-100 justify-content-between">
+    <small>{fa "tasks"}} </small>
+    <h5 class="mb-1">{{team.name}}: {{duty.title}}</h5>
+    <small>{{> taskDate duty}}</small>
+  </div>
+</template>
+
+<template name="leadTitle">
+  <small>{{fa "user-circle"}}</small>
+  <h5 class="mb-1">{{team.type}} {{_ "lead"}}: {{team.name}}</h5>
+</template>
+
+<template name="leadBody">
+  <h5 class="mb-2 text-muted">{{_ "title"}}</h5>
+    {{duty.title}}
+  <h5 class="mb-2 text-muted">{{_ "description"}}</h5>
+  <p class="card-text">{{duty.description}}</p>
+  <h5 class="mb-2 text-muted">{{_ "responsabilities"}}</h5>
+  <p class="card-text"> {{duty.responsabilities}}</p>
+  <h5 class="mb-2 text-muted">{{_ "qualificatons"}}</h5>
+  <p class="card-text">{{duty.qualificatons}}</p>
+</template>
+
+<template name="shiftBody">
+  <h5 class="mb-2 text-muted">{{_ "description"}}</h5>
+  <p class="card-text">{{duty.description}}</p>
+  <h5 class="mb-2 text-muted">{{_ "location"}}</h5>
+    {{team.location}}
+</template>
+
+<template name="taskBody">
+  <p class="card-text">{{duty.description}}</p>
+</template>
+
+<!-- main template to display list of duties : shift, tasks, lead -->
+<template name="dutiesListItem">
+  <nav class="navbar navbar-light bg-light">
+    {{#if $eq duty.type "shift"}}
+      {{> shiftTitle duty=duty team=team}}
+    {{/if}}
+    {{#if $eq duty.type "task"}}
+      {{>taskTitle duty=duty team=team}}
+    {{/if}}
+    {{#if $eq duty.type "lead"}}
+      {{>leadTitle duty=duty team=team}}
+    {{/if}}
+  </nav>
+  <div>
+    {{#if $eq duty.type "shift"}}
+      {{>shiftBody duty=duty team=team}}
+    {{/if}}
+    {{#if $eq duty.type "task"}}
+      {{>taskBody duty=duty team=team}}
+    {{/if}}
+    {{#if $eq duty.type "lead"}}
+      {{>leadBody duty=duty team=team}}
+    {{/if}}
+  </div>
+  <div>
+    {{#if team.tags}}
+      {{fa "tags"}} <ul>{{#each tag in team.tags}}<li>{{tag}}</li>{{/each}}</ul>
+    {{/if}}
+    <div class="pull-right">
+      {{#if $and signup.status ($neq signup.status 'bailed')}}
+        <button class="btn btn-default disabled
+          {{#if $eq signup.status 'confirmed'}}btn-success{{/if}}">
+          {{_ signup.status }}
+        </button>
+      {{else}}
+        {{#if $eq signup.status 'bailed'}}
+          <button class="btn btn-default disabled">
             {{_ signup.status }}
           </button>
-        {{else}}
-          {{#if $eq signup.status 'bailed'}}
-            <button class="btn btn-default disabled">
-              {{_ signup.status }}
-            </button>
-          {{/if}}
-          {{#unless $eq shift.policy "adminOnly"}}
-            <button class="btn btn-primary" data-shiftid="{{shift._id}}"
-              data-parentid="{{team._id}}" data-action="apply">
-              {{#if $eq shift.policy "public"}}{{_ "join"}}{{/if}}
-              {{#if $eq shift.policy "requireApproval"}}{{_ "apply"}}{{/if}}
-            </button>
-          {{else}}
-            {{_ "admin_only"}}
-          {{/unless}}
         {{/if}}
-        {{#if canBail}}
-          <button class="btn btn-danger" data-shiftid="{{shiftId}}" data-parentid="{{unitId}}"
-            data-action="bail" data-type={{type}}>
-            {{_ "bail"}}
+        {{#unless $eq duty.policy "adminOnly"}}
+          <button class="btn btn-primary" data-shiftid="{{duty._id}}"
+            data-parentid="{{duty.parentId}}" data-type="{{duty.type}}" data-action="apply">
+            {{#if $eq duty.policy "public"}}{{_ "join"}}{{/if}}
+            {{#if $eq duty.policy "requireApproval"}}{{_ "apply"}}{{/if}}
           </button>
-        {{/if}}
-      </div>
+        {{else}}
+          {{_ "admin_only"}}
+        {{/unless}}
+      {{/if}}
+      {{#if canBail}}
+        <button class="btn btn-danger" data-shiftid="{{duty._id}}"
+          data-parentid="{{duty.parentId}}}" data-type="{{duty.type}}" data-action="bail">
+          {{_ "bail"}}
+        </button>
+      {{/if}}
     </div>
   </div>
 </template>
@@ -69,13 +125,13 @@
     {{#if $and ($eq type "lead") ($eq status "pending")}} {{fa "exclamation-triangle"}}{{/if}}
   </div>
   <div>
-    {{#if $eq type "shift"}}{{fa "calendar"}}{{/if}}
-    {{#if $eq type "task"}}{{fa "tasks"}}{{/if}}
-    {{#if $eq type "lead"}}{{fa "user-circle"}}{{/if}}
-    {{#if $eq type "task"}}
-      {{formatDate dueDate}} - {{_ "estimated_time"}} {{estimatedTime}}
+    {{#if $eq type "shift"}}{{fa "calendar"}}
+    {{else $eq type "task"}}{{fa "tasks"}}
+    {{else $eq type "lead"}}{{fa "user-circle"}}
     {{/if}}
-    {{#if $eq type "shift"}}
+    {{#if $eq type "task"}}
+      {{> taskDate shift}}
+    {{else $eq type "shift"}}
       {{> shiftDate shift}}
     {{/if}}
   </div>

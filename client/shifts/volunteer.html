@@ -1,33 +1,35 @@
-
-<template name="volunteerShiftsList">
-    <!-- {{#unless isCustumSearch }}
+<!--  main shifts signup -->
+<template name="signupsList">
+  <div class="container-fluid">
+    {{#unless isCustumSearch }}
+      <!-- <div class="row">
+        <form>
+          <div class="form-row">
+            <div class="col">{{> rangePicker searchQuery=searchQuery}}</div>
+            <div class="col">{{> periodPicker searchQuery=searchQuery}}</div>
+            <div class="col">{{> dutiesPicker searchQuery=searchQuery}}</div>
+            <div class="col">{{> tagsPicker searchQuery=searchQuery}}</div>
+            <div class="col">{{> teamsPicker searchQuery=searchQuery}}</div>
+            <div class="col">{{> moreFilters searchQuery=searchQuery}}</div>
+          </div>
+        </form>
+      </div> -->
+    {{/unless}}
     <div class="row">
-      <div class="col-md-12">
-        <div class="panel panel-default">
-          <form class="form-horizontal">
-            <div class="form-group">
-            <div class="col-sm-2">{{> rangePicker searchQuery=searchQuery}}</div>
-              <div class="col-sm-2">{{> periodPicker searchQuery=searchQuery}}</div>
-              <div class="col-sm-2">{{> dutiesPicker searchQuery=searchQuery}}</div>
-              <div class="col-sm-2">{{> tagsPicker searchQuery=searchQuery}}</div>
-              <div class="col-sm-4">{{> teamsPicker searchQuery=searchQuery}}</div>
-              <div class="col-sm-2">{{> moreFilters searchQuery=searchQuery}}</div>
-            </div>
-          </form>
+      <ul class="list-group">
+        {{#each duty in allDuties}}
+          <li class="list-group-item list-group-item-action flex-column align-items-start">
+            {{> dutiesListItem duty }}
+          </li>
+        {{/each}}
+      </ul>
+    </div>
+    {{#if loadMore}}
+      <div class="row">
+        <div class="col-sm-offset-5 col-sm-2 text-center">
+          <button class="btn btn-primary" data-action="loadMore">{{_ "load_more"}}</button>
         </div>
       </div>
-    </div>
-    {{/unless}} -->
-  <ul class="list-group">
-    {{#each duty in allDuties}}
-      <li class="list-group-item">
-        {{> shiftsListItem duty }}
-      </li>
-    {{/each}}
-  </ul>
-  {{#if loadMore}}
-    <div class="col-sm-offset-5 col-sm-2 text-center">
-      <button class="btn btn-primary" data-action="loadMore">{{_ "load_more"}}</button>
-    </div>
-  {{/if}}
+    {{/if}}
+  </div>
 </template>

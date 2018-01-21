@@ -71,8 +71,6 @@ Package.onUse(function(api) {
   // api.add_files([ 'package-tap.i18n', ], ['client', 'server']);
   api.add_files([
     'client/global_helpers.coffee',
-    // 'client/css/awesome-bootstrap-checkbox.css',
-    'client/css/custom.css',
 
     "client/shifts/filters.html",
     "client/shifts/filters.coffee",
@@ -99,7 +97,7 @@ Package.onUse(function(api) {
     "client/signups/team.coffee",
     "client/signups/signups.html",
     "client/signups/signups.js",
-    
+
     "client/stats.coffee",
   ], "client");
 
