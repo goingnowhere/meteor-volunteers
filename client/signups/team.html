@@ -1,4 +1,12 @@
 <template name="teamShiftsTable">
+  {{#if grouping}}
+  <div class="btn-group pull-right">
+    <button type="button" class="btn btn-default" data-action="groupDone"
+      aria-haspopup="true" aria-expanded="false">
+      {{fa "check"}} {{_ "done"}}
+    </button>
+  </div>
+  {{/if}}
   <table class="table">
     <thead>
       <th></th>
@@ -8,8 +16,12 @@
       <th></th>
     </thead>
     {{#each shift in shifts}}
-      <tr>
-        <td>{{#if $eq shift.priority "essential"}}<div class="text-danger">{{fa "exclamation-circle"}}</div>{{/if}}</td>
+      <tr class="shift" data-id="{{shift._id}}">
+        <td>
+          {{#if $eq shift.priority "essential"}}
+            <div class="text-danger">{{fa "exclamation-circle"}}</div>
+          {{/if}}
+        </td>
         <td>{{formatTime shift.start}} - {{formatTime shift.end}}</td>
         <td>{{shift.title}}
           {{#if ($eq shift.policy 'public')}}{{fa 'globe'}}{{/if}}
@@ -21,7 +33,8 @@
         </td>
         <td>
           <div class="btn-group pull-right">
-            <button type="button" class="btn btn-default dropdown-toggle"
+            <button type="button"
+              class="btn btn-default btn-circle dropdown-toggle {{#if grouping}}disabled{{/if}}"
               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <span class="caret"></span>
             </button>
@@ -32,6 +45,12 @@
                 {{fa "trash-o"}} {{_ "remove"}}</a></li>
               <li class="dropdown-item"><a href="#" data-action="clone" data-id="{{shift._id}}">
                 {{fa "clone"}} {{_ "clone"}}</a></li>
+              <li class="dropdown-item"><a href="#" data-action="group" data-id="{{shift._id}}">
+                {{fa "object-group"}} {{_ "group"}}</a></li>
+              {{#if shift.groupId }}
+                <li class="dropdown-item"><a href="#" data-action="removeFromGroup" data-id="{{shift._id}}">
+                  {{fa "object-ungroup"}} {{_ "remove from group"}}</a></li>
+              {{/if}}
             </ul>
           </div>
         </td>

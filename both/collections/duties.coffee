@@ -50,6 +50,11 @@ CommonTask = new SimpleSchema(
     allowedValues: policyValues
     autoform:
       defaultValue: "public"
+  groupId:
+    type: String
+    optional: true
+    autoform:
+      omit: true
 )
 
 share.Schemas.TeamTasks = new SimpleSchema(
@@ -125,17 +130,6 @@ share.Schemas.TeamShifts = new SimpleSchema(
     autoValue: () -> moment(this.field('end').value).hour() + 1
     autoform:
       omit: true
-  # group:
-  #   type: Array
-  #   label: () -> TAPi18n.__("group")
-  #   optional: true
-  #   autoform:
-  #     type: "select2"
-  #     options: () -> getUniqueShifts(AutoForm.getFieldValue('parentId'))
-  #     afFieldInput:
-  #       multiple: true
-  #       select2Options: () -> {multiple: true}
-  # "group.$": String
 )
 
 share.Schemas.TeamShifts.extend(CommonTask)
