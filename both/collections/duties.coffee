@@ -15,16 +15,16 @@ CommonTask = new SimpleSchema(
       type: "hidden"
   title:
     type: String
-    label: () -> TAPi18n.__("title")
+    label: () -> i18n.__("abate:volunteers","title")
   description:
     type: String
-    label: () -> TAPi18n.__("description")
+    label: () -> i18n.__("abate:volunteers","description")
     optional: true
     autoform:
       rows: 5
   min:
     type: Number
-    label: () -> TAPi18n.__("min_members")
+    label: () -> i18n.__("abate:volunteers","min_members")
     optional: true
     autoform:
       afFieldInput:
@@ -32,7 +32,7 @@ CommonTask = new SimpleSchema(
         placeholder: "min"
   max:
     type: Number
-    label: () -> TAPi18n.__("max_members")
+    label: () -> i18n.__("abate:volunteers","max_members")
     optional: true
     # TODO: if max is not set, it should be equal to min
     autoform:
@@ -40,13 +40,13 @@ CommonTask = new SimpleSchema(
         placeholder: "max"
   priority:
     type: String
-    label: () -> TAPi18n.__("priority")
+    label: () -> i18n.__("abate:volunteers","priority")
     allowedValues: taskPriority
     autoform:
       defaultValue: "normal"
   policy:
     type: String
-    label: () -> TAPi18n.__("policy")
+    label: () -> i18n.__("abate:volunteers","policy")
     allowedValues: policyValues
     autoform:
       defaultValue: "public"
@@ -64,7 +64,7 @@ share.Schemas.TeamTasks = new SimpleSchema(
     defaultValue: "1-3hs"
   dueDate:
     type: Date
-    label: () -> TAPi18n.__("due_date")
+    label: () -> i18n.__("abate:volunteers","due_date")
     optional: true
     autoValue: () ->
       if this.field('dueDate').isSet
@@ -72,7 +72,7 @@ share.Schemas.TeamTasks = new SimpleSchema(
     autoform:
       afFieldInput:
         type: "datetimepicker"
-        placeholder: () -> TAPi18n.__("due_date")
+        placeholder: () -> i18n.__("abate:volunteers","due_date")
         opts: () ->
           step: 60
           format: 'DD-MM-YYYY HH:mm'
@@ -92,13 +92,13 @@ getUniqueShifts = () ->
 share.Schemas.TeamShifts = new SimpleSchema(
   start:
     type: Date
-    label: () -> TAPi18n.__("start")
+    label: () -> i18n.__("abate:volunteers","start")
     autoform:
       # defaultValue: () ->
       #   AutoForm.getFieldValue('start')
       afFieldInput:
         type: "datetimepicker"
-        placeholder: () -> TAPi18n.__("start")
+        placeholder: () -> i18n.__("abate:volunteers","start")
         opts: () ->
           step: 15
           format: 'DD-MM-YYYY HH:mm'
@@ -107,11 +107,11 @@ share.Schemas.TeamShifts = new SimpleSchema(
           # maxDate:
   end:
     type: Date
-    label: () -> TAPi18n.__("end")
+    label: () -> i18n.__("abate:volunteers","end")
     autoform:
       afFieldInput:
         type: "datetimepicker"
-        placeholder: () -> TAPi18n.__("end")
+        placeholder: () -> i18n.__("abate:volunteers","end")
         opts: () ->
           step: 15
           format: 'DD-MM-YYYY HH:mm'
@@ -138,25 +138,25 @@ share.Schemas.Lead = new SimpleSchema(CommonTask)
 share.Schemas.Lead.extend(
   responsibilities:
     type: String
-    label: () -> TAPi18n.__("responsibilities")
+    label: () -> i18n.__("abate:volunteers","responsibilities")
     optional: true
     autoform:
       rows: 5
   qualificatons:
     type: String
-    label: () -> TAPi18n.__("qualificatons")
+    label: () -> i18n.__("abate:volunteers","qualificatons")
     optional: true
     autoform:
       rows: 5
   notes:
     type: String
-    label: () -> TAPi18n.__("notes")
+    label: () -> i18n.__("abate:volunteers","notes")
     optional: true
     autoform:
       rows: 5
   policy:
     type: String
-    label: () -> TAPi18n.__("policy")
+    label: () -> i18n.__("abate:volunteers","policy")
     allowedValues: policyValues
     autoform:
       defaultValue: "requireApproval"

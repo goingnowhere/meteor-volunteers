@@ -1,3 +1,4 @@
+Template.teamEdit.bindI18nNamespace('abate:volunteers')
 Template.teamEdit.onCreated () ->
   template = this
   template.teamId = template.data._id
@@ -8,14 +9,14 @@ Template.teamEdit.onCreated () ->
 Template.teamEdit.helpers
   'main': () ->
     id: "details"
-    label: "details"
+    label: i18n.__("abate:volunteers","details")
     form: { collection: share.Team }
     data: Template.currentData()
   'tabs': () ->
     parentId = if Template.currentData() then Template.currentData()._id
     shift =  {
       id: "shift"
-      label: "shifts"
+      label: i18n.__("abate:volunteers","shifts")
       tableFields: [ { name: 'title'}, {name: 'start',template: "shiftDate"} ]
       form: { collection: share.TeamShifts, filter: {parentId: parentId} }
       subscription : (template) ->
@@ -23,7 +24,7 @@ Template.teamEdit.helpers
       }
     task =  {
       id: "task"
-      label: "tasks"
+      label: i18n.__("abate:volunteers","tasks")
       tableFields: [ { name: 'title'}, {name: 'dueDate'} ]
       form: { collection: share.TeamTasks, filter: {parentId: parentId} }
       subscription : (template) ->
@@ -31,10 +32,10 @@ Template.teamEdit.helpers
       }
     lead =  {
       'id': "leads"
-      'label': "leads"
+      'label': i18n.__("abate:volunteers","leads")
       'tableFields': [
+        { name: 'title' }
         { name: 'userId', template: "teamLeadField"},
-        { name: 'role' }
       ]
       'form': { collection: share.Lead, filter: {parentId: parentId} }
       'subscription': (template) ->
@@ -42,6 +43,7 @@ Template.teamEdit.helpers
       }
     return [shift,task,lead]
 
+Template.addTeam.bindI18nNamespace('abate:volunteers')
 Template.addTeam.onCreated () ->
   template = this
   template.departmentId = template.data.departmentId
@@ -54,6 +56,17 @@ Template.addTeam.events
   'click [data-action="removeTeam"]': (event,template) ->
     teamId = $(event.target).data('id')
     share.meteorCall "team.remove", teamId
+
+Template.teamLeadField.bindI18nNamespace('abate:volunteers')
+Template.teamLeadField.onCreated () ->
+  template = this
+  share.templateSub(template,"LeadSignups.byTeam",template.data.parentId)
+
+Template.teamLeadField.helpers
+  'signup': () ->
+    parentId = Template.instance().data.parentId
+    shiftId = Template.instance().data._id
+    share.LeadSignups.findOne({parentId: parentId, shiftId: shiftId})
 
 AutoForm.addHooks ['UpdateTeamFormId'],
   onSuccess: (formType, result) ->

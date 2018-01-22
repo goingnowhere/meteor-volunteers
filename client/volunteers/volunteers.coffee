@@ -7,6 +7,7 @@ events =
     doc = {parentId: parentId, shiftId: shiftId, userId: userId}
     share.meteorCall "shiftSignups.bail", doc
 
+Template.bookedTable.bindI18nNamespace('abate:volunteers')
 Template.bookedTable.helpers
   'allShifts': (userId) ->
     return share.ShiftSignups.find(
@@ -14,6 +15,7 @@ Template.bookedTable.helpers
 
 Template.bookedTable.events events
 
+Template.shiftsUserRowView.bindI18nNamespace('abate:volunteers')
 # this template is called with a shiftSignups
 Template.shiftsUserRowView.onCreated () ->
   template = this
@@ -28,6 +30,7 @@ Template.shiftsUserRowView.helpers
 
 Template.shiftsUserRowView.events events
 
+Template.tasksUserRowView.bindI18nNamespace('abate:volunteers')
 # this template is called with a taskSignups
 Template.tasksUserRowView.onCreated () ->
   template = this
@@ -40,6 +43,7 @@ Template.tasksUserRowView.helpers
 
 Template.tasksUserRowView.events events
 
+Template.leadsUserRowView.bindI18nNamespace('abate:volunteers')
 # this template is called with a leadsSignups
 Template.leadsUserRowView.onCreated () ->
   template = this

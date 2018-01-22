@@ -3,9 +3,9 @@
   <table class="table">
     <thead>
       <th></th>
-      <th>{{_ "time"}}</th>
-      <th>{{_ "name"}}</th>
-      <th>{{_ "location"}}</th>
+      <th>{{__ ".time"}}</th>
+      <th>{{__ ".name"}}</th>
+      <th>{{__ ".location"}}</th>
       <th></th>
     </thead>
     {{#each shift in allShifts }}
@@ -27,7 +27,7 @@
       <div class="btn-group pull-right">
         <button type="button" class="btn btn-default btn-circle" data-action="bail"
           data-shiftId="{{signup.shiftId}}" data-parentId="{{signup.parentId}}">
-          {{fa "pencil-square-o"}} {{_ "bail"}}
+          {{fa "pencil-square-o"}} {{__ ".bail"}}
         </button>
       </div>
     </td>
@@ -39,7 +39,7 @@
     <td>{{team.name}} {{task.title}}</td>
     <td>
       {{fa "task"}}
-      {formatDate task.dueDate}} - {{_ "estimated_time"}} {{task.estimatedTime}}
+      {formatDate task.dueDate}} - {{__ ".estimated_time"}} {{task.estimatedTime}}
     </td>
   </tr>
 </template>

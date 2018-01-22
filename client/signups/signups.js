@@ -1,5 +1,6 @@
 let share = __coffeescriptShare;
 
+Template.teamSignupsList.bindI18nNamespace('abate:volunteers');
 Template.teamSignupsList.onCreated(function () {
   const template = this;
   template.teamId = this.data._id
@@ -52,6 +53,7 @@ Template.teamSignupsList.events({
   },
 })
 
+Template.departmentSignupsList.bindI18nNamespace('abate:volunteers');
 Template.departmentSignupsList.onCreated(function () {
   const template = this;
   template.departmentId = this.data._id

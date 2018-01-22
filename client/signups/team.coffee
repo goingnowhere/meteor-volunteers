@@ -1,3 +1,4 @@
+Template.teamShiftsTable.bindI18nNamespace('abate:volunteers')
 Template.teamShiftsTable.onCreated () ->
   template = this
   teamId = template.data._id
@@ -64,6 +65,7 @@ Template.teamShiftsTable.events
     doc = {_id: id, modifier: {$unset: {groupId: ""}}}
     share.meteorCall "teamShifts.update", doc
 
+Template.teamDayViewGrid.bindI18nNamespace('abate:volunteers');
 Template.teamDayViewGrid.onCreated () ->
   template = this
   template.taskFilter = new ReactiveVar(["pending","overdue","done"])
@@ -122,6 +124,7 @@ Template.teamDayViewGrid.events
     selected = template.findAll("#taskStatus:checked")
     template.taskFilter.set(_.map(selected, (i) -> i.defaultValue))
 
+Template.teamTasksView.bindI18nNamespace('abate:volunteers');
 Template.teamTasksView.onCreated () ->
   template = this
   share.templateSub(template,"teamTasks.backend",template.data.teamId)

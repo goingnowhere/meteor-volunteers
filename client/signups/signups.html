@@ -1,5 +1,5 @@
 <template name="teamSignupsList">
-  <h3>{{_ "team"}} : {{name}}</h3>
+  <h3>{{__ ".team"}} : {{name}}</h3>
   <table class="table">
     {{#each signup in allSignups}}
     <tr>
@@ -14,7 +14,7 @@
         {{/if}}
         {{#if $eq signup.type "lead"}}
           {{fa "user-circle"}}
-          {{#if signup.userId}}{{getUserName signupuserId}}{{else}}{{_ "vacant"}}{{/if}}
+          {{#if signup.userId}}{{getUserName signupuserId}}{{else}}{{__ ".vacant"}}{{/if}}
         {{/if}}
       </td>
       <td>
@@ -25,11 +25,11 @@
       <td>
         <button class="btn btn-default btn-sm" data-action="approve"
           data-signup="{{ signup._id }}" data-type="{{ signup.type }}">
-            {{_ 'approve' }}
+            {{__ '.approve' }}
         </button>
         <button class="btn btn-default btn-sm" data-action="refuse"
           data-signup="{{ signup._id }}" data-type="{{ signup.type }}">
-            {{_ 'refuse' }}
+            {{__ '.refuse' }}
         </button>
       </td>
     </tr>
@@ -43,7 +43,7 @@
     <tr>
       <td>
           {{fa "user-circle"}}
-          {{#if signup.userId}}{{getUserName signupuserId}}{{else}}{{_ "vacant"}}{{/if}}
+          {{#if signup.userId}}{{getUserName signupuserId}}{{else}}{{__ ".vacant"}}{{/if}}
       </td>
       <td>{{ signup.duty.title }}</td>
       <td>{{formatDate signup.createdAt}}</td>
@@ -51,11 +51,11 @@
       <td>
         <button class="btn btn-default btn-sm" data-action="approve"
           data-signup="{{ signup._id }}">
-            {{_ 'approve' }}
+            {{__ '.approve' }}
         </button>
         <button class="btn btn-default btn-sm" data-action="refuse"
           data-signup="{{ signup._id }}">
-            {{_ 'refuse' }}
+            {{__ '.refuse' }}
         </button>
       </td>
     </tr>

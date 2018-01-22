@@ -6,6 +6,7 @@ addLocalDutiesCollection = (collection,template,type,filter = {},limit = 10) ->
     template.DutiesLocal.insert(duty)
   )
 
+Template.signupsList.bindI18nNamespace('abate:volunteers')
 Template.signupsList.onCreated () ->
   template = this
   template.searchQuery = new ReactiveDict({})

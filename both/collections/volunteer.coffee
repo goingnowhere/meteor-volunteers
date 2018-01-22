@@ -18,7 +18,7 @@ share.Schemas.VolunteerForm = new SimpleSchema(
       omit: true
   private_notes:
     type: String
-    label: () -> TAPi18n.__("notes")
+    label: () -> i18n.__("abate:volunteers","notes")
     optional: true
     max: 1000
     autoform:

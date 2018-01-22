@@ -11,7 +11,6 @@ Npm.depends({
   'jquery': '3.2.1',
   'bootstrap': '4.0.0-beta.3',
   'popper.js': '1.12.9'
-// "awesome-bootstrap-checkbox": "1.0.0-alpha.4"
 });
 
 Package.onUse(function(api) {
@@ -37,6 +36,8 @@ Package.onUse(function(api) {
     'reactive-var',
     'random',
     'iron:router',
+    'universe:i18n',
+    'universe:i18n-blaze',
     'abate:autoform-components',
     'abate:formbuilder'
   ], ['client', 'server']);
@@ -68,7 +69,6 @@ Package.onUse(function(api) {
     "api.coffee"
   ], ["server","client"]);
 
-  // api.add_files([ 'package-tap.i18n', ], ['client', 'server']);
   api.add_files([
     'client/global_helpers.coffee',
 
@@ -106,7 +106,7 @@ Package.onUse(function(api) {
     'server/publications1.coffee',
   ],"server");
 
-  // api.add_files([ "i18n/en.i18n.json", ], ["client", "server"]);
+  api.add_files([ "i18n/en.i18n.json", ], ["client", "server"]);
 
   api.export([ 'VolunteersClass']);
 });

@@ -1,3 +1,4 @@
+Template.dutiesListItem.bindI18nNamespace('abate:volunteers')
 Template.dutiesListItem.onCreated () ->
   template = this
   template.duty = template.data

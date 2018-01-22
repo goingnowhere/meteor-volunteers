@@ -12,7 +12,7 @@
 <!-- helper display to format the date of a task. used in dutiesListItem and ... -->
 <template name="taskDate">
   <div class="row">{{formatDate dueDate}}</div>
-  <div class="row">{{_ "estimated_time"}} {{estimatedTime}}</div>
+  <div class="row">{{__ ".estimated_time"}} {{estimatedTime}}</div>
 </template>
 
 <template name="shiftTitle">
@@ -33,24 +33,24 @@
 
 <template name="leadTitle">
   <small>{{fa "user-circle"}}</small>
-  <h5 class="mb-1">{{team.type}} {{_ "lead"}}: {{team.name}}</h5>
+  <h5 class="mb-1">{{team.type}} {{__ ".lead"}}: {{team.name}}</h5>
 </template>
 
 <template name="leadBody">
-  <h5 class="mb-2 text-muted">{{_ "title"}}</h5>
+  <h5 class="mb-2 text-muted">{{__ ".title"}}</h5>
     {{duty.title}}
-  <h5 class="mb-2 text-muted">{{_ "description"}}</h5>
+  <h5 class="mb-2 text-muted">{{__ ".description"}}</h5>
   <p class="card-text">{{duty.description}}</p>
-  <h5 class="mb-2 text-muted">{{_ "responsabilities"}}</h5>
+  <h5 class="mb-2 text-muted">{{__ ".responsabilities"}}</h5>
   <p class="card-text"> {{duty.responsabilities}}</p>
-  <h5 class="mb-2 text-muted">{{_ "qualificatons"}}</h5>
+  <h5 class="mb-2 text-muted">{{__ ".qualificatons"}}</h5>
   <p class="card-text">{{duty.qualificatons}}</p>
 </template>
 
 <template name="shiftBody">
-  <h5 class="mb-2 text-muted">{{_ "description"}}</h5>
+  <h5 class="mb-2 text-muted">{{__ ".description"}}</h5>
   <p class="card-text">{{duty.description}}</p>
-  <h5 class="mb-2 text-muted">{{_ "location"}}</h5>
+  <h5 class="mb-2 text-muted">{{__ ".location"}}</h5>
     {{team.location}}
 </template>
 
@@ -90,28 +90,28 @@
       {{#if $and signup.status ($neq signup.status 'bailed')}}
         <button class="btn btn-default disabled
           {{#if $eq signup.status 'confirmed'}}btn-success{{/if}}">
-          {{_ signup.status }}
+          {{__ signup.status }}
         </button>
       {{else}}
         {{#if $eq signup.status 'bailed'}}
           <button class="btn btn-default disabled">
-            {{_ signup.status }}
+            {{__ signup.status }}
           </button>
         {{/if}}
         {{#unless $eq duty.policy "adminOnly"}}
           <button class="btn btn-primary" data-shiftid="{{duty._id}}"
             data-parentid="{{duty.parentId}}" data-type="{{duty.type}}" data-action="apply">
-            {{#if $eq duty.policy "public"}}{{_ "join"}}{{/if}}
-            {{#if $eq duty.policy "requireApproval"}}{{_ "apply"}}{{/if}}
+            {{#if $eq duty.policy "public"}}{{__ ".join"}}{{/if}}
+            {{#if $eq duty.policy "requireApproval"}}{{__ ".apply"}}{{/if}}
           </button>
         {{else}}
-          {{_ "admin_only"}}
+          {{__ ".admin_only"}}
         {{/unless}}
       {{/if}}
       {{#if canBail}}
         <button class="btn btn-danger" data-shiftid="{{duty._id}}"
           data-parentid="{{duty.parentId}}}" data-type="{{duty.type}}" data-action="bail">
-          {{_ "bail"}}
+          {{__ "bail"}}
         </button>
       {{/if}}
     </div>

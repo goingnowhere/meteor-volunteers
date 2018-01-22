@@ -1,14 +1,14 @@
 Template.departmentEdit.helpers
   'main': () ->
     id: "details"
-    label: "details"
+    label: i18n.__("abate:volunteers","details")
     form: { collection: share.Department }
     data: Template.currentData()
   'tabs': () ->
     parentId = if Template.currentData() then Template.currentData()._id
     team =  {
       id: "team"
-      label: "teams"
+      label: i18n.__("abate:volunteers","team")
       tableFields: [ { name: 'name'} ]
       form: { collection: share.Team }
       subscription : (template) ->
@@ -16,7 +16,7 @@ Template.departmentEdit.helpers
       }
     lead =  {
       id: "leads"
-      label: "leads"
+      label: i18n.__("abate:volunteers","leads")
       tableFields: [
        { name: 'userId', template:"leadField"},
        { name: 'role' }

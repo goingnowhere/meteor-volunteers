@@ -20,10 +20,10 @@ CommonUnit = new SimpleSchema(
       type: "hidden"
   name:
     type: String
-    label: () -> TAPi18n.__("name")
+    label: () -> i18n.__("abate:volunteers","name")
   tags:
     type: Array
-    label: () -> TAPi18n.__("tags")
+    label: () -> i18n.__("abate:volunteers","tags")
     optional: true
     autoform:
       type: "select2"
@@ -34,14 +34,14 @@ CommonUnit = new SimpleSchema(
   "tags.$": String
   description:
     type: String
-    label: () -> TAPi18n.__("description")
+    label: () -> i18n.__("abate:volunteers","description")
     optional: true
     autoform:
       rows: 5
   # the unit policy should lock the policy of all entities below
   policy:
     type: String
-    label: () -> TAPi18n.__("policy")
+    label: () -> i18n.__("abate:volunteers","policy")
     allowedValues: unitPolicy
     defaultValue: "public"
 )
@@ -50,7 +50,7 @@ share.Schemas.Team = new SimpleSchema(CommonUnit)
 share.Schemas.Team.extend(
   location:
     type: String
-    label: () -> TAPi18n.__("location")
+    label: () -> i18n.__("abate:volunteers","location")
     optional: true
     autoform:
       type: "select2"

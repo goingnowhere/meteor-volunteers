@@ -91,7 +91,7 @@ Template.periodPicker.events
 Template.dutiesPicker.onRendered () ->
   data = _.map(["shift","task","lead"],(t) ->
     id: t
-    text: (TAPi18n.__ t))
+    text: (i18n.__("abate:volunteers",t)))
   $("#duties").select2({
     data: data,
     multiple: true})

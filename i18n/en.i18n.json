@@ -1,1 +1,21 @@
-{}
+{
+  "time": "Time",
+  "name": "Name",
+  "title": "Title",
+  "lead": "Lead",
+  "location": "Location",
+  "positions": "Positions",
+  "apply": "Apply",
+  "join": "Join",
+  "details": "Details",
+  "shifts": "Shifts",
+  "tasks": "Tasks",
+  "leads": "Leads",
+  "add_new": "Add New",
+  "team": "Team",
+  "department": "Department",
+  "division": "Division",
+  "description": "Description",
+  "responsabilities": "Responsibilities",
+  "qualificatons": "Qualificatons"
+}
