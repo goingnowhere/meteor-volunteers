@@ -82,6 +82,9 @@ share.Schemas.TeamTasks = new SimpleSchema(
   status:
     type: String
     allowedValues: ["done", "archived","pending"]
+    optional: true
+    autoform:
+      omit: true
 )
 share.Schemas.TeamTasks.extend(CommonTask)
 

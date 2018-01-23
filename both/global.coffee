@@ -9,14 +9,13 @@ share.meteorSub = (name,args...) ->
 
 share.meteorCall = (name,args...) ->
   Meteor.call("#{share.eventName}.Volunteers.#{name}", args... , (err,res) ->
-    console.log(err);
     if err
       Bert.alert({
-        title: 'Now Playing',
+        title: i18n.__("abate:volunteers","error"),
         message: err,
-        type: 'info',
+        type: 'error',
         style: 'growl-top-right',
-        icon: 'fa-music'
+        icon: 'fa-warning'
       })
     )
 

@@ -15,14 +15,70 @@
       <th>{{__ ".positions"}}</th>
       <th></th>
     </thead>
-    {{#each shift in shifts}}
+    {{#each group in groupedShifts}}
+      {{#each shift in group.shifts }}
+        <tr class="shift" data-id="{{shift._id}}">
+          <td>
+            {{#if $eq shift.priority "essential"}}
+              <div class="text-danger">{{fa "exclamation-circle"}}</div>
+            {{/if}}
+          </td>
+          <td>{{> shiftDate shift}}</td>
+          <td>{{shift.title}}
+            {{#if ($eq shift.policy 'public')}}{{fa 'globe'}}{{/if}}
+            {{#if ($eq shift.policy 'private')}}{{fa 'user-secret'}}{{/if}}
+            {{#if ($eq shift.policy 'requireApproval')}}{{fa 'lock'}}{{/if}}
+          </td>
+          <td class="pull-rigth">
+            <span class="badge badge-pill badge-primary">{{shift.needed}} / {{shift.confirmed}}</span>
+          </td>
+          <td>
+            <div class="btn-group pull-right">
+              <button type="button"
+                class="btn btn-default btn-circle dropdown-toggle {{#if grouping}}disabled{{/if}}"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu">
+                <li class="dropdown-item"><a href="#" data-action="edit" data-id="{{shift._id}}">
+                  {{fa "pencil-square-o"}} {{__ ".edit"}}</a></li>
+                <li class="dropdown-item"><a href="#" data-action="delete" data-id="{{shift._id}}">
+                  {{fa "trash-o"}} {{__ ".remove"}}</a></li>
+                <li class="dropdown-item"><a href="#" data-action="clone" data-id="{{shift._id}}">
+                  {{fa "clone"}} {{__ ".clone"}}</a></li>
+                <li class="dropdown-item"><a href="#" data-action="group" data-id="{{shift._id}}">
+                  {{fa "object-group"}} {{__ ".group"}}</a></li>
+                {{#if shift.groupId }}
+                  <li class="dropdown-item"><a href="#" data-action="removeFromGroup" data-id="{{shift._id}}">
+                    {{fa "object-ungroup"}} {{__ ".remove_from_group"}}</a></li>
+                {{/if}}
+              </ul>
+            </div>
+          </td>
+        </tr>
+      {{/each}}
+      {{#if $gt ($len group.shifts) 1}}<tr><td colspan="5"></td></tr>{{/if}}
+    {{/each}}
+  </table>
+</template>
+
+<template name="teamTasksTable">
+  <table class="table">
+    <thead>
+      <th></th>
+      <th>{{__ ".duedate"}}</th>
+      <th>{{__ ".name"}}</th>
+      <th>{{__ ".positions"}}</th>
+      <th></th>
+    </thead>
+    {{#each shift in allTasks }}
       <tr class="shift" data-id="{{shift._id}}">
         <td>
           {{#if $eq shift.priority "essential"}}
             <div class="text-danger">{{fa "exclamation-circle"}}</div>
           {{/if}}
         </td>
-        <td>{{formatTime shift.start}} - {{formatTime shift.end}}</td>
+        <td>{{> taskDate shift}}</td>
         <td>{{shift.title}}
           {{#if ($eq shift.policy 'public')}}{{fa 'globe'}}{{/if}}
           {{#if ($eq shift.policy 'private')}}{{fa 'user-secret'}}{{/if}}
@@ -45,12 +101,6 @@
                 {{fa "trash-o"}} {{__ ".remove"}}</a></li>
               <li class="dropdown-item"><a href="#" data-action="clone" data-id="{{shift._id}}">
                 {{fa "clone"}} {{__ ".clone"}}</a></li>
-              <li class="dropdown-item"><a href="#" data-action="group" data-id="{{shift._id}}">
-                {{fa "object-group"}} {{__ ".group"}}</a></li>
-              {{#if shift.groupId }}
-                <li class="dropdown-item"><a href="#" data-action="removeFromGroup" data-id="{{shift._id}}">
-                  {{fa "object-ungroup"}} {{__ ".remove_from_group"}}</a></li>
-              {{/if}}
             </ul>
           </div>
         </td>

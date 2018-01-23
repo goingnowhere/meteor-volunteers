@@ -1,39 +1,47 @@
 <template name="teamSignupsList">
-  <h3>{{__ ".team"}} : {{name}}</h3>
   <table class="table">
-    {{#each signup in allSignups}}
-    <tr>
-      <td>
-        {{#if $eq signup.type "shift"}}
-          {{fa "calendar"}}
-          {{> shiftDate signup.duty}}
-        {{/if}}
-        {{#if $eq signup.type "task"}}
-          {{fa "tasks"}}
-          {{> taskDate signup.duty}}
-        {{/if}}
-        {{#if $eq signup.type "lead"}}
-          {{fa "user-circle"}}
-          {{#if signup.userId}}{{getUserName signupuserId}}{{else}}{{__ ".vacant"}}{{/if}}
-        {{/if}}
-      </td>
-      <td>
-        {{ signup.duty.title }}
-      </td>
-      <td>{{formatDate signup.createdAt}}</td>
-      <td>{{getUserName signup.userId}}</td>
-      <td>
-        <button class="btn btn-default btn-sm" data-action="approve"
-          data-signup="{{ signup._id }}" data-type="{{ signup.type }}">
-            {{__ '.approve' }}
-        </button>
-        <button class="btn btn-default btn-sm" data-action="refuse"
-          data-signup="{{ signup._id }}" data-type="{{ signup.type }}">
-            {{__ '.refuse' }}
-        </button>
-      </td>
-    </tr>
-    {{/each}}
+    <thead>
+      <th>{{__ ".date"}}</th>
+      <th>{{__ ".duty"}}</th>
+      <th>{{__ ".created"}}</th>
+      <th>{{__ ".user"}}</th>
+      <th></th>
+    </thead>
+    <tbody>
+      {{#each signup in allSignups}}
+        <tr>
+          <td>
+            {{#if $eq signup.type "shift"}}
+              {{fa "calendar"}}
+              {{> shiftDate signup.duty}}
+            {{/if}}
+            {{#if $eq signup.type "task"}}
+              {{fa "tasks"}}
+              {{> taskDate signup.duty}}
+            {{/if}}
+            {{#if $eq signup.type "lead"}}
+              {{fa "user-circle"}}
+              {{#if signup.userId}}{{getUserName signupuserId}}{{else}}{{__ ".vacant"}}{{/if}}
+            {{/if}}
+          </td>
+          <td>
+            {{ signup.duty.title }}
+          </td>
+          <td>{{formatDate signup.createdAt}}</td>
+          <td>{{getUserName signup.userId}}</td>
+          <td>
+            <button class="btn btn-default btn-sm" data-action="approve"
+              data-signup="{{ signup._id }}" data-type="{{ signup.type }}">
+                {{__ '.approve' }}
+            </button>
+            <button class="btn btn-default btn-sm" data-action="refuse"
+              data-signup="{{ signup._id }}" data-type="{{ signup.type }}">
+                {{__ '.refuse' }}
+            </button>
+          </td>
+        </tr>
+      {{/each}}
+    </tbody>
   </table>
 </template>
 

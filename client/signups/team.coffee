@@ -12,8 +12,12 @@ Template.teamShiftsTable.onCreated () ->
       template.shifts.set(share.getShifts({parentId: teamId}))
 
 Template.teamShiftsTable.helpers
-  'shifts': () -> Template.instance().shifts.get()
   'grouping': () -> Template.instance().grouping.get().size > 0
+  'groupedShifts': () ->
+    g = _.groupBy(Template.instance().shifts.get(),
+      (shift) -> if shift.groupId then shift.groupId else shift._id
+    )
+    return _.map(g,(v,k) -> {group:k, shifts:v} )
 
 Template.teamShiftsTable.events
   'click [data-action="edit"]': (event,template) ->

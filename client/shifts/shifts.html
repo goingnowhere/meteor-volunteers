@@ -118,6 +118,20 @@
   </div>
 </template>
 
+<!-- Create a new shift give for a given team
+   args: Team
+-->
+<template name="addShift">
+  {{> insertUpdateTemplate form=form data=data }}
+</template>
+
+<!-- Create a new task give for a given team
+   args: Team
+-->
+<template name="addTask">
+  {{> insertUpdateTemplate form=form data=data }}
+</template>
+
 <template name="shiftsTasksTableRowView">
   <div>
     <a href="{{pathFor teamViewEventName _id=teamId}}">{{teamName}}</a>:

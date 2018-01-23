@@ -10,7 +10,7 @@ Npm.depends({
   'flatpickr':'2.4.8',
   'jquery': '3.2.1',
   'bootstrap': '4.0.0-beta.3',
-  'popper.js': '1.12.9'
+  // 'popper.js': '1.12.9',
 });
 
 Package.onUse(function(api) {
@@ -28,9 +28,8 @@ Package.onUse(function(api) {
     'ostrio:files',
     'check',
     'underscore',
-    'benmgreene:moment-range',
     'momentjs:moment',
-    'reywood:publish-composite@1.5.2',
+    'reywood:publish-composite',
     'piemonkey:roles',
     'reactive-dict',
     'reactive-var',

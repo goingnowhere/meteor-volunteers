@@ -17,5 +17,12 @@
   "division": "Division",
   "description": "Description",
   "responsabilities": "Responsibilities",
-  "qualificatons": "Qualificatons"
+  "qualificatons": "Qualificatons",
+  "vacant": "Vacant",
+  "approve": "Approve",
+  "refuse": "Refuse",
+  "date": "Date",
+  "duty": "Duty",
+  "created": "Created",
+  "user": "User"
 }

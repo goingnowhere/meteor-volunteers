@@ -60,6 +60,16 @@ Template.dutiesListItem.helpers
 Template.shiftDate.helpers
   'sameDay': (start, end) -> moment(start).isSame(moment(end),"day")
 
+Template.addShift.bindI18nNamespace('abate:volunteers')
+Template.addShift.helpers
+  'form': () -> { collection: share.TeamShifts }
+  'data': () -> Template.instance().data
+
+Template.addTask.bindI18nNamespace('abate:volunteers')
+Template.addTask.helpers
+  'form': () -> { collection: share.TeamTasks }
+  'data': () -> Template.instance().data
+
 AutoForm.addHooks ['InsertTeamShiftsFormId','UpdateTeamShiftsFormId'],
   onSuccess: (formType, result) ->
     if this.template.data.var
