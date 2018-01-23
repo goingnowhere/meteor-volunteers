@@ -29,8 +29,7 @@ class VolunteersClass
     share.initMethods(@eventName)
     initAuthorization(@eventName)
     if Meteor.isServer
-      # share.initPublications(@eventName)
-      share.initPublications1(@eventName)
+      share.initPublications(@eventName)
     @Schemas = share.Schemas
     @Collections =
       VolunteerForm: share.VolunteerForm

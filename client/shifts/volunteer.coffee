@@ -3,7 +3,9 @@ import SimpleSchema from 'simpl-schema'
 addLocalDutiesCollection = (collection,template,type,filter = {},limit = 10) ->
   collection.find(filter,{limit: limit}).forEach((duty) ->
     duty.type = type
-    template.DutiesLocal.insert(duty)
+    if ! template.DutiesLocal.findOne(duty._id)
+      # XXX: there must be a better way ... like with an upsert
+      template.DutiesLocal.insert(duty)
   )
 
 Template.signupsList.bindI18nNamespace('abate:volunteers')

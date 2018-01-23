@@ -70,9 +70,13 @@ Template.departmentSignupsList.helpers({
           ...signup,
           type: 'lead',
           duty: share.Lead.findOne(signup.shiftId)
-      })).sort((a, b) => {
-        return a.createdAt && b.createdAt && a.createdAt.getTime() - b.createdAt.getTime()
-    })
+      }))
+      // .sort((a, b) => {
+      //   return a.createdAt && b.createdAt && a.createdAt.getTime() - b.createdAt.getTime()
+    // })
+    console.log(teamIds);
+    console.log(share.LeadSignups.find().fetch());
+    console.log(share.LeadSignups.find({ parentId: {$in: teamIds}, status: 'pending' }).fetch());
     return leads
   }
 })
