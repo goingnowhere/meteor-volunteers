@@ -70,13 +70,9 @@ Template.departmentSignupsList.helpers({
           ...signup,
           type: 'lead',
           duty: share.Lead.findOne(signup.shiftId)
-      }))
-      // .sort((a, b) => {
-      //   return a.createdAt && b.createdAt && a.createdAt.getTime() - b.createdAt.getTime()
-    // })
-    console.log(teamIds);
-    console.log(share.LeadSignups.find().fetch());
-    console.log(share.LeadSignups.find({ parentId: {$in: teamIds}, status: 'pending' }).fetch());
+      })).sort((a, b) => {
+        return a.createdAt && b.createdAt && a.createdAt.getTime() - b.createdAt.getTime()
+    })
     return leads
   }
 })
@@ -90,4 +86,29 @@ Template.departmentSignupsList.events({
     const signupId = $(event.target).data('signup')
     share.meteorCall(`leadSignups.refuse`, signupId)
   },
+})
+
+Template.managerSignupsList.bindI18nNamespace('abate:volunteers');
+Template.managerSignupsList.onCreated(function () {
+  const template = this;
+  share.templateSub(template,"LeadSignups.Manager")
+})
+
+Template.managerSignupsList.helpers({
+  allSignups: () => {
+    divisionIds = share.Division.find().map((t) => { return t._id })
+    deptIds = share.Department.find({parentId: {$in: divisionIds}}).map((t) => { return t._id })
+    teamIds = share.Team.find({parentId: {$in: deptIds}}).map((t) => { return t._id })
+    const leads = share.LeadSignups.find(
+        { parentId: {$in: teamIds.concat(deptIds).concat(divisionIds)},
+          status: 'pending' }, {sort: {createdAt: -1}}
+      ).map(signup => ({
+          ...signup,
+          type: 'lead',
+          duty: share.Lead.findOne(signup.shiftId)
+      })).sort((a, b) => {
+        return a.createdAt && b.createdAt && a.createdAt.getTime() - b.createdAt.getTime()
+    })
+    return leads
+  }
 })

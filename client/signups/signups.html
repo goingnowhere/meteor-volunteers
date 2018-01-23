@@ -70,3 +70,30 @@
     {{/each}}
   </table>
 </template>
+
+<template name="managerSignupsList">
+  <table class="table">
+    {{#each signup in allSignups}}
+    {{debug signup}}
+    <tr>
+      <td>
+          {{fa "user-circle"}}
+          {{#if signup.userId}}{{getUserName signupuserId}}{{else}}{{__ ".vacant"}}{{/if}}
+      </td>
+      <td>{{signup.duty.title}}</td>
+      <td>{{formatDate signup.createdAt}}</td>
+      <td>{{getUserName signup.userId}}</td>
+      <td>
+        <button class="btn btn-default btn-sm" data-action="approve"
+          data-signup="{{ signup._id }}">
+            {{__ '.approve' }}
+        </button>
+        <button class="btn btn-default btn-sm" data-action="refuse"
+          data-signup="{{ signup._id }}">
+            {{__ '.refuse' }}
+        </button>
+      </td>
+    </tr>
+    {{/each}}
+  </table>
+</template>

@@ -101,8 +101,7 @@ Package.onUse(function(api) {
   ], "client");
 
   api.add_files([
-    // 'server/publications.coffee',
-    'server/publications1.coffee',
+    'server/publications.coffee',
   ],"server");
 
   api.add_files([ "i18n/en.i18n.json", ], ["client", "server"]);
