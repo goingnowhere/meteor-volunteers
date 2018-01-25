@@ -18,14 +18,12 @@ Package.onUse(function(api) {
 
   api.use([
     'mongo',
-    'coffeescript',
+    'coffeescript@1.12.7_3',
     'ecmascript',
     'tmeasday:check-npm-versions',
     'aldeed:collection2-core',
     'aldeed:autoform@6.2.0',
     'aldeed:autoform-select2',
-    'ostrio:autoform-files',
-    'ostrio:files',
     'check',
     'underscore',
     'momentjs:moment',

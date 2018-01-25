@@ -69,6 +69,7 @@ Template.departmentSignupsList.helpers({
       ).map(signup => ({
           ...signup,
           type: 'lead',
+          unit: share.Team.findOne(signup.parentId),
           duty: share.Lead.findOne(signup.shiftId)
       })).sort((a, b) => {
         return a.createdAt && b.createdAt && a.createdAt.getTime() - b.createdAt.getTime()
@@ -99,12 +100,15 @@ Template.managerSignupsList.helpers({
     divisionIds = share.Division.find().map((t) => { return t._id })
     deptIds = share.Department.find({parentId: {$in: divisionIds}}).map((t) => { return t._id })
     teamIds = share.Team.find({parentId: {$in: deptIds}}).map((t) => { return t._id })
+    console.log(deptIds);
     const leads = share.LeadSignups.find(
         { parentId: {$in: teamIds.concat(deptIds).concat(divisionIds)},
           status: 'pending' }, {sort: {createdAt: -1}}
       ).map(signup => ({
           ...signup,
           type: 'lead',
+          // XXX this should be either team, dept or division
+          unit: share.Department.findOne(signup.parentId),
           duty: share.Lead.findOne(signup.shiftId)
       })).sort((a, b) => {
         return a.createdAt && b.createdAt && a.createdAt.getTime() - b.createdAt.getTime()

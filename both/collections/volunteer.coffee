@@ -23,6 +23,7 @@ share.Schemas.VolunteerForm = new SimpleSchema(
     max: 1000
     autoform:
       rows:4
+      omit: true
 )
 
 commonSignups = new SimpleSchema(

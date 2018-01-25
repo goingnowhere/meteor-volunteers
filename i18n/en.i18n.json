@@ -24,5 +24,7 @@
   "date": "Date",
   "duty": "Duty",
   "created": "Created",
-  "user": "User"
+  "user": "User",
+  "update_volunteer_profile": "Update",
+  "notes": "Notes"
 }
