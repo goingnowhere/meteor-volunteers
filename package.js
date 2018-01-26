@@ -27,7 +27,7 @@ Package.onUse(function(api) {
     'check',
     'underscore',
     'momentjs:moment',
-    'reywood:publish-composite',
+    'reywood:publish-composite@1.5.2',
     'piemonkey:roles',
     'reactive-dict',
     'reactive-var',
