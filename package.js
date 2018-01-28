@@ -18,7 +18,7 @@ Package.onUse(function(api) {
 
   api.use([
     'mongo',
-    'coffeescript@1.12.7_3',
+    'coffeescript',
     'ecmascript',
     'tmeasday:check-npm-versions',
     'aldeed:collection2-core',
@@ -68,6 +68,7 @@ Package.onUse(function(api) {
 
   api.add_files([
     'client/global_helpers.coffee',
+    'client/css/custom.css',
 
     "client/shifts/filters.html",
     "client/shifts/filters.coffee",
