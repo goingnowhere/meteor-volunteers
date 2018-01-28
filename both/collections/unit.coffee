@@ -5,8 +5,12 @@ SimpleSchema.extendOptions(['autoform'])
 
 unitPolicy = ["public";"private";"restricted"]
 
-share.getTagList = (sel={}) ->
-  tags = _.union.apply null, share.Team.find(sel).map((team) -> team.tags)
+share.getSkillsList = (sel={}) ->
+  tags = _.union.apply null, share.Team.find(sel).map((team) -> team.skills)
+  _.map tags, (tag) -> {value: tag, label: tag}
+
+share.getQuirksList = (sel={}) ->
+  tags = _.union.apply null, share.Team.find(sel).map((team) -> team.quirks)
   _.map tags, (tag) -> {value: tag, label: tag}
 
 share.getLocationList = (sel={}) ->
@@ -21,17 +25,28 @@ CommonUnit = new SimpleSchema(
   name:
     type: String
     label: () -> i18n.__("abate:volunteers","name")
-  tags:
+  skills:
     type: Array
-    label: () -> i18n.__("abate:volunteers","tags")
+    label: () -> i18n.__("abate:volunteers","skills")
     optional: true
     autoform:
       type: "select2"
-      options: share.getTagList
+      options: share.getSkillsList
       afFieldInput:
         multiple: true
         select2Options: () -> {tags: true}
-  "tags.$": String
+  "skills.$": String
+  quirks:
+    type: Array
+    label: () -> i18n.__("abate:volunteers","quirks")
+    optional: true
+    autoform:
+      type: "select2"
+      options: share.getQuirksList
+      afFieldInput:
+        multiple: true
+        select2Options: () -> {tags: true}
+  "quirks.$": String
   description:
     type: String
     label: () -> i18n.__("abate:volunteers","description")

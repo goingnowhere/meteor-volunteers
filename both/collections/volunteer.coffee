@@ -16,9 +16,35 @@ share.Schemas.VolunteerForm = new SimpleSchema(
       else this.unset()
     autoform:
       omit: true
+  skills:
+    type: Array
+    label: () -> i18n.__("abate:volunteers","skills")
+    optional: true
+    autoform:
+      # XXX bug in autoform https://github.com/aldeed/meteor-autoform/issues/1635
+      # group: () -> i18n.__("abate:volunteers","preferences")
+      group: "Preferences"
+      type: "select2"
+      options: share.getSkillsList
+      afFieldInput:
+        multiple: true
+        # select2Options: () -> {tags: true}
+  "skills.$": String
+  quirks:
+    type: Array
+    label: () -> i18n.__("abate:volunteers","quirks")
+    optional: true
+    autoform:
+      # group: () -> i18n.__("abate:volunteers","preferences")
+      group: "Preferences"
+      type: "select2"
+      options: share.getQuirksList
+      afFieldInput:
+        multiple: true
+        # select2Options: () -> {tags: true}
   private_notes:
     type: String
-    label: () -> i18n.__("abate:volunteers","notes")
+    label: () -> i18n.__("abate:volunteers","private_notes")
     optional: true
     max: 1000
     autoform:

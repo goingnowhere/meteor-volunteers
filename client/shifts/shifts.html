@@ -1,64 +1,4 @@
-<!-- helper display to format the date of a shift. used in dutiesListItem and ... -->
-<template name="shiftDate">
-  {{#if sameDay start end}}
-    <div class="row">{{formatDate start}}</div>
-    <div class="row">{{formatTime start}} - {{formatTime end}}</div>
-  {{else}}
-    <div class="row">{{formatDateTime start}}</div>
-    <div class="row">{{formatTime end}} {{differenceTime start end}}</div>
-  {{/if}}
-</template>
-
-<!-- helper display to format the date of a task. used in dutiesListItem and ... -->
-<template name="taskDate">
-  <div class="row">{{formatDate dueDate}}</div>
-  <div class="row">{{__ ".estimated_time"}} {{estimatedTime}}</div>
-</template>
-
-<template name="shiftTitle">
-  <div class="d-flex w-100 justify-content-between">
-    <small>{{fa "calendar"}} </small>
-    <h5 class="mb-1">{{team.name}}: {{duty.title}}</h5>
-    <small> {{> shiftDate duty}} </small>
-  </div>
-</template>
-
-<template name="taskTitle">
-  <div class="d-flex w-100 justify-content-between">
-    <small>{fa "tasks"}} </small>
-    <h5 class="mb-1">{{team.name}}: {{duty.title}}</h5>
-    <small>{{> taskDate duty}}</small>
-  </div>
-</template>
-
-<template name="leadTitle">
-  <small>{{fa "user-circle"}}</small>
-  <h5 class="mb-1">{{team.type}} {{__ ".lead"}}: {{team.name}}</h5>
-</template>
-
-<template name="leadBody">
-  <h5 class="mb-2 text-muted">{{__ ".title"}}</h5>
-    {{duty.title}}
-  <h5 class="mb-2 text-muted">{{__ ".description"}}</h5>
-  <p class="card-text">{{duty.description}}</p>
-  <h5 class="mb-2 text-muted">{{__ ".responsabilities"}}</h5>
-  <p class="card-text"> {{duty.responsabilities}}</p>
-  <h5 class="mb-2 text-muted">{{__ ".qualificatons"}}</h5>
-  <p class="card-text">{{duty.qualificatons}}</p>
-</template>
-
-<template name="shiftBody">
-  <h5 class="mb-2 text-muted">{{__ ".description"}}</h5>
-  <p class="card-text">{{duty.description}}</p>
-  <h5 class="mb-2 text-muted">{{__ ".location"}}</h5>
-    {{team.location}}
-</template>
-
-<template name="taskBody">
-  <p class="card-text">{{duty.description}}</p>
-</template>
-
-<!-- main template to display list of duties : shift, tasks, lead -->
+<!-- main template to display list of duties for a user : shift, tasks, lead -->
 <template name="dutiesListItem">
   <nav class="navbar navbar-light bg-light">
     {{#if $eq duty.type "shift"}}
@@ -83,8 +23,23 @@
     {{/if}}
   </div>
   <div>
-    {{#if team.tags}}
-      {{fa "tags"}} <ul>{{#each tag in team.tags}}<li>{{tag}}</li>{{/each}}</ul>
+    {{#if team.quirks}}
+      <ul class="list-inline">
+        {{#each tag in team.quirks}}
+          <li class="list-inline-item">
+            <span class="badge badge-primary badge-pill">{{quirks}}</span>
+          </li>
+        {{/each}}
+      </ul>
+    {{/if}}
+    {{#if team.skills}}
+      <ul class="list-inline">
+        {{#each tag in team.skills}}
+          <li class="list-inline-item">
+            <span class="badge badge-secondary badge-pill">{{skills}}</span>
+          </li>
+        {{/each}}
+      </ul>
     {{/if}}
     <div class="pull-right">
       {{#if $and signup.status ($neq signup.status 'bailed')}}
@@ -149,4 +104,64 @@
       {{> shiftDate shift}}
     {{/if}}
   </div>
+</template>
+
+<!-- helper display to format the date of a shift. used in dutiesListItem and ... -->
+<template name="shiftDate">
+  {{#if sameDay start end}}
+    <div class="row">{{formatDate start}}</div>
+    <div class="row">{{formatTime start}} - {{formatTime end}}</div>
+  {{else}}
+    <div class="row">{{formatDateTime start}}</div>
+    <div class="row">{{formatTime end}} {{differenceTime start end}}</div>
+  {{/if}}
+</template>
+
+<!-- helper display to format the date of a task. used in dutiesListItem and ... -->
+<template name="taskDate">
+  <div class="row">{{formatDate dueDate}}</div>
+  <div class="row">{{__ ".estimated_time"}} {{estimatedTime}}</div>
+</template>
+
+<template name="shiftTitle">
+  <div class="d-flex w-100 justify-content-between">
+    <small>{{fa "calendar"}} </small>
+    <h5 class="mb-1">{{team.name}}: {{duty.title}}</h5>
+    <small> {{> shiftDate duty}} </small>
+  </div>
+</template>
+
+<template name="taskTitle">
+  <div class="d-flex w-100 justify-content-between">
+    <small>{fa "tasks"}} </small>
+    <h5 class="mb-1">{{team.name}}: {{duty.title}}</h5>
+    <small>{{> taskDate duty}}</small>
+  </div>
+</template>
+
+<template name="leadTitle">
+  <small>{{fa "user-circle"}}</small>
+  <h5 class="mb-1">{{team.type}} {{__ ".lead"}}: {{team.name}}</h5>
+</template>
+
+<template name="leadBody">
+  <h5 class="mb-2 text-muted">{{__ ".title"}}</h5>
+    {{duty.title}}
+  <h5 class="mb-2 text-muted">{{__ ".description"}}</h5>
+  <p class="card-text">{{duty.description}}</p>
+  <h5 class="mb-2 text-muted">{{__ ".responsabilities"}}</h5>
+  <p class="card-text"> {{duty.responsabilities}}</p>
+  <h5 class="mb-2 text-muted">{{__ ".qualificatons"}}</h5>
+  <p class="card-text">{{duty.qualificatons}}</p>
+</template>
+
+<template name="shiftBody">
+  <h5 class="mb-2 text-muted">{{__ ".description"}}</h5>
+  <p class="card-text">{{duty.description}}</p>
+  <h5 class="mb-2 text-muted">{{__ ".location"}}</h5>
+    {{team.location}}
+</template>
+
+<template name="taskBody">
+  <p class="card-text">{{duty.description}}</p>
 </template>

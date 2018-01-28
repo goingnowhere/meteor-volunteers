@@ -25,6 +25,14 @@
   "duty": "Duty",
   "created": "Created",
   "user": "User",
-  "update_volunteer_profile": "Update",
-  "notes": "Notes"
+  "update_volunteer_profile": "Update Profile",
+  "notes": "Notes",
+  "bail": "Bail",
+  "skills": "Skills",
+  "quirks": "Quirks",
+  "create_volunteer_profile": "Create Profile",
+  "preferences": "Preferences",
+  "private_notes": "Private Notes",
+  "date_range": "Dates",
+  "period": "Times"
 }

@@ -109,7 +109,7 @@ Template.tagsPicker.onRendered () ->
     if sub.ready()
       tags= template.data.searchQuery.get('tags')
       sel = if tags?.length > 0 then {_id: {$in: tags}} else {}
-      data = _.map(share.getTagList(sel),(t) ->
+      data = _.map(share.getSkillsList(sel),(t) ->
         id: t.value
         text: t.label)
       $("#tags").select2({
