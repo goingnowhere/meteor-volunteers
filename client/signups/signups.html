@@ -1,3 +1,4 @@
+<!-- all Restricted shifts and tasks requests for a given team -->
 <template name="teamSignupsList">
   <table class="table">
     <thead>
@@ -18,10 +19,6 @@
             {{#if $eq signup.type "task"}}
               {{fa "tasks"}}
               {{> taskDate signup.duty}}
-            {{/if}}
-            {{#if $eq signup.type "lead"}}
-              {{fa "user-circle"}}
-              {{#if signup.userId}}{{getUserName signupuserId}}{{else}}{{__ ".vacant"}}{{/if}}
             {{/if}}
           </td>
           <td>
@@ -45,6 +42,7 @@
   </table>
 </template>
 
+<!-- all Lead team requests for a given department -->
 <template name="departmentSignupsList">
   <table class="table">
     <thead>
@@ -78,6 +76,9 @@
   </table>
 </template>
 
+<!-- TODO : department Lead requests for a division -->
+
+<!-- all division and departments Lead request for the manager -->
 <template name="managerSignupsList">
   <table class="table">
     <thead>

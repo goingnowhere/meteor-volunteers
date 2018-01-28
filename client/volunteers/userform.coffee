@@ -7,12 +7,17 @@ Template.addVolunteerForm.onCreated () ->
 # user and not only display Meteor.userId() / the current user
 Template.addVolunteerForm.helpers
   'form': () ->
-    form = share.form.get()
-    if form then {
-      collection: form
-      insert:
-        label: i18n.__("abate:volunteers","create_volunteer_profile")
-      update:
-        label: i18n.__("abate:volunteers","update_volunteer_profile")
-    }
+    if Template.instance().subscriptionsReady()
+      form = share.form.get()
+      dform = FormBuilder.Collections.DynamicForms.findOne({name: "VolunteerForm"})
+      fields = _.chain(dform.form).map((f) -> if f.group then f.group else f.name).uniq().value()
+      console.log fields
+      if form then {
+        collection: form
+        # fields: fields
+        insert:
+          label: i18n.__("abate:volunteers","create_volunteer_profile")
+        update:
+          label: i18n.__("abate:volunteers","update_volunteer_profile")
+      }
   'data': () -> share.VolunteerForm.findOne({userId: Meteor.userId()})
