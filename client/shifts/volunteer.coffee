@@ -1,11 +1,12 @@
 import SimpleSchema from 'simpl-schema'
 
-addLocalDutiesCollection = (collection,template,type,filter = {},limit = 10) ->
-  collection.find(filter,{limit: limit}).forEach((duty) ->
+addLocalDutiesCollection = (duties,signups,template,type,filter = {},limit = 10) ->
+  duties.find(filter,{limit: limit}).forEach((duty) ->
     duty.type = type
     if ! template.DutiesLocal.findOne(duty._id)
-      # XXX: there must be a better way ... like with an upsert
-      template.DutiesLocal.insert(duty)
+      if ! signups.findOne({userId: Meteor.userId(), shiftId: duty._id})
+        # XXX: there must be a better way ... like with an upsert
+        template.DutiesLocal.insert(duty)
   )
 
 Template.signupsList.bindI18nNamespace('abate:volunteers')
@@ -31,17 +32,17 @@ Template.signupsList.onCreated () ->
   template.autorun () ->
     filter = makeFilter(template.searchQuery)
     limit = template.searchQuery.get('limit') || 10
-    sub1 = share.templateSub(template,"TeamShifts",limit)
-    sub2 = share.templateSub(template,"TeamTasks",limit)
-    sub3 = share.templateSub(template,"Lead",limit)
+    share.templateSub(template,"TeamShifts",limit)
+    share.templateSub(template,"TeamTasks",limit)
+    share.templateSub(template,"Lead",limit)
+    share.templateSub(template,"ShiftSignups.byUser", Meteor.userId())
+    share.templateSub(template,"TaskSignups.byUser", Meteor.userId())
+    share.templateSub(template,"LeadSignups.byUser", Meteor.userId())
 
-    # if sub1.ready() && sub2.ready() && sub3.ready()
-    if sub1.ready()
-      addLocalDutiesCollection(share.TeamShifts,template,'shift',filter,limit)
-    if sub2.ready()
-      addLocalDutiesCollection(share.TeamTasks,template,'task',filter,limit)
-    if sub3.ready()
-      addLocalDutiesCollection(share.Lead,template,'lead',filter,limit)
+    if template.subscriptionsReady()
+      addLocalDutiesCollection(share.TeamShifts,share.ShiftSignups,template,'shift',filter,limit)
+      addLocalDutiesCollection(share.TeamTasks,share.TaskSignups,template,'task',filter,limit)
+      addLocalDutiesCollection(share.Lead,share.LeadSignups,template,'lead',filter,limit)
     template.sel.set(filter)
 
 Template.signupsList.helpers
