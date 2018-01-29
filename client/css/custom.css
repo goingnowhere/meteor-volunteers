@@ -16,3 +16,9 @@
 	border-bottom-left-radius:0;
 	border-right-width: 1px;
 }
+.list_item {
+	height: 85px;
+}
+.small_pad {
+	padding: 5px !important;
+}

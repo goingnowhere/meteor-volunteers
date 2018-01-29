@@ -1,47 +1,19 @@
 <!-- main template to display list of duties for a user : shift, tasks, lead -->
 <template name="dutiesListItem">
-  <nav class="navbar navbar-light bg-light">
-    {{#if $eq duty.type "shift"}}
-      {{> shiftTitle duty=duty team=team}}
-    {{/if}}
-    {{#if $eq duty.type "task"}}
-      {{>taskTitle duty=duty team=team}}
-    {{/if}}
-    {{#if $eq duty.type "lead"}}
-      {{>leadTitle duty=duty team=team}}
-    {{/if}}
-  </nav>
-  <div>
-    {{#if $eq duty.type "shift"}}
-      {{>shiftBody duty=duty team=team}}
-    {{/if}}
-    {{#if $eq duty.type "task"}}
-      {{>taskBody duty=duty team=team}}
-    {{/if}}
-    {{#if $eq duty.type "lead"}}
-      {{>leadBody duty=duty team=team}}
-    {{/if}}
-  </div>
-  <div>
-    {{#if team.quirks}}
-      <ul class="list-inline">
-        {{#each tag in team.quirks}}
-          <li class="list-inline-item">
-            <span class="badge badge-primary badge-pill">{{quirks}}</span>
-          </li>
-        {{/each}}
-      </ul>
-    {{/if}}
-    {{#if team.skills}}
-      <ul class="list-inline">
-        {{#each tag in team.skills}}
-          <li class="list-inline-item">
-            <span class="badge badge-secondary badge-pill">{{skills}}</span>
-          </li>
-        {{/each}}
-      </ul>
-    {{/if}}
-    <div class="pull-right">
+  <div class="row justify-content-between align-content-center list_item">
+    {{> shiftDate duty}}
+    <div class="col-md-6 d-flex flex-column align-content-center small_pad">
+      {{#if $eq duty.type "shift"}}
+        {{> shiftTitle duty=duty team=team}}
+      {{/if}}
+      {{#if $eq duty.type "task"}}
+        {{>taskTitle duty=duty team=team}}
+      {{/if}}
+      {{#if $eq duty.type "lead"}}
+        {{>leadTitle duty=duty team=team}}
+      {{/if}}
+    </div>
+    <div class="col-md-2 d-flex align-content-center small_pad">
       {{#if $and signup.status ($neq signup.status 'bailed')}}
         <button class="btn btn-default disabled
           {{#if $eq signup.status 'confirmed'}}btn-success{{/if}}">
@@ -70,6 +42,37 @@
         </button>
       {{/if}}
     </div>
+  </div>
+  <div class="container">
+      {{#if $eq duty.type "shift"}}
+        {{>shiftBody duty=duty team=team}}
+      {{/if}}
+      {{#if $eq duty.type "task"}}
+        {{>taskBody duty=duty team=team}}
+      {{/if}}
+      {{#if $eq duty.type "lead"}}
+        {{>leadBody duty=duty team=team}}
+      {{/if}}
+    </div>
+    <div class="row">
+    {{#if team.quirks}}
+      <ul class="list-inline">
+        {{#each tag in team.quirks}}
+          <li class="list-inline-item">
+            <span class="badge badge-primary badge-pill">{{quirks}}</span>
+          </li>
+        {{/each}}
+      </ul>
+    {{/if}}
+    {{#if team.skills}}
+      <ul class="list-inline">
+        {{#each tag in team.skills}}
+          <li class="list-inline-item">
+            <span class="badge badge-secondary badge-pill">{{skills}}</span>
+          </li>
+        {{/each}}
+      </ul>
+    {{/if}}
   </div>
 </template>
 
@@ -109,17 +112,17 @@
 <!-- helper display to format the date of a shift. used in dutiesListItem and ... -->
 <template name="shiftDate">
   {{#if sameDay start end}}
-    <div class="row">{{formatDate start}}</div>
-    <div class="row">{{formatTime start}} - {{formatTime end}}</div>
+    <div class="col-md-2 align-content-center small_pad"><h5>{{formatDate start}}</h5></div>
+    <div class="col-md-2 align-content-center small_pad"><h6>{{formatTime start}} <br> {{formatTime end}}</h6></div>
   {{else}}
-    <div class="row">{{formatDateTime start}}</div>
-    <div class="row">{{formatTime end}} {{differenceTime start end}}</div>
+    <div class="col-md-2 align-content-center small_pad">{{formatDateTime start}}</div>
+    <div class="col-md-2 align-content-center small_pad">{{formatTime end}} {{differenceTime start end}}</div>
   {{/if}}
 </template>
 
 <!-- helper display to format the date of a task. used in dutiesListItem and ... -->
 <template name="taskDate">
-  <div class="row">{{formatDate dueDate}}</div>
+  <div class="row">{{> taskDate duty}}</div>
   <div class="row">{{__ ".estimated_time"}} {{estimatedTime}}</div>
 </template>
 
@@ -141,21 +144,21 @@
 </template>
 
 <template name="leadBody">
-  <h5 class="mb-2 text-muted">{{__ ".title"}}</h5>
-    {{duty.title}}
-  <h5 class="mb-2 text-muted">{{__ ".description"}}</h5>
-  <p class="card-text">{{duty.description}}</p>
-  <h5 class="mb-2 text-muted">{{__ ".responsabilities"}}</h5>
-  <p class="card-text"> {{duty.responsabilities}}</p>
-  <h5 class="mb-2 text-muted">{{__ ".qualificatons"}}</h5>
-  <p class="card-text">{{duty.qualificatons}}</p>
+  <div class="row">
+    <p class="card-text">{{duty.description}}</p>
+  </div>
+  <div class="row">
+    <h5 class="mb-2 text-muted">{{__ ".responsabilities"}}</h5>
+    <p class="card-text"> {{duty.responsabilities}}</p>
+  </div>
+  <div class="row">
+    <h5 class="mb-2 text-muted">{{__ ".qualificatons"}}</h5>
+    <p class="card-text">{{duty.qualificatons}}</p>
+  </div>
 </template>
 
 <template name="shiftBody">
-  <h5 class="mb-2 text-muted">{{__ ".description"}}</h5>
   <p class="card-text">{{duty.description}}</p>
-  <h5 class="mb-2 text-muted">{{__ ".location"}}</h5>
-    {{team.location}}
 </template>
 
 <template name="taskBody">
