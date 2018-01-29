@@ -63,12 +63,12 @@ Template.shiftDate.helpers
 Template.addShift.bindI18nNamespace('abate:volunteers')
 Template.addShift.helpers
   'form': () -> { collection: share.TeamShifts }
-  'data': () -> Template.instance().data
+  'data': () -> Template.currentData().data
 
 Template.addTask.bindI18nNamespace('abate:volunteers')
 Template.addTask.helpers
   'form': () -> { collection: share.TeamTasks }
-  'data': () -> Template.instance().data
+  'data': () -> Template.currentData().data
 
 AutoForm.addHooks ['InsertTeamShiftsFormId','UpdateTeamShiftsFormId'],
   onSuccess: (formType, result) ->
