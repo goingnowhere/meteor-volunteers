@@ -1,37 +1,43 @@
 <!-- All Shifts, Leads and tasks booked by a user -->
 <template name="bookedTable">
-  <table class="table">
-    <thead>
-      <th></th>
-      <th>{{__ ".time"}}</th>
-      <th>{{__ ".name"}}</th>
-      <th>{{__ ".location"}}</th>
-      <th></th>
-    </thead>
-    {{#each shift in allShifts }}
-      {{> shiftsUserRowView shift}}
-    {{/each}}
-  </table>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-4">{{__ ".time"}}</div>
+      <div class="col-md-4">{{__ ".name"}}</div>
+      <div class="col-md-4">{{__ ".location"}}</div>
+    </div>
+    <div class="row">
+      <div class="container">
+        {{#each shift in allShifts }}
+        <div class="flex-column">
+          {{> shiftsUserRowView shift}}
+        </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
 </template>
- 
+
 <template name="shiftsUserRowView">
-  <tr>
-    <td>
+  <div class="row justify-content-between align-content-center list_item">
+    <div class="col-md-1 d-flex flex-column align-content-center small_pad">
       {{#if $eq signup.status "confirmed"}}<div class="text-success">{{fa "check"}}</div>{{/if}}
       {{#if $eq signup.status "pending"}}<div class="text-warning">{{fa "clock-o"}}</div>{{/if}}
-    </td>
-    <td>{{> shiftDate shift }}</td>
-    <td>{{team.name}} {{shift.title}}</td>
-    <td>{{team.location}}</td>
-    <td>
+    </div>
+    {{> shiftDate shift }}
+    <div class="col-md-5 d-flex flex-column align-content-center small_pad">
+      {{team.name}} {{shift.title}}
+      {{team.location}}
+    </div>
+    <div class="col-md-2 d-flex flex-column align-content-center small_pad">
       <div class="btn-group pull-right">
         <button type="button" class="btn btn-default btn-circle" data-action="bail"
           data-shiftId="{{signup.shiftId}}" data-parentId="{{signup.parentId}}">
           {{fa "pencil-square-o"}} {{__ ".bail"}}
         </button>
       </div>
-    </td>
-  </tr>
+    </div>
+  </div>
 </template>
 
 <template name="tasksUserRowView">
