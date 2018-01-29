@@ -42,6 +42,7 @@ share.Schemas.VolunteerForm = new SimpleSchema(
       afFieldInput:
         multiple: true
         # select2Options: () -> {tags: true}
+  "quirks.$": String
   private_notes:
     type: String
     label: () -> i18n.__("abate:volunteers","private_notes")
