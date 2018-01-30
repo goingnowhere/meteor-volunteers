@@ -108,9 +108,13 @@ Package.onUse(function(api) {
   api.export([ 'VolunteersClass']);
 });
 
-//Package.onTest(function(api) {
-  //api.use('ecmascript');
-  //api.use('tinytest');
-  //api.use('i18n-inline');
-  //api.mainModule('i18n-inline-tests.js');
-//});
+// Package.onTest(function (api) {
+//   api.use([
+//     'practicalmeteor:mocha',
+//     'johanbrook:publication-collector',
+//     'ecmascript'
+//   ]);
+//
+//   // Add any files with mocha tests.
+//   api.addFiles('imports/tests/methods.tests.js');
+// });

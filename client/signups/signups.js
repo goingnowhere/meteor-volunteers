@@ -3,14 +3,14 @@ let share = __coffeescriptShare;
 Template.teamSignupsList.bindI18nNamespace('abate:volunteers');
 Template.teamSignupsList.onCreated(function () {
   const template = this;
-  template.teamId = this.data._id
-  share.templateSub(template,"ShiftSignups.byTeam",template.teamId)
-  share.templateSub(template,"TaskSignups.byTeam",template.teamId)
-})
+  template.teamId = this.data._id;
+  share.templateSub(template,"ShiftSignups.byTeam",template.teamId);
+  share.templateSub(template,"TaskSignups.byTeam",template.teamId);
+});
 
 Template.teamSignupsList.helpers({
   allSignups() {
-    teamId = Template.instance().teamId
+    teamId = Template.currentData().teamId;
     const shifts = share.ShiftSignups.find({ parentId: teamId , status: 'pending' }, {sort: {createdAt: -1}})
       .map(signup => ({
         ...signup,
@@ -62,7 +62,7 @@ Template.departmentSignupsList.onCreated(function () {
 
 Template.departmentSignupsList.helpers({
   allSignups: () => {
-    departmentId = Template.instance().departmentId
+    departmentId = Template.currentData().departmentId
     teamIds = share.Team.find({parentId: departmentId}).map((t) => { return t._id })
     const leads = share.LeadSignups.find(
         { parentId: {$in: teamIds}, status: 'pending' }, {sort: {createdAt: -1}}
@@ -100,7 +100,6 @@ Template.managerSignupsList.helpers({
     divisionIds = share.Division.find().map((t) => { return t._id })
     deptIds = share.Department.find({parentId: {$in: divisionIds}}).map((t) => { return t._id })
     teamIds = share.Team.find({parentId: {$in: deptIds}}).map((t) => { return t._id })
-    console.log(deptIds);
     const leads = share.LeadSignups.find(
         { parentId: {$in: teamIds.concat(deptIds).concat(divisionIds)},
           status: 'pending' }, {sort: {createdAt: -1}}

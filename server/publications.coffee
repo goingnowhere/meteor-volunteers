@@ -263,13 +263,15 @@ share.initPublications = (eventName) ->
   createPublicationAllDuties("TeamTasks",share.TeamTasks)
   createPublicationAllDuties("Lead",share.Lead)
 
-  Meteor.publish "#{eventName}.Volunteers.volunteerForm", (sel={}) ->
-    if this.userId
-      if share.isManagerOrLead(this.userId)
-        share.VolunteerForm.find(sel)
+  Meteor.publish "#{eventName}.Volunteers.volunteerForm", (userId) ->
+    # XXX access to all leads, or only those leads that need to know ?
+    if share.isManagerOrLead(this.userId)
+      share.VolunteerForm.find({userId: userId})
+    else
+      if this.userId? == userId
+        share.VolunteerForm.find({userId: userId},{fields: {private_notes: 0}})
       else
-        sel = _.extend(sel,{userId: this.userId})
-        share.VolunteerForm.find(sel,{fields: {private_notes: 0}})
+        return null
 
   ######################################
   # Below here, all public information #

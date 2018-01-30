@@ -11,7 +11,6 @@ Template.addVolunteerForm.helpers
       form = share.form.get()
       dform = FormBuilder.Collections.DynamicForms.findOne({name: "VolunteerForm"})
       fields = _.chain(dform.form).map((f) -> if f.group then f.group else f.name).uniq().value()
-      console.log fields
       if form then {
         collection: form
         # fields: fields
