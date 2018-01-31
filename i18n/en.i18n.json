@@ -34,5 +34,10 @@
   "preferences": "Preferences",
   "private_notes": "Private Notes",
   "date_range": "Dates",
-  "period": "Times"
+  "period": "Times",
+  "edit": "Edit",
+  "remove": "Remove",
+  "clone": "Clone",
+  "group": "Group"
+
 }

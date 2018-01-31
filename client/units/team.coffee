@@ -67,13 +67,3 @@ Template.teamLeadField.helpers
     parentId = Template.currentData().data.parentId
     shiftId = Template.currentData().data._id
     share.LeadSignups.findOne({parentId: parentId, shiftId: shiftId, status: 'confirmed'})
-
-# AutoForm.addHooks ['UpdateTeamFormId'],
-#   onSuccess: (formType, result) ->
-#     this.template.currentShift.set({teamId:result._id})
-#     this.template.currentTask.set({teamId:result._id})
-#     this.template.currentLead.set({teamId:result._id})
-
-# AutoForm.addHooks ['InsertTeamFormId'],
-#   onSuccess: (formType, result) ->
-#     console.log "modal close"
