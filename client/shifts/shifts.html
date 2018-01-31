@@ -124,24 +124,20 @@
 </template>
 
 <template name="shiftTitle">
-  <div class="d-flex w-100 justify-content-between">
-    <small>{{fa "calendar"}} </small>
-    <h5 class="mb-1">{{team.name}}: {{duty.title}}</h5>
-    <small> {{> shiftDate duty}} </small>
-  </div>
+  <small>{{fa "calendar"}} </small>
+  <h5 class="mb-1 mr-auto">{{team.name}}: {{duty.title}}</h5>
+  <small> {{> shiftDate duty}} </small>
 </template>
 
 <template name="taskTitle">
-  <div class="d-flex w-100 justify-content-between">
-    <small>{fa "tasks"}} </small>
-    <h5 class="mb-1">{{team.name}}: {{duty.title}}</h5>
-    <small>{{> taskDate duty}}</small>
-  </div>
+  <small>{fa "tasks"}} </small>
+  <h5 class="mb-1 mr-auto">{{team.name}}: {{duty.title}}</h5>
+  <small>{{> taskDate duty}}</small>
 </template>
 
 <template name="leadTitle">
   <small>{{fa "user-circle"}}</small>
-  <h5 class="mb-1">{{team.type}} {{__ ".lead"}}: {{team.name}}</h5>
+  <h5 class="mb-1 mr-auto">{{team.type}} {{__ ".lead"}}: {{team.name}}</h5>
 </template>
 
 <template name="leadBody">
