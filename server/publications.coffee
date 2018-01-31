@@ -268,8 +268,8 @@ share.initPublications = (eventName) ->
     if share.isManagerOrLead(this.userId)
       share.VolunteerForm.find({userId: userId})
     else
-      if this.userId? == userId
-        share.VolunteerForm.find({userId: userId},{fields: {private_notes: 0}})
+      if !userId? or this?.userId == userId
+        share.VolunteerForm.find({userId: this.userId},{fields: {private_notes: 0}})
       else
         return null
 
