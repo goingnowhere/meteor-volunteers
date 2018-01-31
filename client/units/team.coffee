@@ -64,9 +64,9 @@ Template.teamLeadField.onCreated () ->
 
 Template.teamLeadField.helpers
   'signup': () ->
-    parentId = Template.instance().data.parentId
-    shiftId = Template.instance().data._id
-    share.LeadSignups.findOne({parentId: parentId, shiftId: shiftId})
+    parentId = Template.currentData().data.parentId
+    shiftId = Template.currentData().data._id
+    share.LeadSignups.findOne({parentId: parentId, shiftId: shiftId, status: 'confirmed'})
 
 # AutoForm.addHooks ['UpdateTeamFormId'],
 #   onSuccess: (formType, result) ->

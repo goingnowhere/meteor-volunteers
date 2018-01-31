@@ -10,7 +10,7 @@ Template.teamSignupsList.onCreated(function () {
 
 Template.teamSignupsList.helpers({
   allSignups() {
-    teamId = Template.currentData().teamId;
+    teamId = Template.instance().teamId;
     const shifts = share.ShiftSignups.find({ parentId: teamId , status: 'pending' }, {sort: {createdAt: -1}})
       .map(signup => ({
         ...signup,
@@ -62,7 +62,7 @@ Template.departmentSignupsList.onCreated(function () {
 
 Template.departmentSignupsList.helpers({
   allSignups: () => {
-    departmentId = Template.currentData().departmentId
+    departmentId = Template.instance().departmentId
     teamIds = share.Team.find({parentId: departmentId}).map((t) => { return t._id })
     const leads = share.LeadSignups.find(
         { parentId: {$in: teamIds}, status: 'pending' }, {sort: {createdAt: -1}}
