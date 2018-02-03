@@ -38,6 +38,13 @@
   "edit": "Edit",
   "remove": "Remove",
   "clone": "Clone",
-  "group": "Group"
-
+  "group": "Group",
+  "start": "Start",
+  "end": "End",
+  "min_people": "Min People",
+  "max_people": "Max People",
+  "priority": "Priority",
+  "policy": "Policy",
+  "new_shift": "New Shift",
+  "update_shift": "Update Shift"
 }

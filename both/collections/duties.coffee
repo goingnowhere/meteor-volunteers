@@ -24,7 +24,7 @@ CommonTask = new SimpleSchema(
       rows: 5
   min:
     type: Number
-    label: () -> i18n.__("abate:volunteers","min_members")
+    label: () -> i18n.__("abate:volunteers","min_people")
     optional: true
     autoform:
       afFieldInput:
@@ -32,7 +32,7 @@ CommonTask = new SimpleSchema(
         placeholder: "min"
   max:
     type: Number
-    label: () -> i18n.__("abate:volunteers","max_members")
+    label: () -> i18n.__("abate:volunteers","max_people")
     optional: true
     # TODO: if max is not set, it should be equal to min
     autoform:

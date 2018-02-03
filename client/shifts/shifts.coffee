@@ -62,7 +62,11 @@ Template.shiftDate.helpers
 
 Template.addShift.bindI18nNamespace('abate:volunteers')
 Template.addShift.helpers
-  'form': () -> { collection: share.TeamShifts }
+  'form': () -> {
+    collection: share.TeamShifts,
+    update: {label: i18n.__("abate:volunteers","update_shift") },
+    insert: {label: i18n.__("abate:volunteers","new_shift") }
+  }
   'data': () -> Template.currentData().data
 
 Template.addTask.bindI18nNamespace('abate:volunteers')
