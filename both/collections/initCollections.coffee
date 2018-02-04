@@ -15,6 +15,9 @@ share.initCollections = (eventName) ->
   share.TeamShifts = new Mongo.Collection "#{prefix}Volunteers.teamShifts"
   share.TeamShifts.attachSchema(share.Schemas.TeamShifts)
 
+  share.Projects = new Mongo.Collection "#{prefix}Volunteers.projects"
+  share.Projects.attachSchema(share.Schemas.Projects)
+
   share.Lead = new Mongo.Collection "#{prefix}Volunteers.lead"
   share.Lead.attachSchema(share.Schemas.Lead)
 
@@ -78,3 +81,4 @@ share.initCollections = (eventName) ->
     lead: share.Lead
     shift: share.TeamShifts
     task: share.TeamTasks
+    project: share.Projects

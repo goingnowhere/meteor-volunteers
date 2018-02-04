@@ -8,7 +8,7 @@ taskPriority = [ "essential", "important", "normal"]
 
 share.Schemas = {}
 
-CommonTask = new SimpleSchema(
+Common = new SimpleSchema(
   parentId:
     type: String
     autoform:
@@ -22,22 +22,6 @@ CommonTask = new SimpleSchema(
     optional: true
     autoform:
       rows: 5
-  min:
-    type: Number
-    label: () -> i18n.__("abate:volunteers","min_people")
-    optional: true
-    autoform:
-      afFieldInput:
-        min: 1
-        placeholder: "min"
-  max:
-    type: Number
-    label: () -> i18n.__("abate:volunteers","max_people")
-    optional: true
-    # TODO: if max is not set, it should be equal to min
-    autoform:
-      afFieldInput:
-        placeholder: "max"
   priority:
     type: String
     label: () -> i18n.__("abate:volunteers","priority")
@@ -56,6 +40,26 @@ CommonTask = new SimpleSchema(
     autoform:
       omit: true
 )
+
+CommonTask = new SimpleSchema(
+  min:
+    type: Number
+    label: () -> i18n.__("abate:volunteers","min_people")
+    optional: true
+    autoform:
+      afFieldInput:
+        min: 1
+        placeholder: "min"
+  max:
+    type: Number
+    label: () -> i18n.__("abate:volunteers","max_people")
+    optional: true
+    # TODO: if max is not set, it should be equal to min
+    autoform:
+      afFieldInput:
+        placeholder: "max"
+)
+CommonTask.extend(Common)
 
 share.Schemas.TeamTasks = new SimpleSchema(
   estimatedTime:
@@ -164,3 +168,50 @@ share.Schemas.Lead.extend(
     autoform:
       defaultValue: "requireApproval"
 )
+
+share.Schemas.Projects = new SimpleSchema(
+  start:
+    type: Date
+    label: () -> i18n.__("abate:volunteers","start")
+    autoform:
+      afFieldInput:
+        type: "date"
+        placeholder: () -> i18n.__("abate:volunteers","start")
+  end:
+    type: Date
+    label: () -> i18n.__("end")
+    custom: () ->
+      start = moment(this.field('start').value)
+      # console.log('checking', this.value, start.value, moment(this.value), moment(start.value))
+      if !moment(this.value).isAfter(start)
+        "Fail"# TODO find some way to display message? { type: SimpleSchema.ErrorTypes.MIN_DATE, min: start.format('dd Mo') }
+    autoform:
+      afFieldInput:
+        type: "date"
+        placeholder: () -> i18n.__("end")
+  # startTime:
+  #   type: Date
+  #   label: () => i18n.__('daily_start_time')
+  #   autoform:
+  staffing:
+    type: Array
+    minCount: 1
+    custom: () ->
+      days = moment(this.obj.end)
+      console.log('custom validator', this)
+    # autoform:
+    #   type: 'inlineArray'
+    #   afFieldInput:
+    #     type: 'range'
+  'staffing.$':
+    type: new SimpleSchema(
+      min:
+        type: SimpleSchema.Integer
+      max:
+        type: SimpleSchema.Integer
+    )
+    autoform:
+      afArrayField:
+        type: 'inlineArray'
+)
+share.Schemas.Projects.extend(Common)
