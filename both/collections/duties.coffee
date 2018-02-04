@@ -172,23 +172,14 @@ share.Schemas.Lead.extend(
 share.Schemas.Projects = new SimpleSchema(
   start:
     type: Date
-    label: () -> i18n.__("abate:volunteers","start")
-    autoform:
-      afFieldInput:
-        type: "date"
-        placeholder: () -> i18n.__("abate:volunteers","start")
+    label: () -> i18n.__("abate:volunteers", "start")
   end:
     type: Date
-    label: () -> i18n.__("end")
+    label: () -> i18n.__("abate:volunteers", "end")
     custom: () ->
       start = moment(this.field('start').value)
-      # console.log('checking', this.value, start.value, moment(this.value), moment(start.value))
       if !moment(this.value).isAfter(start)
         "Fail"# TODO find some way to display message? { type: SimpleSchema.ErrorTypes.MIN_DATE, min: start.format('dd Mo') }
-    autoform:
-      afFieldInput:
-        type: "date"
-        placeholder: () -> i18n.__("end")
   # startTime:
   #   type: Date
   #   label: () => i18n.__('daily_start_time')

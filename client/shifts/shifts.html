@@ -31,8 +31,12 @@
         {{#unless $eq duty.policy "adminOnly"}}
           <button class="btn btn-primary" data-shiftid="{{duty._id}}"
             data-parentid="{{duty.parentId}}" data-type="{{duty.type}}" data-action="apply">
-            {{#if $eq duty.policy "public"}}{{__ ".join"}}{{/if}}
-            {{#if $eq duty.policy "requireApproval"}}{{__ ".apply"}}{{/if}}
+            {{#if $eq duty.type "project"}}
+              {{__ ".choose_date"}}
+            {{else}}
+              {{#if $eq duty.policy "public"}}{{__ ".join"}}{{/if}}
+              {{#if $eq duty.policy "requireApproval"}}{{__ ".apply"}}{{/if}}
+            {{/if}}
           </button>
         {{else}}
           {{__ ".admin_only"}}
@@ -169,4 +173,9 @@
 
 <template name="taskBody">
   <p class="card-text">{{duty.description}}</p>
+</template>
+
+<template name="projectSignupForm">
+  <p>{{__ ".project_signup_form"}}</p>
+  {{> insertUpdateTemplate form=form data=signup }}
 </template>

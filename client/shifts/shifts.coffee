@@ -15,7 +15,11 @@ Template.dutiesListItem.events
     selectedUser = $(".select-users[data-shiftId='#{shiftId}']").val()
     userId = if selectedUser && (selectedUser != "-1") then selectedUser else Meteor.userId()
     doc = {parentId: parentId, shiftId: shiftId, userId: userId}
-    share.meteorCall "#{type}Signups.insert", doc
+    if type == 'project'
+      project = share.Projects.findOne(shiftId)
+      AutoFormComponents.ModalShowWithTemplate('projectSignupForm', { signup: doc, project })
+    else
+      share.meteorCall "#{type}Signups.insert", doc
   'click [data-action="bail"]': ( event, template ) ->
     shiftId = $(event.target).data('shiftid')
     type = $(event.target).data('type')
@@ -78,3 +82,17 @@ AutoForm.addHooks ['InsertTeamShiftsFormId','UpdateTeamShiftsFormId'],
   onSuccess: (formType, result) ->
     if this.template.data.var
       this.template.data.var.set({add: false, teamId: result.teamId})
+
+Template.projectSignupForm.bindI18nNamespace('abate:volunteers')
+Template.projectSignupForm.helpers
+  form: () =>
+    label = if Template.currentData().project.policy == 'public' then 'join' else 'apply'
+    return
+      collection: share.ProjectSignups
+      insert: { label: i18n.__("abate:volunteers", label) }
+
+AutoForm.addHooks([
+    'InsertProjectSignupsFormId',
+  ],
+  onSuccess: () => Modal.hide()
+)

@@ -119,19 +119,20 @@ share.initMethods = (eventName) ->
     else if type == "insert"
       Meteor.methods "#{collectionName}.insert": (doc) ->
         console.log ["#{collectionName}.insert", doc]
-        SimpleSchema.validate(doc, schema.omit('status'))
+        signup = _.omit(doc, 'status')
+        SimpleSchema.validate(signup, schema.omit('status'))
         userId = Meteor.userId()
-        parentDoc = parentCollection.findOne(doc.shiftId)
+        parentDoc = parentCollection.findOne(signup.shiftId)
         # XXX In this case only the manager or the lead of the team can add a
         # volunteer to a shift. Can the lead of a Department add a volunteer to
         # of a team of its Department ? .
-        if (doc.userId == userId) || (share.isManagerOrLead(userId,[parentDoc.parentId]))
+        if (signup.userId == userId) || (share.isManagerOrLead(userId,[parentDoc.parentId]))
           status =
             if parentDoc.policy == "public" then "confirmed"
             else if parentDoc.policy == "requireApproval" then "pending"
           if status
             if Meteor.isServer
-              collection.upsert(doc,{$set: {status: status}})
+              collection.upsert(signup,{$set: {status: status}})
         else
           return throwError(403, 'Insufficient Permission');
     else if type == "bail"

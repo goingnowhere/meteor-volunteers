@@ -54,9 +54,18 @@ share.Schemas.VolunteerForm = new SimpleSchema(
 )
 
 commonSignups = new SimpleSchema(
-  parentId: String
-  shiftId: String
-  userId: String
+  parentId:
+    type: String
+    autoform:
+      type: "hidden"
+  shiftId:
+    type: String
+    autoform:
+      type: "hidden"
+  userId:
+    type: String
+    autoform:
+      type: "hidden"
   createdAt:
     type: Date
     optional: true
@@ -69,10 +78,22 @@ commonSignups = new SimpleSchema(
     type: String
     allowedValues: ["confirmed", "pending", "refused", "bailed"]
     autoform:
-      omit: true
+      type: "hidden"
       defaultValue: "pending"
 )
 share.Schemas.ShiftSignups = commonSignups
 share.Schemas.TaskSignups = commonSignups
 share.Schemas.LeadSignups = commonSignups
-share.Schemas.ProjectSignups = commonSignups
+share.Schemas.ProjectSignups = new SimpleSchema(
+  start:
+    type: Date
+    label: () -> i18n.__("abate:volunteers", "start")
+  end:
+    type: Date
+    label: () -> i18n.__("abate:volunteers", "end")
+    custom: () ->
+      start = moment(this.field('start').value)
+      if !moment(this.value).isAfter(start)
+        "Fail"# TODO find some way to display message? { type: SimpleSchema.ErrorTypes.MIN_DATE, min: start.format('dd Mo') }
+)
+share.Schemas.ProjectSignups.extend(commonSignups)
