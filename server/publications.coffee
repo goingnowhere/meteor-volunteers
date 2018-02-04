@@ -45,6 +45,7 @@ share.initPublications = (eventName) ->
 
   createPublicationTeam("ShiftSignups",share.ShiftSignups,share.TeamShifts)
   createPublicationTeam("TaskSignups",share.TaskSignups,share.TeamTasks)
+  createPublicationTeam("ProjectSignups",share.TaskSignups,share.Projects)
   createPublicationTeam("LeadSignups",share.LeadSignups,share.Lead)
 
   # all given a department id, return all teams and all signups related
@@ -84,6 +85,7 @@ share.initPublications = (eventName) ->
 
   createPublicationDept("ShiftSignups",share.ShiftSignups,share.TeamShifts)
   createPublicationDept("TaskSignups",share.TaskSignups,share.TeamTasks)
+  # createPublicationDept("ProjectSignups",share.ProjectSignups,share.Projects)
   createPublicationDept("LeadSignups",share.LeadSignups,share.Lead)
 
   # all given a division id, return all teams and all signups related
@@ -128,6 +130,7 @@ share.initPublications = (eventName) ->
 
   createPublicationDivision("ShiftSignups",share.ShiftSignups,share.TeamShifts)
   createPublicationDivision("TaskSignups",share.TaskSignups,share.TeamTasks)
+  # createPublicationDivision("ProjectSignups",share.ProjectSignups,share.Projects)
   createPublicationDivision("LeadSignups",share.LeadSignups,share.Lead)
 
   # return all divisions, departments and teams signups. restricted to manager
@@ -176,6 +179,7 @@ share.initPublications = (eventName) ->
 
   createPublicationManager("ShiftSignups",share.ShiftSignups,share.TeamShifts)
   createPublicationManager("TaskSignups",share.TaskSignups,share.TeamTasks)
+  # createPublicationManager("ProjectSignups",share.ProjectSignups,share.Projects)
   createPublicationManager("LeadSignups",share.LeadSignups,share.Lead)
 
   # given a user id return all signups, shift and teams related to this user.
@@ -205,6 +209,7 @@ share.initPublications = (eventName) ->
 
   createPublicationUser("ShiftSignups",share.ShiftSignups,share.TeamShifts)
   createPublicationUser("TaskSignups",share.TaskSignups,share.TeamTasks)
+  # createPublicationUser("ProjectSignups",share.ProjectSignups,share.Projects)
   createPublicationUser("LeadSignups",share.LeadSignups,share.Lead)
 
   # given a duty id return the team and all signups related to the current user
@@ -250,6 +255,7 @@ share.initPublications = (eventName) ->
 
   createPublicationDuty("TeamShifts",share.TeamShifts,share.ShiftSignups)
   createPublicationDuty("TeamTasks",share.TeamTasks,share.TaskSignups)
+  createPublicationDuty("Projects",share.Projects,share.TaskSignups)
   createPublicationDuty("Lead",share.Lead,share.LeadSignups)
 
   createPublicationAllDuties = (type,duties) ->
@@ -261,6 +267,7 @@ share.initPublications = (eventName) ->
 
   createPublicationAllDuties("TeamShifts",share.TeamShifts)
   createPublicationAllDuties("TeamTasks",share.TeamTasks)
+  createPublicationAllDuties("Projects",share.Projects)
   createPublicationAllDuties("Lead",share.Lead)
 
   Meteor.publish "#{eventName}.Volunteers.volunteerForm", (userId) ->

@@ -75,6 +75,12 @@ Template.addTask.helpers
   'data': () ->
     parentId: Template.currentData().team?._id
 
+Template.addProject.bindI18nNamespace('abate:volunteers')
+Template.addProject.helpers
+  'form': () -> { collection: share.Projects }
+  'data': () ->
+    parentId: Template.currentData().team?._id
+
 AutoForm.addHooks ['InsertTeamShiftsFormId','UpdateTeamShiftsFormId'],
   onSuccess: (formType, result) ->
     if this.template.data.var

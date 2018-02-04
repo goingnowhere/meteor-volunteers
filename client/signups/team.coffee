@@ -5,6 +5,7 @@ Template.teamShiftsTable.onCreated () ->
   sub = share.templateSub(template,"ShiftSignups.byTeam",teamId)
   sub = share.templateSub(template,"LeadSignups.byTeam",teamId)
   sub = share.templateSub(template,"TaskSignups.byTeam",teamId)
+  sub = share.templateSub(template,"ProjectSignups.byTeam",teamId)
   template.shifts = new ReactiveVar([])
   template.grouping = new ReactiveVar(new Set())
   template.autorun () ->
