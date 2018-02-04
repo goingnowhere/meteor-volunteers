@@ -67,12 +67,13 @@ Template.addShift.helpers
     update: {label: i18n.__("abate:volunteers","update_shift") },
     insert: {label: i18n.__("abate:volunteers","new_shift") }
   }
-  'data': () -> Template.currentData().data
+  'data': () -> parentId: Template.currentData().team?._id
 
 Template.addTask.bindI18nNamespace('abate:volunteers')
 Template.addTask.helpers
   'form': () -> { collection: share.TeamTasks }
-  'data': () -> Template.currentData().data
+  'data': () ->
+    parentId: Template.currentData().team?._id
 
 AutoForm.addHooks ['InsertTeamShiftsFormId','UpdateTeamShiftsFormId'],
   onSuccess: (formType, result) ->
