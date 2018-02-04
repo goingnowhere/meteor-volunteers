@@ -1,6 +1,6 @@
 <!-- main template to display list of duties for a user : shift, tasks, lead -->
 <template name="dutiesListItem">
-  <div class="row justify-content-between align-content-center list_item">
+  <div class="row justify-content-between align-content-center list_item no-gutters">
     {{> shiftDate duty}}
     <div class="col-md-6 d-flex flex-column align-content-center small_pad">
       {{#if $eq duty.type "shift"}}
@@ -127,18 +127,15 @@
 </template>
 
 <template name="shiftTitle">
-  <small>{{fa "calendar"}} </small>
-  <h5 class="mb-1 mr-auto">{{team.name}}: {{duty.title}}</h5>
+  <h5 class="mb-1 mr-auto"><small>{{fa "calendar"}} </small>{{team.name}}: {{duty.title}}</h5>
 </template>
 
 <template name="taskTitle">
-  <small>{fa "tasks"}} </small>
-  <h5 class="mb-1 mr-auto">{{team.name}}: {{duty.title}}</h5>
+  <h5 class="mb-1 mr-auto"><small>{fa "tasks"}} </small>{{team.name}}: {{duty.title}}</h5>
 </template>
 
 <template name="leadTitle">
-  <small>{{fa "user-circle"}}</small>
-  <h5 class="mb-1 mr-auto">{{team.type}} {{__ ".lead"}}: {{team.name}}</h5>
+  <h5 class="mb-1 mr-auto"><small>{{fa "user-circle"}}</small>{{team.type}} {{__ ".lead"}}: {{team.name}}</h5>
 </template>
 
 <template name="leadBody">
