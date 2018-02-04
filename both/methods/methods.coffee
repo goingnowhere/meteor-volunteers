@@ -158,6 +158,7 @@ share.initMethods = (eventName) ->
       # XXX I think here we can do the same using share.dutiesCollections
       createSignupMethod('ShiftSignups', share.TeamShifts, type)
       createSignupMethod('TaskSignups', share.TeamTasks, type)
+      createSignupMethod('ProjectSignups', share.Projects, type)
 
   prefix = "#{eventName}.Volunteers"
   Meteor.methods "#{prefix}.volunteerForm.remove": (formId) ->

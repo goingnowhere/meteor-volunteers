@@ -34,14 +34,17 @@ Template.signupsList.onCreated () ->
     limit = template.searchQuery.get('limit') || 10
     share.templateSub(template,"TeamShifts",limit)
     share.templateSub(template,"TeamTasks",limit)
+    share.templateSub(template,"Projects",limit)
     share.templateSub(template,"Lead",limit)
     share.templateSub(template,"ShiftSignups.byUser", Meteor.userId())
     share.templateSub(template,"TaskSignups.byUser", Meteor.userId())
+    share.templateSub(template,"ProjectSignups.byUser", Meteor.userId())
     share.templateSub(template,"LeadSignups.byUser", Meteor.userId())
 
     if template.subscriptionsReady()
       addLocalDutiesCollection(share.TeamShifts,share.ShiftSignups,template,'shift',filter,limit)
       addLocalDutiesCollection(share.TeamTasks,share.TaskSignups,template,'task',filter,limit)
+      addLocalDutiesCollection(share.Projects,share.ProjectSignups,template,'project',filter,limit)
       addLocalDutiesCollection(share.Lead,share.LeadSignups,template,'lead',filter,limit)
     template.sel.set(filter)
 

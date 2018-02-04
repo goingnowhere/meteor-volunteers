@@ -72,6 +72,11 @@ share.initCollections = (eventName) ->
   # if Meteor.isServer
   #   share.LeadSignups._ensureIndex( { userId: 1, shiftId: 1 }, { unique: 1 } )
 
+  share.ProjectSignups = new Mongo.Collection "#{prefix}Volunteers.projectSignups"
+  share.ProjectSignups.attachSchema(share.Schemas.ProjectSignups)
+  # if Meteor.isServer
+  #   share.LeadSignups._ensureIndex( { userId: 1, shiftId: 1 }, { unique: 1 } )
+
   # shortcut to recover all related collections more easily
   share.orgUnitCollections =
     team: share.Team

@@ -4,6 +4,7 @@ Template.dutiesListItem.onCreated () ->
   template.duty = template.data
   share.templateSub(template,"TeamShifts.byDuty", template.duty._id, Meteor.userId())
   share.templateSub(template,"TeamTasks.byDuty", template.duty._id, Meteor.userId())
+  share.templateSub(template,"Projects.byDuty", template.duty._id, Meteor.userId())
   share.templateSub(template,"Lead.byDuty", template.duty._id, Meteor.userId())
 
 Template.dutiesListItem.events
@@ -14,12 +15,7 @@ Template.dutiesListItem.events
     selectedUser = $(".select-users[data-shiftId='#{shiftId}']").val()
     userId = if selectedUser && (selectedUser != "-1") then selectedUser else Meteor.userId()
     doc = {parentId: parentId, shiftId: shiftId, userId: userId}
-    if type == "shift"
-      share.meteorCall "shiftSignups.insert", doc
-    else if type == "task"
-      share.meteorCall "taskSignups.insert", doc
-    else if type == "lead"
-      share.meteorCall "leadSignups.insert", doc
+    share.meteorCall "#{type}Signups.insert", doc
   'click [data-action="bail"]': ( event, template ) ->
     shiftId = $(event.target).data('shiftid')
     type = $(event.target).data('type')
@@ -27,12 +23,7 @@ Template.dutiesListItem.events
     selectedUser = $("[data-shiftId='#{shiftId}']").val()
     userId = if selectedUser && (selectedUser != "-1") then selectedUser else Meteor.userId()
     doc = {parentId: parentId, shiftId: shiftId, userId: userId}
-    if type == "shift"
-      share.meteorCall "shiftSignups.bail", doc
-    else if type == "task"
-      share.meteorCall "taskSignups.bail", doc
-    else if type == "lead"
-      share.meteorCall "leadSignups.bail", doc
+    share.meteorCall "#{type}Signups.bail", doc
 
 Template.dutiesListItem.helpers
   'duty': () -> Template.instance().duty
@@ -56,6 +47,8 @@ Template.dutiesListItem.helpers
       return share.TaskSignups.findOne({userId: userId, shiftId: duty._id})
     else if duty.type == "lead"
       return share.LeadSignups.findOne({userId: userId, shiftId: duty._id})
+    else if duty.type == "project"
+      return share.ProjectSignups.findOne({userId: userId, shiftId: duty._id})
 
 Template.shiftDate.helpers
   'sameDay': (start, end) -> moment(start).isSame(moment(end),"day")

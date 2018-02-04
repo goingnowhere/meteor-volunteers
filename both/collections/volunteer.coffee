@@ -75,3 +75,4 @@ commonSignups = new SimpleSchema(
 share.Schemas.ShiftSignups = commonSignups
 share.Schemas.TaskSignups = commonSignups
 share.Schemas.LeadSignups = commonSignups
+share.Schemas.ProjectSignups = commonSignups

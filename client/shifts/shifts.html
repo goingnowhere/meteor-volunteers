@@ -9,6 +9,9 @@
       {{#if $eq duty.type "task"}}
         {{>taskTitle duty=duty team=team}}
       {{/if}}
+      {{#if $eq duty.type "project"}}
+        {{>projectTitle duty=duty team=team}}
+      {{/if}}
       {{#if $eq duty.type "lead"}}
         {{>leadTitle duty=duty team=team}}
       {{/if}}
@@ -135,7 +138,11 @@
 </template>
 
 <template name="taskTitle">
-  <h5 class="mb-1 mr-auto"><small>{fa "tasks"}} </small>{{team.name}}: {{duty.title}}</h5>
+  <h5 class="mb-1 mr-auto"><small>{{fa "tasks"}} </small>{{team.name}}: {{duty.title}}</h5>
+</template>
+
+<template name="projectTitle"><!-- TODO find icon -->
+  <h5 class="mb-1 mr-auto"><small>{{fa "tasks"}} </small>{{team.name}}: {{duty.title}}</h5>
 </template>
 
 <template name="leadTitle">
