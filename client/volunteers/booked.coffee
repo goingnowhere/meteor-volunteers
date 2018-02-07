@@ -10,25 +10,33 @@ events =
 Template.bookedTable.bindI18nNamespace('abate:volunteers')
 Template.bookedTable.helpers
   'allShifts': (userId) ->
-    return share.ShiftSignups.find(
+    shiftSignups = share.ShiftSignups.find(
       {userId: Meteor.userId(), status: {$in: ["confirmed","pending"]}})
+      .map((signup) => _.extend({}, signup, {type: 'shift'}))
+    projectSignups = share.ProjectSignups.find(
+      {userId: Meteor.userId(), status: {$in: ["confirmed","pending"]}})
+      .map((signup) => _.extend({}, signup, {type: 'project'}))
+    return shiftSignups.concat(projectSignups)
 
 Template.bookedTable.events events
 
-Template.shiftsUserRowView.bindI18nNamespace('abate:volunteers')
-# this template is called with a shiftSignups
-Template.shiftsUserRowView.onCreated () ->
+Template.signupUserRowView.bindI18nNamespace('abate:volunteers')
+# this template is called with a shift or project signup
+Template.signupUserRowView.onCreated () ->
   template = this
-  template.shiftSignup = template.data
-  share.templateSub(template,"ShiftSignups.byUser", template.shiftSignup.userId)
+  template.signup = template.data.signup
 
-Template.shiftsUserRowView.helpers
-  'team': () -> share.Team.findOne(Template.instance().shiftSignup.parentId)
-  'shift': () -> share.TeamShifts.findOne(Template.instance().shiftSignup.shiftId)
-  'signup': () -> share.ShiftSignups.findOne(Template.instance().shiftSignup._id)
-  'sameDay': (start, end) -> moment(start).isSame(moment(end),"day")
+Template.signupUserRowView.helpers
+  team: () -> share.Team.findOne(Template.instance().signup.parentId)
+  duty: () ->
+    type = Template.instance().signup.type
+    shiftId = Template.instance().signup.shiftId
+    if type == "shift"
+      share.TeamShifts.findOne(shiftId)
+    else if type == "project"
+      share.Projects.findOne(shiftId)
 
-Template.shiftsUserRowView.events events
+Template.signupUserRowView.events events
 
 Template.tasksUserRowView.bindI18nNamespace('abate:volunteers')
 # this template is called with a taskSignups

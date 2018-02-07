@@ -10,7 +10,7 @@
       <div class="container-fluid small-pad">
         {{#each shift in allShifts }}
         <div class="flex-column zebra-line small-pad">
-          {{> shiftsUserRowView shift}}
+          {{> signupUserRowView signup=shift}}
         </div>
         {{/each}}
       </div>
@@ -18,15 +18,19 @@
   </div>
 </template>
 
-<template name="shiftsUserRowView">
+<template name="signupUserRowView">
   <div class="row justify-content-between align-content-center list_item no-gutters">
     <div class="col-md-1 d-flex flex-column align-content-center small-pad justify-content-center">
       {{#if $eq signup.status "confirmed"}}<div class="text-success">{{fa "check"}}</div>{{/if}}
       {{#if $eq signup.status "pending"}}<div class="text-warning">{{fa "clock-o"}}</div>{{/if}}
     </div>
-    {{> shiftDate shift }}
+    {{#if $eq signup.type "project"}}
+      {{> shiftDate signup }}
+    {{else}}
+      {{> shiftDate duty }}
+    {{/if}}
     <div class="col-md-5 d-flex flex-column align-content-center small-pad justify-content-center">
-      {{team.name}} {{shift.title}}
+      {{team.name}} {{duty.title}}
       {{team.location}}
     </div>
     <div class="col-md-2 d-flex flex-column align-content-center small-pad justify-content-center">
