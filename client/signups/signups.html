@@ -20,6 +20,10 @@
               {{fa "tasks"}}
               {{> taskDate signup.duty}}
             {{/if}}
+            {{#if $eq signup.type "project"}}
+              {{fa "calendar"}}
+              {{> shiftDate signup}}
+            {{/if}}
           </td>
           <td>
             {{ signup.duty.title }}

@@ -6,6 +6,7 @@ Template.teamSignupsList.onCreated(function () {
   template.teamId = this.data._id;
   share.templateSub(template,"ShiftSignups.byTeam",template.teamId);
   share.templateSub(template,"TaskSignups.byTeam",template.teamId);
+  share.templateSub(template,"ProjectSignups.byTeam",template.teamId);
 });
 
 Template.teamSignupsList.helpers({
@@ -23,9 +24,16 @@ Template.teamSignupsList.helpers({
         type: 'task',
         duty: share.TeamTasks.findOne(signup.shiftId)
       }))
+    const projects = share.ProjectSignups.find({ parentId: teamId, status: 'pending' }, {sort: {createdAt: -1}})
+      .map(signup => ({
+        ...signup,
+        type: 'project',
+        duty: share.Projects.findOne(signup.shiftId)
+      }))
     return [
       ...shifts,
       ...tasks,
+      ...projects,
     ].sort((a, b) => a.createdAt && b.createdAt && a.createdAt.getTime() - b.createdAt.getTime())
   }
 })
