@@ -180,29 +180,11 @@ share.Schemas.Projects = new SimpleSchema(
       start = moment(this.field('start').value)
       if !moment(this.value).isAfter(start)
         "Fail"# TODO find some way to display message? { type: SimpleSchema.ErrorTypes.MIN_DATE, min: start.format('dd Mo') }
-  # startTime:
-  #   type: Date
-  #   label: () => i18n.__('daily_start_time')
-  #   autoform:
   staffing:
     type: Array
     minCount: 1
-    custom: () ->
-      days = moment(this.obj.end)
-      console.log('custom validator', this)
-    # autoform:
-    #   type: 'inlineArray'
-    #   afFieldInput:
-    #     type: 'range'
-  'staffing.$':
-    type: new SimpleSchema(
-      min:
-        type: SimpleSchema.Integer
-      max:
-        type: SimpleSchema.Integer
-    )
-    autoform:
-      afArrayField:
-        type: 'inlineArray'
+  'staffing.$': Object
+  'staffing.$.min': SimpleSchema.Integer
+  'staffing.$.max': SimpleSchema.Integer
 )
 share.Schemas.Projects.extend(Common)
