@@ -57,6 +57,9 @@ Template.dutiesListItem.helpers
 Template.shiftDate.helpers
   'sameDay': (start, end) -> moment(start).isSame(moment(end),"day")
 
+Template.projectDate.helpers
+  dates: () => [Template.instance().data.start, Template.instance().data.end]
+
 Template.addShift.bindI18nNamespace('abate:volunteers')
 Template.addShift.helpers
   'form': () -> {

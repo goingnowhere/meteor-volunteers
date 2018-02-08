@@ -1,7 +1,11 @@
 <!-- main template to display list of duties for a user : shift, tasks, lead -->
 <template name="dutiesListItem">
   <div class="row justify-content-between align-content-center list_item no-gutters">
-    {{> shiftDate duty}}
+    {{#if $eq signup.type "project"}}
+      {{> projectDate duty }}
+    {{else}}
+      {{> shiftDate duty }}
+    {{/if}}
     <div class="col-md-6 d-flex flex-column align-content-center small_pad">
       {{#if $eq duty.type "shift"}}
         {{> shiftTitle duty=duty team=team}}
@@ -131,6 +135,15 @@
   {{/if}}
 </template>
 
+<template name="projectDate">
+  {{#each date in dates}}
+    <div class="col-md-2 align-content-center small_pad">
+      <h6 class="mb-0">{{formatMoment date 'ddd Do' }}</h6>
+      <h6>{{formatMoment date 'MMM' }}</h6>
+    </div>
+  {{/each}}
+</template>
+
 <!-- helper display to format the date of a task. used in dutiesListItem and ... -->
 <template name="taskDate">
   <!-- <div class="row">{{> taskDate duty}}</div> -->
@@ -145,8 +158,8 @@
   <h5 class="mb-1 mr-auto"><small>{{fa "tasks"}} </small>{{team.name}}: {{duty.title}}</h5>
 </template>
 
-<template name="projectTitle"><!-- TODO find icon -->
-  <h5 class="mb-1 mr-auto"><small>{{fa "tasks"}} </small>{{team.name}}: {{duty.title}}</h5>
+<template name="projectTitle">
+  <h5 class="mb-1 mr-auto"><small>{{fa "calendar-o"}} </small>{{team.name}}: {{duty.title}}</h5>
 </template>
 
 <template name="leadTitle">
