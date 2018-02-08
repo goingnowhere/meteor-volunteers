@@ -56,16 +56,13 @@ share.Schemas.VolunteerForm = new SimpleSchema(
 commonSignups = new SimpleSchema(
   parentId:
     type: String
-    autoform:
-      type: "hidden"
+    autoform: "hidden"
   shiftId:
     type: String
-    autoform:
-      type: "hidden"
+    autoform: "hidden"
   userId:
     type: String
-    autoform:
-      type: "hidden"
+    autoform: "hidden"
   createdAt:
     type: Date
     optional: true
@@ -94,6 +91,6 @@ share.Schemas.ProjectSignups = new SimpleSchema(
     custom: () ->
       start = moment(this.field('start').value)
       if !moment(this.value).isAfter(start)
-        "Fail"# TODO find some way to display message? { type: SimpleSchema.ErrorTypes.MIN_DATE, min: start.format('dd Mo') }
+        return "minDateCustom"
 )
 share.Schemas.ProjectSignups.extend(commonSignups)

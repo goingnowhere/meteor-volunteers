@@ -6,6 +6,11 @@ SimpleSchema.extendOptions(['autoform'])
 policyValues = ["public", "adminOnly", "requireApproval"]
 taskPriority = [ "essential", "important", "normal"]
 
+SimpleSchema.setDefaultMessages
+  messages:
+    en:
+      "minDateCustom": "Too long!",
+
 share.Schemas = {}
 
 Common = new SimpleSchema(
@@ -179,7 +184,7 @@ share.Schemas.Projects = new SimpleSchema(
     custom: () ->
       start = moment(this.field('start').value)
       if !moment(this.value).isAfter(start)
-        "Fail"# TODO find some way to display message? { type: SimpleSchema.ErrorTypes.MIN_DATE, min: start.format('dd Mo') }
+        return "minDateCustom"
   staffing:
     type: Array
     minCount: 1
