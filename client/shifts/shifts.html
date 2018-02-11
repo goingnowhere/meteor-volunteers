@@ -27,11 +27,11 @@
           {{__ signup.status }}
         </button>
       {{else}}
-        {{#if $eq signup.status 'bailed'}}
+        <!-- {{#if $eq signup.status 'bailed'}}
           <button class="btn btn-default disabled">
             {{__ signup.status }}
           </button>
-        {{/if}}
+        {{/if}} -->
         {{#unless $eq duty.policy "adminOnly"}}
           <button class="btn btn-primary btn-action" data-shiftid="{{duty._id}}"
             data-parentid="{{duty.parentId}}" data-type="{{duty.type}}" data-action="apply">

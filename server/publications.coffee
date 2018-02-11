@@ -3,10 +3,10 @@ share.initPublications = (eventName) ->
   dutiesPublicPolicy = { policy: { $in: ["public", "requireApproval"] } }
   unitPublicPolicy = { policy: { $in: ["public"] } }
 
-  filterForPublic = (userId, sel) =>
+  filterForPublic = (userId, sel) ->
     unless share.isManager() #Roles.userIsInRole(userId, 'manager', eventName)
-      # getRolesForUser includes all roles, e.g. if user is lead of a department,
-      # returns the department and all teams within it
+      #getRolesForUser includes all roles, e.g. if user is lead of a department,
+      #returns the department and all teams within it
       allOrgUnitIds = Roles.getRolesForUser(Meteor.userId(), eventName)
       sel = _.extend(sel,dutiesPublicPolicy)
       if allOrgUnitIds.length > 0
@@ -260,9 +260,10 @@ share.initPublications = (eventName) ->
 
   createPublicationAllDuties = (type,duties) ->
     Meteor.publish "#{eventName}.Volunteers.#{type}", (sel={},limit=10) ->
-      sel = dutiesPublicPolicy
+      sel = _.extend(sel,dutiesPublicPolicy)
       if this.userId
         sel = filterForPublic(this.userId, sel)
+      # console.log(JSON.stringify(sel, null, 4))
       return duties.find(sel,{limit: limit})
 
   createPublicationAllDuties("TeamShifts",share.TeamShifts)
