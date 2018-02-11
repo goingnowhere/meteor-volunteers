@@ -38,8 +38,10 @@ class VolunteersClass
       Department: share.Department
       TeamShifts: share.TeamShifts
       TeamTasks: share.TeamTasks
+      Projects: share.Projects
       Lead: share.Lead
       ShiftSignups: share.ShiftSignups
+      ProjectSignups: share.ProjectSignups
       TaskSignups: share.TaskSignups
       LeadSignups: share.LeadSignups
   setPeriods: (periods) -> share.periods.set(periods)
