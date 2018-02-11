@@ -130,14 +130,22 @@
     <div class="col-md-2"><h5>{{formatDate start}}</h5></div>
     <div class="col-md-2"><h6>{{formatTime start}} <br> {{formatTime end}}</h6></div>
   {{else}}
-    <div class="col-md-2">{{formatDateTime start}}</div>
-    <div class="col-md-2">{{formatTime end}} {{differenceTime start end}}</div>
+    <div class="col-md-2 align-content-center"><h5>{{formatDateTime start}}</h5></div>
+    <div class="col-md-2 align-content-center"><h6>{{formatTime end}} {{differenceTime start end}}</h6></div>
+  {{/if}}
+</template>
+
+<template name="shiftDateInline">
+  {{#if sameDay start end}}
+    <h6>{{formatDateTime start}} - {{formatTime end}}</h6>
+  {{else}}
+    <h6>{{formatDateTime start}} - {{formatTime end}} {{differenceTime start end}}</h6>
   {{/if}}
 </template>
 
 <template name="projectDate">
   {{#each date in dates}}
-    <div class="col-md-2 align-content-center small_pad">
+    <div class="col-md-2 align-content-center">
       <h6 class="mb-0">{{formatMoment date 'ddd Do' }}</h6>
       <h6>{{formatMoment date 'MMM' }}</h6>
     </div>

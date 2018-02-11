@@ -54,8 +54,12 @@ Template.dutiesListItem.helpers
     else if duty.type == "project"
       return share.ProjectSignups.findOne({userId: userId, shiftId: duty._id})
 
-Template.shiftDate.helpers
+sameDayHelper = {
   'sameDay': (start, end) -> moment(start).isSame(moment(end),"day")
+}
+
+Template.shiftDate.helpers sameDayHelper
+Template.shiftDateInline.helpers sameDayHelper
 
 Template.projectDate.helpers
   dates: () => [Template.instance().data.start, Template.instance().data.end]
