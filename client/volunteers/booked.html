@@ -1,15 +1,15 @@
 <!-- All Shifts, Leads and tasks booked by a user -->
 <template name="bookedTable">
-  <div class="container-fluid">
+  <div class="container-fluid p-0">
     <div class="row">
       <div class="col-md-4">{{__ ".time"}}</div>
       <div class="col-md-4">{{__ ".name"}}</div>
       <div class="col-md-4">{{__ ".location"}}</div>
     </div>
     <div class="row">
-      <div class="container-fluid small-pad">
+      <div class="container-fluid p-0">
         {{#each shift in allShifts }}
-        <div class="flex-column zebra-line small-pad">
+        <div class="flex-column zebra-line no-gutters">
           {{> signupUserRowView signup=shift}}
         </div>
         {{/each}}
@@ -19,8 +19,8 @@
 </template>
 
 <template name="signupUserRowView">
-  <div class="row justify-content-between align-content-center list_item no-gutters">
-    <div class="col-md-1 d-flex flex-column align-content-center small-pad justify-content-center">
+  <div class="row justify-content-between align-content-center list-item no-gutters">
+    <div class="col-md-1 p-0">
       {{#if $eq signup.status "confirmed"}}<div class="text-success">{{fa "check"}}</div>{{/if}}
       {{#if $eq signup.status "pending"}}<div class="text-warning">{{fa "clock-o"}}</div>{{/if}}
     </div>
@@ -29,17 +29,15 @@
     {{else}}
       {{> shiftDate duty }}
     {{/if}}
-    <div class="col-md-5 d-flex flex-column align-content-center small-pad justify-content-center">
-      {{team.name}} {{duty.title}}
+    <div class="col-md-5 d-flex p-0 align-items-start">
+      <h5>{{team.name}} : {{shift.title}}</h5>
       {{team.location}}
     </div>
-    <div class="col-md-2 d-flex flex-column align-content-center small-pad justify-content-center">
-      <div class="btn-group pull-right">
-        <button type="button" class="btn btn-default btn-circle" data-action="bail"
-          data-shiftId="{{signup.shiftId}}" data-parentId="{{signup.parentId}}">
-          {{fa "pencil-square-o"}} {{__ ".bail"}}
-        </button>
-      </div>
+    <div class="col-md-2 p-0">
+      <button type="button" class="btn btn-primary" data-action="bail"
+        data-shiftId="{{signup.shiftId}}" data-parentId="{{signup.parentId}}">
+        {{fa "pencil-square-o"}} {{__ ".bail"}}
+      </button>
     </div>
   </div>
 </template>

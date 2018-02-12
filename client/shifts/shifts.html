@@ -1,12 +1,12 @@
-<!-- main template to display list of duties for a user : shift, tasks, lead -->
+<!-- main template to display list-items of duties for a user : shift, tasks, lead -->
 <template name="dutiesListItem">
-  <div class="row justify-content-between align-content-center list_item no-gutters">
+  <div class="row justify-content-between align-content-center list-item no-gutters">
     {{#if $eq signup.type "project"}}
       {{> projectDate duty }}
     {{else}}
       {{> shiftDate duty }}
     {{/if}}
-    <div class="col-md-6 d-flex flex-column align-content-center small_pad">
+    <div class="col-md-6 p-0">
       {{#if $eq duty.type "shift"}}
         {{> shiftTitle duty=duty team=team}}
       {{/if}}
@@ -20,7 +20,7 @@
         {{>leadTitle duty=duty team=team}}
       {{/if}}
     </div>
-    <div class="col-md-2 d-flex align-content-center small_pad">
+    <div class="col-md-2 p-0">
       {{#if $and signup.status ($neq signup.status 'bailed')}}
         <button class="btn btn-default disabled
           {{#if $eq signup.status 'confirmed'}}btn-success{{/if}}">
@@ -65,7 +65,7 @@
         {{>leadBody duty=duty team=team}}
       {{/if}}
     </div>
-    <div class="row">
+    <div class="row no-gutters">
     {{#if team.quirks}}
       <ul class="list-inline">
         {{#each quirk in team.quirks}}
@@ -127,11 +127,11 @@
 <!-- helper display to format the date of a shift. used in dutiesListItem and ... -->
 <template name="shiftDate">
   {{#if sameDay start end}}
-    <div class="col-md-2 align-content-center small_pad"><h5>{{formatDate start}}</h5></div>
-    <div class="col-md-2 align-content-center small_pad"><h6>{{formatTime start}} <br> {{formatTime end}}</h6></div>
+    <div class="col-md-2 p-0"><h5>{{formatDate start}}</h5></div>
+    <div class="col-md-2 p-0"><h6>{{formatTime start}} <br> {{formatTime end}}</h6></div>
   {{else}}
-    <div class="col-md-2 align-content-center small_pad">{{formatDateTime start}}</div>
-    <div class="col-md-2 align-content-center small_pad">{{formatTime end}} {{differenceTime start end}}</div>
+    <div class="col-md-2 p-0">{{formatDateTime start}}</div>
+    <div class="col-md-2 p-0">{{formatTime end}} {{differenceTime start end}}</div>
   {{/if}}
 </template>
 
@@ -163,18 +163,18 @@
 </template>
 
 <template name="leadTitle">
-  <h5 class="mb-1 mr-auto"><small>{{fa "user-circle"}}</small>{{team.type}} {{__ ".lead"}}: {{team.name}}</h5>
+  <h5 class="mb-1 mr-auto"><small>{{fa "user-circle"}}</small> {{team.type}} {{__ ".lead"}}: {{team.name}}</h5>
 </template>
 
 <template name="leadBody">
-  <div class="row">
+  <div class="row no-gutters">
     <p class="card-text">{{duty.description}}</p>
   </div>
-  <div class="row">
+  <div class="row no-gutters">
     <h5 class="mb-2 text-muted">{{__ ".responsabilities"}}</h5>
     <p class="card-text"> {{duty.responsabilities}}</p>
   </div>
-  <div class="row">
+  <div class="row no-gutters">
     <h5 class="mb-2 text-muted">{{__ ".qualificatons"}}</h5>
     <p class="card-text">{{duty.qualificatons}}</p>
   </div>
