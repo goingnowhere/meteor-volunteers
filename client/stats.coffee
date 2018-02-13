@@ -1,18 +1,20 @@
-getDuty = (sel, duty, signup) ->
+getDuty = (sel, type, duty, signup) ->
   sort = {sort: {start: 1, priority: 1}}
   duty.find(sel).map((v) ->
     confirmed = signup.find({status: "confirmed", shiftId: v._id},sort).count()
     _.extend(v,
+      type: type
       duration: moment.duration(v.end - v.start).humanize()
       confirmed: confirmed
       needed: v.min - confirmed)
     return v
-    )
+  )
 
 # return a shift/task/lead document together with updated signups information
-share.getShifts = (sel) -> getDuty(sel,share.TeamShifts,share.ShiftSignups)
-share.getTasks = (sel) -> getDuty(sel,share.TeamTasks,share.TaskSignups)
-share.getLeads = (sel) -> getDuty(sel,share.Lead,share.LeadSignups)
+share.getShifts = (sel) -> getDuty(sel,"shift",share.TeamShifts,share.ShiftSignups)
+share.getProjects = (sel) -> getDuty(sel,"project",share.Projects,share.ProjectSignups)
+share.getTasks = (sel) -> getDuty(sel,"task",share.TeamTasks,share.TaskSignups)
+share.getLeads = (sel) -> getDuty(sel,"lead",share.Lead,share.LeadSignups)
 
 rate = (l) ->
   _.reduce(l,(

@@ -2,14 +2,14 @@ Template.teamShiftsTable.bindI18nNamespace('abate:volunteers')
 Template.teamShiftsTable.onCreated () ->
   template = this
   teamId = template.data._id
-  sub = share.templateSub(template,"ShiftSignups.byTeam",teamId)
-  sub = share.templateSub(template,"LeadSignups.byTeam",teamId)
-  sub = share.templateSub(template,"TaskSignups.byTeam",teamId)
-  sub = share.templateSub(template,"ProjectSignups.byTeam",teamId)
+  share.templateSub(template,"ShiftSignups.byTeam",teamId)
+  share.templateSub(template,"LeadSignups.byTeam",teamId)
+  share.templateSub(template,"TaskSignups.byTeam",teamId)
+  share.templateSub(template,"ProjectSignups.byTeam",teamId)
   template.shifts = new ReactiveVar([])
   template.grouping = new ReactiveVar(new Set())
   template.autorun () ->
-    if sub.ready()
+    if template.subscriptionsReady()
       sel = {parentId: teamId}
       date = Template.currentData().date
       if date
@@ -42,53 +42,65 @@ Template.teamShiftsTable.helpers
 
 Template.teamShiftsTable.events
   'click [data-action="edit"]': (event,template) ->
-    id = $(event.target).data('id')
-    shift = share.TeamShifts.findOne(id)
+    id = $(event.currentTarget).data('id')
+    type = $(event.currentTarget).data('type')
+    collection = share.dutiesCollections[type]
+    shift = collection.findOne(id)
     AutoFormComponents.ModalShowWithTemplate("insertUpdateTemplate",
-      {form:{collection: share.TeamShifts}, data: shift})
+      {form:{collection}, data: shift})
   'click [data-action="delete"]': (event,template) ->
-    id = $(event.target).data('id')
-    share.meteorCall "teamShifts.remove", id
+    id = $(event.currentTarget).data('id')
+    type = $(event.currentTarget).data('type')
+    collection = share.dutiesCollections[type]
+    share.meteorCall "#{collection._name}.remove", id
   'click [data-action="clone"]': (event,template) ->
-    id = $(event.target).data('id')
-    shift = share.TeamShifts.findOne(id)
+    id = $(event.currentTarget).data('id')
+    type = $(event.currentTarget).data('type')
+    collection = share.dutiesCollections[type]
+    shift = collection.findOne(id)
     delete shift._id
     AutoFormComponents.ModalShowWithTemplate("insertUpdateTemplate",
-      {form:{collection: share.TeamShifts}, data: shift})
+      {form:{collection}, data: shift})
   'click tr.shift': (event,template) ->
-    g = template.grouping.get()
-    if g.size > 0
-      tr = $(event.target).parent()
-      id = tr.data('id')
+    grouping = template.grouping.get()
+    if grouping.size > 0
+      tr = $(event.currentTarget)
+      entry =
+        id: tr.data('id')
+        type: tr.data('type')
       # this "if" is needed because the action "group" triggers also this event
       # and I don't understand how to prenvent the propagation without killing
       # the dropdown
-      if id
+      if entry
         if tr.hasClass('bg-info')
-          g = g.delete(id)
+          grouping = grouping.delete(entry)
           tr.removeClass('bg-info')
         else
-          g = g.add(id)
+          grouping = grouping.add(entry)
           tr.addClass('bg-info')
-        template.grouping.set(g)
+        template.grouping.set(grouping)
   'click [data-action="group"]': (event,template) ->
     # event.stopPropagation()
     # event.preventDefault()
     g = template.grouping.get()
-    id = $(event.target).data('id')
-    $("tr.shift[data-id='#{id}']").addClass('bg-info')
-    template.grouping.set((new Set()).add(id))
+    id = $(event.currentTarget).data('id')
+    type = $(event.currentTarget).data('type')
+    # $("tr.shift[data-id='#{id}']").addClass('bg-info')
+    template.grouping.set((new Set()).add({id, type}))
   'click [data-action="groupDone"]': (event,template) ->
     $("tr.shift").removeClass('bg-info')
     groupId = Random.id()
-    template.grouping.get().forEach (id) ->
+    template.grouping.get().forEach ({id, type}) ->
       doc = {_id: id, modifier: {$set: {groupId: groupId}}}
-      share.meteorCall "teamShifts.update", doc
+      collection = share.dutiesCollections[type]
+      share.meteorCall "#{collection._name}.update", doc
     template.grouping.set(new Set())
   'click [data-action="removeFromGroup"]': (event,template) ->
-    id = $(event.target).data('id')
+    id = $(event.currentTarget).data('id')
+    type = $(event.currentTarget).data('type')
+    collection = share.dutiesCollections[type]
     doc = {_id: id, modifier: {$unset: {groupId: ""}}}
-    share.meteorCall "teamShifts.update", doc
+    share.meteorCall "#{collection._name}.update", doc
 
 Template.teamDayViewGrid.bindI18nNamespace('abate:volunteers');
 Template.teamDayViewGrid.onCreated () ->
