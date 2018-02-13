@@ -105,6 +105,35 @@
   {{> insertUpdateTemplate form=form data=data }}
 </template>
 
+<Template name="projectStaffingInput">
+  {{! Wrapper div with this.atts needed to wire it into autoform}}
+  <div {{this.atts}}>
+    {{#if datesSet}}
+      <div class="row">
+        <div class="col-md-4 offset-md-4">
+          {{__ ".min_people"}}
+        </div>
+        <div class="col-md-4">
+          {{__ ".max_people"}}
+        </div>
+      </div>
+      {{#each staffingValue in staffingArray}}
+        <div class="row" data-index="{{@index}}">
+          <div class="col-md-4">
+            {{day @index}}
+          </div>
+          <div class="col-md-4">
+            <input data-field="min" type="number" name="{{this.atts.name}}.{{@index}}.min" value="{{staffingValue.[min]}}" class="form-control" />
+          </div>
+          <div class="col-md-4">
+            <input data-field="max" type="number" name="{{this.atts.name}}.{{@index}}.max" value="{{staffingValue.[max]}}" class="form-control" />
+          </div>
+        </div>
+      {{/each}}
+    {{/if}}
+  </div>
+</Template>
+
 <template name="shiftsTasksTableRowView">
   <div>
     <a href="{{pathFor teamViewEventName _id=teamId}}">{{teamName}}</a>:

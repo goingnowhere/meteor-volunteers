@@ -90,6 +90,36 @@ AutoForm.addHooks ['InsertTeamShiftsFormId','UpdateTeamShiftsFormId'],
     if this.template.data.var
       this.template.data.var.set({add: false, teamId: result.teamId})
 
+Template.projectStaffingInput.bindI18nNamespace('abate:volunteers')
+Template.projectStaffingInput.helpers
+  day: (index) =>
+    start = AutoForm.getFieldValue('start')
+    return moment(start).add(index, 'days').format('MMM Do')
+  datesSet: () =>
+    start = AutoForm.getFieldValue('start')
+    end = AutoForm.getFieldValue('end')
+    return start? && end? && moment(start).isBefore(end)
+  staffingArray: () =>
+    start = AutoForm.getFieldValue('start')
+    end = AutoForm.getFieldValue('end')
+    if start? && end?
+      staffing = AutoForm.getFieldValue('staffing') || []
+      days = moment(end).diff(moment(start), 'days') + 1
+      if days > staffing.length
+        return staffing.concat(Array(days - staffing.length).fill({}))
+      else
+        return staffing.slice(0, days)
+AutoForm.addInputType("projectStaffing",
+  template: 'projectStaffingInput'
+  valueOut: () ->
+    values = this.find('[data-index]')
+      .map((_, col) =>
+        min: $(col).find('[data-field="min"]').val()
+        max: $(col).find('[data-field="max"]').val()
+      ).get()
+    return values
+)
+
 Template.projectSignupForm.bindI18nNamespace('abate:volunteers')
 Template.projectSignupForm.helpers
   form: () =>

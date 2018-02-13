@@ -9,7 +9,8 @@ taskPriority = [ "essential", "important", "normal"]
 SimpleSchema.setDefaultMessages
   messages:
     en:
-      "minDateCustom": "Too long!",
+      "startBeforeEndCustom": "Start Date can't be after End Date"
+      "numberOfDaysCustom": "Set for every day"
 
 share.Schemas = {}
 
@@ -183,11 +184,17 @@ share.Schemas.Projects = new SimpleSchema(
     label: () -> i18n.__("abate:volunteers", "end")
     custom: () ->
       start = moment(this.field('start').value)
-      if !moment(this.value).isAfter(start)
-        return "minDateCustom"
+      unless moment(this.value).isAfter(start)
+        return "startBeforeEndCustom"
   staffing:
     type: Array
     minCount: 1
+    autoform:
+      type: 'projectStaffing'
+    custom: () ->
+      days = moment(this.field('end').value).diff(moment(this.field('start').value), 'days') + 1
+      unless this.value.length == days
+        return "numberOfDaysCustom"
   'staffing.$': Object
   'staffing.$.min': SimpleSchema.Integer
   'staffing.$.max': SimpleSchema.Integer

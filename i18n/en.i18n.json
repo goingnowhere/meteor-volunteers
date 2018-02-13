@@ -48,6 +48,9 @@
   "policy": "Policy",
   "new_shift": "New Shift",
   "update_shift": "Update Shift",
+  "new_project": "New Project",
+  "update_project": "Update Project",
   "project_signup_form": "Select dates to volunteer",
-  "choose_date": "Choose dates"
+  "choose_date": "Choose dates",
+  "estimated_time": "approx."
 }
