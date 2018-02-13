@@ -1,6 +1,6 @@
 <!--  main shifts signup -->
 <template name="signupsList">
-  <div class="container-fluid p-0">
+  <div class="container-fluid p-0 signupsList">
     {{#unless isCustumSearch }}
       <div class="row">
         <form class="mx-2 my-auto d-inline w-100">
@@ -18,9 +18,9 @@
       </div>
     {{/unless}}
     <div class="row">
-      <div class="container-fluid p-0">
+      <div class="container-fluid">
         {{#each duty in allDuties}}
-          <div class="flex-column zebra-line-2 no-gutters">
+          <div class="flex-column signupsListItem">
             {{> dutiesListItem duty }}
           </div>
         {{/each}}

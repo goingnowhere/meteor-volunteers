@@ -1,15 +1,17 @@
 <!-- All Shifts, Leads and tasks booked by a user -->
 <template name="bookedTable">
-  <div class="container-fluid p-0">
+  <div class="container-fluid p-0 bookedTable">
     <div class="row">
-      <div class="col-md-4">{{__ ".time"}}</div>
-      <div class="col-md-4">{{__ ".name"}}</div>
-      <div class="col-md-4">{{__ ".location"}}</div>
+      <div class="col-md-1"></div>
+      <div class="col-md-3">{{__ ".time"}}</div>
+      <div class="col-md-3">{{__ ".name"}}</div>
+      <div class="col-md-3">{{__ ".location"}}</div>
+      <div class="col-md-1"></div>
     </div>
     <div class="row">
-      <div class="container-fluid p-0">
+      <div class="container-fluid">
         {{#each shift in allShifts }}
-        <div class="flex-column zebra-line no-gutters">
+        <div class="flex-column bookedTableItem">
           {{> signupUserRowView signup=shift}}
         </div>
         {{/each}}
@@ -19,7 +21,7 @@
 </template>
 
 <template name="signupUserRowView">
-  <div class="row justify-content-between align-content-center list-item no-gutters">
+  <div class="row justify-content-between align-content-center no-gutters">
     <div class="col-md-1 p-0">
       {{#if $eq signup.status "confirmed"}}<div class="text-success">{{fa "check"}}</div>{{/if}}
       {{#if $eq signup.status "pending"}}<div class="text-warning">{{fa "clock-o"}}</div>{{/if}}
@@ -34,9 +36,9 @@
       {{team.location}}
     </div>
     <div class="col-md-2 p-0">
-      <button type="button" class="btn btn-primary" data-action="bail"
+      <button type="button" class="btn btn-primary btn-action" data-action="bail"
         data-shiftId="{{signup.shiftId}}" data-parentId="{{signup.parentId}}">
-        {{fa "pencil-square-o"}} {{__ ".bail"}}
+        {{__ ".bail"}}
       </button>
     </div>
   </div>

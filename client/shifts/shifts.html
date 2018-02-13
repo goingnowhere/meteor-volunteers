@@ -1,12 +1,12 @@
 <!-- main template to display list-items of duties for a user : shift, tasks, lead -->
 <template name="dutiesListItem">
-  <div class="row justify-content-between align-content-center list-item no-gutters">
+  <div class="row justify-content-between align-content-center no-gutters">
     {{#if $eq signup.type "project"}}
       {{> projectDate duty }}
     {{else}}
       {{> shiftDate duty }}
     {{/if}}
-    <div class="col-md-6 p-0">
+    <div class="col-md-6">
       {{#if $eq duty.type "shift"}}
         {{> shiftTitle duty=duty team=team}}
       {{/if}}
@@ -22,7 +22,7 @@
     </div>
     <div class="col-md-2 p-0">
       {{#if $and signup.status ($neq signup.status 'bailed')}}
-        <button class="btn btn-default disabled
+        <button class="btn btn-default btn-action disabled
           {{#if $eq signup.status 'confirmed'}}btn-success{{/if}}">
           {{__ signup.status }}
         </button>
@@ -33,7 +33,7 @@
           </button>
         {{/if}}
         {{#unless $eq duty.policy "adminOnly"}}
-          <button class="btn btn-primary" data-shiftid="{{duty._id}}"
+          <button class="btn btn-primary btn-action" data-shiftid="{{duty._id}}"
             data-parentid="{{duty.parentId}}" data-type="{{duty.type}}" data-action="apply">
             {{#if $eq duty.type "project"}}
               {{__ ".choose_date"}}
@@ -47,7 +47,7 @@
         {{/unless}}
       {{/if}}
       {{#if canBail}}
-        <button class="btn btn-danger" data-shiftid="{{duty._id}}"
+        <button class="btn btn-danger btn-action" data-shiftid="{{duty._id}}"
           data-parentid="{{duty.parentId}}}" data-type="{{duty.type}}" data-action="bail">
           {{__ "bail"}}
         </button>
@@ -127,11 +127,11 @@
 <!-- helper display to format the date of a shift. used in dutiesListItem and ... -->
 <template name="shiftDate">
   {{#if sameDay start end}}
-    <div class="col-md-2 p-0"><h5>{{formatDate start}}</h5></div>
-    <div class="col-md-2 p-0"><h6>{{formatTime start}} <br> {{formatTime end}}</h6></div>
+    <div class="col-md-2"><h5>{{formatDate start}}</h5></div>
+    <div class="col-md-2"><h6>{{formatTime start}} <br> {{formatTime end}}</h6></div>
   {{else}}
-    <div class="col-md-2 p-0">{{formatDateTime start}}</div>
-    <div class="col-md-2 p-0">{{formatTime end}} {{differenceTime start end}}</div>
+    <div class="col-md-2">{{formatDateTime start}}</div>
+    <div class="col-md-2">{{formatTime end}} {{differenceTime start end}}</div>
   {{/if}}
 </template>
 
