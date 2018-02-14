@@ -19,7 +19,7 @@ share.Schemas.VolunteerForm = new SimpleSchema(
   skills:
     type: Array
     label: () -> i18n.__("abate:volunteers","skills")
-    optional: true
+    optional: false
     autoform:
       # XXX bug in autoform https://github.com/aldeed/meteor-autoform/issues/1635
       # group: () -> i18n.__("abate:volunteers","preferences")
@@ -33,7 +33,7 @@ share.Schemas.VolunteerForm = new SimpleSchema(
   quirks:
     type: Array
     label: () -> i18n.__("abate:volunteers","quirks")
-    optional: true
+    optional: false
     autoform:
       # group: () -> i18n.__("abate:volunteers","preferences")
       group: "Preferences"
