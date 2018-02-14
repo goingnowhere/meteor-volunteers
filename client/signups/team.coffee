@@ -10,7 +10,23 @@ Template.teamShiftsTable.onCreated () ->
   template.grouping = new ReactiveVar(new Set())
   template.autorun () ->
     if sub.ready()
-      template.shifts.set(share.getShifts({parentId: teamId}))
+      sel = {parentId: teamId}
+      date = Template.currentData().date
+      if date
+        startOfDay = moment(date).startOf('day')
+        endOfDay = moment(date).endOf('day')
+        sel =
+          $and: [
+            sel,
+            {
+              $and: [
+                { end: { $gte: startOfDay.toDate() } },
+                { start: { $lte: endOfDay.toDate() } },
+              ]
+            }
+          ]
+      shifts = share.getShifts(sel)
+      template.shifts.set(shifts)
 
 Template.teamShiftsTable.helpers
   'grouping': () -> Template.instance().grouping.get().size > 0
