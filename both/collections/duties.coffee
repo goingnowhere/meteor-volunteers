@@ -178,10 +178,32 @@ share.Schemas.Lead.extend(
 share.Schemas.Projects = new SimpleSchema(
   start:
     type: Date
-    label: () -> i18n.__("abate:volunteers", "start")
+    label: () -> i18n.__("abate:volunteers","start")
+    autoform:
+      # defaultValue: () ->
+      #   AutoForm.getFieldValue('start')
+      afFieldInput:
+        type: "datetimepicker"
+        placeholder: () -> i18n.__("abate:volunteers","start")
+        opts: () ->
+          step: 15
+          format: 'DD-MM-YYYY HH:mm'
+          defaultTime:'05:00'
+          # minDate:
+          # maxDate:
   end:
     type: Date
-    label: () -> i18n.__("abate:volunteers", "end")
+    label: () -> i18n.__("abate:volunteers","end")
+    autoform:
+      afFieldInput:
+        type: "datetimepicker"
+        placeholder: () -> i18n.__("abate:volunteers","end")
+        opts: () ->
+          step: 15
+          format: 'DD-MM-YYYY HH:mm'
+          defaultTime:'08:00'
+          # minDate:
+          # maxDate:
     custom: () ->
       start = moment(this.field('start').value)
       unless moment(this.value).isAfter(start)
