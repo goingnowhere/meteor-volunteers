@@ -1,12 +1,14 @@
 <!-- main template to display list-items of duties for a user : shift, tasks, lead -->
 <template name="dutiesListItem">
-  <div class="row justify-content-between align-content-center no-gutters">
-    {{#if $eq signup.type "project"}}
-      {{> projectDate duty }}
-    {{else}}
-      {{> shiftDate duty }}
-    {{/if}}
-    <div class="col-md-6">
+  <div class="row">
+    <div class="col">
+      {{#if $eq signup.type "project"}}
+        {{> projectDate duty }}
+      {{else}}
+        {{> shiftDate duty }}
+      {{/if}}
+    </div>
+    <div class="col-lg-6 col-md-8 col-sm-10">
       {{#if $eq duty.type "shift"}}
         {{> shiftTitle duty=duty team=team}}
       {{/if}}
@@ -20,7 +22,7 @@
         {{>leadTitle duty=duty team=team}}
       {{/if}}
     </div>
-    <div class="col-md-2 p-0">
+    <div class="col">
       {{#if $and signup.status ($neq signup.status 'bailed')}}
         <button class="btn btn-default btn-action disabled
           {{#if $eq signup.status 'confirmed'}}btn-success{{/if}}">
@@ -54,7 +56,8 @@
       {{/if}}
     </div>
   </div>
-  <div class="container">
+  <div class="row">
+    <div class="col">
       {{#if $eq duty.type "shift"}}
         {{>shiftBody duty=duty team=team}}
       {{/if}}
@@ -65,7 +68,8 @@
         {{>leadBody duty=duty team=team}}
       {{/if}}
     </div>
-    <div class="row no-gutters">
+  </div>
+  <div class="row no-gutters">
     {{#if team.quirks}}
       <ul class="list-inline">
         {{#each quirk in team.quirks}}
@@ -155,13 +159,15 @@
 
 <!-- helper display to format the date of a shift. used in dutiesListItem and ... -->
 <template name="shiftDate">
-  {{#if sameDay start end}}
-    <div class="col-md-2"><h5>{{formatDate start}}</h5></div>
-    <div class="col-md-2"><h6>{{formatTime start}} <br> {{formatTime end}}</h6></div>
-  {{else}}
-    <div class="col-md-2 align-content-center"><h5>{{formatDateTime start}}</h5></div>
-    <div class="col-md-2 align-content-center"><h6>{{formatTime end}} {{differenceTime start end}}</h6></div>
-  {{/if}}
+  <div class="row">
+    {{#if sameDay start end}}
+      <div class="col"><h5>{{formatDate start}}</h5></div>
+      <div class="col"><h6>{{formatTime start}} <br> {{formatTime end}}</h6></div>
+    {{else}}
+      <div class="col align-content-center"><h5>{{formatDateTime start}}</h5></div>
+      <div class="col align-content-center"><h6>{{formatTime end}} {{differenceTime start end}}</h6></div>
+    {{/if}}
+  </div>
 </template>
 
 <template name="shiftDateInline">
