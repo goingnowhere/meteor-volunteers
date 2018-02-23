@@ -11,74 +11,105 @@
   </div>
   {{/if}}
   <table class="table">
-    <thead>
-      <th></th>
-      <th>{{__ ".time"}}</th>
-      <!-- <th>{{__ ".name"}}</th> -->
-      <th>{{__ ".positions"}}</th>
-      <th></th>
-    </thead>
     {{#each family in groupedShifts}}
-      <tr class="shiftFamily" data-toggle="collapse" data-target=".{{family.class}}">
+    <thead class="thead-default">
+      <tr class="shiftFamily table-active" data-toggle="collapse" data-target=".{{family.class}}">
         <td colspan="4"><h5>{{family.title}}</h5></td>
       </tr>
+    </thead>
+    <tbody>
       {{#each group in family.groups}}
         {{#each shift in group.shifts }}
-          <tr class="shift {{family.class}} collapse" data-id="{{shift._id}}" data-type="{{shift.type}}">
-            <td>
+          <tr class="shift {{family.class}}" data-id="{{shift._id}}" data-type="{{shift.type}}">
+            <th scope="row">
+              <span>
               {{#if $eq shift.priority "essential"}}
-                <div class="text-danger">{{fa "exclamation-circle"}}</div>
+                <span class="text-danger">{{fa "exclamation-circle"}}</span>
               {{/if}}
-            </td>
-            <td>
-              {{#if $eq shift.type "shift"}}
-                {{> shiftDateInline shift}}
-              {{else}}
-                {{> projectDate shift}}
-              {{/if}}
-            </td>
-            <!-- <td>
-              {{shift.title}}
-              {{#if ($eq shift.policy 'public')}}{{fa 'globe'}}{{/if}}
               {{#if ($eq shift.policy 'private')}}{{fa 'user-secret'}}{{/if}}
               {{#if ($eq shift.policy 'requireApproval')}}{{fa 'lock'}}{{/if}}
-            </td> -->
-            {{#if $eq shift.type "shift"}}
-              <td class="pull-right">
-                <span class="badge badge-pill badge-primary">{{shift.needed}} / {{shift.confirmed}}</span>
-              </td>
-            {{else}}
-              <td>
-                <!-- TODO -->
-              </td>
-            {{/if}}
+            </span>
+            </th>
+            <td> {{> shiftDateInline shift}} </td>
             <td>
-              <div class="btn-group pull-right">
+              <span class="badge badge-pill badge-primary">{{shift.needed}} / {{shift.confirmed}}</span>
+            </td>
+            <td>
+              <div class="btn-group">
                 <button type="button"
                   class="btn btn-sm btn-circle dropdown-toggle {{#if grouping}}disabled{{/if}}"
                   data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                   <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu">
-                  <li class="dropdown-item"><a href="#" data-action="edit" data-id="{{shift._id}}" data-type="{{shift.type}}">
+                  <li class="dropdown-item"><a href="#" data-action="edit" data-id="{{shift._id}}" data-type="shift">
                     {{fa "pencil-square-o"}} {{__ ".edit"}}</a></li>
-                  <li class="dropdown-item"><a href="#" data-action="delete" data-id="{{shift._id}}" data-type="{{shift.type}}">
+                  <li class="dropdown-item"><a href="#" data-action="delete" data-id="{{shift._id}}" data-type="shift">
                     {{fa "trash-o"}} {{__ ".remove"}}</a></li>
-                  <li class="dropdown-item"><a href="#" data-action="clone" data-id="{{shift._id}}" data-type="{{shift.type}}">
+                  <li class="dropdown-item"><a href="#" data-action="clone" data-id="{{shift._id}}" data-type="shift">
                     {{fa "clone"}} {{__ ".clone"}}</a></li>
-                  <li class="dropdown-item"><a href="#" data-action="group" data-id="{{shift._id}}" data-type="{{shift.type}}">
+                  <li class="dropdown-item"><a href="#" data-action="group" data-id="{{shift._id}}" data-type="shift">
                     {{fa "object-group"}} {{__ ".group"}}</a></li>
                   {{#if shift.groupId }}
-                    <li class="dropdown-item"><a href="#" data-action="removeFromGroup" data-id="{{shift._id}}" data-type="{{shift.type}}">
+                    <li class="dropdown-item"><a href="#" data-action="removeFromGroup" data-id="{{shift._id}}" data-type="shift">
                       {{fa "object-ungroup"}} {{__ ".remove_from_group"}}</a></li>
                   {{/if}}
                 </ul>
               </div>
             </td>
           </tr>
+          {{#if $gt shift.confirmed 0}}
+            <tr class="shift {{family.class}}">
+              <td colspan="4">
+                <ol>
+                  {{#each signup in shift.volunteers }}
+                    <li>{{getUserName signup.userId}} ( {{__ ".joined"}} {{ formatDate signup.createdAt }} )</li>
+                  {{/each}}
+                </ol>
+              </td>
+            </tr>
+          {{/if}}
         {{/each}}
         {{#if $gt ($len group.shifts) 1}}<tr><td colspan="5"></td></tr>{{/if}}
       {{/each}}
+    </tbody>
+    {{/each}}
+  </table>
+</template>
+
+<!-- used to display all projects for a given team
+     Args: team
+-->
+<template name="teamProjectsTable">
+  <table class="table">
+    {{#each project in allProjects }}
+      <tr>
+        <td>
+          {{#if $eq project.priority "essential"}}
+            <div class="text-danger">{{fa "exclamation-circle"}}</div>
+          {{/if}}
+        </td>
+        <td>{{> projectDate project}}</td>
+        <td>{{project.title}}</td>
+        <td>
+          <div class="btn-group pull-right">
+            <button type="button"
+              class="btn btn-sm btn-circle dropdown-toggle {{#if grouping}}disabled{{/if}}"
+              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li class="dropdown-item"><a href="#" data-action="edit" data-id="{{project._id}}" data-type="project">
+                {{fa "pencil-square-o"}} {{__ ".edit"}}</a></li>
+              <li class="dropdown-item"><a href="#" data-action="delete" data-id="{{project._id}}" data-type="project">
+                {{fa "trash-o"}} {{__ ".remove"}}</a></li>
+              <li class="dropdown-item"><a href="#" data-action="clone" data-id="{{project._id}}" data-type="project">
+                {{fa "clone"}} {{__ ".clone"}}</a></li>
+            </ul>
+          </div>
+        </td>
+      </tr>
+      <tr><td>Histogram here days vs covered/wanted</td></tr>
     {{/each}}
   </table>
 </template>

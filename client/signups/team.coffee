@@ -1,3 +1,25 @@
+commonEvents =
+  'click [data-action="edit"]': (event,template) ->
+    id = $(event.currentTarget).data('id')
+    type = $(event.currentTarget).data('type')
+    collection = share.dutiesCollections[type]
+    shift = collection.findOne(id)
+    AutoFormComponents.ModalShowWithTemplate("insertUpdateTemplate",
+      {form:{collection}, data: shift}, "", 'lg')
+  'click [data-action="delete"]': (event,template) ->
+    id = $(event.currentTarget).data('id')
+    type = $(event.currentTarget).data('type')
+    collection = share.dutiesCollections[type]
+    share.meteorCall "#{collection._name}.remove", id
+  'click [data-action="clone"]': (event,template) ->
+    id = $(event.currentTarget).data('id')
+    type = $(event.currentTarget).data('type')
+    collection = share.dutiesCollections[type]
+    shift = collection.findOne(id)
+    delete shift._id
+    AutoFormComponents.ModalShowWithTemplate("insertUpdateTemplate",
+      {form:{collection}, data: shift})
+
 Template.teamShiftsTable.bindI18nNamespace('abate:volunteers')
 Template.teamShiftsTable.onCreated () ->
   template = this
@@ -40,27 +62,8 @@ Template.teamShiftsTable.helpers
       groups: _.map(g,(v,k) -> {group:k, shifts:v} )
     )
 
+Template.teamShiftsTable.events commonEvents
 Template.teamShiftsTable.events
-  'click [data-action="edit"]': (event,template) ->
-    id = $(event.currentTarget).data('id')
-    type = $(event.currentTarget).data('type')
-    collection = share.dutiesCollections[type]
-    shift = collection.findOne(id)
-    AutoFormComponents.ModalShowWithTemplate("insertUpdateTemplate",
-      {form:{collection}, data: shift})
-  'click [data-action="delete"]': (event,template) ->
-    id = $(event.currentTarget).data('id')
-    type = $(event.currentTarget).data('type')
-    collection = share.dutiesCollections[type]
-    share.meteorCall "#{collection._name}.remove", id
-  'click [data-action="clone"]': (event,template) ->
-    id = $(event.currentTarget).data('id')
-    type = $(event.currentTarget).data('type')
-    collection = share.dutiesCollections[type]
-    shift = collection.findOne(id)
-    delete shift._id
-    AutoFormComponents.ModalShowWithTemplate("insertUpdateTemplate",
-      {form:{collection}, data: shift})
   'click tr.shift': (event,template) ->
     grouping = template.grouping.get()
     if grouping.size > 0
@@ -101,6 +104,20 @@ Template.teamShiftsTable.events
     collection = share.dutiesCollections[type]
     doc = {_id: id, modifier: {$unset: {groupId: ""}}}
     share.meteorCall "#{collection._name}.update", doc
+
+Template.teamProjectsTable.bindI18nNamespace('abate:volunteers')
+Template.teamProjectsTable.onCreated () ->
+  template = this
+  template.teamId = template.data._id
+  share.templateSub(template,"ProjectSignups.byTeam",teamId)
+
+Template.teamProjectsTable.helpers
+  allProjects: () ->
+    share.Projects.find({parentId: Template.instance().teamId})
+
+Template.teamProjectsTable.events commonEvents
+
+# OLD CODE #############################
 
 Template.teamDayViewGrid.bindI18nNamespace('abate:volunteers');
 Template.teamDayViewGrid.onCreated () ->

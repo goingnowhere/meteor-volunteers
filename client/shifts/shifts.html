@@ -173,12 +173,7 @@
 </template>
 
 <template name="projectDate">
-  {{#each date in dates}}
-    <div class="col-md-2 align-content-center">
-      <h6 class="mb-0">{{formatMoment date 'ddd Do' }}</h6>
-      <h6>{{formatMoment date 'MMM' }}</h6>
-    </div>
-  {{/each}}
+  <h6>{{formatDate start }} - {{formatDate end }}</h6>
 </template>
 
 <!-- helper display to format the date of a task. used in dutiesListItem and ... -->

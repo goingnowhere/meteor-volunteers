@@ -1,12 +1,13 @@
 getDuty = (sel, type, duty, signup) ->
   sort = {sort: {start: 1, priority: 1}}
   duty.find(sel).map((v) ->
-    confirmed = signup.find({status: "confirmed", shiftId: v._id},sort).count()
+    confirmed = signup.find({status: "confirmed", shiftId: v._id},sort)
     _.extend(v,
       type: type
       duration: moment.duration(v.end - v.start).humanize()
-      confirmed: confirmed
-      needed: v.min - confirmed)
+      confirmed: confirmed.count()
+      volunteers: confirmed.fetch()
+      needed: v.min - confirmed.count())
     return v
   )
 

@@ -62,7 +62,8 @@ Template.shiftDate.helpers sameDayHelper
 Template.shiftDateInline.helpers sameDayHelper
 
 Template.projectDate.helpers
-  dates: () => [Template.instance().data.start, Template.instance().data.end]
+  start: () -> Template.instance().data.start
+  end: () -> Template.instance().data.end
 
 Template.addShift.bindI18nNamespace('abate:volunteers')
 Template.addShift.helpers
