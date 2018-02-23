@@ -71,8 +71,7 @@ MakeDutyFilter = (searchQuery) ->
   if duties?.length > 0 then sel.push {type: { "$in": duties }}
   return if sel.length > 0 then {"$and": sel} else {}
 
-Template.signupsList.bindI18nNamespace('abate:volunteers')
-Template.signupsList.onCreated () ->
+signupsListOnCreated = () ->
   template = this
   userId = Meteor.userId()
   template.searchQuery = new ReactiveDict({})
@@ -114,7 +113,26 @@ Template.signupsList.onCreated () ->
     template.sel.set(MakeDutyFilter(template.searchQuery))
   )
 
+Template.signupsList.bindI18nNamespace('abate:volunteers')
+Template.signupsList.onCreated signupsListOnCreated
+
 Template.signupsList.helpers
   'allDuties': () ->
     filter = Template.instance().sel.get()
     Template.instance().DutiesLocal.find(filter)
+
+Template.signupsListGroupped.bindI18nNamespace('abate:volunteers')
+Template.signupsListGroupped.onCreated signupsListOnCreated
+
+Template.signupsListGroupped.helpers
+  'allDuties': () ->
+    filter = Template.instance().sel.get()
+    # group by team, title, order by importance, date
+    groupByParentId =
+      _.groupBy(Template.instance().DutiesLocal.find(filter).fetch(),'parentId')
+    _.map(groupByParentId, (teamdutieslist,parentId) ->
+      groupByTitle = _.groupBy(teamdutieslist,'title')
+      team: share.Team.findOne(parentId)
+      group: _.map(groupByTitle, (dutieslist,title) ->
+        {title: title, group: dutieslist} )
+    )

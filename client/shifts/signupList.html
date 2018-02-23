@@ -3,10 +3,35 @@
   <div class="container-fluid p-0">
     <div class="row no-gutters">
       <div class="container-fluid p-0">
-        {{#each duty in allDuties}}
-          <div class="flex-column signupsListItem">
-            {{> dutiesListItem duty }}
-          </div>
+        {{#each teamDuties in allDuties}}
+          {{#each duties in teamDuties.group }}
+            <div class="flex-column signupsListItem">
+              {{> dutiesListItemGroupped duties=duties}}
+            </div>
+          {{/each}}
+        {{/each}}
+      </div>
+    </div>
+    {{#if loadMore}}
+      <div class="row">
+        <div class="text-center">
+          <button class="btn btn-primary" data-action="loadMore">{{__ ".load_more"}}</button>
+        </div>
+      </div>
+    {{/if}}
+  </div>
+</template>
+
+<template name="signupsListGroupped">
+  <div class="container-fluid p-0">
+    <div class="row no-gutters">
+      <div class="container-fluid p-0">
+        {{#each teamDuties in allDuties}}
+          {{#each duties in teamDuties.group }}
+            <div class="flex-column signupsListItem">
+              {{> dutiesListItemGroupped duties=duties}}
+            </div>
+          {{/each}}
         {{/each}}
       </div>
     </div>

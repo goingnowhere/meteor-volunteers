@@ -1,13 +1,13 @@
 Template.dutiesListItem.bindI18nNamespace('abate:volunteers')
 Template.dutiesListItem.onCreated () ->
   template = this
-  template.duty = template.data
-  share.templateSub(template,"TeamShifts.byDuty", template.duty._id, Meteor.userId())
-  share.templateSub(template,"TeamTasks.byDuty", template.duty._id, Meteor.userId())
-  share.templateSub(template,"Projects.byDuty", template.duty._id, Meteor.userId())
-  share.templateSub(template,"Lead.byDuty", template.duty._id, Meteor.userId())
+  duty = template.data
+  share.templateSub(template,"TeamShifts.byDuty", duty._id, Meteor.userId())
+  share.templateSub(template,"TeamTasks.byDuty", duty._id, Meteor.userId())
+  share.templateSub(template,"Projects.byDuty", duty._id, Meteor.userId())
+  share.templateSub(template,"Lead.byDuty", duty._id, Meteor.userId())
 
-Template.dutiesListItem.events
+dutiesListItemEvents =
   'click [data-action="apply"]': ( event, template ) ->
     shiftId = $(event.target).data('shiftid')
     type = $(event.target).data('type')
@@ -29,10 +29,13 @@ Template.dutiesListItem.events
     doc = {parentId: parentId, shiftId: shiftId, userId: userId}
     share.meteorCall "#{type}Signups.bail", doc
 
-Template.dutiesListItem.helpers
-  'duty': () -> Template.instance().duty
+Template.dutiesListItem.events dutiesListItemEvents
+Template.dutiesListItemDate.events dutiesListItemEvents
+
+dutiesListItemHelpers =
+  'duty': () -> Template.currentData()
   'team': () ->
-    duty = Template.instance().duty
+    duty = Template.currentData()
     if duty.type == "shift" ||  duty.type == "task"
       share.Team.findOne(duty.parentId)
     else
@@ -44,7 +47,7 @@ Template.dutiesListItem.helpers
         return _.extend(dv,{type: "division"})
   'signup': () ->
     userId = Meteor.userId()
-    duty = Template.instance().duty
+    duty = Template.currentData()
     if duty.type == "shift"
       return share.ShiftSignups.findOne({userId: userId, shiftId: duty._id})
     else if duty.type == "task"
@@ -53,6 +56,11 @@ Template.dutiesListItem.helpers
       return share.LeadSignups.findOne({userId: userId, shiftId: duty._id})
     else if duty.type == "project"
       return share.ProjectSignups.findOne({userId: userId, shiftId: duty._id})
+
+Template.dutiesListItem.helpers dutiesListItemHelpers
+Template.dutiesListItemTitle.helpers dutiesListItemHelpers
+Template.dutiesListItemDate.helpers dutiesListItemHelpers
+Template.dutiesListItemContent.helpers dutiesListItemHelpers
 
 sameDayHelper = {
   'sameDay': (start, end) -> moment(start).isSame(moment(end),"day")

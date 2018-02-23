@@ -13,13 +13,13 @@
         {{> shiftTitle duty=duty team=team}}
       {{/if}}
       {{#if $eq duty.type "task"}}
-        {{>taskTitle duty=duty team=team}}
+        {{> taskTitle duty=duty team=team}}
       {{/if}}
       {{#if $eq duty.type "project"}}
-        {{>projectTitle duty=duty team=team}}
+        {{> projectTitle duty=duty team=team}}
       {{/if}}
       {{#if $eq duty.type "lead"}}
-        {{>leadTitle duty=duty team=team}}
+        {{> leadTitle duty=duty team=team}}
       {{/if}}
     </div>
     <div class="col">
@@ -91,6 +91,120 @@
   </div>
 </template>
 
+<template name="dutiesListItemGroupped">
+  <div class="row justify-content-between align-content-center no-gutters">
+    <div class="col">
+      {{> dutiesListItemTitle duties.group.[0] }}
+    </div>
+  </div>
+  <div class="row justify-content-between align-content-center no-gutters">
+    <div class="col">
+      {{> dutiesListItemContent duties.group.[0] }}
+    </div>
+  </div>
+  <div class="item-unstyled pt-2">
+    {{#each duty in duties.group }}
+      <div class="list-item">{{> dutiesListItemDate duty }}</div>
+    {{/each}}
+  </div>
+</template>
+
+<template name="dutiesListItemDate">
+  <div class="row justify-content-between align-content-center no-gutters">
+    <div class="col">
+      <div class="row">
+        {{#if $eq signup.type "project"}}
+          {{> projectDate duty }}
+        {{else}}
+          {{> shiftDate duty }}
+        {{/if}}
+      </div>
+    </div>
+    <div class="col p-0">
+      {{#if $and signup.status ($neq signup.status 'bailed')}}
+        <button class="btn btn-default btn-action disabled
+          {{#if $eq signup.status 'confirmed'}}btn-success{{/if}}">
+          {{__ signup.status }}
+        </button>
+      {{else}}
+        <!-- {{#if $eq signup.status 'bailed'}}
+          <button class="btn btn-default disabled">
+            {{__ signup.status }}
+          </button>
+        {{/if}} -->
+        {{#unless $eq duty.policy "adminOnly"}}
+          <button class="btn btn-primary btn-action" data-shiftid="{{duty._id}}"
+            data-parentid="{{duty.parentId}}" data-type="{{duty.type}}" data-action="apply">
+            {{#if $eq duty.type "project"}}
+              {{__ ".choose_date"}}
+            {{else}}
+              {{#if $eq duty.policy "public"}}{{__ ".join"}}{{/if}}
+              {{#if $eq duty.policy "requireApproval"}}{{__ ".apply"}}{{/if}}
+            {{/if}}
+          </button>
+        {{else}}
+          {{__ ".admin_only"}}
+        {{/unless}}
+      {{/if}}
+      {{#if canBail}}
+        <button class="btn btn-danger btn-action" data-shiftid="{{duty._id}}"
+          data-parentid="{{duty.parentId}}}" data-type="{{duty.type}}" data-action="bail">
+          {{__ "bail"}}
+        </button>
+      {{/if}}
+    </div>
+  </div>
+</template>
+
+<template name="dutiesListItemContent">
+  <div class="row no-gutters">
+    {{#if $eq duty.type "shift"}}
+      {{>shiftBody duty=duty team=team}}
+    {{/if}}
+    {{#if $eq duty.type "task"}}
+      {{>taskBody duty=duty team=team}}
+    {{/if}}
+    {{#if $eq duty.type "lead"}}
+      {{>leadBody duty=duty team=team}}
+    {{/if}}
+  </div>
+  <div class="row no-gutters">
+    {{#if team.quirks}}
+      <ul class="list-inline">
+        {{#each quirk in team.quirks}}
+          <li class="list-inline-item">
+            <span class="badge badge-primary badge-pill">{{quirk}}</span>
+          </li>
+        {{/each}}
+      </ul>
+    {{/if}}
+    {{#if team.skills}}
+      <ul class="list-inline">
+        {{#each skill in team.skills}}
+          <li class="list-inline-item">
+            <span class="badge badge-secondary badge-pill">{{skill}}</span>
+          </li>
+        {{/each}}
+      </ul>
+    {{/if}}
+  </div>
+</template>
+
+<template name="dutiesListItemTitle">
+  {{#if $eq duty.type "shift"}}
+    {{> shiftTitle duty=duty team=team}}
+  {{/if}}
+  {{#if $eq duty.type "task"}}
+    {{> taskTitle duty=duty team=team}}
+  {{/if}}
+  {{#if $eq duty.type "project"}}
+    {{> projectTitle duty=duty team=team}}
+  {{/if}}
+  {{#if $eq duty.type "lead"}}
+    {{> leadTitle duty=duty team=team}}
+  {{/if}}
+</template>
+
 <!-- Create a new shift give for a given team
    args: Team
 -->
@@ -159,14 +273,16 @@
 
 <!-- helper display to format the date of a shift. used in dutiesListItem and ... -->
 <template name="shiftDate">
-  <div class="row">
-    {{#if sameDay start end}}
-      <div class="col"><h5>{{formatDate start}}</h5></div>
-      <div class="col"><h6>{{formatTime start}} <br> {{formatTime end}}</h6></div>
-    {{else}}
-      <div class="col align-content-center"><h5>{{formatDateTime start}}</h5></div>
-      <div class="col align-content-center"><h6>{{formatTime end}} {{differenceTime start end}}</h6></div>
-    {{/if}}
+  <div class="container-fluid">
+    <div class="row">
+      {{#if sameDay start end}}
+        <div class="col"><h5>{{formatDate start}}</h5></div>
+        <div class="col"><h6>{{formatTime start}} <br> {{formatTime end}}</h6></div>
+      {{else}}
+        <div class="col align-content-center"><h5>{{formatDateTime start}}</h5></div>
+        <div class="col align-content-center"><h6>{{formatTime end}} {{differenceTime start end}}</h6></div>
+      {{/if}}
+    </div>
   </div>
 </template>
 
