@@ -38,16 +38,24 @@ getUnit = (sel,unit,type) ->
 
 class TeamStatsClass
   constructor: (@teamId) ->
-  # all shifts that are not yet completely covered
+  # all shifts,tasks,projects that are not yet completely covered
   # can be ordered by priority to get all the important shifts that are
   # not covered
   shiftsLow: () ->
     _.filter(share.getShifts({parentId: @teamId}),((shift) -> shift.min < shift.signups))
-  # all tasks that are not yet completely covered
   tasksLow: () ->
     _.filter(share.getTasks({parentId: @teamId}),((shift) -> shift.min < shift.signups))
+  projectLow: () ->
+    _.filter(share.getProjects({parentId: @teamId}),((shift) -> shift.min < shift.signups))
+
   # All pending requests for tasks, shifts and leads
-  pendingRequests: () -> []
+  pendingRequests: () ->
+    shifts = share.ShiftSignups.find({parentId: @teamId, status:'pending'})
+    leads = share.LeadSignups.find({parentId: @teamId, status:'pending'})
+    tasks = share.TaskSignups.find({parentId: @teamId, status:'pending'})
+    projects = share.ProjectSignups.find({parentId: @teamId, status:'pending'})
+    shifts.fetch().concat(leads.fetch()).concat(projects.fetch())
+
   # total number of shifts vs total number of signups
   shiftRate: () -> rate(share.getShifts({parentId: @teamId}))
   # total number of tasks vs total number of signups

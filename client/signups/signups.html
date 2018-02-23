@@ -1,35 +1,14 @@
 <!-- all Restricted shifts and tasks requests for a given team -->
 <template name="teamSignupsList">
-  <table class="table">
-    <thead>
-      <th>{{__ ".date"}}</th>
-      <th>{{__ ".duty"}}</th>
-      <th>{{__ ".created"}}</th>
-      <th>{{__ ".user"}}</th>
-      <th></th>
-    </thead>
+  <table class="table table-striped">
     <tbody>
       {{#each signup in allSignups}}
         <tr>
+          <td>{{ signup.duty.title }}</td>
           <td>
-            {{#if $eq signup.type "shift"}}
-              {{fa "calendar"}}
-              {{> shiftDate signup.duty}}
-            {{/if}}
-            {{#if $eq signup.type "task"}}
-              {{fa "tasks"}}
-              {{> taskDate signup.duty}}
-            {{/if}}
-            {{#if $eq signup.type "project"}}
-              {{fa "calendar-o"}}
-              {{> projectDate signup}}
-            {{/if}}
+            {{getUserName signup.userId}}
+            <small>{{__ ".created"}}: {{formatDate signup.createdAt}}</small>
           </td>
-          <td>
-            {{ signup.duty.title }}
-          </td>
-          <td>{{formatDate signup.createdAt}}</td>
-          <td>{{getUserName signup.userId}}</td>
           <td>
             <button class="btn btn-default btn-sm" data-action="approve"
               data-signup="{{ signup._id }}" data-type="{{ signup.type }}">
@@ -48,13 +27,7 @@
 
 <!-- all Lead team requests for a given department -->
 <template name="departmentSignupsList">
-  <table class="table">
-    <thead>
-      <th></th>
-      <th>{{__ ".title"}}</th>
-      <th>{{__ ".user"}}</th>
-      <th></th>
-    </thead>
+  <table class="table table-striped">
     <tbody>
       {{#each signup in allSignups}}
         <tr>
@@ -84,13 +57,7 @@
 
 <!-- all division and departments Lead request for the manager -->
 <template name="managerSignupsList">
-  <table class="table">
-    <thead>
-      <th></th>
-      <th>{{__ ".title"}}</th>
-      <th>{{__ ".user"}}</th>
-      <th></th>
-    </thead>
+  <table class="table table-striped">
     <tbody>
       {{#each signup in allSignups}}
         <tr>
