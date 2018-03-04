@@ -109,9 +109,21 @@
           </div>
         </td>
       </tr>
-      <tr><td>Histogram here days vs covered/wanted</td></tr>
+      <tr><td colspan="4">
+        {{> stackedBar (stackedBarData project) }}
+      </td></tr>
     {{/each}}
   </table>
+</template>
+
+<template name="stackedBar">
+  <div class="chart-container" style="position: relative; height:40vh">
+    <canvas id="StackedBar-{{_id}}" class="chart"></canvas>
+  </div>
+</template>
+
+<template name="teamPie">
+  <canvas id="teamPie-{{_id}}" class="chart"></canvas>
 </template>
 
 <!-- used to display all tasks for a given team

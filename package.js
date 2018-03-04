@@ -10,6 +10,8 @@ Npm.depends({
   'flatpickr':'2.4.8',
   'jquery': '3.2.1',
   'bootstrap': '4.0.0-beta.3',
+  'chartjs': '0.3.24',
+  'moment-range': '3.1.1'
   // 'popper.js': '1.12.9',
 });
 

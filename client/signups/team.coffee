@@ -1,3 +1,6 @@
+import { Chart } from 'chart.js'
+import Moment from 'moment'
+
 commonEvents =
   'click [data-action="edit"]': (event,template) ->
     id = $(event.currentTarget).data('id')
@@ -114,8 +117,65 @@ Template.teamProjectsTable.onCreated () ->
 Template.teamProjectsTable.helpers
   allProjects: () ->
     share.Projects.find({parentId: Template.instance().teamId})
+  stackedBarData: (project) ->
+    _.extend(share.projectSignupsConfirmed(project),{_id:project._id})
 
 Template.teamProjectsTable.events commonEvents
+
+drawStakedBar = (v) ->
+  data =
+    labels: v.days.map((t) -> moment(t).format("MMM Do"))
+    datasets: [
+      { label: "needed", data: v.needed, backgroundColor: '#ffe94D' },
+      { label: "confirmed", data: v.confirmed, backgroundColor: '#D6E9C6' },
+    ]
+  options =
+    responsive: true,
+    # XXX canvas are not fully responsive ...
+    # maintainAspectRatio: false,
+    scales:
+      xAxes: [{ stacked: true }],
+      yAxes: [{ stacked: true }]
+  ctx = $("#StackedBar-#{v._id}").get(0).getContext('2d')
+  new Chart(ctx,{type: 'bar', data: data, options: options})
+
+Template.stackedBar.onRendered () ->
+  template = this
+  template.autorun () ->
+    drawStakedBar(Template.currentData())
+
+################## TODO
+
+drawPie = (id,datavalues, datalabels) ->
+  data =
+    labels: []
+    datasets: [
+      { label: "needed", data: [20], backgroundColor: '#D6E9C6' },
+      { label: "signed", data: [80], backgroundColor: '#ffe94D' },
+    ]
+  options = {}
+  ctx = $("#teamPie-#{id}").get(0).getContext('2d')
+  new Chart(ctx,{type: 'pie', data: data, options: options})
+
+Template.teamPie.onCreated () ->
+  template = this
+  teamId = template.data._id
+  share.templateSub(template,"ShiftSignups.byTeam",teamId)
+  share.templateSub(template,"LeadSignups.byTeam",teamId)
+  share.templateSub(template,"TaskSignups.byTeam",teamId)
+  share.templateSub(template,"ProjectSignups.byTeam",teamId)
+
+Template.teamPie.onRendered () ->
+  template = this
+  Tracker.autorun () ->
+    if template.subscriptionsReady()
+      Tracker.afterFlush () ->
+        console.log share.Projects.find({parentId: template.teamId}).fetch()
+        share.Projects.find(
+          {parentId: template.teamId}).forEach((p) ->
+            console.log p
+            drawStakedBar(p._id, [],[])
+          )
 
 # OLD CODE #############################
 

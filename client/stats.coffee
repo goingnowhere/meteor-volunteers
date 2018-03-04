@@ -1,3 +1,7 @@
+import Moment from 'moment'
+import { extendMoment } from 'moment-range'
+moment = extendMoment(Moment)
+
 getDuty = (sel, type, duty, signup) ->
   sort = {sort: {start: 1, priority: 1}}
   duty.find(sel).map((v) ->
@@ -36,6 +40,28 @@ getUnit = (sel,unit,type) ->
       u.shiftRate = rate(share.getShifts({parentId: u._id}))
     return u
     )
+
+share.projectSignupsConfirmed = (p) ->
+  range = moment.range(moment(p.start),moment(p.end))
+  pdays = Array.from(range.by('day')).map((m) -> m.toISOString())
+  needed = _.object(pdays,p.staffing.map((s) -> s.min))
+  confirmed = _.object(pdays,Array(pdays.length).fill(0))
+  signups = share.ProjectSignups.find({parentId: p._id}).fetch()
+  _.each(signups,((s) ->
+    range = moment.range(moment(s.start),moment(s.end))
+    days = Array.from(range.by('day')).map((m) -> m.toISOString())
+    days.forEach((day) ->
+      confirmed[day] = confirmed[day] + 1
+      needed[day] = needed[day] - 1
+    )
+  ))
+  filter = (arr) -> _.sortBy(Object.entries(arr),
+    (e) -> moment(e[0])).map((e) -> e[1])
+  return {
+    needed: filter(needed),
+    confirmed: filter(confirmed),
+    days: pdays
+  }
 
 class TeamStatsClass
   constructor: (@teamId) ->
