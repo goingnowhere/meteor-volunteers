@@ -131,15 +131,47 @@ AutoForm.addInputType("projectStaffing",
 )
 
 Template.projectSignupForm.bindI18nNamespace('abate:volunteers')
-Template.projectSignupForm.helpers
-  form: () =>
-    label = if Template.currentData().project.policy == 'public' then 'join' else 'apply'
-    return
-      collection: share.ProjectSignups
-      insert: { label: i18n.__("abate:volunteers", label) }
+Template.projectSignupForm.onCreated () ->
+  template = this
+  template.start = new ReactiveVar()
+  template.end = new ReactiveVar()
 
-AutoForm.addHooks([
-    'InsertProjectSignupsFormId',
-  ],
-  onSuccess: () => Modal.hide()
-)
+Template.projectSignupForm.helpers
+  projectDays: () =>
+    project = Template.currentData().project
+    current = moment(project.start)
+    days = [current]
+    while current.isBefore(project.end)
+      current = moment(current).add(1, 'days')
+      days.push(current)
+    Template.instance().days = days
+    return days
+  formatDay: (day) =>
+    day.format('dd Do MMM')
+  highlightClass: (index) =>
+    start = Template.instance().start.get()
+    end = Template.instance().end.get()
+    if start == index or end == index
+      return "selected"
+    if start < index and end > index
+      return "in-range"
+Template.projectSignupForm.events
+  'click [data-action="choose"]': (event, template) =>
+    index = $(event.target).data('index')
+    if template.start.get()
+      if template.start.get() < index
+        template.end.set(index)
+      else
+        template.end.set(template.start.get())
+        template.start.set(index)
+    else
+      template.start.set(index)
+  'click [data-action="apply"]': (event, template) =>
+    startIndex = template.start.get()
+    endIndex = template.end.get()
+    if startIndex? and endIndex?
+      start = template.days[startIndex].toDate()
+      end = template.days[endIndex].toDate()
+      signup = _.extend(template.data.signup, { start, end })
+      share.meteorCall "projectSignups.insert", signup
+      Modal.hide()

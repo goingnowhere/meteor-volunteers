@@ -362,6 +362,12 @@
 </template>
 
 <template name="projectSignupForm">
-  <p>{{__ ".project_signup_form"}}</p>
-  {{> insertUpdateTemplate form=form data=signup }}
+  <div class="container-fluid">
+    <div class="row">
+      {{#each day in projectDays}}
+        <a class="col shift-day {{highlightClass @index}}" data-action="choose" data-index="{{@index}}"><h5>{{formatDate day }}</h5></a>
+      {{/each}}
+    </div>
+  </div>
+  <button class="btn" data-action="apply">apply</button>
 </template>
