@@ -72,6 +72,7 @@ Template.shiftDateInline.helpers sameDayHelper
 Template.projectDate.helpers
   start: () -> Template.instance().data.start
   end: () -> Template.instance().data.end
+  longformDay: (date) => moment(date).format('dddd')
 
 Template.addShift.bindI18nNamespace('abate:volunteers')
 Template.addShift.helpers

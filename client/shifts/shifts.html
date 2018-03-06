@@ -2,7 +2,7 @@
 <template name="dutiesListItem">
   <div class="row">
     <div class="col">
-      {{#if $eq signup.type "project"}}
+      {{#if $eq duty.type "project"}}
         {{> projectDate duty }}
       {{else}}
         {{> shiftDate duty }}
@@ -67,6 +67,9 @@
       {{#if $eq duty.type "lead"}}
         {{>leadBody duty=duty team=team}}
       {{/if}}
+      {{#if $eq duty.type "project"}}
+        {{>projectBody duty=duty team=team}}
+      {{/if}}
     </div>
   </div>
   <div class="row no-gutters">
@@ -113,7 +116,7 @@
   <div class="row justify-content-between align-content-center no-gutters">
     <div class="col">
       <div class="row">
-        {{#if $eq signup.type "project"}}
+        {{#if $eq duty.type "project"}}
           {{> projectDate duty }}
         {{else}}
           {{> shiftDate duty }}
@@ -166,6 +169,9 @@
     {{/if}}
     {{#if $eq duty.type "lead"}}
       {{>leadBody duty=duty team=team}}
+    {{/if}}
+    {{#if $eq duty.type "project"}}
+      {{>projectBody duty=duty team=team}}
     {{/if}}
   </div>
   <div class="row no-gutters">
@@ -295,6 +301,15 @@
 </template>
 
 <template name="projectDate">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col"><h5 class="mb-0">{{formatDate start}}</h5><h6>{{longformDay start}}</h6></div>
+      <div class="col"><h5 class="mb-0">{{formatDate end}}</h5><h6>{{longformDay end}}</h6></div>
+    </div>
+  </div>
+</template>
+
+<template name="projectDateInline">
   <h6>{{formatDate start }} - {{formatDate end }}</h6>
 </template>
 
@@ -339,6 +354,10 @@
 </template>
 
 <template name="taskBody">
+  <p class="card-text">{{duty.description}}</p>
+</template>
+
+<template name="projectBody">
   <p class="card-text">{{duty.description}}</p>
 </template>
 
