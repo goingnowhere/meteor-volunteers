@@ -215,7 +215,7 @@ share.initPublications = (eventName) ->
   # given a duty id return the team and all signups related to the current user
   # Restricted to user or duty.parentId lead
   createPublicationDuty = (type,duties,signups) ->
-    Meteor.publishComposite("#{eventName}.Volunteers.#{type}.byDuty", (id,userId) ->
+    Meteor.publishComposite("#{eventName}.Volunteers.#{type}.byDuty", (id,userId = this.userId) ->
       actualUserId = this.userId
       return {
         find: () -> return duties.find(id)

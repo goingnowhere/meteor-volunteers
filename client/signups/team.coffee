@@ -117,18 +117,24 @@ Template.teamProjectsTable.onCreated () ->
 Template.teamProjectsTable.helpers
   allProjects: () ->
     share.Projects.find({parentId: Template.instance().teamId})
-  stackedBarData: (project) ->
-    _.extend(share.projectSignupsConfirmed(project),{_id:project._id})
 
 Template.teamProjectsTable.events commonEvents
 
-drawStakedBar = (v) ->
+Template.projectStaffingChart.bindI18nNamespace('abate:volunteers')
+Template.projectStaffingChart.helpers
+  stackedBarData: (project) ->
+    _.extend(share.projectSignupsConfirmed(project),{_id:project._id})
+
+drawStakedBar = (props) ->
+  barData = props.barData
+  datasets = [{ label: "needed", data: barData.needed, backgroundColor: '#ffe94D' }]
+  unless props.hideConfirmed
+    datasets.push({ label: "confirmed", data: barData.confirmed, backgroundColor: '#D6E9C6' })
+  if props.extraField?
+    datasets.unshift(props.extraField)
   data =
-    labels: v.days.map((t) -> moment(t).format("MMM Do"))
-    datasets: [
-      { label: "needed", data: v.needed, backgroundColor: '#ffe94D' },
-      { label: "confirmed", data: v.confirmed, backgroundColor: '#D6E9C6' },
-    ]
+    labels: barData.days.map((t) -> moment(t).format("MMM Do"))
+    datasets: datasets
   options =
     responsive: true,
     # XXX canvas are not fully responsive ...
@@ -136,7 +142,8 @@ drawStakedBar = (v) ->
     scales:
       xAxes: [{ stacked: true }],
       yAxes: [{ stacked: true }]
-  ctx = $("#StackedBar-#{v._id}").get(0).getContext('2d')
+    onClick: props.getOnClick && props.getOnClick(barData.days)
+  ctx = $("#StackedBar-#{barData._id}").get(0).getContext('2d')
   new Chart(ctx,{type: 'bar', data: data, options: options})
 
 Template.stackedBar.onRendered () ->

@@ -362,12 +362,14 @@
 </template>
 
 <template name="projectSignupForm">
-  <div class="container-fluid">
-    <div class="row">
-      {{#each day in projectDays}}
-        <a class="col shift-day {{highlightClass @index}}" data-action="choose" data-index="{{@index}}"><h5>{{formatDate day }}</h5></a>
-      {{/each}}
-    </div>
+  {{> projectBody duty=project }}
+  <div class="project-signup-chart">
+    {{#if Template.subscriptionsReady }}
+      {{> projectStaffingChart project=project hideConfirmed=true extraField=extraField getOnClick=getOnClick }}
+    {{/if}}
   </div>
-  <button class="btn" data-action="apply">apply</button>
+  <button class="btn btn-primary btn-action" data-action="apply">
+    {{#if $eq project.policy "public"}}{{__ ".join"}}{{/if}}
+    {{#if $eq project.policy "requireApproval"}}{{__ ".apply"}}{{/if}}
+  </button>
 </template>

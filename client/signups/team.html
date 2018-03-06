@@ -110,15 +110,19 @@
         </td>
       </tr>
       <tr><td colspan="4">
-        {{> stackedBar (stackedBarData project) }}
+        {{> projectStaffingChart project=project }}
       </td></tr>
     {{/each}}
   </table>
 </template>
 
+<template name="projectStaffingChart">
+  {{> stackedBar barData=(stackedBarData project) hideConfirmed=hideConfirmed extraField=extraField getOnClick=getOnClick }}
+</template>
+
 <template name="stackedBar">
   <div class="chart-container" style="position: relative; height:40vh">
-    <canvas id="StackedBar-{{_id}}" class="chart"></canvas>
+    <canvas id="StackedBar-{{barData._id}}" class="chart"></canvas>
   </div>
 </template>
 

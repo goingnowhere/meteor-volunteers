@@ -17,7 +17,7 @@ dutiesListItemEvents =
     doc = {parentId: parentId, shiftId: shiftId, userId: userId}
     if type == 'project'
       project = share.Projects.findOne(shiftId)
-      AutoFormComponents.ModalShowWithTemplate('projectSignupForm', { signup: doc, project })
+      AutoFormComponents.ModalShowWithTemplate('projectSignupForm', { signup: doc, project }, project.title)
     else
       share.meteorCall "#{type}Signups.insert", doc
   'click [data-action="bail"]': ( event, template ) ->
@@ -133,45 +133,37 @@ AutoForm.addInputType("projectStaffing",
 Template.projectSignupForm.bindI18nNamespace('abate:volunteers')
 Template.projectSignupForm.onCreated () ->
   template = this
-  template.start = new ReactiveVar()
-  template.end = new ReactiveVar()
+  project = template.data.project
+  share.templateSub(template,"Projects.byDuty",project._id)
+  template.autorun () ->
+    if template.subscriptionsReady()
+      projectLength = moment(project.end).diff(moment(project.start), 'days')
+      applying = Array(projectLength).fill(0)
+      template.data.extraField = { label: "applying", data: applying, backgroundColor: '#3944e8' }
+      template.data.getOnClick = () => () => (xValues) => (event, elements) ->
+        if elements.length >= 1
+          index = elements[0]._index
+          if !template.startIndex? || (template.startIndex? && template.endIndex?)
+            delete template.endIndex
+            delete template.start
+            delete template.end
+            template.startIndex = index
+            applying.fill(0)
+            applying[index] = 1
+          else
+            currentStart = template.startIndex
+            template.startIndex = Math.min(currentStart, index)
+            template.endIndex = Math.max(currentStart, index)
+            template.start = xValues[template.startIndex]
+            template.end = xValues[template.endIndex]
+            applying.fill(1, template.startIndex, template.endIndex + 1)
+          this.update()
 
-Template.projectSignupForm.helpers
-  projectDays: () =>
-    project = Template.currentData().project
-    current = moment(project.start)
-    days = [current]
-    while current.isBefore(project.end)
-      current = moment(current).add(1, 'days')
-      days.push(current)
-    Template.instance().days = days
-    return days
-  formatDay: (day) =>
-    day.format('dd Do MMM')
-  highlightClass: (index) =>
-    start = Template.instance().start.get()
-    end = Template.instance().end.get()
-    if start == index or end == index
-      return "selected"
-    if start < index and end > index
-      return "in-range"
 Template.projectSignupForm.events
-  'click [data-action="choose"]': (event, template) =>
-    index = $(event.target).data('index')
-    if template.start.get()
-      if template.start.get() < index
-        template.end.set(index)
-      else
-        template.end.set(template.start.get())
-        template.start.set(index)
-    else
-      template.start.set(index)
   'click [data-action="apply"]': (event, template) =>
-    startIndex = template.start.get()
-    endIndex = template.end.get()
-    if startIndex? and endIndex?
-      start = template.days[startIndex].toDate()
-      end = template.days[endIndex].toDate()
-      signup = _.extend(template.data.signup, { start, end })
+    start = template.start
+    end = template.end
+    if start? and end?
+      signup = _.extend(template.data.signup, { start: new Date(start), end: new Date(end) })
       share.meteorCall "projectSignups.insert", signup
       Modal.hide()
