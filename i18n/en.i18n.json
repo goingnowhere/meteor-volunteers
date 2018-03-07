@@ -52,6 +52,8 @@
   "new_project": "New Project",
   "update_project": "Update Project",
   "project_signup_form": "Select dates to volunteer",
+  "project_signup_start": "Select start day",
+  "project_signup_end": "Select final day",
   "choose_date": "Choose dates",
   "estimated_time": "approx.",
   "joined": "Joined"

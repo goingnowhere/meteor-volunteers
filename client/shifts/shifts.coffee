@@ -135,9 +135,11 @@ Template.projectSignupForm.onCreated () ->
   template = this
   project = template.data.project
   share.templateSub(template,"Projects.byDuty",project._id)
+  template.allDays = new ReactiveVar()
   template.autorun () ->
     if template.subscriptionsReady()
       projectLength = moment(project.end).diff(moment(project.start), 'days')
+      template.allDays.set(moment(project.start).add(num, 'days') for num in [0..projectLength])
       applying = Array(projectLength).fill(0)
       template.data.extraField = { label: "applying", data: applying, backgroundColor: '#3944e8' }
       template.data.getOnClick = () => () => (xValues) => (event, elements) ->
@@ -158,12 +160,26 @@ Template.projectSignupForm.onCreated () ->
             template.end = xValues[template.endIndex]
             applying.fill(1, template.startIndex, template.endIndex + 1)
           this.update()
+Template.projectSignupForm.helpers
+  allDays: () =>
+    Template.instance().allDays.get()
+      ?.map((day) => {label: day.format('MMM Do'), value: day.format('YYYY-MM-DD')})
+  endDays: () =>
+    start = AutoForm.getFieldValue('start')
+    days = Template.instance().allDays.get()
+      ?.filter((day) => day.isSameOrAfter(moment(start)))
+      ?.map((day) => {label: day.format('MMM Do'), value: day.format('YYYY-MM-DD')})
+  collection: () => share.ProjectSignups
+  methodName: () => "#{share.ProjectSignups._name}.insert"
+  updateLabel: () =>
+    if Template.currentData().project.policy == "public"
+      i18n.__("abate:volunteers",".join")
+    else
+      i18n.__("abate:volunteers",".apply")
 
-Template.projectSignupForm.events
-  'click [data-action="apply"]': (event, template) =>
-    start = template.start
-    end = template.end
-    if start? and end?
-      signup = _.extend(template.data.signup, { start: new Date(start), end: new Date(end) })
-      share.meteorCall "projectSignups.insert", signup
-      Modal.hide()
+AutoForm.addHooks([
+  'projectSignupsInsert',
+],
+  onSuccess: () =>
+    Modal.hide()
+)

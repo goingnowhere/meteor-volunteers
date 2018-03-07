@@ -363,13 +363,26 @@
 
 <template name="projectSignupForm">
   {{> projectBody duty=project }}
-  <div class="project-signup-chart">
-    {{#if Template.subscriptionsReady }}
-      {{> projectStaffingChart project=project hideConfirmed=true extraField=extraField getOnClick=getOnClick }}
-    {{/if}}
-  </div>
-  <button class="btn btn-primary btn-action" data-action="apply">
-    {{#if $eq project.policy "public"}}{{__ ".join"}}{{/if}}
-    {{#if $eq project.policy "requireApproval"}}{{__ ".apply"}}{{/if}}
-  </button>
+  {{#if Template.subscriptionsReady }}
+    {{> projectStaffingChart project=project hideConfirmed=true extraField=extraField getOnClick=getOnClick }}
+  {{/if}}
+  {{#autoForm
+    collection=collection
+    id="projectSignupsInsert"
+    type="method"
+    meteormethod=methodName
+    doc=signup
+  }}
+    {{> afQuickField name="start" options=allDays}}
+    {{> afQuickField name="end" options=endDays}}
+    {{#each name in afFieldNames}}
+      {{#unless $or ($eq name.name "start") ($eq name.name "end") }}
+        {{> afQuickField name=name.name}}
+      {{/unless}}
+    {{/each}}
+    <button type="submit" class="btn btn-primary btn-action">
+      {{#if $eq project.policy "public"}}{{__ ".join"}}{{/if}}
+      {{#if $eq project.policy "requireApproval"}}{{__ ".apply"}}{{/if}}
+    </button>
+  {{/autoForm}}
 </template>

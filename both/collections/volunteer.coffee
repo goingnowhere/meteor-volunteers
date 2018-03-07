@@ -56,13 +56,16 @@ share.Schemas.VolunteerForm = new SimpleSchema(
 commonSignups = new SimpleSchema(
   parentId:
     type: String
-    autoform: "hidden"
+    autoform:
+      type: "hidden"
   shiftId:
     type: String
-    autoform: "hidden"
+    autoform:
+      type: "hidden"
   userId:
     type: String
-    autoform: "hidden"
+    autoform:
+      type: "hidden"
   createdAt:
     type: Date
     optional: true
