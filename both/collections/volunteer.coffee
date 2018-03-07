@@ -90,7 +90,7 @@ share.Schemas.ProjectSignups = new SimpleSchema(
     label: () -> i18n.__("abate:volunteers", "end")
     custom: () ->
       start = moment(this.field('start').value)
-      if !moment(this.value).isAfter(start)
+      if !moment(this.value).isSameOrAfter(start)
         return "minDateCustom"
 )
 share.Schemas.ProjectSignups.extend(commonSignups)
