@@ -140,26 +140,6 @@ Template.projectSignupForm.onCreated () ->
     if template.subscriptionsReady()
       projectLength = moment(project.end).diff(moment(project.start), 'days')
       template.allDays.set(moment(project.start).add(num, 'days') for num in [0..projectLength])
-      applying = Array(projectLength).fill(0)
-      template.data.extraField = { label: "applying", data: applying, backgroundColor: '#3944e8' }
-      template.data.getOnClick = () => () => (xValues) => (event, elements) ->
-        if elements.length >= 1
-          index = elements[0]._index
-          if !template.startIndex? || (template.startIndex? && template.endIndex?)
-            delete template.endIndex
-            delete template.start
-            delete template.end
-            template.startIndex = index
-            applying.fill(0)
-            applying[index] = 1
-          else
-            currentStart = template.startIndex
-            template.startIndex = Math.min(currentStart, index)
-            template.endIndex = Math.max(currentStart, index)
-            template.start = xValues[template.startIndex]
-            template.end = xValues[template.endIndex]
-            applying.fill(1, template.startIndex, template.endIndex + 1)
-          this.update()
 Template.projectSignupForm.helpers
   allDays: () =>
     Template.instance().allDays.get()

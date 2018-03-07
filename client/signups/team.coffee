@@ -130,8 +130,6 @@ drawStakedBar = (props) ->
   datasets = [{ label: "needed", data: barData.needed, backgroundColor: '#ffe94D' }]
   unless props.hideConfirmed
     datasets.push({ label: "confirmed", data: barData.confirmed, backgroundColor: '#D6E9C6' })
-  if props.extraField?
-    datasets.unshift(props.extraField)
   data =
     labels: barData.days.map((t) -> moment(t).format("MMM Do"))
     datasets: datasets
@@ -142,7 +140,6 @@ drawStakedBar = (props) ->
     scales:
       xAxes: [{ stacked: true }],
       yAxes: [{ stacked: true }]
-    onClick: props.getOnClick && props.getOnClick(barData.days)
   ctx = $("#StackedBar-#{barData._id}").get(0).getContext('2d')
   new Chart(ctx,{type: 'bar', data: data, options: options})
 

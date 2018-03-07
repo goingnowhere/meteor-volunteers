@@ -364,7 +364,7 @@
 <template name="projectSignupForm">
   {{> projectBody duty=project }}
   {{#if Template.subscriptionsReady }}
-    {{> projectStaffingChart project=project hideConfirmed=true extraField=extraField getOnClick=getOnClick }}
+    {{> projectStaffingChart project=project hideConfirmed=true }}
   {{/if}}
   {{#autoForm
     collection=collection
