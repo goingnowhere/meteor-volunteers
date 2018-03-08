@@ -1,11 +1,12 @@
 events =
   'click [data-action="bail"]': ( event, template ) ->
     shiftId = $(event.target).data('shiftid')
+    type = $(event.target).data('type')
     parentId = $(event.target).data('parentid')
     selectedUser = $("[data-shiftId='#{shiftId}']").val()
-    userId = Meteor.userId()
+    userId = if selectedUser && (selectedUser != "-1") then selectedUser else Meteor.userId()
     doc = {parentId: parentId, shiftId: shiftId, userId: userId}
-    share.meteorCall "shiftSignups.bail", doc
+    share.meteorCall "#{type}Signups.bail", doc
 
 Template.bookedTable.bindI18nNamespace('abate:volunteers')
 Template.bookedTable.helpers

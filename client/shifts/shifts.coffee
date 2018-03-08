@@ -17,17 +17,10 @@ dutiesListItemEvents =
     doc = {parentId: parentId, shiftId: shiftId, userId: userId}
     if type == 'project'
       project = share.Projects.findOne(shiftId)
-      AutoFormComponents.ModalShowWithTemplate('projectSignupForm', { signup: doc, project }, project.title)
+      AutoFormComponents.ModalShowWithTemplate('projectSignupForm',
+        { signup: doc, project }, project.title, 'lg')
     else
       share.meteorCall "#{type}Signups.insert", doc
-  'click [data-action="bail"]': ( event, template ) ->
-    shiftId = $(event.target).data('shiftid')
-    type = $(event.target).data('type')
-    parentId = $(event.target).data('parentid')
-    selectedUser = $("[data-shiftId='#{shiftId}']").val()
-    userId = if selectedUser && (selectedUser != "-1") then selectedUser else Meteor.userId()
-    doc = {parentId: parentId, shiftId: shiftId, userId: userId}
-    share.meteorCall "#{type}Signups.bail", doc
 
 Template.dutiesListItem.events dutiesListItemEvents
 Template.dutiesListItemDate.events dutiesListItemEvents

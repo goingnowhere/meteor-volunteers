@@ -138,10 +138,11 @@ share.initMethods = (eventName) ->
     else if type == "bail"
       Meteor.methods "#{collectionName}.bail": (sel) ->
         console.log ["#{collectionName}.bail", sel]
-        SimpleSchema.validate(sel, schema.omit('status'))
+        SimpleSchema.validate(sel, schema.omit('status','start','end'))
         userId = Meteor.userId()
         if (sel.userId == userId) || (share.isManagerOrLead(userId,[sel.parentId]))
-          collection.update(sel, {$set: {status: "bailed"}})
+          # this multi: true should not be necessary, but just in case ...
+          collection.update(sel, {$set: {status: "bailed"}},{multi: true})
         else
           return throwError(403, 'Insufficient Permission');
 
