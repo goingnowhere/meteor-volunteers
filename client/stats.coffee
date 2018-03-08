@@ -46,7 +46,7 @@ share.projectSignupsConfirmed = (p) ->
   pdays = Array.from(range.by('day')).map((m) -> m.toISOString())
   needed = _.object(pdays,p.staffing.map((s) -> s.min))
   confirmed = _.object(pdays,Array(pdays.length).fill(0))
-  signups = share.ProjectSignups.find({parentId: p._id}).fetch()
+  signups = share.ProjectSignups.find({shiftId: p._id}).fetch()
   _.each(signups,((s) ->
     range = moment.range(moment(s.start),moment(s.end))
     days = Array.from(range.by('day')).map((m) -> m.toISOString())
