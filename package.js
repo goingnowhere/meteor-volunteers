@@ -106,6 +106,7 @@ Package.onUse(function(api) {
   ], "client");
 
   api.add_files([
+    'server/methods.js',
     'server/publications.coffee',
   ],"server");
 
