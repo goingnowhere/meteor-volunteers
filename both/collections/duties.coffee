@@ -64,6 +64,11 @@ CommonTask = new SimpleSchema(
     autoform:
       afFieldInput:
         placeholder: "max"
+  signedUp:
+    type: Number
+    defaultValue: 0
+    autoform:
+      omit: true
 )
 CommonTask.extend(Common)
 

@@ -4,20 +4,21 @@ events =
     type = $(event.target).data('type')
     parentId = $(event.target).data('parentid')
     selectedUser = $("[data-shiftId='#{shiftId}']").val()
-    userId = if selectedUser && (selectedUser != "-1") then selectedUser else Meteor.userId()
+    userId = Meteor.userId()
     doc = {parentId: parentId, shiftId: shiftId, userId: userId}
     share.meteorCall "#{type}Signups.bail", doc
 
 Template.bookedTable.bindI18nNamespace('abate:volunteers')
 Template.bookedTable.helpers
   'allShifts': (userId) ->
-    shiftSignups = share.ShiftSignups.find(
-      {userId: Meteor.userId(), status: {$in: ["confirmed","pending"]}})
-      .map((signup) => _.extend({}, signup, {type: 'shift'}))
-    projectSignups = share.ProjectSignups.find(
-      {userId: Meteor.userId(), status: {$in: ["confirmed","pending"]}})
-      .map((signup) => _.extend({}, signup, {type: 'project'}))
-    return shiftSignups.concat(projectSignups)
+    sel = {userId: Meteor.userId(), status: {$in: ["confirmed","pending"]}}
+    shiftSignups = share.ShiftSignups.find(sel)
+      .map((signup) -> _.extend({}, signup, {type: 'shift'}))
+    projectSignups = share.ProjectSignups.find(sel)
+      .map((signup) -> _.extend({}, signup, {type: 'project'}))
+    leadSignups = share.LeadSignups.find({status: "pending"})
+      .map((signup) -> _.extend({}, signup, {type: 'lead'}))
+    return leadSignups.concat(shiftSignups.concat(projectSignups))
 
 Template.bookedTable.events events
 
@@ -32,10 +33,10 @@ Template.signupUserRowView.helpers
   duty: () ->
     type = Template.instance().signup.type
     shiftId = Template.instance().signup.shiftId
-    if type == "shift"
-      share.TeamShifts.findOne(shiftId)
-    else if type == "project"
-      share.Projects.findOne(shiftId)
+    switch type
+      when "shift" then share.TeamShifts.findOne(shiftId)
+      when "project" then share.Projects.findOne(shiftId)
+      when "lead" then share.Lead.findOne(shiftId)
 
 Template.signupUserRowView.events events
 

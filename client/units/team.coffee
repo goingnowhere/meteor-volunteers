@@ -64,6 +64,7 @@ Template.teamLeadField.onCreated () ->
 
 Template.teamLeadField.helpers
   'signup': () ->
-    parentId = Template.currentData().data.parentId
-    shiftId = Template.currentData().data._id
+    console.log
+    parentId = Template.currentData().parentId
+    shiftId = Template.currentData()._id
     share.LeadSignups.findOne({parentId: parentId, shiftId: shiftId, status: 'confirmed'})

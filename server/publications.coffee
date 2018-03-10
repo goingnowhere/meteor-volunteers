@@ -16,7 +16,7 @@ share.initPublications = (eventName) ->
   # all given a team id, return all signups related to this team.
   # Restricted to team lead
   createPublicationTeam = (type,signups,duties) ->
-    Meteor.publishComposite("#{eventName}.Volunteers.#{type}.byTeam", (teamId) ->
+    Meteor.publishComposite("#{eventName}.Volunteers.#{type}.byTeam",(teamId) ->
       userId = this.userId
       return {
         find: () ->
@@ -280,6 +280,26 @@ share.initPublications = (eventName) ->
         share.VolunteerForm.find({userId: this.userId},{fields: {private_notes: 0}})
       else
         return null
+
+  # Reactive publication sorted by user preferences
+  Meteor.publish "#{eventName}.Volunteers.team.ByUserPref", (quirks,skills) ->
+    if this.userId
+      ReactiveAggregate(this, share.Team, [
+        { $project: {
+          quirks:  { $ifNull: [ "$quirks", [] ] },
+          skills:  { $ifNull: [ "$skills", [] ] },
+          intq: {"$setIntersection": [ quirks, "$quirks" ] },
+          ints: {"$setIntersection": [ skills, "$skills" ] },
+        }},
+        {$project: {
+          subq: { $size: { $ifNull: [ "$intq", [] ] } },
+          subs: { $size: { $ifNull: [ "$ints", [] ] } },
+        }},
+        {$project: {
+          score: { $sum: [ "$subq", "$subs" ]}
+        }},
+        { $sort: { score: -1 } }
+      ])
 
   ######################################
   # Below here, all public information #

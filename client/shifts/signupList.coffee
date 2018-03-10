@@ -1,138 +1,91 @@
 import SimpleSchema from 'simpl-schema'
 
-addLocalDutiesCollection = (duties,signups,template,type,filter = {},limit = 10) ->
-  duties.find(filter,{limit: limit}).forEach((duty) ->
-    duty.type = type
-    if ! template.DutiesLocal.findOne(duty._id)
-      if ! signups.findOne({userId: Meteor.userId(), shiftId: duty._id, status: 'confirmed'})
-        # XXX: there must be a better way ... like with an upsert
-        template.DutiesLocal.insert(duty)
-  )
+# coll contains shifts unique shifts title
+addLocalDutiesCollection = (duties,coll,type,filter,limit) ->
+  shifts = duties.find(filter,{limit: limit}).fetch()
+  _.chain(shifts).groupBy('title').map((l,title) ->
+    duty = { type: type, title: title, parentId: filter.parentId }
+    coll.upsert(duty,duty)
+  ).value()
 
-makeFilter = (searchQuery) ->
-  sel = []
-  teams = searchQuery.get('teams')
-  if teams?.length > 0 then sel.push {parentId: { $in: teams }}
-
-  departments = searchQuery.get('departments')
-  if departments?.length > 0 then sel.push {parentId: { $in: departments }}
-
-  return sel
-
-MakeShiftFilter = (searchQuery) ->
-  sel = makeFilter(searchQuery)
-
-  # TODO: add these filters back.
-  # rangeList = searchQuery.get('range')
-  # if rangeList?.length > 0
-  #   range = _.map(rangeList,(d) -> moment(d, 'YYYY-MM-DD'))
-  #   range = moment.range(rangeList)
-  #   sel.push
-  #     $and: [
-  #       {start: { $gte: range.start.startOf('day').toDate() }},
-  #       {start: { $lt: range.end.endOf('day').toDate() }}
-  #     ]
-  # console.log "range",sel
-
-  # daysList = searchQuery.get('range')
-  # if daysList.length > 0
-  #   range = _.map(rangeList,(d) -> moment(d, 'YYYY-MM-DD'))
-  #   range = moment.range(rangeList)
-  #   sel.push
-  #     $and: [
-  #       {start: { $gte: range.start.toDate() }},
-  #       {start: { $lt: range.end.toDate() }}
-  #     ]
-  # console.log "days",sel
-
-  # periodList = searchQuery.get('period')
-  # if periodList?.length > 0
-  #   periods = share.periods.get()
-  #   for p in periodList
-  #     sel.push
-  #       $and: [
-  #         {startTime: { $gte: periods[p].start }},
-  #         {startTime: { $lt: periods[p].end }}
-  #       ]
-
-  return if sel.length > 0 then {"$and": sel} else {}
-
-MakeProjectFilter = (searchQuery) ->
-  sel = makeFilter(searchQuery)
-  return if sel.length > 0 then {"$and": sel} else {}
-
-MakeLeadFilter = (searchQuery) ->
-  sel = makeFilter(searchQuery)
-  return if sel.length > 0 then {"$and": sel} else {}
-
-MakeDutyFilter = (searchQuery) ->
-  sel = makeFilter(searchQuery)
-  duties = searchQuery.get('duties')
-  if duties?.length > 0 then sel.push {type: { "$in": duties }}
-  return if sel.length > 0 then {"$and": sel} else {}
-
-signupsListOnCreated = () ->
+Template.signupsListTeam.bindI18nNamespace('abate:volunteers')
+Template.signupsListTeam.onCreated () ->
   template = this
-  userId = Meteor.userId()
-  template.searchQuery = new ReactiveDict({})
+  template.team = template.data
+  template.limit = new ReactiveVar(10)
   template.DutiesLocal = new Mongo.Collection(null)
-  template.sel = new ReactiveVar({})
-  template.isCustumSearch = template.data?.searchQuery?
+  coll = template.DutiesLocal
 
-  if template.isCustumSearch
-    template.autorun () ->
-      searchQuery = template.data.searchQuery.get()
-      # template.searchQuery.set('range',searchQuery.range)
-      # template.searchQuery.set('days',searchQuery.days)
-      # template.searchQuery.set('period',searchQuery.period)
-      template.searchQuery.set('duties',searchQuery.duties)
-      template.searchQuery.set('teams',searchQuery.teams)
-      template.searchQuery.set('departments',searchQuery.departments)
-      template.searchQuery.set('limit',searchQuery.limit)
+  sel = {parentId : template.team._id}
+  template.autorun () ->
+    limit = template.limit.get()
+    switch template.team.dutytype
+      when "shift"
+        share.templateSub(template,"TeamShifts",sel,limit)
+        if template.subscriptionsReady()
+          addLocalDutiesCollection(share.TeamShifts,coll,'shift',sel,limit)
+      when "task"
+        share.templateSub(template,"TeamTasks",sel,limit)
+        if template.subscriptionsReady()
+          addLocalDutiesCollection(share.TeamTasks,coll,'task',sel,limit)
+      when "project"
+        share.templateSub(template,"Projects",sel,limit)
+        if template.subscriptionsReady()
+          addLocalDutiesCollection(share.Projects,coll,'project',sel,limit)
+      else
+        share.templateSub(template,"TeamShifts",sel,limit)
+        share.templateSub(template,"TeamTasks",sel,limit)
+        share.templateSub(template,"Projects",sel,limit)
+        if template.subscriptionsReady()
+          addLocalDutiesCollection(share.TeamShifts,coll,'shift',sel,limit)
+          addLocalDutiesCollection(share.TeamTasks,coll,'task',sel,limit)
+          addLocalDutiesCollection(share.Projects,coll,'project',sel,limit)
 
-  template.autorun () -> (
-    shiftFilter = MakeShiftFilter(template.searchQuery)
-    projectFilter = MakeProjectFilter(template.searchQuery)
-    leadFilter = MakeLeadFilter(template.searchQuery)
-    limit = template.searchQuery.get('limit') || 10
-    share.templateSub(template,"TeamShifts",shiftFilter,limit)
-    share.templateSub(template,"TeamTasks",shiftFilter,limit)
-    share.templateSub(template,"Projects",projectFilter,limit)
-    share.templateSub(template,"Lead",leadFilter,limit)
-    share.templateSub(template,"ShiftSignups.byUser", userId)
-    share.templateSub(template,"TaskSignups.byUser", userId)
-    share.templateSub(template,"ProjectSignups.byUser", userId)
-    share.templateSub(template,"LeadSignups.byUser", userId)
+Template.signupsListTeam.helpers
+  'allShifts': () ->
+    template = Template.instance()
+    sel = {parentId : template.team._id}
+    template.DutiesLocal.find(sel).fetch()
+  'loadMore' : () ->
+    template = Template.instance()
+    sel = {parentId : template.team._id}
+    template.DutiesLocal.find(sel).count() >= template.limit.get()
 
-    if template.subscriptionsReady()
-      addLocalDutiesCollection(share.TeamShifts,share.ShiftSignups,template,'shift',shiftFilter,limit)
-      addLocalDutiesCollection(share.TeamTasks,share.TaskSignups,template,'task',shiftFilter,limit)
-      addLocalDutiesCollection(share.Projects,share.ProjectSignups,template,'project',projectFilter,limit)
-      addLocalDutiesCollection(share.Lead,share.LeadSignups,template,'lead',leadFilter,limit)
-
-    template.sel.set(MakeDutyFilter(template.searchQuery))
-  )
+Template.signupsListTeam.events
+  'click [data-action="loadMoreShifts"]': ( event, template ) ->
+    limit = template.limit.get()
+    template.limit.set(limit+2)
 
 Template.signupsList.bindI18nNamespace('abate:volunteers')
-Template.signupsList.onCreated signupsListOnCreated
+Template.signupsList.onCreated () ->
+  template = this
+  template.limit = new ReactiveVar(10)
+  quirks =  template.data?.quirks
+  skills =  template.data?.skills
+
+  template.autorun () ->
+    limit = template.limit.get()
+    if quirks and skills
+      share.templateSub(template,"team.ByUserPref",quirks,skills,limit)
+    else
+      share.templateSub(template,"team",{},limit)
 
 Template.signupsList.helpers
-  'allDuties': () ->
-    filter = Template.instance().sel.get()
-    Template.instance().DutiesLocal.find(filter)
+  'allTeams': () ->
+    template = Template.instance()
+    limit = template.limit.get()
+    team = share.Team.find({},{sort: {score: -1}},{limit:limit})
+    console.log team.fetch()
+    console.log Template.currentData()
+    team.dutytype = null
+    if Template.currentData()?.dutytype?
+      team.dutytype = Template.currentData().dutytype
+    return team
+  'loadMore' : () ->
+    template = Template.instance()
+    share.Team.find().count() >= template.limit.get()
 
-Template.signupsListGroupped.bindI18nNamespace('abate:volunteers')
-Template.signupsListGroupped.onCreated signupsListOnCreated
-
-Template.signupsListGroupped.helpers
-  'allDuties': () ->
-    filter = Template.instance().sel.get()
-    # group by team, title, order by importance, date
-    groupByParentId =
-      _.groupBy(Template.instance().DutiesLocal.find(filter).fetch(),'parentId')
-    _.map(groupByParentId, (teamdutieslist,parentId) ->
-      groupByTitle = _.groupBy(teamdutieslist,'title')
-      team: share.Team.findOne(parentId)
-      group: _.map(groupByTitle, (dutieslist,title) ->
-        {title: title, group: dutieslist} )
-    )
+Template.signupsList.events
+  'click [data-action="loadMoreTeams"]': ( event, template ) ->
+    limit = template.limit.get()
+    template.limit.set(limit+2)

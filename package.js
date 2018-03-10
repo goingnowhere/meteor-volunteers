@@ -51,6 +51,10 @@ Package.onUse(function(api) {
     'peppelg:bootstrap-3-modal',
   ], 'client');
 
+  api.use([
+    'jcbernack:reactive-aggregate'
+  ], 'server')
+
   // Order Matters !
   api.add_files([
     'both/global.coffee',

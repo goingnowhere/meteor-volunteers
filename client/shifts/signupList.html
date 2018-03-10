@@ -1,46 +1,46 @@
-<!--  main shifts signup -->
 <template name="signupsList">
   <div class="container-fluid p-0">
-    <div class="row no-gutters">
-      <div class="container-fluid p-0">
-        {{#each teamDuties in allDuties}}
-          {{#each duties in teamDuties.group }}
-            <div class="flex-column signupsListItem">
-              {{> dutiesListItemGroupped duties=duties}}
-            </div>
+    {{#if Template.subscriptionsReady }}
+      <div class="row no-gutters">
+        <div class="container-fluid p-0">
+          {{#each team in allTeams }}
+            {{#if leadsOnly }}
+              {{> leadListItemGroupped team }}
+            {{else }}
+              {{> signupsListTeam team }}
+            {{/if}}
           {{/each}}
-        {{/each}}
-      </div>
-    </div>
-    {{#if loadMore}}
-      <div class="row">
-        <div class="text-center">
-          <button class="btn btn-primary" data-action="loadMore">{{__ ".load_more"}}</button>
+          {{#if loadMore}}
+            <div class="row align-content-right no-gutters">
+              <div class="col">
+                <button class="btn btn-default btn-primary"
+                  data-action="loadMoreTeams">{{__ ".load_more_teams"}}</button>
+              </div>
+            </div>
+          {{/if}}
         </div>
       </div>
     {{/if}}
   </div>
 </template>
 
-<template name="signupsListGroupped">
-  <div class="container-fluid p-0">
-    <div class="row no-gutters">
-      <div class="container-fluid p-0">
-        {{#each teamDuties in allDuties}}
-          {{#each duties in teamDuties.group }}
-            <div class="flex-column signupsListItem">
-              {{> dutiesListItemGroupped duties=duties}}
-            </div>
-          {{/each}}
+<template name="signupsListTeam">
+  {{#if $and Template.subscriptionsReady ($gt ($len allShifts) 0) }}
+    {{name}}
+    <div class="row justify-content-between align-content-center no-gutters">
+      <div class="container-fluid p-0 signupsListItem">
+        {{#each duty in allShifts }}
+          {{> dutiesListItemGroupped duty }}
         {{/each}}
+        {{#if loadMore}}
+          <div class="row align-content-right no-gutters">
+            <div class="col-md-2 offset-md-8">
+              <button class="btn btn-default btn-primary"
+                data-action="loadMoreShifts">{{__ ".load_more_shifts"}}</button>
+            </div>
+          </div>
+        {{/if}}
       </div>
     </div>
-    {{#if loadMore}}
-      <div class="row">
-        <div class="text-center">
-          <button class="btn btn-primary" data-action="loadMore">{{__ ".load_more"}}</button>
-        </div>
-      </div>
-    {{/if}}
-  </div>
+  {{/if}}
 </template>

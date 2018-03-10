@@ -1,13 +1,13 @@
 <!-- All Shifts, Leads and tasks booked by a user -->
 <template name="bookedTable">
   <div class="container-fluid p-0 bookedTable">
-    <div class="row">
+    <!-- <div class="row">
       <div class="col-md-1"></div>
       <div class="col-md-3">{{__ ".time"}}</div>
       <div class="col-md-3">{{__ ".name"}}</div>
       <div class="col-md-3">{{__ ".location"}}</div>
       <div class="col-md-1"></div>
-    </div>
+    </div> -->
     <div class="row">
       <div class="container-fluid">
         {{#each shift in allShifts }}
@@ -22,18 +22,22 @@
 
 <template name="signupUserRowView">
   <div class="row justify-content-between align-content-center no-gutters">
-    <div class="col-md-1 p-0">
+    <div class="col-md-1">
       {{#if $eq signup.status "confirmed"}}<div class="text-success">{{fa "check"}}</div>{{/if}}
       {{#if $eq signup.status "pending"}}<div class="text-warning">{{fa "clock-o"}}</div>{{/if}}
     </div>
     {{#if $eq signup.type "project"}}
       {{> projectDateInline signup }}
     {{else}}
-      {{> shiftDateInline duty }}
+      {{#if $eq signup.type "shift"}}
+        {{> shiftDateInline duty }}
+      {{/if}}
     {{/if}}
-    <div class="col-md-5 d-flex p-0 align-items-start">
-      <h5>{{team.name}} : {{shift.title}}</h5>
-      {{team.location}}
+    <div class="col-md-5 d-flex align-items-start">
+      <h5>{{duty.title}}</h5> ({{team.name}})
+      {{#if $eq signup.type "shift"}}
+        {{team.location}}
+      {{/if}}
     </div>
     <div class="col-md-2 p-0">
       <button type="button" class="btn btn-primary btn-action" data-action="bail"
