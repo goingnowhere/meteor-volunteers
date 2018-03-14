@@ -14,6 +14,30 @@ SimpleSchema.setDefaultMessages
 
 share.Schemas = {}
 
+Bounds = new SimpleSchema(
+  min:
+    type: Number
+    label: () -> i18n.__("abate:volunteers","min_people")
+    optional: true
+    autoform:
+      afFieldInput:
+        min: 1
+        placeholder: "min"
+  max:
+    type: Number
+    label: () -> i18n.__("abate:volunteers","max_people")
+    optional: true
+    # TODO: if max is not set, it should be equal to min
+    autoform:
+      afFieldInput:
+        placeholder: "max"
+  signedUp:
+    type: Number
+    defaultValue: 0
+    autoform:
+      omit: true
+)
+
 Common = new SimpleSchema(
   parentId:
     type: String
@@ -47,31 +71,6 @@ Common = new SimpleSchema(
       omit: true
 )
 
-CommonTask = new SimpleSchema(
-  min:
-    type: Number
-    label: () -> i18n.__("abate:volunteers","min_people")
-    optional: true
-    autoform:
-      afFieldInput:
-        min: 1
-        placeholder: "min"
-  max:
-    type: Number
-    label: () -> i18n.__("abate:volunteers","max_people")
-    optional: true
-    # TODO: if max is not set, it should be equal to min
-    autoform:
-      afFieldInput:
-        placeholder: "max"
-  signedUp:
-    type: Number
-    defaultValue: 0
-    autoform:
-      omit: true
-)
-CommonTask.extend(Common)
-
 share.Schemas.TeamTasks = new SimpleSchema(
   estimatedTime:
     type: String
@@ -101,7 +100,8 @@ share.Schemas.TeamTasks = new SimpleSchema(
     autoform:
       omit: true
 )
-share.Schemas.TeamTasks.extend(CommonTask)
+share.Schemas.TeamTasks.extend(Common)
+share.Schemas.TeamTasks.extend(Bounds)
 
 getUniqueShifts = () ->
   allShifts = share.TeamShifts.find({},{sort: {title: 1}}).fetch()
@@ -150,9 +150,10 @@ share.Schemas.TeamShifts = new SimpleSchema(
       omit: true
 )
 
-share.Schemas.TeamShifts.extend(CommonTask)
+share.Schemas.TeamShifts.extend(Common)
+share.Schemas.TeamShifts.extend(Bounds)
 
-share.Schemas.Lead = new SimpleSchema(CommonTask)
+share.Schemas.Lead = new SimpleSchema(Common)
 share.Schemas.Lead.extend(
   responsibilities:
     type: String
@@ -222,8 +223,6 @@ share.Schemas.Projects = new SimpleSchema(
       days = moment(this.field('end').value).diff(moment(this.field('start').value), 'days') + 1
       unless this.value.length == days
         return "numberOfDaysCustom"
-  'staffing.$': Object
-  'staffing.$.min': SimpleSchema.Integer
-  'staffing.$.max': SimpleSchema.Integer
+  'staffing.$': Bounds
 )
 share.Schemas.Projects.extend(Common)
