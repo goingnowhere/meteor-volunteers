@@ -9,6 +9,7 @@ throwError = (error, reason, details) ->
   return
 
 share.initMethods = (eventName) ->
+
   # Generic function to create insert,update,remove methods for groups within
   # the organisation, e.g. teams
   createOrgUnitMethod = (collection, type) ->
@@ -64,7 +65,7 @@ share.initMethods = (eventName) ->
 
   # Generic function to create insert,update,remove methods.
   # Security check : user must be manager
-  createMethod = (collection,type) ->
+  createDutiesMethod = (collection,type) ->
     collectionName = collection._name
     switch type
       when "remove"
@@ -135,10 +136,10 @@ share.initMethods = (eventName) ->
               else if parentDoc.policy == "requireApproval" then "pending"
             if status
               if Meteor.isServer
-                collection.upsert(signup,{$set: {status: status}})
-                if status == "confirmed"
-                  console.log
-                  parentCollection.update(signup.shiftId,{$inc: {signedUp: 1}})
+                collection.upsert(signup,{$set: {status: status}}, (err,res) ->
+                  if (!err) and status == "confirmed"
+                    parentCollection.update(signup.shiftId,{$set: {$inc: {signedUp: 1}}})
+                )
           else
             return throwError(403, 'Insufficient Permission')
       when "bail"
@@ -148,9 +149,11 @@ share.initMethods = (eventName) ->
           userId = Meteor.userId()
           if (sel.userId == userId) || (share.isManagerOrLead(userId,[sel.parentId]))
             # this multi: true should not be necessary, but just in case ...
-            collection.update(sel, {$set: {status: "bailed"}},{multi: true})
-            parentDoc = parentCollection.findOne(sel.shiftId)
-            parentCollection.update(sel.shiftId, {$inc: {signedUp: -1}})
+            collection.update(sel, {$set: {status: "bailed"}},{multi: true},(err,res) ->
+              unless err
+                parentDoc = parentCollection.findOne(sel.shiftId)
+                parentCollection.update(sel.shiftId, { $set: {$inc: {signedUp: -1}}})
+            )
           else
             return throwError(403, 'Insufficient Permission')
 
@@ -161,7 +164,7 @@ share.initMethods = (eventName) ->
           createOrgUnitMethod(collection, type)
       for k,collection of share.dutiesCollections
         do ->
-          createMethod(collection,type)
+          createDutiesMethod(collection,type)
 
   for type in ['remove', 'update', 'insert', 'bail']
     do ->

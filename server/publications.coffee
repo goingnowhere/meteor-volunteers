@@ -195,7 +195,7 @@ share.initPublications = (eventName) ->
           else return null
         children: [
           { find: (signup) -> return duties.find(signup.shiftId) }
-          { find: (signup) -> return share.Team.find(signup.parentId) }
+          # { find: (signup) -> return share.Team.find(signup.parentId) }
           { find: (signup) ->
             if signup
               if share.isManagerOrLead(userId,[ signup.parentId ])
@@ -227,19 +227,19 @@ share.initPublications = (eventName) ->
                 else return null
               else return null
             children: [
-              { find: (signup,duty) ->
-                if duty
-                  if type == "TeamShifts" || type == "TeamTasks"
-                    return share.Team.find(duty.parentId)
-                  else if type == "Lead"
-                    t = share.Team.find(duty.parentId)
-                    if t.count() > 0 then return t else
-                    dt = share.Department.find(duty.parentId)
-                    if dt.count() > 0 then return dt else
-                    dv = share.Division.find(duty.parentId)
-                    return dv
-                else return null
-              },
+              # { find: (signup,duty) ->
+              #   if duty
+              #     if type == "TeamShifts" || type == "TeamTasks"
+              #       return share.Team.find(duty.parentId)
+              #     else if type == "Lead"
+              #       t = share.Team.find(duty.parentId)
+              #       if t.count() > 0 then return t else
+              #       dt = share.Department.find(duty.parentId)
+              #       if dt.count() > 0 then return dt else
+              #       dv = share.Division.find(duty.parentId)
+              #       return dv
+              #   else return null
+              # },
               { find: (signup,duty) ->
                 if signup
                   if share.isManagerOrLead(userId,[ duty.parentId ])
@@ -281,26 +281,98 @@ share.initPublications = (eventName) ->
       else
         return null
 
+  # this pipeline sort add the totalscore field to a team
+  teamPipeline = [
+    # get all the shifts associated to this team
+    { $lookup: {
+      from: share.TeamShifts._name,
+      localField: "_id",
+      foreignField: "parentId",
+      as: "duties"
+    }},
+    { $unwind: "$duties" },
+    # project the results in mongo 3.4 use addfields instead
+    { $project: {
+      name: 1,
+      description: 1,
+      parentId: 1,
+      quirks: 1,
+      skills: 1,
+      duties: 1,
+      p : {
+        $cond: [{ $eq: [ "$duties.priority", "normal"]},1,
+          { $cond: [{ $eq: [ "$duties.priority", "important"]},3,
+            {
+              $cond: [{ $eq: [ "$duties.priority", "essential"]},5,0]
+            }
+          ]}
+        ]
+      }}
+    },
+    { $group: {
+      _id: "$_id",
+      # types: { $addToSet: "$duties.priority" },
+      totalscore: { $sum: "$p"}, # assign a score to each team based on its shifts' priority
+      name: {$first: "$name"},
+      description : {$first: "$description"},
+      parentId: {$first: "$parentId"}
+      quirks: {$first: "$quirks"},
+      skills: {$first: "$skills"},
+    }},
+  ]
+
   # Reactive publication sorted by user preferences
+  # I use the pipeline above + adding one more field for the userPref
   Meteor.publish "#{eventName}.Volunteers.team.ByUserPref", (quirks,skills) ->
     if this.userId
-      ReactiveAggregate(this, share.Team, [
+      ReactiveAggregate(this, share.Team, teamPipeline.concat([
         { $project: {
+          name: 1,
+          description: 1,
+          parentId: 1,
+          totalscore: 1
           quirks:  { $ifNull: [ "$quirks", [] ] },
           skills:  { $ifNull: [ "$skills", [] ] },
           intq: {"$setIntersection": [ quirks, "$quirks" ] },
           ints: {"$setIntersection": [ skills, "$skills" ] },
         }},
         {$project: {
+          name: 1,
+          description: 1,
+          parentId: 1,
+          quirks: 1,
+          skills: 1,
+          totalscore: 1
           subq: { $size: { $ifNull: [ "$intq", [] ] } },
           subs: { $size: { $ifNull: [ "$ints", [] ] } },
         }},
         {$project: {
-          score: { $sum: [ "$subq", "$subs" ]}
+          name: 1,
+          description: 1,
+          parentId: 1,
+          quirks: 1,
+          skills: 1,
+          totalscore: 1
+          # assign a score to the team w.r.t. the user preferences
+          userpref: { $sum: [ "$subq", "$subs" ]}
         }},
-        { $sort: { score: -1 } }
-      ])
+        # remove all teams without duties
+        { $match: { totalscore: { $gt: 0 } }},
+        { $sort: { totalscore: -1 } }
+      ]))
 
+  Meteor.publish "#{eventName}.Volunteers.team", (sel={}) ->
+    unless share.isManagerOrLead(this.userId)
+      sel = _.extend(sel,unitPublicPolicy)
+    ReactiveAggregate(this, share.Team,
+      [ { $match: sel } ].concat(
+        teamPipeline.concat( [
+          { $match: { totalscore: { $gt: 0 } }},
+          { $sort: { totalscore: -1 } }
+          ]
+        )
+      )
+    )
   ######################################
   # Below here, all public information #
   ######################################
@@ -315,11 +387,7 @@ share.initPublications = (eventName) ->
     dv = share.Division.find(sel)
     return [dv,dp,t]
 
-  Meteor.publish "#{eventName}.Volunteers.team", (sel={}) ->
-    if this.userId && share.isManagerOrLead(this.userId)
-      share.Team.find(sel)
-    else
-      share.Team.find(_.extend(sel,unitPublicPolicy))
+
 
   Meteor.publish "#{eventName}.Volunteers.division", (sel={}) ->
     if this.userId && share.isManagerOrLead(this.userId)

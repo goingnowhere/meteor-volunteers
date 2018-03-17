@@ -21,9 +21,12 @@ getTeam = (type,parentId) ->
           dv = share.Division.findOne(parentId)
           return _.extend(dv,{type: "division"})
 
-# coll contains all shifts (dates) related to a particular title
+# client side collection
+DutiesLocal = new Mongo.Collection(null)
+
+# DutiesLocal contains all shifts (dates) related to a particular title
 # and parentId
-addLocalDutiesCollection = (duties,coll,type,filter,limit) ->
+addLocalDutiesCollection = (duties,type,filter,limit) ->
   duties.find(filter,{limit: limit}).forEach((duty) ->
     duty.type = type
     duty.team = getTeam(type,duty.parentId)
@@ -34,7 +37,7 @@ addLocalDutiesCollection = (duties,coll,type,filter,limit) ->
         when "task" then share.TaskSignups.findOne(sel)
         when "project" then share.ProjectSignups.findOne(sel)
       )
-    coll.upsert(duty._id,duty)
+    DutiesLocal.upsert(duty._id,duty)
   )
 
 Template.leadListItemGroupped.bindI18nNamespace('abate:volunteers')
@@ -93,8 +96,6 @@ Template.dutiesListItemGroupped.onCreated () ->
   duty = template.data
   userId = Meteor.userId()
   template.limit = new ReactiveVar(2)
-  template.DutiesLocal = new Mongo.Collection(null)
-  coll = template.DutiesLocal
 
   sel = {title: duty.title, parentId: duty.parentId}
   template.autorun () ->
@@ -104,17 +105,17 @@ Template.dutiesListItemGroupped.onCreated () ->
         share.templateSub(template,"TeamShifts",sel,limit)
         share.templateSub(template,"ShiftSignups.byUser", userId)
         if template.subscriptionsReady()
-          addLocalDutiesCollection(share.TeamShifts,coll,'shift',sel,limit)
+          addLocalDutiesCollection(share.TeamShifts,'shift',sel,limit)
       when "task"
         share.templateSub(template,"TeamTasks",sel,limit)
         share.templateSub(template,"TaskSignups.byUser", userId)
         if template.subscriptionsReady()
-          addLocalDutiesCollection(share.TeamTasks,coll,'task',sel,limit)
+          addLocalDutiesCollection(share.TeamTasks,'task',sel,limit)
       when "project"
         share.templateSub(template,"Projects",sel,limit)
         share.templateSub(template,"ProjectSignups.byUser", userId)
         if template.subscriptionsReady()
-          addLocalDutiesCollection(share.Projects,coll,'project',sel,limit)
+          addLocalDutiesCollection(share.Projects,'project',sel,limit)
 
 Template.dutiesListItemGroupped.helpers
   'loadMore': () ->
@@ -122,13 +123,13 @@ Template.dutiesListItemGroupped.helpers
     duty = Template.currentData()
     if duty
       sel = {title: duty.title}
-      template.DutiesLocal.find(sel).count() >= template.limit.get()
+      DutiesLocal.find(sel).count() >= template.limit.get()
   'allDates': () ->
     template = Template.instance()
     duty = Template.currentData()
     if duty
       sel = {title: duty.title, "signup.status": { $nin: ["confirmed"] } }
-      template.DutiesLocal.find(sel)
+      DutiesLocal.find(sel)
   'duty': () ->
     duty = Template.currentData()
     if duty
@@ -145,7 +146,7 @@ Template.dutiesListItemDate.helpers
   'spotleft': () ->
     duty = Template.currentData()
     duty.min - duty.signedUp
-    
+
 Template.dutiesListItemDate.events
   'click [data-action="apply"]': ( event, template ) ->
     shiftId = $(event.target).data('shiftid')

@@ -53,7 +53,7 @@ CommonUnit = new SimpleSchema(
     optional: true
     autoform:
       rows: 5
-  # the unit policy should lock the policy of all entities below
+  # TODO: the unit policy should lock the policy of all entities below
   policy:
     type: String
     label: () -> i18n.__("abate:volunteers","policy")

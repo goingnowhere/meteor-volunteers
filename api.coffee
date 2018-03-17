@@ -52,3 +52,5 @@ class VolunteersClass
   isManager: () -> share.isManager()
   teamStats: (id) -> share.TeamStats(id)
   deptStats: (id) -> share.DepartmentStats(id)
+  # used in the fixetures
+  updateTeamsScores: (duties) -> share.updateTeamsScores(duties)
