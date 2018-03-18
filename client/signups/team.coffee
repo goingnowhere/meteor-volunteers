@@ -136,7 +136,7 @@ drawStakedBar = (props) ->
   barData = props.barData
   datasets = [{ label: "needed", data: barData.needed, backgroundColor: '#ffe94D' }]
   unless props.hideConfirmed
-    datasets.push({ label: "confirmed", data: barData.confirmed, backgroundColor: '#D6E9C6' })
+    datasets.unshift({ label: "confirmed", data: barData.confirmed, backgroundColor: '#D6E9C6' })
   data =
     labels: barData.days.map((t) -> moment(t).format("MMM Do"))
     datasets: datasets

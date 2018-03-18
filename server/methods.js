@@ -15,7 +15,7 @@ share.initServerMethods = (eventName) => {
         .fetch()
 
       return days.map(day =>
-        signups.filter(signup => signup.status === 'confirmed' && day.isBetween(signup.start, signup.end)).length
+        signups.filter(signup => signup.status === 'confirmed' && day.isBetween(signup.start, signup.end, 'days', '[]')).length
       )
     }
   })

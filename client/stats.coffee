@@ -50,7 +50,7 @@ share.projectSignupsConfirmed = (p) ->
   signups = share.ProjectSignups.find({shiftId: p._id}).fetch()
   _.each(signups,((signup) ->
     pdays.forEach((day) ->
-      if day.isBetween(signup.start, signup.end)
+      if day.isBetween(signup.start, signup.end, 'days', '[]')
         confirmed[day] = confirmed[day] + 1
         needed[day] = needed[day] - 1
     )
