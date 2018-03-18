@@ -108,7 +108,17 @@ share.initMethods = (eventName) ->
           check(shiftId, String)
           olddoc = collection.findOne(shiftId)
           if share.isManagerOrLead(Meteor.userId(),[olddoc.parentId])
-            collection.remove(shiftId)
+            collection.remove(shiftId,(err,res) ->
+              unless err
+                incValue = (
+                  switch olddoc.status
+                    when 'confirmed' then -1
+                    when 'bailed' then -1
+                    else 0
+                )
+                if incValue != 0
+                  parentCollection.update(signup.shiftId,{$set: {$inc: {signedUp: incValue}}})
+              )
           else
             return throwError(403, 'Insufficient Permission')
       when "update"
@@ -117,7 +127,19 @@ share.initMethods = (eventName) ->
           SimpleSchema.validate(doc.modifier, schema, { modifier: true })
           olddoc = collection.findOne(doc._id)
           if share.isManagerOrLead(Meteor.userId(),[olddoc.parentId])
-            collection.update(doc._id, doc.modifier)
+            collection.update(doc._id, doc.modifier (err,res) ->
+              unless err
+                incValue = (
+                  if doc.modifier.status?
+                    switch doc.modifier.status
+                      when 'confirmed' then 1
+                      when 'bailed' then -1
+                      else 0
+                  else 0
+                )
+                if incValue != 0
+                  parentCollection.update(signup.shiftId,{$set: {$inc: {signedUp: incValue}}})
+              )
           else
             return throwError(403, 'Insufficient Permission')
       when "insert"
@@ -148,8 +170,7 @@ share.initMethods = (eventName) ->
           SimpleSchema.validate(sel, schema.omit('status','start','end'))
           userId = Meteor.userId()
           if (sel.userId == userId) || (share.isManagerOrLead(userId,[sel.parentId]))
-            # this multi: true should not be necessary, but just in case ...
-            collection.update(sel, {$set: {status: "bailed"}},{multi: true},(err,res) ->
+            collection.update(sel, {$set: {status: "bailed"}},(err,res) ->
               unless err
                 parentDoc = parentCollection.findOne(sel.shiftId)
                 parentCollection.update(sel.shiftId, { $set: {$inc: {signedUp: -1}}})
@@ -273,7 +294,7 @@ share.initMethods = (eventName) ->
     userId = Meteor.userId()
     olddoc = share.LeadSignups.findOne(sel)
     if (sel.userId == userId) || (share.isManagerOrLead(userId,[olddoc.parentId]))
-      share.LeadSignups.update(sel,{$set: {status: "bailed"}},{multi: true}, (err,res) ->
+      share.LeadSignups.update(sel,{$set: {status: "bailed"}},(err,res) ->
         unless err
           if Meteor.isServer
             Roles.removeUsersFromRoles(olddoc.userId, olddoc.parentId, eventName)
