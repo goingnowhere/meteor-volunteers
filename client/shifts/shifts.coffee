@@ -215,7 +215,7 @@ Template.projectStaffingInput.helpers
       staffing = AutoForm.getFieldValue('staffing') || []
       days = moment(end).diff(moment(start), 'days') + 1
       if days > staffing.length
-        return staffing.concat(Array(days - staffing.length).fill({}))
+        return staffing.concat(Array(days - staffing.length).fill({signedUp: 0}))
       else
         return staffing.slice(0, days)
 AutoForm.addInputType("projectStaffing",
@@ -225,6 +225,7 @@ AutoForm.addInputType("projectStaffing",
       .map((_, col) ->
         min: $(col).find('[data-field="min"]').val()
         max: $(col).find('[data-field="max"]').val()
+        signedUp: $(col).find('[data-field="signedUp"]').val()
       ).get()
     return values
 )
