@@ -207,7 +207,8 @@ share.initMethods = (eventName) ->
     console.log ["#{prefix}.volunteerForm.update",doc]
     schema = share.form.get().simpleSchema()
     SimpleSchema.validate(doc.modifier,schema,{ modifier: true })
-    if (Meteor.userId() == doc.userId) || share.isManager()
+    oldDoc = share.form.get().findOne(doc._id)
+    if (Meteor.userId() == oldDoc.userId) || share.isManager()
       share.form.get().update(doc._id,doc.modifier)
     else
       return throwError(403, 'Insufficient Permission')
