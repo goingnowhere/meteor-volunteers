@@ -7,7 +7,11 @@ share.templateSub = (template,name,args...) ->
 share.meteorSub = (name,args...) ->
   Meteor.subscribe("#{share.eventName}.Volunteers.#{name}",args...)
 
-share.meteorCall = (name,args...) ->
+share.meteorCall = (name,args...,lastArg) ->
+  if typeof lastArg == 'function'
+    callback = lastArg
+  else
+    args.push(lastArg)
   Meteor.call("#{share.eventName}.Volunteers.#{name}", args... , (err,res) ->
     if err
       Bert.alert({
@@ -17,6 +21,8 @@ share.meteorCall = (name,args...) ->
         style: 'growl-top-right',
         icon: 'fa-warning'
       })
+    if callback
+      callback(err,res)
     )
 
 share.getOrgUnit = (unitId) ->

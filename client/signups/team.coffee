@@ -123,13 +123,20 @@ Template.teamProjectsTable.events commonEvents
 Template.projectStaffingChart.bindI18nNamespace('abate:volunteers')
 Template.projectStaffingChart.helpers
   stackedBarData: (project) ->
-    _.extend(share.projectSignupsConfirmed(project),{_id:project._id})
+    confirmedSignups = Template.currentData().confirmedSignups
+    signupData = _.extend(share.projectSignupsConfirmed(project),{_id:project._id})
+    if confirmedSignups
+      signupData = _.extend(signupData, {
+        confirmed: confirmedSignups,
+        needed: signupData.needed.map((need, index) => need - confirmedSignups[index]),
+      })
+    signupData
 
 drawStakedBar = (props) ->
   barData = props.barData
   datasets = [{ label: "needed", data: barData.needed, backgroundColor: '#ffe94D' }]
   unless props.hideConfirmed
-    datasets.push({ label: "confirmed", data: barData.confirmed, backgroundColor: '#D6E9C6' })
+    datasets.unshift({ label: "confirmed", data: barData.confirmed, backgroundColor: '#D6E9C6' })
   data =
     labels: barData.days.map((t) -> moment(t).format("MMM Do"))
     datasets: datasets

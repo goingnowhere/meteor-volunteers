@@ -43,16 +43,16 @@ getUnit = (sel,unit,type) ->
 
 share.projectSignupsConfirmed = (p) ->
   range = moment.range(moment(p.start),moment(p.end))
-  pdays = Array.from(range.by('day')).map((m) -> m.toISOString())
+  pdays = Array.from(range.by('day'))
+  dayStrings = pdays.map((m) -> m.toISOString())
   needed = _.object(pdays,p.staffing.map((s) -> s.min))
   confirmed = _.object(pdays,Array(pdays.length).fill(0))
-  signups = share.ProjectSignups.find({parentId: p._id}).fetch()
-  _.each(signups,((s) ->
-    range = moment.range(moment(s.start),moment(s.end))
-    days = Array.from(range.by('day')).map((m) -> m.toISOString())
-    days.forEach((day) ->
-      confirmed[day] = confirmed[day] + 1
-      needed[day] = needed[day] - 1
+  signups = share.ProjectSignups.find({shiftId: p._id}).fetch()
+  _.each(signups,((signup) ->
+    pdays.forEach((day) ->
+      if day.isBetween(signup.start, signup.end, 'days', '[]')
+        confirmed[day] = confirmed[day] + 1
+        needed[day] = needed[day] - 1
     )
   ))
   filter = (arr) -> _.sortBy(Object.entries(arr),
@@ -60,7 +60,7 @@ share.projectSignupsConfirmed = (p) ->
   return {
     needed: filter(needed),
     confirmed: filter(confirmed),
-    days: pdays
+    days: dayStrings
   }
 
 class TeamStatsClass

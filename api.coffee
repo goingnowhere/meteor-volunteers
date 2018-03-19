@@ -27,6 +27,8 @@ class VolunteersClass
     share.initCollections(@eventName)
     share.initRouters(@eventName)
     share.initMethods(@eventName)
+    if Meteor.isServer
+      share.initServerMethods(@eventName)
     initAuthorization(@eventName)
     if Meteor.isServer
       share.initPublications(@eventName)

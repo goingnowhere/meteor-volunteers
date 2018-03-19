@@ -234,6 +234,8 @@ Template.projectSignupForm.onCreated () ->
   project = template.data.project
   share.templateSub(template,"Projects.byDuty",project._id)
   template.allDays = new ReactiveVar()
+  template.confirmed = new ReactiveVar()
+  share.meteorCall("getProjectStaffing", project._id, (err, confirmed) => template.confirmed.set(confirmed))
   template.autorun () ->
     if template.subscriptionsReady()
       projectLength = moment(project.end).diff(moment(project.start), 'days')
@@ -254,6 +256,7 @@ Template.projectSignupForm.helpers
       i18n.__("abate:volunteers",".join")
     else
       i18n.__("abate:volunteers",".apply")
+  confirmed: () => Template.instance().confirmed.get()
 
 AutoForm.addHooks([
   'projectSignupsInsert',
