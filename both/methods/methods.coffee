@@ -113,7 +113,6 @@ share.initMethods = (eventName) ->
                 incValue = (
                   switch olddoc.status
                     when 'confirmed' then -1
-                    when 'bailed' then -1
                     else 0
                 )
                 if incValue != 0
@@ -127,16 +126,21 @@ share.initMethods = (eventName) ->
           SimpleSchema.validate(doc.modifier, schema, { modifier: true })
           olddoc = collection.findOne(doc._id)
           if share.isManagerOrLead(Meteor.userId(),[olddoc.parentId])
-            collection.update(doc._id, doc.modifier (err,res) ->
+            collection.update(doc._id, doc.modifier, (err,res) ->
               unless err
-                incValue = (
-                  if doc.modifier.status?
-                    switch doc.modifier.status
-                      when 'confirmed' then 1
-                      when 'bailed' then -1
+                incValue =
+                  if doc.modifier.$set?.status?
+                    switch doc.modifier.$set.status
+                      when 'confirmed'
+                        switch oldDoc.status
+                          when 'pending' then 1
+                          else 0
+                      when 'bailed'
+                        switch oldDoc.status
+                          when 'confirmed' then -1
+                          else 0
                       else 0
                   else 0
-                )
                 if incValue != 0
                   parentCollection.update(signup.shiftId,{$set: {$inc: {signedUp: incValue}}})
               )
@@ -172,8 +176,13 @@ share.initMethods = (eventName) ->
           if (sel.userId == userId) || (share.isManagerOrLead(userId,[sel.parentId]))
             collection.update(sel, {$set: {status: "bailed"}},(err,res) ->
               unless err
-                parentDoc = parentCollection.findOne(sel.shiftId)
-                parentCollection.update(sel.shiftId, { $set: {$inc: {signedUp: -1}}})
+                olddoc = collection.findOne(sel)
+                incValue =
+                  switch olddoc.start
+                    when 'confirmed' then -1
+                    else 0
+                if incValue != 0
+                  parentCollection.update(sel.shiftId, { $set: {$inc: {signedUp: incValue}}})
             )
           else
             return throwError(403, 'Insufficient Permission')
