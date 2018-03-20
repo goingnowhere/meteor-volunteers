@@ -213,6 +213,9 @@
           <div class="col-md-4">
             <input data-field="max" type="number" name="{{this.atts.name}}.{{@index}}.max" value="{{staffingValue.[max]}}" class="form-control" />
           </div>
+          <div class="d-none">
+            <input data-field="signedUp" type="number" name="{{this.atts.name}}.{{@index}}.signedUp" value="{{staffingValue.[signedUp]}}" class="form-control" />
+          </div>
         </div>
       {{/each}}
     {{/if}}
