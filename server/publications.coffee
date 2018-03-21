@@ -258,18 +258,44 @@ share.initPublications = (eventName) ->
   createPublicationDuty("Projects",share.Projects,share.ProjectSignups)
   createPublicationDuty("Lead",share.Lead,share.LeadSignups)
 
-  createPublicationAllDuties = (type,duties) ->
+  createPublicationAllDuties = (type,duties,signups) ->
     Meteor.publish "#{eventName}.Volunteers.#{type}", (sel={},limit=10) ->
       sel = _.extend(sel,dutiesPublicPolicy)
       if this.userId
         sel = filterForPublic(this.userId, sel)
       # console.log(JSON.stringify(sel, null, 4))
-      return duties.find(sel,{limit: limit})
+      ReactiveAggregate(this, duties, [
+        { $match: sel },
+        { $lookup: {
+          from: signups._name,
+          localField: "_id",
+          foreignField: "shiftId",
+          as: "signups"
+        }},
+        { $unwind: {path: "$signups", "preserveNullAndEmptyArrays": true} },
+        { $group: {
+          _id: "$_id",
+          signedUp: { $sum: { "$cond": [
+            { $eq: [ "$signups.status", "confirmed" ] },1,0 ]
+          }},
+          min: { $first: "$min" },
+          max: { $first: "$max" },
+          parentId:{ $first: "$parentId" },
+          title: { $first: "$title" },
+          description: { $first: "$description" },
+          priority: { $first: "$priority" },
+          policy: { $first: "$policy" },
+          start: { $first: "$start" },
+          end: { $first: "$end" },
+          staffing: { $first: "$staffing" },
+        }},
+      ])
 
-  createPublicationAllDuties("TeamShifts",share.TeamShifts)
-  createPublicationAllDuties("TeamTasks",share.TeamTasks)
-  createPublicationAllDuties("Projects",share.Projects)
-  createPublicationAllDuties("Lead",share.Lead)
+
+  createPublicationAllDuties("TeamShifts",share.TeamShifts,share.ShiftSignups)
+  createPublicationAllDuties("TeamTasks",share.TeamTasks,share.TaskSignups)
+  createPublicationAllDuties("Projects",share.Projects, share.ProjectSignups)
+  createPublicationAllDuties("Lead",share.Lead, share.LeadSignups)
 
   Meteor.publish "#{eventName}.Volunteers.volunteerForm", (userId) ->
     # XXX access to all leads, or only those leads that need to know ?

@@ -129,6 +129,7 @@ Template.dutiesListItemGroupped.helpers
     duty = Template.currentData()
     if duty
       sel = {title: duty.title, "signup.status": { $nin: ["confirmed"] } }
+      console.log DutiesLocal.find({status: 1}).fetch()
       DutiesLocal.find(sel)
   'duty': () ->
     duty = Template.currentData()
@@ -145,7 +146,10 @@ Template.dutiesListItemGroupped.events
 Template.dutiesListItemDate.helpers
   'spotleft': () ->
     duty = Template.currentData()
-    duty.min - duty.signedUp
+    if duty.signedUp?
+      # TODO update when upgrading to mongodb > 3.2
+      duty.min - duty.signedUp
+    else duty.min
 
 Template.dutiesListItemDate.events
   'click [data-action="apply"]': ( event, template ) ->

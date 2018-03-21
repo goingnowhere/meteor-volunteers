@@ -108,16 +108,7 @@ share.initMethods = (eventName) ->
           check(shiftId, String)
           olddoc = collection.findOne(shiftId)
           if share.isManagerOrLead(Meteor.userId(),[olddoc.parentId])
-            collection.remove(shiftId,(err,res) ->
-              unless err
-                incValue = (
-                  switch olddoc.status
-                    when 'confirmed' then -1
-                    else 0
-                )
-                if incValue != 0
-                  parentCollection.update(signup.shiftId,{$set: {$inc: {signedUp: incValue}}})
-              )
+            collection.remove(shiftId)
           else
             return throwError(403, 'Insufficient Permission')
       when "update"
@@ -126,24 +117,7 @@ share.initMethods = (eventName) ->
           SimpleSchema.validate(doc.modifier, schema, { modifier: true })
           olddoc = collection.findOne(doc._id)
           if share.isManagerOrLead(Meteor.userId(),[olddoc.parentId])
-            collection.update(doc._id, doc.modifier, (err,res) ->
-              unless err
-                incValue =
-                  if doc.modifier.$set?.status?
-                    switch doc.modifier.$set.status
-                      when 'confirmed'
-                        switch oldDoc.status
-                          when 'pending' then 1
-                          else 0
-                      when 'bailed'
-                        switch oldDoc.status
-                          when 'confirmed' then -1
-                          else 0
-                      else 0
-                  else 0
-                if incValue != 0
-                  parentCollection.update(signup.shiftId,{$set: {$inc: {signedUp: incValue}}})
-              )
+            collection.update(doc._id, doc.modifier)
           else
             return throwError(403, 'Insufficient Permission')
       when "insert"
@@ -163,8 +137,6 @@ share.initMethods = (eventName) ->
             if status
               if Meteor.isServer
                 collection.upsert(signup,{$set: {status: status}}, (err,res) ->
-                  if (!err) and status == "confirmed"
-                    parentCollection.update(signup.shiftId,{$set: {$inc: {signedUp: 1}}})
                 )
           else
             return throwError(403, 'Insufficient Permission')
@@ -174,16 +146,7 @@ share.initMethods = (eventName) ->
           SimpleSchema.validate(sel, schema.omit('status','start','end'))
           userId = Meteor.userId()
           if (sel.userId == userId) || (share.isManagerOrLead(userId,[sel.parentId]))
-            collection.update(sel, {$set: {status: "bailed"}},(err,res) ->
-              unless err
-                olddoc = collection.findOne(sel)
-                incValue =
-                  switch olddoc.start
-                    when 'confirmed' then -1
-                    else 0
-                if incValue != 0
-                  parentCollection.update(sel.shiftId, { $set: {$inc: {signedUp: incValue}}})
-            )
+            collection.update(sel, {$set: {status: "bailed"}})
           else
             return throwError(403, 'Insufficient Permission')
 

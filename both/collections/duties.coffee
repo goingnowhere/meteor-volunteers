@@ -31,11 +31,6 @@ Bounds = new SimpleSchema(
     autoform:
       afFieldInput:
         placeholder: "max"
-  signedUp:
-    type: Number
-    defaultValue: 0
-    autoform:
-      omit: true
 )
 
 Common = new SimpleSchema(
