@@ -129,8 +129,7 @@ Template.dutiesListItemGroupped.helpers
     duty = Template.currentData()
     if duty
       sel = {title: duty.title, "signup.status": { $nin: ["confirmed"] } }
-      console.log DutiesLocal.find({status: 1}).fetch()
-      DutiesLocal.find(sel)
+      DutiesLocal.find( sel, {sort: { "start": -1 }} )
   'duty': () ->
     duty = Template.currentData()
     if duty

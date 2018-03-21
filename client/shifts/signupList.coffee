@@ -90,7 +90,6 @@ Template.signupsList.helpers
         t.dutyType = template.data.dutyType if template.data.dutyType?
         return t
       )
-    console.log teams
     return teams
   'loadMore' : () ->
     template = Template.instance()
