@@ -136,8 +136,7 @@ share.initMethods = (eventName) ->
               else if parentDoc.policy == "requireApproval" then "pending"
             if status
               if Meteor.isServer
-                collection.upsert(signup,{$set: {status: status}}, (err,res) ->
-                )
+                collection.upsert(signup,{$set: {status: status}})
           else
             return throwError(403, 'Insufficient Permission')
       when "bail"
