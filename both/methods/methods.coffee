@@ -9,6 +9,7 @@ throwError = (error, reason, details) ->
   return
 
 share.initMethods = (eventName) ->
+
   # Generic function to create insert,update,remove methods for groups within
   # the organisation, e.g. teams
   createOrgUnitMethod = (collection, type) ->
@@ -64,7 +65,7 @@ share.initMethods = (eventName) ->
 
   # Generic function to create insert,update,remove methods.
   # Security check : user must be manager
-  createMethod = (collection,type) ->
+  createDutiesMethod = (collection,type) ->
     collectionName = collection._name
     switch type
       when "remove"
@@ -136,9 +137,6 @@ share.initMethods = (eventName) ->
             if status
               if Meteor.isServer
                 collection.upsert(signup,{$set: {status: status}})
-                if status == "confirmed"
-                  console.log
-                  parentCollection.update(signup.shiftId,{$inc: {signedUp: 1}})
           else
             return throwError(403, 'Insufficient Permission')
       when "bail"
@@ -147,10 +145,7 @@ share.initMethods = (eventName) ->
           SimpleSchema.validate(sel, schema.omit('status','start','end'))
           userId = Meteor.userId()
           if (sel.userId == userId) || (share.isManagerOrLead(userId,[sel.parentId]))
-            # this multi: true should not be necessary, but just in case ...
-            collection.update(sel, {$set: {status: "bailed"}},{multi: true})
-            parentDoc = parentCollection.findOne(sel.shiftId)
-            parentCollection.update(sel.shiftId, {$inc: {signedUp: -1}})
+            collection.update(sel, {$set: {status: "bailed"}})
           else
             return throwError(403, 'Insufficient Permission')
 
@@ -161,7 +156,7 @@ share.initMethods = (eventName) ->
           createOrgUnitMethod(collection, type)
       for k,collection of share.dutiesCollections
         do ->
-          createMethod(collection,type)
+          createDutiesMethod(collection,type)
 
   for type in ['remove', 'update', 'insert', 'bail']
     do ->
@@ -183,7 +178,8 @@ share.initMethods = (eventName) ->
     console.log ["#{prefix}.volunteerForm.update",doc]
     schema = share.form.get().simpleSchema()
     SimpleSchema.validate(doc.modifier,schema,{ modifier: true })
-    if (Meteor.userId() == doc.userId) || share.isManager()
+    oldDoc = share.form.get().findOne(doc._id)
+    if (Meteor.userId() == oldDoc.userId) || share.isManager()
       share.form.get().update(doc._id,doc.modifier)
     else
       return throwError(403, 'Insufficient Permission')
@@ -270,7 +266,7 @@ share.initMethods = (eventName) ->
     userId = Meteor.userId()
     olddoc = share.LeadSignups.findOne(sel)
     if (sel.userId == userId) || (share.isManagerOrLead(userId,[olddoc.parentId]))
-      share.LeadSignups.update(sel,{$set: {status: "bailed"}},{multi: true}, (err,res) ->
+      share.LeadSignups.update(sel,{$set: {status: "bailed"}},(err,res) ->
         unless err
           if Meteor.isServer
             Roles.removeUsersFromRoles(olddoc.userId, olddoc.parentId, eventName)

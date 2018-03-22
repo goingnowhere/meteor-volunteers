@@ -52,3 +52,5 @@ class VolunteersClass
   isManager: () -> share.isManager()
   teamStats: (id) -> share.TeamStats(id)
   deptStats: (id) -> share.DepartmentStats(id)
+  # Was used in the fixtures? Doesn't seem to exist any more - Rich
+  # updateTeamsScores: (duties) -> share.updateTeamsScores(duties)
