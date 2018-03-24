@@ -242,13 +242,14 @@
 <template name="shiftDate">
   <div class="container-fluid">
     <div class="row">
-      {{#if sameDay start end}}
-        <div class="col"><h5>{{formatDate start}}</h5></div>
-        <div class="col"><h6>{{formatTime start}} <br> {{formatTime end}}</h6></div>
-      {{else}}
-        <div class="col align-content-center"><h5>{{formatDateTime start}}</h5></div>
-        <div class="col align-content-center"><h6>{{formatTime end}} {{differenceTime start end}}</h6></div>
-      {{/if}}
+      <div class="col"><h5>{{formatDate start}}</h5></div>
+      <div class="col"><h6>{{formatTime start}} <br>
+        {{#if sameDay start end}}
+          {{formatTime end}}
+        {{else}}
+          {{formatTime end}} {{differenceTime start end}}
+        {{/if}}
+      </h6></div>
     </div>
   </div>
 </template>
