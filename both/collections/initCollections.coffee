@@ -11,15 +11,23 @@ share.initCollections = (eventName) ->
 
   share.TeamTasks = new Mongo.Collection "#{prefix}Volunteers.teamTasks"
   share.TeamTasks.attachSchema(share.Schemas.TeamTasks)
+  if Meteor.isServer
+    share.TeamTasks._ensureIndex( { parentId: 1 } )
 
   share.TeamShifts = new Mongo.Collection "#{prefix}Volunteers.teamShifts"
   share.TeamShifts.attachSchema(share.Schemas.TeamShifts)
+  if Meteor.isServer
+    share.TeamShifts._ensureIndex( { parentId: 1 } )
 
   share.Projects = new Mongo.Collection "#{prefix}Volunteers.projects"
   share.Projects.attachSchema(share.Schemas.Projects)
+  if Meteor.isServer
+    share.Projects._ensureIndex( { parentId: 1 } )
 
   share.Lead = new Mongo.Collection "#{prefix}Volunteers.lead"
   share.Lead.attachSchema(share.Schemas.Lead)
+  if Meteor.isServer
+    share.Lead._ensureIndex( { parentId: 1 } )
 
   # Orga
 
@@ -38,6 +46,8 @@ share.initCollections = (eventName) ->
   share.VolunteerForm = new Mongo.Collection "#{prefix}Volunteers.volunteerForm"
   share.VolunteerForm.attachSchema(share.Schemas.VolunteerForm)
   share.form = new ReactiveVar(share.VolunteerForm)
+  if Meteor.isServer
+    share.form.get()._ensureIndex( { userId: 1 } )
 
   share.extendVolunteerForm = (data) ->
     form = share.form.get()
@@ -59,23 +69,23 @@ share.initCollections = (eventName) ->
 
   share.ShiftSignups = new Mongo.Collection "#{prefix}Volunteers.shiftSignups"
   share.ShiftSignups.attachSchema(share.Schemas.ShiftSignups)
-  # if Meteor.isServer
-  #   share.ShiftSignups._ensureIndex( { userId: 1, shiftId: 1 }, { unique: 1 } )
+  if Meteor.isServer
+    share.ShiftSignups._ensureIndex( { userId: 1, shiftId: 1 } )
 
   share.TaskSignups = new Mongo.Collection "#{prefix}Volunteers.taskSignups"
   share.TaskSignups.attachSchema(share.Schemas.TaskSignups)
-  # if Meteor.isServer
-  #   share.TaskSignups._ensureIndex( { userId: 1, shiftId: 1 }, { unique: 1 } )
+  if Meteor.isServer
+    share.TaskSignups._ensureIndex( { userId: 1, shiftId: 1 } )
 
   share.LeadSignups = new Mongo.Collection "#{prefix}Volunteers.leadSignups"
   share.LeadSignups.attachSchema(share.Schemas.LeadSignups)
-  # if Meteor.isServer
-  #   share.LeadSignups._ensureIndex( { userId: 1, shiftId: 1 }, { unique: 1 } )
+  if Meteor.isServer
+    share.LeadSignups._ensureIndex( { userId: 1, shiftId: 1 } )
 
   share.ProjectSignups = new Mongo.Collection "#{prefix}Volunteers.projectSignups"
   share.ProjectSignups.attachSchema(share.Schemas.ProjectSignups)
-  # if Meteor.isServer
-  #   share.LeadSignups._ensureIndex( { userId: 1, shiftId: 1 }, { unique: 1 } )
+  if Meteor.isServer
+    share.ProjectSignups._ensureIndex( { userId: 1, shiftId: 1 } )
 
   # shortcut to recover all related collections more easily
   share.orgUnitCollections =
