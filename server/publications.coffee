@@ -25,10 +25,11 @@ share.initPublications = (eventName) ->
             sel = _.extend(sel,dutiesPublicPolicy)
           return duties.find(sel)
         children: [
-          { find: (duty) ->
-            if share.isManagerOrLead(userId,[ teamId ])
-              return signups.find({shiftId: duty._id})
-            else return null
+          {
+            find: (duty) ->
+              if share.isManagerOrLead(userId,[ teamId ])
+                return signups.find({shiftId: duty._id})
+              else return null
             children: [
               { find: (signup,duty) ->
                 if signup
@@ -63,17 +64,19 @@ share.initPublications = (eventName) ->
                 sel = _.extend(sel,dutiesPublicPolicy)
               return duties.find(sel)
             children: [
-              { find: (duty,team) ->
-                if share.isManagerOrLead(userId,[ departmentId ])
-                  return signups.find({parentId: team._id})
-                else return null
+              {
+                find: (duty,team) ->
+                  if share.isManagerOrLead(userId,[ departmentId ])
+                    return signups.find({parentId: team._id})
+                  else return null
                 children: [
-                  { find: (signup,duty,team) ->
-                    if signup
-                      if share.isManagerOrLead(userId,[ departmentId ])
-                        return Meteor.users.find(signup.userId)
+                  {
+                    find: (signup,duty,team) ->
+                      if signup
+                        if share.isManagerOrLead(userId,[ departmentId ])
+                          return Meteor.users.find(signup.userId)
+                        else return null
                       else return null
-                    else return null
                   }
                 ]
               }
@@ -106,17 +109,19 @@ share.initPublications = (eventName) ->
                     sel = _.extend(sel,dutiesPublicPolicy)
                   return duties.find(sel)
                 children: [
-                  { find: (duty,team,dept) ->
-                    if share.isManagerOrLead(userId,[ divisionId ])
-                      return signups.find({parentId: {$in: [team._id, dept._id]}})
-                    else return null
+                  {
+                    find: (duty,team,dept) ->
+                      if share.isManagerOrLead(userId,[ divisionId ])
+                        return signups.find({parentId: {$in: [team._id, dept._id]}})
+                      else return null
                     children: [
-                      { find: (signup,duty,team) ->
-                        if signup
-                          if share.isManagerOrLead(userId,[ divisionId ])
-                            return Meteor.users.find(signup.userId)
+                      {
+                        find: (signup,duty,team) ->
+                          if signup
+                            if share.isManagerOrLead(userId,[ divisionId ])
+                              return Meteor.users.find(signup.userId)
+                            else return null
                           else return null
-                        else return null
                       }
                     ]
                   }
@@ -153,10 +158,11 @@ share.initPublications = (eventName) ->
                         sel = _.extend(sel,dutiesPublicPolicy)
                       return duties.find(sel)
                     children: [
-                      { find: (duty,team,dept,division) ->
-                        if share.isManagerOrLead(userId,[ division._id ])
-                          return signups.find({parentId: {$in: [team._id, dept._id, division._id]}})
-                        else return null
+                      {
+                        find: (duty,team,dept,division) ->
+                          if share.isManagerOrLead(userId,[ division._id ])
+                            return signups.find({parentId: {$in: [team._id, dept._id, division._id]}})
+                          else return null
                         children: [
                           { find: (signup,duty,team,dept,division) ->
                             if signup
@@ -196,12 +202,13 @@ share.initPublications = (eventName) ->
         children: [
           { find: (signup) -> return duties.find(signup.shiftId) }
           # { find: (signup) -> return share.Team.find(signup.parentId) }
-          { find: (signup) ->
-            if signup
-              if share.isManagerOrLead(userId,[ signup.parentId ])
-                return Meteor.users.find(signup.userId)
+          {
+            find: (signup) ->
+              if signup
+                if share.isManagerOrLead(userId,[ signup.parentId ])
+                  return Meteor.users.find(signup.userId)
+                else return null
               else return null
-            else return null
           }
         ]
       }
@@ -220,7 +227,8 @@ share.initPublications = (eventName) ->
       return {
         find: () -> return duties.find(id)
         children: [
-          { find: (duty) ->
+          {
+            find: (duty) ->
               if duty
                 if userId && (userId == actualUserId) || share.isManagerOrLead(userId, [duty.parentId])
                   return signups.find({shiftId: duty._id, userId: userId})
@@ -240,12 +248,13 @@ share.initPublications = (eventName) ->
               #       return dv
               #   else return null
               # },
-              { find: (signup,duty) ->
-                if signup
-                  if share.isManagerOrLead(userId,[ duty.parentId ])
-                    return Meteor.users.find(signup.userId)
+              {
+                find: (signup,duty) ->
+                  if signup
+                    if share.isManagerOrLead(userId,[ duty.parentId ])
+                      return Meteor.users.find(signup.userId)
+                    else return null
                   else return null
-                else return null
               }
             ]
           }
