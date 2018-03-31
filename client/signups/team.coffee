@@ -12,8 +12,13 @@ commonEvents =
   'click [data-action="delete"]': (event,template) ->
     id = $(event.currentTarget).data('id')
     type = $(event.currentTarget).data('type')
-    collection = share.dutiesCollections[type]
-    share.meteorCall "#{collection._name}.remove", id
+    switch type
+      when 'shift'
+        share.meteorCall "teamShifts.remove", id
+      when 'project'
+        share.meteorCall "Project.remove", id
+      when 'task'
+        share.meteorCall "teamTasks.remove", id
   'click [data-action="add_date"]': (event,template) ->
     id = $(event.currentTarget).data('id')
     type = $(event.currentTarget).data('type')
@@ -56,7 +61,6 @@ Template.teamShiftsTable.onCreated () ->
       template.shifts.set(shifts)
 
 Template.teamShiftsTable.helpers
-  # TODO aggregation !
   'groupedShifts': () ->
     _.chain(Template.instance().shifts.get())
     .groupBy('groupId')
