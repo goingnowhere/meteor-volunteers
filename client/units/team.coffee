@@ -1,3 +1,9 @@
+
+Template.teamEditDetails.bindI18nNamespace('abate:volunteers')
+Template.teamEditDetails.helpers
+  'form': () -> { collection: share.Team }
+  'data': () -> Template.currentData()
+
 Template.teamEdit.bindI18nNamespace('abate:volunteers')
 Template.teamEdit.onCreated () ->
   template = this

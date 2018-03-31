@@ -1,3 +1,8 @@
+Template.departmentEditDetails.bindI18nNamespace('abate:volunteers')
+Template.departmentEditDetails.helpers
+  'form': () -> { collection: share.Department }
+  'data': () -> Template.currentData()
+
 Template.departmentEdit.helpers
   'main': () ->
     id: "details"
