@@ -27,8 +27,9 @@ Bounds = new SimpleSchema(
     type: Number
     label: () -> i18n.__("abate:volunteers","max_people")
     optional: true
-    # TODO: if max is not set, it should be equal to min
     autoform:
+      defaultValue: () ->
+        AutoForm.getFieldValue('min')
       afFieldInput:
         placeholder: "max"
 )
@@ -124,7 +125,13 @@ share.Schemas.TeamShifts = new SimpleSchema(
   end:
     type: Date
     label: () -> i18n.__("abate:volunteers","end")
+    custom: () ->
+      start = moment(this.field('start').value)
+      unless moment(this.value).isAfter(start)
+        return "startBeforeEndCustom"
     autoform:
+      defaultValue: () ->
+        AutoForm.getFieldValue('start')
       afFieldInput:
         type: "datetimepicker"
         placeholder: () -> i18n.__("abate:volunteers","end")
@@ -183,6 +190,13 @@ share.Schemas.Projects = new SimpleSchema(
   start:
     type: Date
     label: () -> i18n.__("abate:volunteers","start")
+    autoform:
+      afFieldInput:
+        type: "datetimepicker"
+        placeholder: () -> i18n.__("abate:volunteers","start")
+        opts: () ->
+          format: 'DD-MM-YYYY'
+          timepicker: false
   end:
     type: Date
     label: () -> i18n.__("abate:volunteers","end")
@@ -190,6 +204,15 @@ share.Schemas.Projects = new SimpleSchema(
       start = moment(this.field('start').value)
       unless moment(this.value).isAfter(start)
         return "startBeforeEndCustom"
+    autoform:
+      defaultValue: () ->
+        AutoForm.getFieldValue('start')
+      afFieldInput:
+        type: "datetimepicker"
+        placeholder: () -> i18n.__("abate:volunteers","end")
+        opts: () ->
+          format: 'DD-MM-YYYY'
+          timepicker: false
   staffing:
     type: Array
     minCount: 1
