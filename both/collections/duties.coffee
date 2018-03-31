@@ -62,8 +62,11 @@ Common = new SimpleSchema(
   groupId:
     type: String
     optional: true
+    autoValue: () ->
+      if not this.field('groupId').isSet
+        Random.id()
     autoform:
-      omit: true
+      type: "hidden"
 )
 
 share.Schemas.TeamTasks = new SimpleSchema(

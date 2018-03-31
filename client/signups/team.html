@@ -2,75 +2,61 @@
      Args: team
 -->
 <template name="teamShiftsTable">
-  {{#if grouping}}
-  <div class="btn-group pull-right">
-    <button type="button" class="btn btn-default" data-action="groupDone"
-      aria-haspopup="true" aria-expanded="false">
-      {{fa "check"}} {{__ ".done"}}
-    </button>
-  </div>
-  {{/if}}
   <table class="table">
     {{#each family in groupedShifts}}
     <thead class="thead-default">
-      <tr class="shiftFamily table-active" data-toggle="collapse" data-target=".{{family.class}}">
-        <td colspan="4"><h5>{{family.title}}</h5></td>
+      <tr class="shiftFamily table-active">
+        <td colspan="3"><h5>{{family.title}}</h5></td>
+        <td>
+          <button type="button" class="btn btn-default btn-sm"
+            data-id="{{family.first._id}}" data-type="shift" data-action="add_date">
+            {{fa "calendar"}} {{__ ".add_date"}}
+          </button>
+        </td>
+        <!-- <td>
+          <button type="button" class="btn btn-default btn-sm"
+            data-toggle="collapse" data-target=".{{family.class}}">
+            {{fa "angle-up"}}
+          </button>
+        </td> -->
       </tr>
     </thead>
     <tbody>
-      {{#each group in family.groups}}
-        {{#each shift in group.shifts }}
-          <tr class="shift {{family.class}}" data-id="{{shift._id}}" data-type="{{shift.type}}">
-            <th scope="row">
-              <span>
-              {{#if $eq shift.priority "essential"}}
-                <span class="text-danger">{{fa "exclamation-circle"}}</span>
-              {{/if}}
-              {{#if ($eq shift.policy 'private')}}{{fa 'user-secret'}}{{/if}}
-              {{#if ($eq shift.policy 'requireApproval')}}{{fa 'lock'}}{{/if}}
-            </span>
-            </th>
-            <td> {{> shiftDateInline shift}} </td>
-            <td>
-              <span class="badge badge-pill badge-primary">{{shift.needed}} / {{shift.confirmed}}</span>
-            </td>
-            <td>
-              <div class="btn-group">
-                <button type="button"
-                  class="btn btn-sm btn-circle dropdown-toggle {{#if grouping}}disabled{{/if}}"
-                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu">
-                  <li class="dropdown-item"><a href="#" data-action="edit" data-id="{{shift._id}}" data-type="shift">
-                    {{fa "pencil-square-o"}} {{__ ".edit"}}</a></li>
-                  <li class="dropdown-item"><a href="#" data-action="delete" data-id="{{shift._id}}" data-type="shift">
-                    {{fa "trash-o"}} {{__ ".remove"}}</a></li>
-                  <li class="dropdown-item"><a href="#" data-action="clone" data-id="{{shift._id}}" data-type="shift">
-                    {{fa "clone"}} {{__ ".clone"}}</a></li>
-                  <li class="dropdown-item"><a href="#" data-action="group" data-id="{{shift._id}}" data-type="shift">
-                    {{fa "object-group"}} {{__ ".group"}}</a></li>
-                  {{#if shift.groupId }}
-                    <li class="dropdown-item"><a href="#" data-action="removeFromGroup" data-id="{{shift._id}}" data-type="shift">
-                      {{fa "object-ungroup"}} {{__ ".remove_from_group"}}</a></li>
-                  {{/if}}
-                </ul>
-              </div>
+      {{#each shift in family.shifts }}
+        <tr class="shift {{family.class}}" data-id="{{shift._id}}" data-type="{{shift.type}}">
+          <th scope="row">
+            <span>
+            {{#if $eq shift.priority "essential"}}
+              <span class="text-danger">{{fa "exclamation-circle"}}</span>
+            {{/if}}
+            {{#if ($eq shift.policy 'private')}}{{fa 'user-secret'}}{{/if}}
+            {{#if ($eq shift.policy 'requireApproval')}}{{fa 'lock'}}{{/if}}
+          </span>
+          </th>
+          <td> {{> shiftDateInline shift}} </td>
+          <td>
+            <span class="badge badge-pill badge-primary">{{shift.needed}} / {{shift.confirmed}}</span>
+          </td>
+          <td>
+            <button class="btn btn-sm btn-circle" href="#"
+              data-action="edit" data-id="{{shift._id}}" data-type="shift">
+                  {{fa "pencil-square-o"}}</button>
+            <button class="btn btn-sm btn-circle" href="#"
+              data-action="delete" data-id="{{shift._id}}" data-type="shift">
+                  {{fa "trash-o"}}</button>
+          </td>
+        </tr>
+        {{#if $gt shift.confirmed 0}}
+          <tr class="shift {{family.class}}">
+            <td colspan="4">
+              <ol>
+                {{#each signup in shift.volunteers }}
+                  <li>{{getUserName signup.userId}} ( {{__ ".joined"}} {{ formatDate signup.createdAt }} )</li>
+                {{/each}}
+              </ol>
             </td>
           </tr>
-          {{#if $gt shift.confirmed 0}}
-            <tr class="shift {{family.class}}">
-              <td colspan="4">
-                <ol>
-                  {{#each signup in shift.volunteers }}
-                    <li>{{getUserName signup.userId}} ( {{__ ".joined"}} {{ formatDate signup.createdAt }} )</li>
-                  {{/each}}
-                </ol>
-              </td>
-            </tr>
-          {{/if}}
-        {{/each}}
-        {{#if $gt ($len group.shifts) 1}}<tr><td colspan="5"></td></tr>{{/if}}
+        {{/if}}
       {{/each}}
     </tbody>
     {{/each}}
