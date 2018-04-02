@@ -84,8 +84,11 @@ Template.signupsList.helpers
     limit = template.limit.get()
     # teams are ordered using the score that is calculated by considering
     # the priority of the shifts associated with each team
+    filters = template.data?.filters
+    query = {}
+    query.skills = {$in: filters.skills} if filters?.skills?
     teams = share.Team
-      .find({},{sort: {userpref: -1, score: -1}, limit:limit})
+      .find(query,{sort: {userpref: -1, score: -1}, limit:limit})
       .map((t) ->
         t.dutyType = template.data.dutyType if template.data.dutyType?
         return t
