@@ -87,6 +87,7 @@ Template.signupsList.helpers
     filters = template.data?.filters
     query = {}
     query.skills = {$in: filters.skills} if filters?.skills?
+    query.quirks = {$in: filters.quirks} if filters?.quirks?
     teams = share.Team
       .find(query,{sort: {userpref: -1, score: -1}, limit:limit})
       .map((t) ->
