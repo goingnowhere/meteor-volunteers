@@ -72,7 +72,9 @@ Template.signupsListTeam.events
 Template.signupsList.bindI18nNamespace('abate:volunteers')
 Template.signupsList.onCreated () ->
   template = this
-  template.limit = new ReactiveVar(10)
+  # Move limit to unreasonably high as limiting lead to weird behaviour
+  # e.g. only one team appearing as there weren't any shifts to show for most teams with filtering
+  template.limit = new ReactiveVar(50)
   quirks =  template.data?.quirks
   skills =  template.data?.skills
 
