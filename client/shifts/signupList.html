@@ -7,7 +7,7 @@
             {{#if leadsOnly }}
               {{> leadListItemGroupped team }}
             {{else }}
-              {{> signupsListTeam team }}
+              {{> signupsListTeam team=team filters=filters dutyType=dutyType }}
             {{/if}}
           {{/each}}
           {{#if loadMore}}
