@@ -15,7 +15,7 @@ Template.signupsListTeam.bindI18nNamespace('abate:volunteers')
 Template.signupsListTeam.onCreated () ->
   template = this
   template.limit = new ReactiveVar(10)
-  {team, dutyType} = template.data
+  {team, dutyType = ''} = template.data
 
   template.autorun () ->
     sel = {parentId : team._id}
@@ -23,35 +23,34 @@ Template.signupsListTeam.onCreated () ->
     {filters} = Template.currentData()
     if filters?.priorities?
       sel.priority = {$in: filters.priorities}
-    if dutyType?
-      switch dutyType
-        when "shift"
-          share.templateSub(template,"TeamShifts",sel,limit)
-          if template.subscriptionsReady()
-            addLocalDutiesCollection(share.TeamShifts,'shift',sel,limit)
-        when "task"
-          share.templateSub(template,"TeamTasks",sel,limit)
-          if template.subscriptionsReady()
-            addLocalDutiesCollection(share.TeamTasks,'task',sel,limit)
-        when "project"
-          share.templateSub(template,"Projects",sel,limit)
-          if template.subscriptionsReady()
-            addLocalDutiesCollection(share.Projects,'project',sel,limit)
-    else
-      share.templateSub(template,"TeamShifts",sel,limit)
-      share.templateSub(template,"TeamTasks",sel,limit)
-      share.templateSub(template,"Projects",sel,limit)
-      if template.subscriptionsReady()
-        addLocalDutiesCollection(share.TeamShifts,'shift',sel,limit)
-        addLocalDutiesCollection(share.TeamTasks,'task',sel,limit)
-        addLocalDutiesCollection(share.Projects,'project',sel,limit)
+    switch dutyType
+      when "shift"
+        share.templateSub(template,"TeamShifts",sel,limit)
+        if template.subscriptionsReady()
+          addLocalDutiesCollection(share.TeamShifts,'shift',sel,limit)
+      when "task"
+        share.templateSub(template,"TeamTasks",sel,limit)
+        if template.subscriptionsReady()
+          addLocalDutiesCollection(share.TeamTasks,'task',sel,limit)
+      when "project"
+        share.templateSub(template,"Projects",sel,limit)
+        if template.subscriptionsReady()
+          addLocalDutiesCollection(share.Projects,'project',sel,limit)
+      else
+        share.templateSub(template,"TeamShifts",sel,limit)
+        share.templateSub(template,"TeamTasks",sel,limit)
+        share.templateSub(template,"Projects",sel,limit)
+        if template.subscriptionsReady()
+          addLocalDutiesCollection(share.TeamShifts,'shift',sel,limit)
+          addLocalDutiesCollection(share.TeamTasks,'task',sel,limit)
+          addLocalDutiesCollection(share.Projects,'project',sel,limit)
 
 Template.signupsListTeam.helpers
   'allShifts': () ->
     template = Template.instance()
-    {team, dutyType} = template.data
+    {team, dutyType = ''} = template.data
     sel = {parentId : team._id}
-    if dutyType?
+    if dutyType in ['shift', 'lead', 'project']
       sel.type = dutyType
     if template.subscriptionsReady()
       ShiftTitles.find(sel).fetch()
