@@ -59,10 +59,12 @@
   "project_signup_start": "Select start day",
   "project_signup_end": "Select final day",
   "choose_date": "Choose dates",
+  "choose_shifts": "Choose shifts",
   "estimated_time": "approx.",
   "joined": "Joined",
   "load_more_dates": "More Dates",
   "load_more_teams": "More Teams",
   "load_more_shifts": "More Shifts",
-  "load_more_leads": "More Leads"
+  "load_more_leads": "More Leads",
+  "shift_length_hours": "hour shifts"
 }

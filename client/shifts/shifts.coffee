@@ -1,3 +1,4 @@
+import moment from 'moment'
 
 getDuty = (type,title) ->
   sel = {title: title}
@@ -22,12 +23,12 @@ getTeam = (type,parentId) ->
           return _.extend(dv,{type: "division"})
 
 # client side collection
-DutiesLocal = new Mongo.Collection(null)
+DatesLocal = new Mongo.Collection(null)
 
-# DutiesLocal contains all shifts (dates) related to a particular title
+# DatesLocal contains all shifts (dates) related to a particular title
 # and parentId
-addLocalDutiesCollection = (duties,type,filter,limit) ->
-  duties.find(filter,{limit: limit}).forEach((duty) ->
+addLocalDatesCollection = (duties,type,filter) ->
+  duties.find(filter).forEach((duty) ->
     duty.type = type
     duty.team = getTeam(type,duty.parentId)
     duty.signup = (
@@ -37,7 +38,7 @@ addLocalDutiesCollection = (duties,type,filter,limit) ->
         when "task" then share.TaskSignups.findOne(sel)
         when "project" then share.ProjectSignups.findOne(sel)
       )
-    DutiesLocal.upsert(duty._id,duty)
+    DatesLocal.upsert(duty._id,duty)
   )
 
 Template.leadListItemGroupped.bindI18nNamespace('abate:volunteers')
@@ -90,58 +91,56 @@ Template.leadListItemGroupped.events
     doc = {parentId: parentId, shiftId: shiftId, userId: userId}
     share.meteorCall "#{type}Signups.insert", doc
 
-Template.dutiesListItemGroupped.bindI18nNamespace('abate:volunteers')
-Template.dutiesListItemGroupped.onCreated () ->
+Template.signupModal.onCreated () ->
   template = this
-  duty = template.data
+  {parentId, title, dutyType} = template.data
   userId = Meteor.userId()
-  template.limit = new ReactiveVar(2)
 
-  sel = {title: duty.title, parentId: duty.parentId}
+  sel = {title, parentId}
   template.autorun () ->
-    limit = template.limit.get()
-    switch duty.type
+    switch dutyType
       when "shift"
-        share.templateSub(template,"TeamShifts",sel,limit)
+        share.templateSub(template,"TeamShifts",sel)
         share.templateSub(template,"ShiftSignups.byUser", userId)
         if template.subscriptionsReady()
-          addLocalDutiesCollection(share.TeamShifts,'shift',sel,limit)
+          addLocalDatesCollection(share.TeamShifts,'shift',sel)
       when "task"
-        share.templateSub(template,"TeamTasks",sel,limit)
+        share.templateSub(template,"TeamTasks",sel)
         share.templateSub(template,"TaskSignups.byUser", userId)
         if template.subscriptionsReady()
-          addLocalDutiesCollection(share.TeamTasks,'task',sel,limit)
+          addLocalDatesCollection(share.TeamTasks,'task',sel)
       when "project"
-        share.templateSub(template,"Projects",sel,limit)
+        share.templateSub(template,"Projects",sel)
         share.templateSub(template,"ProjectSignups.byUser", userId)
         if template.subscriptionsReady()
-          addLocalDutiesCollection(share.Projects,'project',sel,limit)
+          addLocalDatesCollection(share.Projects,'project',sel)
+Template.signupModal.helpers
+  allDates: () ->
+    template = Template.instance()
+    {title} = template.data
+    sel = {title: title, "signup.status": { $nin: ["confirmed"] } }
+    DatesLocal.find( sel, {sort: { "start": -1 }} )
 
+Template.dutiesListItemGroupped.bindI18nNamespace('abate:volunteers')
 Template.dutiesListItemGroupped.helpers
-  'loadMore': () ->
-    template = Template.instance()
-    duty = Template.currentData()
-    if duty
-      sel = {title: duty.title}
-      DutiesLocal.find(sel).count() >= template.limit.get()
-  'allDates': () ->
-    template = Template.instance()
-    duty = Template.currentData()
-    if duty
-      sel = {title: duty.title, "signup.status": { $nin: ["confirmed"] } }
-      DutiesLocal.find( sel, {sort: { "start": -1 }} )
-  'duty': () ->
-    duty = Template.currentData()
-    if duty
-      duty.description = getDuty(duty.type,duty.title).description
-      duty.team = getTeam(duty.type,duty.parentId)
-      return duty
+  projectDisplay: (duty) ->
+    _.extend({}, duty.shift, {type: duty.type, team: duty.team})
+  shiftLengths: (shift) ->
+    {start, end} = shift
+    moment(end).diff(start, 'hours')
 
 Template.dutiesListItemGroupped.events
-  'click [data-action="loadMoreDates"]': ( event, template ) ->
-    limit = template.limit.get()
-    template.limit.set(limit+2)
+  'click [data-action="chooseShifts"]': ( event, template ) ->
+    parentId = $(event.target).data('parent-id')
+    groupTitle = $(event.target).data('group-title')
+    dutyType = $(event.target).data('duty-type')
+    Modal.show("signupModal", {
+      title: groupTitle,
+      parentId,
+      dutyType,
+    })
 
+Template.dutiesListItemDate.bindI18nNamespace('abate:volunteers')
 Template.dutiesListItemDate.helpers
   'spotleft': () ->
     duty = Template.currentData()

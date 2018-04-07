@@ -30,16 +30,8 @@
     <div class="row justify-content-between align-content-center no-gutters">
       <div class="container-fluid p-2 signupsListItem">
         {{#each duty in allShifts }}
-          {{> dutiesListItemGroupped duty }}
+          {{> dutiesListItemGroupped duty=duty }}
         {{/each}}
-        {{#if loadMore}}
-          <div class="row align-content-right no-gutters">
-            <div class="col-md-2 offset-md-8">
-              <button class="btn btn-default btn-primary"
-                data-action="loadMoreShifts">{{__ ".load_more_shifts"}}</button>
-            </div>
-          </div>
-        {{/if}}
       </div>
     </div>
   {{/if}}

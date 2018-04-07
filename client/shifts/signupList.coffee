@@ -3,23 +3,32 @@ import SimpleSchema from 'simpl-schema'
 ShiftTitles = new Mongo.Collection(null)
 
 # coll contains shifts unique shifts title
-addLocalDutiesCollection = (duties,type,filter,limit) ->
+addLocalDutiesCollection = (team,duties,type,filter,limit) ->
   ShiftTitles.remove({type, parentId: filter.parentId})
   shifts = duties.find(filter,{limit: limit}).fetch()
-  _.chain(shifts).groupBy('title').map((l,title) ->
-    duty = { type: type, title: title, parentId: filter.parentId }
-    ShiftTitles.upsert(duty,duty)
+  _.chain(shifts).groupBy('title').map((shifts,title) ->
+    shift = shifts[0]
+    duty = {
+      type,
+      title,
+      description: shift.description,
+      priority: shift.priority,
+      parentId: filter.parentId,
+      shift,
+      team,
+    }
+    ShiftTitles.insert(duty)
   ).value()
 
 Template.signupsListTeam.bindI18nNamespace('abate:volunteers')
 Template.signupsListTeam.onCreated () ->
   template = this
-  template.limit = new ReactiveVar(10)
   {team, dutyType = ''} = template.data
 
   template.autorun () ->
     sel = {parentId : team._id}
-    limit = template.limit.get()
+    # Only need one to get details of the shift
+    limit = 1
     {filters} = Template.currentData()
     if filters?.priorities?
       sel.priority = {$in: filters.priorities}
@@ -27,23 +36,23 @@ Template.signupsListTeam.onCreated () ->
       when "shift"
         share.templateSub(template,"TeamShifts",sel,limit)
         if template.subscriptionsReady()
-          addLocalDutiesCollection(share.TeamShifts,'shift',sel,limit)
+          addLocalDutiesCollection(team,share.TeamShifts,'shift',sel,limit)
       when "task"
         share.templateSub(template,"TeamTasks",sel,limit)
         if template.subscriptionsReady()
-          addLocalDutiesCollection(share.TeamTasks,'task',sel,limit)
+          addLocalDutiesCollection(team,share.TeamTasks,'task',sel,limit)
       when "project"
         share.templateSub(template,"Projects",sel,limit)
         if template.subscriptionsReady()
-          addLocalDutiesCollection(share.Projects,'project',sel,limit)
+          addLocalDutiesCollection(team,share.Projects,'project',sel,limit)
       else
         share.templateSub(template,"TeamShifts",sel,limit)
         share.templateSub(template,"TeamTasks",sel,limit)
         share.templateSub(template,"Projects",sel,limit)
         if template.subscriptionsReady()
-          addLocalDutiesCollection(share.TeamShifts,'shift',sel,limit)
-          addLocalDutiesCollection(share.TeamTasks,'task',sel,limit)
-          addLocalDutiesCollection(share.Projects,'project',sel,limit)
+          addLocalDutiesCollection(team,share.TeamShifts,'shift',sel,limit)
+          addLocalDutiesCollection(team,share.TeamTasks,'task',sel,limit)
+          addLocalDutiesCollection(team,share.Projects,'project',sel,limit)
 
 Template.signupsListTeam.helpers
   'allShifts': () ->
@@ -55,12 +64,6 @@ Template.signupsListTeam.helpers
     if template.subscriptionsReady()
       ShiftTitles.find(sel).fetch()
     else []
-  'loadMore' : () ->
-    template = Template.instance()
-    sel = {parentId : template.data.team._id}
-    if template.data.dutyType?
-      sel.type = template.data.dutyType
-    ShiftTitles.find(sel).count() >= template.limit.get()
 
 Template.signupsListTeam.events
   'click [data-action="loadMoreShifts"]': ( event, template ) ->

@@ -11,7 +11,7 @@
     <div class="row">
       <div class="container-fluid">
         {{#each shift in allShifts }}
-        <div class="flex-column bookedTableItem">
+        <div class="flex-column bookedTableItem p-2">
           {{> signupUserRowView signup=shift}}
         </div>
         {{/each}}
@@ -26,13 +26,15 @@
       {{#if $eq signup.status "confirmed"}}<div class="text-success">{{fa "check"}}</div>{{/if}}
       {{#if $eq signup.status "pending"}}<div class="text-warning">{{fa "clock-o"}}</div>{{/if}}
     </div>
-    {{#if $eq signup.type "project"}}
-      {{> projectDateInline signup }}
-    {{else}}
-      {{#if $eq signup.type "shift"}}
-        {{> shiftDateInline duty }}
+    <div class="col-md-4">
+      {{#if $eq signup.type "project"}}
+        {{> projectDateInline signup }}
+      {{else}}
+        {{#if $eq signup.type "shift"}}
+          {{> shiftDateInline duty }}
+        {{/if}}
       {{/if}}
-    {{/if}}
+    </div>
     <div class="col-md-5 d-flex align-items-start">
       <h5>{{duty.title}}</h5> ({{team.name}})
       {{#if $eq signup.type "shift"}}
