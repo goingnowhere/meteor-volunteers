@@ -16,3 +16,7 @@
 	border-bottom-left-radius:0;
 	border-right-width: 1px;
 }
+
+.list-item {
+	margin-bottom: 5px;
+}
