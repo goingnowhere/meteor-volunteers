@@ -6,11 +6,10 @@
       {{#if $eq duty.type 'project'}}
         {{> dutiesListItemDate projectDisplay duty }}
       {{else}}
-        <div class="col"><h5 class="mb-0">dates</h5></div>
         <div class="col">
           <h5 class="mb-0">{{ shiftLengths duty.shift }} {{__ ".shift_length_hours"}}</h5>
         </div>
-        <div class="col">
+        <div class="col-4">
           <button
             class="btn btn-action btn-primary"
             data-parent-id="{{duty.parentId}}"
@@ -120,20 +119,16 @@
     {{/if}}
   </div>
   <div class="row no-gutters">
-    {{#if team.quirks}}
-      <ul class="list-inline">
-        {{#each quirk in team.quirks}}
-          <li class="list-inline-item">
-            <span class="badge badge-primary badge-pill">{{quirk}}</span>
-          </li>
-        {{/each}}
-      </ul>
-    {{/if}}
-    {{#if team.skills}}
-      <ul class="list-inline">
+    {{#if $or team.quirks team.skills}}
+      <ul class="list-inline my-1">
         {{#each skill in team.skills}}
           <li class="list-inline-item">
             <span class="badge badge-secondary badge-pill">{{skill}}</span>
+          </li>
+        {{/each}}
+        {{#each quirk in team.quirks}}
+          <li class="list-inline-item">
+            <span class="badge badge-primary badge-pill">{{quirk}}</span>
           </li>
         {{/each}}
       </ul>
