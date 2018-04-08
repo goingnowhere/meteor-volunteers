@@ -1,4 +1,7 @@
 import SimpleSchema from 'simpl-schema'
+import Moment from 'moment'
+import { extendMoment } from 'moment-range'
+moment = extendMoment(Moment)
 
 throwError = (error, reason, details) ->
   error = new (Meteor.Error)(error, reason, details)
@@ -7,6 +10,22 @@ throwError = (error, reason, details) ->
   else if Meteor.isServer
     throw error
   return
+
+doubleBooking = (shift,collectionKey) ->
+  switch collectionKey
+    when 'ShiftSignups'
+      parentDoc = share.TeamShifts.findOne({_id: shift.shiftId})
+      parentRange = moment.range(moment(parentDoc.start),moment(parentDoc.end))
+      return _.chain(share.ShiftSignups.find({
+        userId: shift.userId,
+        status: {$in: ["confirmed","pending"]}}).fetch())
+        .map((shift) -> share.TeamShifts.findOne({_id: shift.shiftId}))
+        .some((shift) ->
+          shiftRange = moment.range(moment(shift.start),moment(shift.end))
+          parentRange.overlaps(shiftRange))
+        .value()
+    else
+      return false
 
 share.initMethods = (eventName) ->
 
@@ -150,8 +169,12 @@ share.initMethods = (eventName) ->
               if parentDoc.policy == "public" then "confirmed"
               else if parentDoc.policy == "requireApproval" then "pending"
             if status
-              if Meteor.isServer
-                collection.upsert(signup,{$set: {status: status}})
+              # we can double booking only on new signups
+              unless doubleBooking(signup,collectionKey)
+                if Meteor.isServer
+                  collection.upsert(signup,{$set: {status: status}})
+              else
+                return throwError(409, 'Double Booking')
           else
             return throwError(403, 'Insufficient Permission')
       when "bail"

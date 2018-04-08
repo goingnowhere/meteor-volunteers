@@ -1,4 +1,6 @@
-import moment from 'moment'
+import Moment from 'moment'
+import { extendMoment } from 'moment-range'
+moment = extendMoment(Moment)
 
 getTeam = (type,parentId) ->
   switch type
@@ -106,6 +108,7 @@ Template.signupModal.onCreated () ->
         share.templateSub(template,"ProjectSignups.byUser", userId)
         if template.subscriptionsReady()
           addLocalDatesCollection(share.Projects,'project',sel)
+
 Template.signupModal.helpers
   allDates: () ->
     template = Template.instance()
@@ -139,6 +142,13 @@ Template.dutiesListItemDate.helpers
     Math.max(0, max - signedUp)
 
 Template.dutiesListItemDate.events
+  'click [data-action="bail"]': ( event, template ) ->
+    userId = Meteor.userId()
+    shiftId = $(event.target).data('shiftid')
+    type = $(event.target).data('type')
+    parentId = $(event.target).data('parentid')
+    share.meteorCall "#{type}Signups.bail", {parentId, shiftId, userId}
+
   'click [data-action="apply"]': ( event, template ) ->
     shiftId = $(event.target).data('shiftid')
     type = $(event.target).data('type')
@@ -148,21 +158,32 @@ Template.dutiesListItemDate.events
     if type == 'project'
       project = share.Projects.findOne(shiftId)
       AutoFormComponents.ModalShowWithTemplate('projectSignupForm',
-        { signup: doc, project }, project.title, 'lg')
+        { signup: doc, project }, project.title)
     else
-      share.meteorCall "#{type}Signups.insert", doc
-  'click [data-action="bail"]': ( event, template ) ->
-    shiftId = $(event.target).data('shiftid')
-    type = $(event.target).data('type')
-    parentId = $(event.target).data('parentid')
-    userId = Meteor.userId()
-    share.meteorCall "#{type}Signups.bail", {parentId, shiftId, userId}
+      share.meteorCall "#{type}Signups.insert", doc, (err,res) ->
+        if err
+          switch err.error
+            when 409
+              Bert.alert({
+                hideDelay: 4500,
+                title: i18n.__("abate:volunteers","double_booking"),
+                message: i18n.__("abate:volunteers","double_booking_msg"),
+                type: 'warning',
+                style: 'growl-top-right',
+                })
+            else
+              Bert.alert({
+                title: i18n.__("abate:volunteers","error"),
+                message: err.reason,
+                type: 'danger',
+                style: 'growl-top-right',
+              })
 
-sameDayHelper = {
-  'sameDay': (start, end) -> moment(start).isSame(moment(end),"day")
-}
+  sameDayHelper = {
+    'sameDay': (start, end) -> moment(start).isSame(moment(end),"day")
+  }
 
-Template.shiftDate.helpers sameDayHelper
+  Template.shiftDate.helpers sameDayHelper
 Template.shiftDateInline.helpers sameDayHelper
 
 Template.projectDate.helpers
