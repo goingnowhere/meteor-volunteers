@@ -300,7 +300,6 @@ share.initPublications = (eventName) ->
         }},
       ])
 
-
   createPublicationAllDuties("TeamShifts",share.TeamShifts,share.ShiftSignups)
   createPublicationAllDuties("TeamTasks",share.TeamTasks,share.TaskSignups)
   createPublicationAllDuties("Projects",share.Projects, share.ProjectSignups)
@@ -421,8 +420,6 @@ share.initPublications = (eventName) ->
     t = share.Team.find(sel)
     dv = share.Division.find(sel)
     return [dv,dp,t]
-
-
 
   Meteor.publish "#{eventName}.Volunteers.division", (sel={}) ->
     if this.userId && share.isManagerOrLead(this.userId)
