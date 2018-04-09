@@ -96,13 +96,18 @@
     {{else}}
       {{#unless $eq policy "adminOnly"}}
         <button class="btn btn-primary btn-action" data-shiftid="{{_id}}"
-          data-parentid="{{parentId}}" data-type="{{type}}" data-action="apply">
+          data-parentid="{{parentId}}" data-type="{{type}}" data-action="apply"
+          disabled="{{#unless spotsleft}}true{{/unless}}">
           {{#if $eq type "project"}}
             {{__ ".choose_date"}}
           {{else}}
             {{#if $eq policy "public"}}{{__ ".join"}}{{/if}}
             {{#if $eq policy "requireApproval"}}{{__ ".apply"}}{{/if}}
-            ({{spotleft}} {{__ ".spots_left"}})
+            {{#if gaps}}
+              ({{gaps}} {{__ ".people_needed"}})
+            {{else}}
+              ({{spotsleft}} {{__ ".spots_left"}})
+            {{/if}}
           {{/if}}
         </button>
       {{else}}

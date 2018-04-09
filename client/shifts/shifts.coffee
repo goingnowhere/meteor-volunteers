@@ -142,12 +142,13 @@ Template.dutiesListItemGroupped.events
 
 Template.dutiesListItemDate.bindI18nNamespace('abate:volunteers')
 Template.dutiesListItemDate.helpers
-  'spotleft': () ->
-    duty = Template.currentData()
-    if duty.signedUp?
-      # TODO update when upgrading to mongodb > 3.2
-      duty.min - duty.signedUp
-    else duty.min
+  # TODO update when upgrading to mongodb > 3.2
+  gaps: () ->
+    {min, signedUp = 0} = Template.currentData()
+    Math.max(0, min - signedUp)
+  spotsleft: () ->
+    {max, signedUp = 0} = Template.currentData()
+    Math.max(0, max - signedUp)
 
 Template.dutiesListItemDate.events
   'click [data-action="apply"]': ( event, template ) ->
