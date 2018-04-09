@@ -118,8 +118,8 @@ Template.signupModal.helpers
   allDates: () ->
     template = Template.instance()
     {title} = template.data
-    sel = {title: title, "signup.status": { $nin: ["confirmed"] } }
-    DatesLocal.find( sel, {sort: { "start": -1 }} )
+    sel = {title: title}
+    DatesLocal.find(sel, {sort: { "start": -1 }})
 
 Template.dutiesListItemGroupped.bindI18nNamespace('abate:volunteers')
 Template.dutiesListItemGroupped.helpers
@@ -162,6 +162,12 @@ Template.dutiesListItemDate.events
         { signup: doc, project }, project.title, 'lg')
     else
       share.meteorCall "#{type}Signups.insert", doc
+  'click [data-action="bail"]': ( event, template ) ->
+    shiftId = $(event.target).data('shiftid')
+    type = $(event.target).data('type')
+    parentId = $(event.target).data('parentid')
+    userId = Meteor.userId()
+    share.meteorCall "#{type}Signups.bail", {parentId, shiftId, userId}
 
 sameDayHelper = {
   'sameDay': (start, end) -> moment(start).isSame(moment(end),"day")

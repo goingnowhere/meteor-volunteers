@@ -83,10 +83,16 @@
   {{/if}}
   <div class="col-4 p-0">
     {{#if $and signup.status ($neq signup.status 'bailed')}}
-      <button class="btn btn-default btn-action disabled
-        {{#if $eq signup.status 'confirmed'}}btn-success{{/if}}">
-        {{__ signup.status }}
-      </button>
+      <div class="d-flex">
+        <button class="btn btn-action disabled
+          {{#if $eq signup.status 'confirmed'}}btn-success{{/if}}">
+          {{__ signup.status }}
+        </button>
+        <button class="btn btn-primary btn-action" data-shiftid="{{_id}}"
+          data-parentid="{{parentId}}" data-type="{{type}}" data-action="bail">
+            {{__ ".bail"}}
+        </button>
+      </div>
     {{else}}
       {{#unless $eq policy "adminOnly"}}
         <button class="btn btn-primary btn-action" data-shiftid="{{_id}}"
