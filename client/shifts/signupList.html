@@ -1,23 +1,17 @@
 <template name="signupsList">
   <div class="container-fluid p-0">
-    {{#if Template.subscriptionsReady }}
-      <div class="row no-gutters">
-        <div class="container-fluid p-0">
-          {{#each team in allTeams }}
-            {{#if $eq dutyType 'lead' }}
-              {{> leadListItemGroupped team }}
-            {{else }}
-              {{> signupsListTeam team=team filters=filters dutyType=dutyType }}
-            {{/if}}
-          {{/each}}
-          {{#if loadMore}}
-            <div class="row align-content-right no-gutters">
-              <div class="col">
-                <button class="btn btn-default btn-primary"
-                  data-action="loadMoreTeams">{{__ ".load_more_teams"}}</button>
-              </div>
-            </div>
-          {{/if}}
+    {{#each team in allTeams }}
+      {{#if $eq dutyType 'lead' }}
+        {{> leadListItemGroupped team }}
+      {{else }}
+        {{> signupsListTeam team=team filters=filters dutyType=dutyType }}
+      {{/if}}
+    {{/each}}
+    {{#if loadMore}}
+      <div class="row align-content-right no-gutters">
+        <div class="col">
+          <button class="btn btn-default btn-primary"
+            data-action="loadMoreTeams">{{__ ".load_more_teams"}}</button>
         </div>
       </div>
     {{/if}}
@@ -26,13 +20,10 @@
 
 <template name="signupsListTeam">
   {{#if $and Template.subscriptionsReady ($gt ($len allShifts) 0) }}
-    {{team.name}}
-    <div class="row justify-content-between align-content-center no-gutters">
-      <div class="container-fluid p-2 signupsListItem">
-        {{#each duty in allShifts }}
-          {{> dutiesListItemGroupped duty=duty }}
-        {{/each}}
+    {{#each duty in allShifts }}
+      <div class="p-2 signupsListItem">
+        {{> dutiesListItemGroupped duty=duty }}
       </div>
-    </div>
+    {{/each}}
   {{/if}}
 </template>

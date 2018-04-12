@@ -161,15 +161,19 @@
 
 <!-- helper display to format the date of a task. used in dutiesListItem and ... -->
 <template name="shiftTitle">
-  <h5 class="mb-1 mr-auto"><small>{{fa "calendar"}} </small>{{title}}</h5>
+  <h5 class="mb-1 mr-auto">
+    <small>{{fa "calendar"}} </small>
+    {{team.name}} &gt; {{title}}{{#unless $eq priority 'normal'}}
+    <small title="{{__ priority}}" class="{{#if $eq priority 'essential'}}text-secondary{{else}}text-primary{{/if}}">{{fa "exclamation-circle"}}</small>{{/unless}}
+  </h5>
 </template>
 
 <template name="taskTitle">
-  <h5 class="mb-1 mr-auto"><small>{{fa "tasks"}} </small>{{title}}</h5>
+  <h5 class="mb-1 mr-auto"><small>{{fa "tasks"}} </small>{{team.name}} &gt; {{title}}</h5>
 </template>
 
 <template name="projectTitle">
-  <h5 class="mb-1 mr-auto"><small>{{fa "calendar-o"}} </small>{{title}}</h5>
+  <h5 class="mb-1 mr-auto"><small>{{fa "calendar-o"}} </small>{{team.name}} &gt; {{title}}</h5>
 </template>
 
 <template name="leadTitle">
