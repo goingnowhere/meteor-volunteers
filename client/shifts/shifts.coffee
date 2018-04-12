@@ -1,13 +1,5 @@
 import moment from 'moment'
 
-getDuty = (type,title) ->
-  sel = {title: title}
-  switch type
-    when "shift" then share.TeamShifts.findOne(sel)
-    when "task" then share.TeamTasks.findOne(sel)
-    when "project" then share.Projects.findOne(sel)
-    when "lead" then share.Lead.findOne(sel)
-
 getTeam = (type,parentId) ->
   switch type
     when "shift" then share.Team.findOne(parentId)
@@ -122,13 +114,6 @@ Template.signupModal.helpers
     DatesLocal.find(sel, {sort: { "start": -1 }})
 
 Template.dutiesListItemGroupped.bindI18nNamespace('abate:volunteers')
-Template.dutiesListItemGroupped.helpers
-  projectDisplay: (duty) ->
-    _.extend({}, duty.shift, {type: duty.type, team: duty.team})
-  shiftLengths: (shift) ->
-    {start, end} = shift
-    moment(end).diff(start, 'hours')
-
 Template.dutiesListItemGroupped.events
   'click [data-action="chooseShifts"]': ( event, template ) ->
     parentId = $(event.target).data('parent-id')

@@ -19,6 +19,11 @@ share.initCollections = (eventName) ->
   if Meteor.isServer
     share.TeamShifts._ensureIndex( { parentId: 1 } )
 
+  if Meteor.isClient
+    # Create client-side only collection to reactively aggregate into
+    # If preformance is a problem we could aggregate into a collection inside Mongo
+    share.shiftGroups = new Mongo.Collection "#{prefix}Volunteers.shiftGroups"
+
   share.Projects = new Mongo.Collection "#{prefix}Volunteers.projects"
   share.Projects.attachSchema(share.Schemas.Projects)
   if Meteor.isServer

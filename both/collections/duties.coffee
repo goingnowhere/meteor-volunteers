@@ -102,10 +102,6 @@ share.Schemas.TeamTasks = new SimpleSchema(
 share.Schemas.TeamTasks.extend(Common)
 share.Schemas.TeamTasks.extend(Bounds)
 
-getUniqueShifts = () ->
-  allShifts = share.TeamShifts.find({},{sort: {title: 1}}).fetch()
-  _.uniq(allShifts, false, (s) -> s.title).map((s) -> {label: s.title, value: s._id})
-
 share.Schemas.TeamShifts = new SimpleSchema(
   start:
     type: Date

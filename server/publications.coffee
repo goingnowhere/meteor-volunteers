@@ -305,6 +305,32 @@ share.initPublications = (eventName) ->
   createPublicationAllDuties("Projects",share.Projects, share.ProjectSignups)
   createPublicationAllDuties("Lead",share.Lead, share.LeadSignups)
 
+  Meteor.publish "#{eventName}.Volunteers.shiftGroups", (sel={},limit=10) ->
+    sel = _.extend(sel,dutiesPublicPolicy)
+    if this.userId
+      sel = filterForPublic(this.userId, sel)
+    ReactiveAggregate(this, share.TeamShifts, [
+      { $match: sel },
+      { $group: {
+          _id: "$groupId",
+          parentId: { $first: "$parentId" },
+          title: { $first: "$title" },
+          description: { $first: "$description" },
+          priority: { $first: "$priority" },
+          policy: { $first: "$policy" },
+          length: { $first: {
+            $mod: [
+              { $subtract: [
+                {$hour: "$end"},
+                {$hour: "$start"},
+              ]},
+              23,
+            ]},
+          },
+        },
+      },
+    ], { clientCollection: "#{eventName}.Volunteers.shiftGroups" })
+
   Meteor.publish "#{eventName}.Volunteers.volunteerForm", (userId) ->
     # XXX access to all leads, or only those leads that need to know ?
     if share.isManagerOrLead(this.userId)

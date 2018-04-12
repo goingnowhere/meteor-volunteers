@@ -14,9 +14,13 @@ addLocalDutiesCollection = (team,duties,type,filter,limit) ->
       description: shift.description,
       priority: shift.priority,
       parentId: filter.parentId,
-      shift,
+      policy: filter.policy,
       team,
     }
+    if type == 'project'
+      duty._id = shift._id
+      duty.start = shift.start
+      duty.end = shift.end
     ShiftTitles.insert(duty)
   ).value()
 
@@ -34,9 +38,7 @@ Template.signupsListTeam.onCreated () ->
       sel.priority = {$in: filters.priorities}
     switch dutyType
       when "shift"
-        share.templateSub(template,"TeamShifts",sel,limit)
-        if template.subscriptionsReady()
-          addLocalDutiesCollection(team,share.TeamShifts,'shift',sel,limit)
+        share.templateSub(template,"shiftGroups",sel)
       when "task"
         share.templateSub(template,"TeamTasks",sel,limit)
         if template.subscriptionsReady()
@@ -46,11 +48,10 @@ Template.signupsListTeam.onCreated () ->
         if template.subscriptionsReady()
           addLocalDutiesCollection(team,share.Projects,'project',sel,limit)
       else
-        share.templateSub(template,"TeamShifts",sel,limit)
+        share.templateSub(template,"shiftGroups",sel)
         share.templateSub(template,"TeamTasks",sel,limit)
         share.templateSub(template,"Projects",sel,limit)
         if template.subscriptionsReady()
-          addLocalDutiesCollection(team,share.TeamShifts,'shift',sel,limit)
           addLocalDutiesCollection(team,share.TeamTasks,'task',sel,limit)
           addLocalDutiesCollection(team,share.Projects,'project',sel,limit)
 
@@ -59,10 +60,14 @@ Template.signupsListTeam.helpers
     template = Template.instance()
     {team, dutyType = ''} = template.data
     sel = {parentId : team._id}
-    if dutyType in ['shift', 'lead', 'project']
-      sel.type = dutyType
     if template.subscriptionsReady()
-      ShiftTitles.find(sel).fetch()
+      shiftGroups = []
+      if dutyType in ['lead', 'project']
+        sel.type = dutyType
+      else
+        shiftGroups = share.shiftGroups.find(sel).map((group) => _.extend(group, {type: 'shift', team}))
+      otherDuties = ShiftTitles.find(sel).fetch()
+      return shiftGroups.concat(otherDuties)
     else []
 
 Template.signupsListTeam.events
@@ -74,9 +79,7 @@ Template.signupsListTeam.events
 Template.signupsList.bindI18nNamespace('abate:volunteers')
 Template.signupsList.onCreated () ->
   template = this
-  # Move limit to unreasonably high as limiting lead to weird behaviour
-  # e.g. only one team appearing as there weren't any shifts to show for most teams with filtering
-  template.limit = new ReactiveVar(50)
+  template.limit = new ReactiveVar(4)
   quirks =  template.data?.quirks
   skills =  template.data?.skills
 
@@ -84,8 +87,8 @@ Template.signupsList.onCreated () ->
     limit = template.limit.get()
     if quirks and skills
       share.templateSub(template,"team.ByUserPref",quirks,skills,limit)
-    # else
-      # share.templateSub(template,"team",limit)
+    else
+      share.templateSub(template,"team",limit)
 
 Template.signupsList.helpers
   'allTeams': () ->

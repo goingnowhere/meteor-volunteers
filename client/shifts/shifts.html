@@ -4,10 +4,10 @@
     {{> dutiesListItemContent duty }}
     <div class="row no-gutters pt-2 align-items-center">
       {{#if $eq duty.type 'project'}}
-        {{> dutiesListItemDate projectDisplay duty }}
+        {{> dutiesListItemDate duty }}
       {{else}}
         <div class="col">
-          <h5 class="mb-0">{{ shiftLengths duty.shift }} {{__ ".shift_length_hours"}}</h5>
+          <h5 class="mb-0">{{ duty.length }} {{__ ".shift_length_hours"}}</h5>
         </div>
         <div class="col-4">
           <button
