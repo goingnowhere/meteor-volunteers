@@ -111,7 +111,7 @@ Template.signupModal.helpers
     template = Template.instance()
     {title} = template.data
     sel = {title: title}
-    DatesLocal.find(sel, {sort: { "start": -1 }})
+    DatesLocal.find(sel, {sort: { "start": 1 }})
 
 Template.dutiesListItemGroupped.bindI18nNamespace('abate:volunteers')
 Template.dutiesListItemGroupped.events
@@ -132,7 +132,10 @@ Template.dutiesListItemDate.helpers
     {min, signedUp = 0} = Template.currentData()
     Math.max(0, min - signedUp)
   spotsleft: () ->
-    {max, signedUp = 0} = Template.currentData()
+    {max, signedUp = 0, type} = Template.currentData()
+    if type == 'project'
+      # Is there something meaningful we could display?
+      return 1
     Math.max(0, max - signedUp)
 
 Template.dutiesListItemDate.events
