@@ -28,7 +28,7 @@ share.Schemas.VolunteerForm = new SimpleSchema(
       options: share.getSkillsList
       afFieldInput:
         multiple: true
-        # select2Options: () -> {tags: true}
+        select2Options: () -> {width: '100%'}
   "skills.$": String
   quirks:
     type: Array
@@ -41,7 +41,7 @@ share.Schemas.VolunteerForm = new SimpleSchema(
       options: share.getQuirksList
       afFieldInput:
         multiple: true
-        # select2Options: () -> {tags: true}
+        select2Options: () -> {width: '100%'}
   "quirks.$": String
   private_notes:
     type: String

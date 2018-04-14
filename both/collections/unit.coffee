@@ -34,7 +34,10 @@ CommonUnit = new SimpleSchema(
       options: share.getSkillsList
       afFieldInput:
         multiple: true
-        select2Options: () -> {tags: true}
+        select2Options: () -> {
+          tags: true,
+          width: "100%",
+        }
   "skills.$": String
   quirks:
     type: Array
@@ -45,7 +48,10 @@ CommonUnit = new SimpleSchema(
       options: share.getQuirksList
       afFieldInput:
         multiple: true
-        select2Options: () -> {tags: true}
+        select2Options: () -> {
+          tags: true,
+          width: "100%",
+        }
   "quirks.$": String
   description:
     type: String
@@ -71,7 +77,12 @@ share.Schemas.Team.extend(
       type: "select2"
       options: share.getLocationList
       afFieldInput:
-        select2Options: () -> {tags: true}
+        select2Options: () -> {
+          tags: true,
+          width: "100%",
+          placeholder: i18n.__("abate:volunteers","select_location"),
+          allowClear: true
+        }
 )
 
 share.Schemas.Department = CommonUnit
