@@ -28,7 +28,22 @@ commonEvents =
     delete shift.start
     delete shift.end
     AutoFormComponents.ModalShowWithTemplate("insertUpdateTemplate",
-      {form:{collection}, data: shift})
+      { form: {
+        collection,
+        hiddenFields:"description, priority, policy, title"
+        }, data: shift
+      }, shift.title)
+  'click [data-action="edit_group"]': (event,template) ->
+    id = $(event.currentTarget).data('id')
+    type = $(event.currentTarget).data('type')
+    collection = share.dutiesCollections[type]
+    shift = collection.findOne(id)
+    AutoFormComponents.ModalShowWithTemplate("insertUpdateTemplate",
+      { form: {
+        collection,
+        hiddenFields:"min, max, start, end"
+        }, data: shift
+      }, shift.title)
 
 Template.teamShiftsTable.bindI18nNamespace('abate:volunteers')
 Template.teamShiftsTable.onCreated () ->
