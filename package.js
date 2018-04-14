@@ -76,8 +76,6 @@ Package.onUse(function(api) {
     'client/global_helpers.coffee',
     'client/css/custom.css',
 
-    "client/shifts/filters.html",
-    "client/shifts/filters.coffee",
     "client/shifts/shifts.html",
     "client/shifts/shifts.coffee",
     "client/shifts/signupList.html",
