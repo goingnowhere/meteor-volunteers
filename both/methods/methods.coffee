@@ -27,7 +27,7 @@ share.initMethods = (eventName) ->
       when "insert"
         Meteor.methods "#{collectionName}.insert": (doc) ->
           console.log ["#{collectionName}.insert",doc]
-          collection.simpleSchema().namedContext().validate(doc)
+          collection.simpleSchema().validate(doc)
           allowedRoles = [ 'manager' ]
           if doc.parentId != 'TopEntity'
             parentRole = doc.parentId
@@ -45,8 +45,8 @@ share.initMethods = (eventName) ->
             return throwError(403, 'Insufficient Permission')
       when "update"
         Meteor.methods "#{collectionName}.update": (doc) ->
-          console.log ["#{collectionName}.update",doc.modifier]
-          collection.simpleSchema().namedContext().validate(doc.modifier,{modifier:true})
+          console.log ["#{collectionName}.update",doc._id,doc.modifier]
+          collection.simpleSchema().validate(doc.modifier,{modifier:true})
           if share.isManagerOrLead(Meteor.userId(),[doc._id])
             oldDoc = collection.findOne(doc._id)
             collection.update(doc._id,doc.modifier, (err,res) ->
@@ -80,15 +80,15 @@ share.initMethods = (eventName) ->
       when "insert"
         Meteor.methods "#{collectionName}.insert": (doc) ->
           console.log ["#{collectionName}.insert",doc]
-          collection.simpleSchema().namedContext().validate(doc)
+          collection.simpleSchema().validate(doc)
           if share.isManagerOrLead(Meteor.userId(),[doc.parentId])
             collection.insert(doc)
           else
             throwError(403, 'Insufficient Permission')
       when "update"
         Meteor.methods "#{collectionName}.update": (doc) ->
-          console.log ["#{collectionName}.update",doc]
-          collection.simpleSchema().namedContext().validate(doc.modifier,{modifier:true})
+          console.log ["#{collectionName}.update",doc._id,doc.modifier]
+          collection.simpleSchema().validate(doc.modifier,{modifier:true})
           olddoc = collection.findOne(doc._id)
           if share.isManagerOrLead(Meteor.userId(),[olddoc.parentId])
             collection.update(doc._id,doc.modifier)
