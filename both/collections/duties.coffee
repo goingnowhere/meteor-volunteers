@@ -137,18 +137,6 @@ share.Schemas.TeamShifts = new SimpleSchema(
           defaultTime:'08:00'
           # minDate:
           # maxDate:
-  startTime:
-    type: Number
-    optional: true
-    autoValue: () -> moment(this.field('start').value).hour()
-    autoform:
-      omit: true
-  endTime:
-    type: Number
-    optional: true
-    autoValue: () -> moment(this.field('end').value).hour() + 1
-    autoform:
-      omit: true
 )
 
 share.Schemas.TeamShifts.extend(Common)

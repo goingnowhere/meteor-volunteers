@@ -68,6 +68,7 @@
   "load_more_shifts": "More Shifts",
   "load_more_leads": "More Leads",
   "shift_length_hours": "hour shifts",
-  "edit_group": "Edit Shift",
+  "edit_group": "Edit Shift Type",
+  "update_group": "Update all shifts of this type",
   "select_location": "Select Location"
 }

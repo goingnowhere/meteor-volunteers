@@ -94,6 +94,21 @@ share.initMethods = (eventName) ->
             collection.update(doc._id,doc.modifier)
           else
             throwError(403, 'Insufficient Permission')
+      when "updateGroup"
+        Meteor.methods "#{collectionName}.group.update": (doc) ->
+          console.log ["#{collectionName}.group.update",doc._id,doc.modifier]
+          context = collection.simpleSchema()
+            .omit('start', 'end', 'staffing', 'min', 'max', 'estimatedTime', 'dueDate')
+            .validate(doc.modifier,{modifier:true})
+          olddoc = collection.findOne(doc._id)
+          if share.isManagerOrLead(Meteor.userId(),[olddoc.parentId])
+            collection.update(
+              {parentId: olddoc.parentId, groupId: olddoc.groupId},
+              doc.modifier,
+              {multi: true},
+            )
+          else
+            throwError(403, 'Insufficient Permission')
       else
         console.warn "type #{type} for #{collectionName} ERROR"
 
@@ -154,6 +169,8 @@ share.initMethods = (eventName) ->
       for k,collection of share.orgUnitCollections
         do ->
           createOrgUnitMethod(collection, type)
+  for type in ["remove","insert","update","updateGroup"]
+    do ->
       for k,collection of share.dutiesCollections
         do ->
           createDutiesMethod(collection,type)

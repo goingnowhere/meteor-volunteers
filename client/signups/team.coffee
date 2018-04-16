@@ -38,12 +38,17 @@ commonEvents =
     type = $(event.currentTarget).data('type')
     collection = share.dutiesCollections[type]
     shift = collection.findOne(id)
-    AutoFormComponents.ModalShowWithTemplate("insertUpdateTemplate",
-      { form: {
+    AutoFormComponents.ModalShowWithTemplate("insertUpdateTemplate", {
+      form: {
         collection,
-        hiddenFields:"min, max, start, end"
-        }, data: shift
-      }, shift.title)
+        omitFields:"start, end, staffing, min, max, estimatedTime, dueDate",
+        update: {
+          method: "#{collection._name}.group.update",
+          label: i18n.__("abate:volunteers","update_group"),
+        },
+      },
+      data: shift,
+    }, shift.title)
 
 Template.teamShiftsTable.bindI18nNamespace('abate:volunteers')
 Template.teamShiftsTable.onCreated () ->
