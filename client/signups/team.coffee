@@ -97,7 +97,7 @@ Template.teamProjectsTable.bindI18nNamespace('abate:volunteers')
 Template.teamProjectsTable.onCreated () ->
   template = this
   template.teamId = template.data._id
-  share.templateSub(template,"ProjectSignups.byTeam",teamId)
+  share.templateSub(template,"ProjectSignups.byTeam",template.teamId)
 
 Template.teamProjectsTable.helpers
   allProjects: () ->

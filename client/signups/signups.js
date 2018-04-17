@@ -1,40 +1,54 @@
+import moment from 'moment'
+import { ReactiveVar } from 'meteor/reactive-var'
+
 const share = __coffeescriptShare
 
 Template.teamSignupsList.bindI18nNamespace('abate:volunteers')
-Template.teamSignupsList.onCreated(function onCreated() {
+Template.teamSignupsList.onCreated(function () {
   const template = this
-  template.teamId = this.data._id
-  share.templateSub(template, 'ShiftSignups.byTeam', template.teamId)
-  share.templateSub(template, 'TaskSignups.byTeam', template.teamId)
-  share.templateSub(template, 'ProjectSignups.byTeam', template.teamId)
+  const teamId = template.data._id
+  template.signups = new ReactiveVar([])
+  share.templateSub(template, "ShiftSignups.byTeam", teamId);
+  share.templateSub(template, "TaskSignups.byTeam", teamId);
+  share.templateSub(template, "ProjectSignups.byTeam", teamId);
+  template.autorun(() => {
+    if (template.subscriptionsReady()) {
+      const shifts = share.ShiftSignups.find({ parentId: teamId, status: 'pending' }, { sort: { createdAt: -1 } })
+        .map(signup => ({
+          ...signup,
+          type: 'shift',
+          duty: share.TeamShifts.findOne(signup.shiftId),
+        }))
+      const tasks = share.TaskSignups.find({ parentId: teamId, status: 'pending' }, { sort: { createdAt: -1 } })
+        .map(signup => ({
+          ...signup,
+          type: 'task',
+          duty: share.TeamTasks.findOne(signup.shiftId),
+        }))
+      const projects = share.ProjectSignups.find({ parentId: teamId, status: 'pending' }, { sort: { createdAt: -1 } })
+        .map(signup => ({
+          ...signup,
+          type: 'project',
+          duty: share.Projects.findOne(signup.shiftId),
+        }))
+      const signups = [
+        ...shifts,
+        ...tasks,
+        ...projects,
+      ].sort((a, b) => a.createdAt && b.createdAt && a.createdAt.getTime() - b.createdAt.getTime())
+
+      share.templateSub(template,"volunteerForm.list", signups.map(signup => signup.userId))
+      template.signups.set(signups)
+    }
+  })
 })
 
 Template.teamSignupsList.helpers({
   allSignups() {
-    teamId = Template.instance().teamId
-    const shifts = share.ShiftSignups.find({ parentId: teamId, status: 'pending' }, { sort: { createdAt: -1 } })
-      .map(signup => ({
-        ...signup,
-        type: 'shift',
-        duty: share.TeamShifts.findOne(signup.shiftId),
-      }))
-    const tasks = share.TaskSignups.find({ parentId: teamId, status: 'pending' }, { sort: { createdAt: -1 } })
-      .map(signup => ({
-        ...signup,
-        type: 'task',
-        duty: share.TeamTasks.findOne(signup.shiftId),
-      }))
-    const projects = share.ProjectSignups.find({ parentId: teamId, status: 'pending' }, { sort: { createdAt: -1 } })
-      .map(signup => ({
-        ...signup,
-        type: 'project',
-        duty: share.Projects.findOne(signup.shiftId),
-      }))
-    return [
-      ...shifts,
-      ...tasks,
-      ...projects,
-    ].sort((a, b) => a.createdAt && b.createdAt && a.createdAt.getTime() - b.createdAt.getTime())
+    return Template.instance().signups.get()
+  },
+  createdAgo(date) {
+    return moment(date).fromNow()
   },
 })
 
@@ -58,6 +72,15 @@ Template.teamSignupsList.events({
       const signup = { _id: signupId, modifier: { $set: { status: 'refused' } } }
       share.meteorCall(`${type}Signups.update`, signup)
     }
+  },
+  'click [data-action="user-info"]'(event,templateInstance) {
+    const userId = $(event.currentTarget).data('id')
+    const form = share.VolunteerForm.findOne({ userId })
+    const user = Meteor.users.findOne(userId)
+    const userform = { formName: 'VolunteerForm', form, user }
+    // Lifted straight from NoInfo view, should be replaced by something better
+    AutoFormComponents.ModalShowWithTemplate('formBuilderDisplay',
+      userform, "User Form", 'lg')
   },
 })
 

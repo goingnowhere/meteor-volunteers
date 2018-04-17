@@ -1,15 +1,26 @@
 <!-- all Restricted shifts and tasks requests for a given team -->
 <template name="teamSignupsList">
-  <table class="table table-striped">
-    <tbody>
-      {{#each signup in allSignups}}
-        <tr>
-          <td>{{ signup.duty.title }}</td>
-          <td>
-            {{getUserName signup.userId}}
-            <small>{{__ ".created"}}: {{formatDate signup.createdAt}}</small>
-          </td>
-          <td>
+  <ul class="list-group">
+    {{#each signup in allSignups}}
+      <li class="list-group-item p-2">
+        <div class="row no-gutters">
+          <div class="col">
+            {{ signup.duty.title }}
+            {{#if $eq signup.type 'shift'}}
+              {{> shiftDateInline signup.duty }}
+            {{/if}}
+            {{#if $eq signup.type 'project'}}
+              {{> projectDateInline signup }}
+            {{/if}}
+            {{#if $eq signup.type 'task'}}
+              {{> taskDate signup.duty }}
+            {{/if}}
+          </div>
+          <div class="col" data-action="user-info" data-id="{{ signup.userId }}">
+            <button class="btn btn-default btn-sm">{{getUserName signup.userId}}</button>
+            <small>{{__ ".created"}}: {{createdAgo signup.createdAt}}</small>
+          </div>
+          <div class="col">
             <button class="btn btn-default btn-sm" data-action="approve"
               data-signup="{{ signup._id }}" data-type="{{ signup.type }}">
                 {{__ '.approve' }}
@@ -18,11 +29,11 @@
               data-signup="{{ signup._id }}" data-type="{{ signup.type }}">
                 {{__ '.refuse' }}
             </button>
-          </td>
-        </tr>
-      {{/each}}
-    </tbody>
-  </table>
+          </div>
+        </div>
+      </li>
+    {{/each}}
+  </ul>
 </template>
 
 <!-- all Lead team requests for a given department -->

@@ -331,6 +331,12 @@ share.initPublications = (eventName) ->
       },
     ], { clientCollection: "#{eventName}.Volunteers.shiftGroups" })
 
+  Meteor.publish "#{eventName}.Volunteers.volunteerForm.list", (userIds) ->
+    if share.isManagerOrLead(this.userId)
+      share.VolunteerForm.find({userId: {$in: userIds}})
+    else
+      return null
+
   Meteor.publish "#{eventName}.Volunteers.volunteerForm", (userId) ->
     # XXX access to all leads, or only those leads that need to know ?
     if share.isManagerOrLead(this.userId)
