@@ -31,8 +31,9 @@ Template.signupsListTeam.onCreated () ->
 
   template.autorun () ->
     sel = {parentId : team._id}
-    # Only need one to get details of the shift
-    limit = 1
+    # TODO Only need one to get details of the shift but this limits to only one project per team.
+    # We should add a 'projectGroups' aggregation in the same way as 'shiftGroups'
+    limit = 10
     {filters} = Template.currentData()
     if filters?.priorities?
       sel.priority = {$in: filters.priorities}

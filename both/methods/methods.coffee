@@ -158,6 +158,7 @@ share.initMethods = (eventName) ->
         Meteor.methods "#{collectionName}.insert": (doc) ->
           console.log ["#{collectionName}.insert", doc]
           signup = _.omit(doc, 'status')
+          signup.createdAt = new Date()
           SimpleSchema.validate(signup, schema.omit('status'))
           userId = Meteor.userId()
           parentDoc = parentCollection.findOne(signup.shiftId)

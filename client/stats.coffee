@@ -47,7 +47,7 @@ share.projectSignupsConfirmed = (p) ->
   dayStrings = pdays.map((m) -> m.toISOString())
   needed = _.object(pdays,p.staffing.map((s) -> s.min))
   confirmed = _.object(pdays,Array(pdays.length).fill(0))
-  signups = share.ProjectSignups.find({shiftId: p._id}).fetch()
+  signups = share.ProjectSignups.find({shiftId: p._id, status: 'confirmed'}).fetch()
   _.each(signups,((signup) ->
     pdays.forEach((day) ->
       if day.isBetween(signup.start, signup.end, 'days', '[]')
