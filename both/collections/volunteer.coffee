@@ -24,8 +24,10 @@ share.Schemas.VolunteerForm = new SimpleSchema(
       # XXX bug in autoform https://github.com/aldeed/meteor-autoform/issues/1635
       # group: () -> i18n.__("abate:volunteers","preferences")
       group: "Preferences"
+      groupHelp: () -> i18n.__("abate:volunteers","preferences_help")
       type: "select2"
       options: share.getSkillsList
+      afFieldHelpText: () -> i18n.__("abate:volunteers","skills_help")
       afFieldInput:
         multiple: true
         select2Options: () -> {width: '100%'}
@@ -39,6 +41,7 @@ share.Schemas.VolunteerForm = new SimpleSchema(
       group: "Preferences"
       type: "select2"
       options: share.getQuirksList
+      afFieldHelpText: () -> i18n.__("abate:volunteers","quirks_help")
       afFieldInput:
         multiple: true
         select2Options: () -> {width: '100%'}
