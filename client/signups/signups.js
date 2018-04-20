@@ -11,6 +11,7 @@ Template.teamSignupsList.onCreated(function () {
   share.templateSub(template, "ShiftSignups.byTeam", teamId);
   share.templateSub(template, "TaskSignups.byTeam", teamId);
   share.templateSub(template, "ProjectSignups.byTeam", teamId);
+  share.templateSub(template, "LeadSignups.byTeam",template.teamId);
   template.autorun(() => {
     if (template.subscriptionsReady()) {
       const shifts = share.ShiftSignups.find({ parentId: teamId, status: 'pending' }, { sort: { createdAt: -1 } })
@@ -31,10 +32,17 @@ Template.teamSignupsList.onCreated(function () {
           type: 'project',
           duty: share.Projects.findOne(signup.shiftId),
         }))
+      const leads = share.LeadSignups.find({ parentId: teamId, status: 'pending' }, {sort: {createdAt: -1}})
+        .map(signup => ({
+          ...signup,
+          type: 'lead',
+          duty: share.Lead.findOne(signup.shiftId)
+        }))
       const signups = [
         ...shifts,
         ...tasks,
         ...projects,
+        ...leads,
       ].sort((a, b) => a.createdAt && b.createdAt && a.createdAt.getTime() - b.createdAt.getTime())
 
       share.templateSub(template,"volunteerForm.list", signups.map(signup => signup.userId))
