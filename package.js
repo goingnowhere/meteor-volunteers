@@ -4,19 +4,19 @@ Package.describe({
   summary: 'Volunteers form',
   git: '',
   documentation: 'README.md',
-});
+})
 
 Npm.depends({
-  'flatpickr':'2.4.8',
-  'jquery': '3.2.1',
-  'bootstrap': '4.0.0-beta.3',
-  'chartjs': '0.3.24',
-  'moment-range': '3.1.1'
+  flatpickr: '2.4.8',
+  jquery: '3.2.1',
+  bootstrap: '4.0.0-beta.3',
+  chartjs: '0.3.24',
+  'moment-range': '3.1.1',
   // 'popper.js': '1.12.9',
-});
+})
 
-Package.onUse(function(api) {
-  api.versionsFrom('1.4');
+Package.onUse((api) => {
+  api.versionsFrom('1.4')
 
   api.use([
     'mongo',
@@ -38,10 +38,10 @@ Package.onUse(function(api) {
     'universe:i18n',
     'universe:i18n-blaze',
     'abate:autoform-components',
-    'abate:formbuilder'
-  ], ['client', 'server']);
+    'abate:formbuilder',
+  ], ['client', 'server'])
 
-  api.use( [
+  api.use([
     'templating',
     'tracker',
     'fortawesome:fontawesome',
@@ -49,10 +49,10 @@ Package.onUse(function(api) {
     'drewy:datetimepicker',
     'abate:autoform-datetimepicker',
     'peppelg:bootstrap-3-modal',
-  ], 'client');
+  ], 'client')
 
   api.use([
-    'jcbernack:reactive-aggregate'
+    'jcbernack:reactive-aggregate',
   ], 'server')
 
   // Order Matters !
@@ -61,57 +61,57 @@ Package.onUse(function(api) {
     'both/router.coffee',
     'both/routerControllers.js',
 
-    "both/collections/duties.coffee",
-    "both/collections/unit.coffee",
-    "both/collections/volunteer.coffee",
-    "both/collections/timeseries.coffee",
-    "both/collections/initCollections.coffee",
+    'both/collections/duties.coffee',
+    'both/collections/unit.coffee',
+    'both/collections/volunteer.coffee',
+    'both/collections/timeseries.coffee',
+    'both/collections/initCollections.coffee',
 
     'both/methods/methods.coffee',
 
-    "api.coffee"
-  ], ["server","client"]);
+    'api.coffee',
+  ], ['server', 'client'])
 
   api.add_files([
     'client/global_helpers.coffee',
     'client/css/custom.css',
 
-    "client/shifts/shifts.html",
-    "client/shifts/shifts.coffee",
-    "client/shifts/signupList.html",
-    "client/shifts/signupList.coffee",
+    'client/shifts/shifts.html',
+    'client/shifts/shifts.coffee',
+    'client/shifts/signupList.html',
+    'client/shifts/signupList.coffee',
 
-    "client/volunteers/booked.html",
-    "client/volunteers/booked.coffee",
-    "client/volunteers/userform.html",
-    "client/volunteers/userform.coffee",
-    "client/volunteers/volunteerForm.html",
-    "client/volunteers/volunteerForm.coffee",
+    'client/volunteers/booked.html',
+    'client/volunteers/booked.coffee',
+    'client/volunteers/userform.html',
+    'client/volunteers/userform.coffee',
+    'client/volunteers/volunteerForm.html',
+    'client/volunteers/volunteerForm.coffee',
 
-    "client/units/team.html",
-    "client/units/team.coffee",
-    "client/units/department.html",
-    "client/units/department.coffee",
-    "client/units/division.html",
-    "client/units/division.coffee",
+    'client/units/team.html',
+    'client/units/team.coffee',
+    'client/units/department.html',
+    'client/units/department.coffee',
+    'client/units/division.html',
+    'client/units/division.coffee',
 
-    "client/signups/team.html",
-    "client/signups/team.coffee",
-    "client/signups/signups.html",
-    "client/signups/signups.js",
+    'client/signups/team.html',
+    'client/signups/team.coffee',
+    'client/signups/signups.html',
+    'client/signups/signups.js',
 
-    "client/stats.coffee",
-  ], "client");
+    'client/stats.coffee',
+  ], 'client')
 
   api.add_files([
     'server/methods.js',
     'server/publications.coffee',
-  ],"server");
+  ], 'server')
 
-  api.add_files([ "i18n/en.i18n.json", ], ["client", "server"]);
+  api.add_files(['i18n/en.i18n.json'], ['client', 'server'])
 
-  api.export([ 'VolunteersClass']);
-});
+  api.export(['VolunteersClass'])
+})
 
 // Package.onTest(function (api) {
 //   api.use([

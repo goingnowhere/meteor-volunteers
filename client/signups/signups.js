@@ -1,125 +1,119 @@
-let share = __coffeescriptShare;
+const share = __coffeescriptShare
 
-Template.teamSignupsList.bindI18nNamespace('abate:volunteers');
-Template.teamSignupsList.onCreated(function () {
-  const template = this;
-  template.teamId = this.data._id;
-  share.templateSub(template,"ShiftSignups.byTeam",template.teamId);
-  share.templateSub(template,"TaskSignups.byTeam",template.teamId);
-  share.templateSub(template,"ProjectSignups.byTeam",template.teamId);
-});
+Template.teamSignupsList.bindI18nNamespace('abate:volunteers')
+Template.teamSignupsList.onCreated(function onCreated() {
+  const template = this
+  template.teamId = this.data._id
+  share.templateSub(template, 'ShiftSignups.byTeam', template.teamId)
+  share.templateSub(template, 'TaskSignups.byTeam', template.teamId)
+  share.templateSub(template, 'ProjectSignups.byTeam', template.teamId)
+})
 
 Template.teamSignupsList.helpers({
   allSignups() {
-    teamId = Template.instance().teamId;
-    const shifts = share.ShiftSignups.find({ parentId: teamId , status: 'pending' }, {sort: {createdAt: -1}})
+    teamId = Template.instance().teamId
+    const shifts = share.ShiftSignups.find({ parentId: teamId, status: 'pending' }, { sort: { createdAt: -1 } })
       .map(signup => ({
         ...signup,
         type: 'shift',
-        duty: share.TeamShifts.findOne(signup.shiftId)
+        duty: share.TeamShifts.findOne(signup.shiftId),
       }))
-    const tasks = share.TaskSignups.find({ parentId: teamId, status: 'pending' }, {sort: {createdAt: -1}})
+    const tasks = share.TaskSignups.find({ parentId: teamId, status: 'pending' }, { sort: { createdAt: -1 } })
       .map(signup => ({
         ...signup,
         type: 'task',
-        duty: share.TeamTasks.findOne(signup.shiftId)
+        duty: share.TeamTasks.findOne(signup.shiftId),
       }))
-    const projects = share.ProjectSignups.find({ parentId: teamId, status: 'pending' }, {sort: {createdAt: -1}})
+    const projects = share.ProjectSignups.find({ parentId: teamId, status: 'pending' }, { sort: { createdAt: -1 } })
       .map(signup => ({
         ...signup,
         type: 'project',
-        duty: share.Projects.findOne(signup.shiftId)
+        duty: share.Projects.findOne(signup.shiftId),
       }))
     return [
       ...shifts,
       ...tasks,
       ...projects,
     ].sort((a, b) => a.createdAt && b.createdAt && a.createdAt.getTime() - b.createdAt.getTime())
-  }
+  },
 })
 
 Template.teamSignupsList.events({
-  'click [data-action="approve"]'(event) {
+  'click [data-action="approve"]': function e(event) {
     const type = $(event.target).data('type')
     const signupId = $(event.target).data('signup')
     if (type === 'lead') {
       share.meteorCall(`${type}Signups.confirm`, signupId)
     } else {
-      const signup = {_id: signupId, modifier: {$set: {status: 'confirmed'}}}
+      const signup = { _id: signupId, modifier: { $set: { status: 'confirmed' } } }
       share.meteorCall(`${type}Signups.update`, signup)
     }
   },
-  'click [data-action="refuse"]'(event) {
+  'click [data-action="refuse"]': function e(event) {
     const type = $(event.target).data('type')
     const signupId = $(event.target).data('signup')
     if (type === 'lead') {
       share.meteorCall(`${type}Signups.refuse`, signupId)
     } else {
-      const signup = {_id: signupId, modifier: {$set: {status: 'refused'}}}
+      const signup = { _id: signupId, modifier: { $set: { status: 'refused' } } }
       share.meteorCall(`${type}Signups.update`, signup)
     }
   },
 })
 
-Template.departmentSignupsList.bindI18nNamespace('abate:volunteers');
-Template.departmentSignupsList.onCreated(function () {
-  const template = this;
+Template.departmentSignupsList.bindI18nNamespace('abate:volunteers')
+Template.departmentSignupsList.onCreated(function onCreated() {
+  const template = this
   template.departmentId = this.data._id
-  share.templateSub(template,"LeadSignups.byDepartment",template.departmentId)
+  share.templateSub(template, 'LeadSignups.byDepartment', template.departmentId)
 })
 
 Template.departmentSignupsList.helpers({
   allSignups: () => {
     departmentId = Template.instance().departmentId
-    teamIds = share.Team.find({parentId: departmentId}).map((t) => { return t._id })
-    const leads = share.LeadSignups.find(
-        { parentId: {$in: teamIds}, status: 'pending' }, {sort: {createdAt: -1}}
-      ).map(signup => ({
-          ...signup,
-          type: 'lead',
-          unit: share.Team.findOne(signup.parentId),
-          duty: share.Lead.findOne(signup.shiftId)
-      })).sort((a, b) => {
-        return a.createdAt && b.createdAt && a.createdAt.getTime() - b.createdAt.getTime()
-    })
+    teamIds = share.Team.find({ parentId: departmentId }).map(t => t._id)
+    const leads = share.LeadSignups.find({ parentId: { $in: teamIds }, status: 'pending' }, { sort: { createdAt: -1 } }).map(signup => ({
+      ...signup,
+      type: 'lead',
+      unit: share.Team.findOne(signup.parentId),
+      duty: share.Lead.findOne(signup.shiftId),
+    })).sort((a, b) => a.createdAt && b.createdAt && a.createdAt.getTime() - b.createdAt.getTime())
     return leads
-  }
+  },
 })
 
 Template.departmentSignupsList.events({
-  'click [data-action="approve"]'(event) {
+  'click [data-action="approve"]': function e(event) {
     const signupId = $(event.target).data('signup')
-    share.meteorCall(`leadSignups.confirm`, signupId)
+    share.meteorCall('leadSignups.confirm', signupId)
   },
-  'click [data-action="refuse"]'(event) {
+  'click [data-action="refuse"]': function e(event) {
     const signupId = $(event.target).data('signup')
-    share.meteorCall(`leadSignups.refuse`, signupId)
+    share.meteorCall('leadSignups.refuse', signupId)
   },
 })
 
-Template.managerSignupsList.bindI18nNamespace('abate:volunteers');
-Template.managerSignupsList.onCreated(function () {
-  const template = this;
-  share.templateSub(template,"LeadSignups.Manager")
+Template.managerSignupsList.bindI18nNamespace('abate:volunteers')
+Template.managerSignupsList.onCreated(function onCreated() {
+  const template = this
+  share.templateSub(template, 'LeadSignups.Manager')
 })
 
 Template.managerSignupsList.helpers({
   allSignups: () => {
-    divisionIds = share.Division.find().map((t) => { return t._id })
-    deptIds = share.Department.find({parentId: {$in: divisionIds}}).map((t) => { return t._id })
-    teamIds = share.Team.find({parentId: {$in: deptIds}}).map((t) => { return t._id })
-    const leads = share.LeadSignups.find(
-        { parentId: {$in: teamIds.concat(deptIds).concat(divisionIds)},
-          status: 'pending' }, {sort: {createdAt: -1}}
-      ).map(signup => ({
-          ...signup,
-          type: 'lead',
-          // XXX this should be either team, dept or division
-          unit: share.Department.findOne(signup.parentId),
-          duty: share.Lead.findOne(signup.shiftId)
-      })).sort((a, b) => {
-        return a.createdAt && b.createdAt && a.createdAt.getTime() - b.createdAt.getTime()
-    })
+    divisionIds = share.Division.find().map(t => t._id)
+    deptIds = share.Department.find({ parentId: { $in: divisionIds } }).map(t => t._id)
+    teamIds = share.Team.find({ parentId: { $in: deptIds } }).map(t => t._id)
+    const leads = share.LeadSignups.find({
+      parentId: { $in: teamIds.concat(deptIds).concat(divisionIds) },
+      status: 'pending',
+    }, { sort: { createdAt: -1 } }).map(signup => ({
+      ...signup,
+      type: 'lead',
+      // XXX this should be either team, dept or division
+      unit: share.Department.findOne(signup.parentId),
+      duty: share.Lead.findOne(signup.shiftId),
+    })).sort((a, b) => a.createdAt && b.createdAt && a.createdAt.getTime() - b.createdAt.getTime())
     return leads
-  }
+  },
 })
