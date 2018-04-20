@@ -75,5 +75,15 @@
   "select_location": "Select Location",
   "double_booking": "Double Booking",
   "double_booking_msg": "You cannot be in two places at once",
-  "confirmed": "Confirmed"
+  "confirmed": "Confirmed",
+  "priority_help_duty": "Essential shift will be proposed first, then Important, then Normal. Choose normal if unsure.",
+  "policy_help_duty": "RequireApproval shift do not need lead's validation. users can freely join Public shift. AdminOnly will not be listed",
+  "skills_help_team": "Choose or add the skills required or wished for this team.",
+  "quirks_help_team": "These are the peculiarity of a team. Choose or add new.",
+  "policy_help_team": "Public teams are listed. Private teams are visible to leads only. (not yet implemented). Choose Public if unsure.",
+  "location_help_team": "The usual location (if one) of your team. Choose or add new.",
+  "name_help_team": "The name of the team as it is going to be show in the shift listing and team page.",
+  "description_help_team": "The description of the team as it is going to be show in the shift listing and team page.",
+  "name_help_duty": "The name of the shift. The name of the team is always going to be prepend to the name of the shift. E.g. TeamName > ShiftName",
+  "description_help_duty": "The description of this shift. The description of the team will be accessible. No need to repeat."
 }

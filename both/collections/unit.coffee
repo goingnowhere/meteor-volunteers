@@ -3,7 +3,7 @@ checkNpmVersions { 'simpl-schema': '0.3.x' }, 'abate:volunteers'
 import SimpleSchema from 'simpl-schema'
 SimpleSchema.extendOptions(['autoform'])
 
-unitPolicy = ["public";"private";"restricted"]
+unitPolicy = ["public";"private"]
 
 share.getSkillsList = (sel={}) ->
   tags = _.union.apply null, share.Team.find(sel).map((team) -> team.skills)
@@ -25,6 +25,8 @@ CommonUnit = new SimpleSchema(
   name:
     type: String
     label: () -> i18n.__("abate:volunteers","name")
+    autoform:
+      afFieldHelpText: () -> i18n.__("abate:volunteers","name_help_team")
   skills:
     type: Array
     label: () -> i18n.__("abate:volunteers","skills")
@@ -32,6 +34,7 @@ CommonUnit = new SimpleSchema(
     autoform:
       type: "select2"
       options: share.getSkillsList
+      afFieldHelpText: () -> i18n.__("abate:volunteers","skills_help_team")
       afFieldInput:
         multiple: true
         select2Options: () -> {
@@ -46,6 +49,7 @@ CommonUnit = new SimpleSchema(
     autoform:
       type: "select2"
       options: share.getQuirksList
+      afFieldHelpText: () -> i18n.__("abate:volunteers","quirks_help_team")
       afFieldInput:
         multiple: true
         select2Options: () -> {
@@ -59,12 +63,15 @@ CommonUnit = new SimpleSchema(
     optional: true
     autoform:
       rows: 5
+      afFieldHelpText: () -> i18n.__("abate:volunteers","description_help_team")
   # TODO: the unit policy should lock the policy of all entities below
   policy:
     type: String
     label: () -> i18n.__("abate:volunteers","policy")
     allowedValues: unitPolicy
     defaultValue: "public"
+    autoform:
+      afFieldHelpText: () -> i18n.__("abate:volunteers","policy_help_team")
 )
 
 share.Schemas.Team = new SimpleSchema(CommonUnit)
@@ -76,6 +83,7 @@ share.Schemas.Team.extend(
     autoform:
       type: "select2"
       options: share.getLocationList
+      afFieldHelpText: () -> i18n.__("abate:volunteers","location_help_team")
       afFieldInput:
         select2Options: () -> {
           tags: true,

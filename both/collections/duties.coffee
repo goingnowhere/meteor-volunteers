@@ -42,23 +42,28 @@ Common = new SimpleSchema(
   title:
     type: String
     label: () -> i18n.__("abate:volunteers","title")
+    autoform:
+      afFieldHelpText: () -> i18n.__("abate:volunteers","name_help_duty")
   description:
     type: String
     label: () -> i18n.__("abate:volunteers","description")
     optional: true
     autoform:
+      afFieldHelpText: () -> i18n.__("abate:volunteers","description_help_duty")
       rows: 5
   priority:
     type: String
     label: () -> i18n.__("abate:volunteers","priority")
     allowedValues: taskPriority
     autoform:
+      afFieldHelpText: () -> i18n.__("abate:volunteers","priority_help_duty")
       defaultValue: "normal"
   policy:
     type: String
     label: () -> i18n.__("abate:volunteers","policy")
     allowedValues: policyValues
     autoform:
+      afFieldHelpText: () -> i18n.__("abate:volunteers","policy_help_duty")
       defaultValue: "public"
   groupId:
     type: String
@@ -167,6 +172,7 @@ share.Schemas.Lead.extend(
     label: () -> i18n.__("abate:volunteers","policy")
     allowedValues: policyValues
     autoform:
+      afFieldHelpText: () -> i18n.__("abate:volunteers","policy_help_duty")
       defaultValue: "requireApproval"
 )
 
