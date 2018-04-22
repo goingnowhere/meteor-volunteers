@@ -206,6 +206,36 @@ share.initMethods = (eventName) ->
       createSignupMethod('ProjectSignups', share.Projects, type)
 
   prefix = "#{eventName}.Volunteers"
+
+  Meteor.methods "#{prefix}.teamShifts.group.insert": (group) ->
+    console.log ["#{prefix}.teamShifts.group.insert", group]
+    share.Schemas.ShiftGroups.validate(group)
+    {shifts, start, end} = group
+    details = _.omit(group, 'shifts', 'start', 'end')
+    if share.isManagerOrLead(Meteor.userId(),[group.parentId])
+      groupId = Random.id()
+      _.flatten(Array.from(moment.range(start, end).by('days')).map((day) ->
+        shifts.map((shiftSpecifics) ->
+          [startHour, startMin] = shiftSpecifics.startTime.split(':')
+          [endHour, endMin] = shiftSpecifics.endTime.split(':')
+          start = moment(day).hour(startHour).minute(startMin)
+          end = moment(day).hour(endHour).minute(endMin)
+          # Deal with day wrap-around
+          if end.isBefore(start)
+            end.add(1, 'day')
+          return _.extend({
+            min: shiftSpecifics.min,
+            max: shiftSpecifics.max,
+            start: start.toDate(),
+            end: end.toDate(),
+            groupId,
+          }, details))
+        ), true).forEach((constructedShift) ->
+          share.TeamShifts.insert(constructedShift)
+        )
+    else
+      throwError(403, 'Insufficient Permission')
+
   Meteor.methods "#{prefix}.volunteerForm.remove": (formId) ->
     console.log ["#{prefix}.volunteerForm.remove",formId]
     check(formId,String)

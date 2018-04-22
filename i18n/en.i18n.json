@@ -59,6 +59,7 @@
   "update_shift": "Update Shift",
   "new_project": "New Project",
   "update_project": "Update Project",
+  "new_shift_group": "Create shift rota",
   "project_signup_form": "Select dates to volunteer",
   "project_signup_start": "Select start day",
   "project_signup_end": "Select final day",
@@ -85,5 +86,8 @@
   "name_help_team": "The name of the team as it is going to be show in the shift listing and team page.",
   "description_help_team": "The description of the team as it is going to be show in the shift listing and team page.",
   "name_help_duty": "The name of the shift. The name of the team is always going to be prepend to the name of the shift. E.g. TeamName > ShiftName",
-  "description_help_duty": "The description of this shift. The description of the team will be accessible. No need to repeat."
+  "description_help_duty": "The description of this shift. The description of the team will be accessible. No need to repeat.",
+  "start_help_rota": "The first day that shifts of this type happen.",
+  "end_help_rota": "The last day that shifts of this type happen.",
+  "shifts_help_rota": "Add a minimum, maximum and start and end time for each shift in the day. Every day will have the same shifts repeated but you can modify individual shifts later."
 }

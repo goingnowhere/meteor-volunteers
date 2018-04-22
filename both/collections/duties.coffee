@@ -215,3 +215,64 @@ share.Schemas.Projects = new SimpleSchema(
   'staffing.$': Bounds
 )
 share.Schemas.Projects.extend(Common)
+
+share.Schemas.ShiftGroups = new SimpleSchema(Common)
+share.Schemas.ShiftGroups.extend(
+  start:
+    type: Date
+    label: () -> i18n.__("abate:volunteers","start")
+    autoform:
+      afFieldHelpText: () -> i18n.__("abate:volunteers","start_help_rota")
+      afFieldInput:
+        type: "datetimepicker"
+        placeholder: () -> i18n.__("abate:volunteers","start")
+        opts: () ->
+          timepicker: false
+          format: 'DD-MM-YYYY'
+  end:
+    type: Date
+    label: () -> i18n.__("abate:volunteers","end")
+    custom: () ->
+      start = moment(this.field('start').value)
+      unless moment(this.value).isAfter(start)
+        return "startBeforeEndCustom"
+    autoform:
+      afFieldHelpText: () -> i18n.__("abate:volunteers","end_help_rota")
+      defaultValue: () ->
+        AutoForm.getFieldValue('start')
+      afFieldInput:
+        type: "datetimepicker"
+        placeholder: () -> i18n.__("abate:volunteers","end")
+        opts: () ->
+          timepicker: false
+          format: 'DD-MM-YYYY'
+  shifts:
+    type: Array
+    minCount: 1
+    autoform:
+      afFieldHelpText: () -> i18n.__("abate:volunteers","shifts_help_rota")
+  'shifts.$':
+    label: ''
+    type: Bounds.extend(
+      startTime:
+        type: String
+        autoform:
+          afFieldInput:
+            type: 'datetimepicker'
+            placeholder: () -> i18n.__("abate:volunteers","start")
+            opts: () ->
+              format: 'HH:mm'
+              datepicker: false
+              formatTime: 'HH:mm'
+      endTime:
+        type: String
+        autoform:
+          afFieldInput:
+            type: 'datetimepicker'
+            placeholder: () -> i18n.__("abate:volunteers","end")
+            opts: () ->
+              format: 'HH:mm'
+              datepicker: false
+              formatTime: 'HH:mm'
+    )
+)

@@ -200,6 +200,18 @@ Template.addShift.helpers
   }
   'data': () -> parentId: Template.currentData().team?._id
 
+Template.addShiftGroup.bindI18nNamespace('abate:volunteers')
+Template.addShiftGroup.helpers
+  'form': () -> {
+    schema: share.Schemas.ShiftGroups,
+    insert: {
+      id: "InsertShiftGroupFormId",
+      method: "#{share.eventName}.Volunteers.teamShifts.group.insert",
+      label: i18n.__("abate:volunteers","new_shift_group"),
+    }
+  }
+  'data': () -> parentId: Template.currentData().team?._id
+
 Template.addTask.bindI18nNamespace('abate:volunteers')
 Template.addTask.helpers
   'form': () -> { collection: share.TeamTasks }
@@ -212,7 +224,7 @@ Template.addProject.helpers
   'data': () ->
     parentId: Template.currentData().team?._id
 
-AutoForm.addHooks ['InsertTeamShiftsFormId','UpdateTeamShiftsFormId'],
+AutoForm.addHooks ['InsertTeamShiftsFormId','UpdateTeamShiftsFormId','InsertShiftGroupFormId'],
   onSuccess: (formType, result) ->
     if this.template.data.var
       this.template.data.var.set({add: false, teamId: result.teamId})
