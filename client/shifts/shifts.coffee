@@ -224,7 +224,7 @@ Template.addProject.helpers
   'data': () ->
     parentId: Template.currentData().team?._id
 
-AutoForm.addHooks ['InsertTeamShiftsFormId','UpdateTeamShiftsFormId','InsertShiftGroupFormId'],
+AutoForm.addHooks ['InsertTeamShiftsFormId','UpdateTeamShiftsFormId'],
   onSuccess: (formType, result) ->
     if this.template.data.var
       this.template.data.var.set({add: false, teamId: result.teamId})
@@ -291,6 +291,7 @@ Template.projectSignupForm.helpers
 
 AutoForm.addHooks([
   'projectSignupsInsert',
+  'InsertShiftGroupFormId',
 ],
   onSuccess: () ->
     Modal.hide()

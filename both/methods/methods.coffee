@@ -219,16 +219,16 @@ share.initMethods = (eventName) ->
         shifts.map((shiftSpecifics) ->
           [startHour, startMin] = shiftSpecifics.startTime.split(':')
           [endHour, endMin] = shiftSpecifics.endTime.split(':')
-          start = moment(day).hour(startHour).minute(startMin)
-          end = moment(day).hour(endHour).minute(endMin)
+          shiftStart = moment(day).hour(startHour).minute(startMin)
+          shiftEnd = moment(day).hour(endHour).minute(endMin)
           # Deal with day wrap-around
-          if end.isBefore(start)
-            end.add(1, 'day')
+          if shiftEnd.isBefore(shiftStart)
+            shiftEnd.add(1, 'day')
           return _.extend({
             min: shiftSpecifics.min,
             max: shiftSpecifics.max,
-            start: start.toDate(),
-            end: end.toDate(),
+            start: shiftStart.toDate(),
+            end: shiftEnd.toDate(),
             groupId,
           }, details))
         ), true).forEach((constructedShift) ->

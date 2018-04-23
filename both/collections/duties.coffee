@@ -11,6 +11,7 @@ SimpleSchema.setDefaultMessages
     en:
       "startBeforeEndCustom": "Start Date can't be after End Date"
       "numberOfDaysCustom": "Set for every day"
+      "maxMoreThanMin": "Max must be greater than Min"
 
 share.Schemas = {}
 
@@ -27,6 +28,9 @@ Bounds = new SimpleSchema(
     type: Number
     label: () -> i18n.__("abate:volunteers","max_people")
     optional: true
+    custom: () ->
+      unless this.value > this.siblingField('min')
+        return "maxMoreThanMin"
     autoform:
       defaultValue: () ->
         AutoForm.getFieldValue('min')
@@ -234,7 +238,7 @@ share.Schemas.ShiftGroups.extend(
     label: () -> i18n.__("abate:volunteers","end")
     custom: () ->
       start = moment(this.field('start').value)
-      unless moment(this.value).isAfter(start)
+      unless moment(this.value).isSameOrAfter(start)
         return "startBeforeEndCustom"
     autoform:
       afFieldHelpText: () -> i18n.__("abate:volunteers","end_help_rota")
