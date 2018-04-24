@@ -258,7 +258,7 @@ share.Schemas.ShiftGroups.extend(
         type: String
         autoform:
           afFieldInput:
-            type: 'datetimepicker'
+            type: 'timepicker'
             placeholder: () -> i18n.__("abate:volunteers","start")
             opts: () ->
               format: 'HH:mm'
@@ -268,7 +268,7 @@ share.Schemas.ShiftGroups.extend(
         type: String
         autoform:
           afFieldInput:
-            type: 'datetimepicker'
+            type: 'timepicker'
             placeholder: () -> i18n.__("abate:volunteers","end")
             opts: () ->
               format: 'HH:mm'
