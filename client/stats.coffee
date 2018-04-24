@@ -45,8 +45,8 @@ share.projectSignupsConfirmed = (p) ->
   range = moment.range(moment(p.start),moment(p.end))
   pdays = Array.from(range.by('day'))
   dayStrings = pdays.map((m) -> m.toISOString())
-  needed = _.object(pdays,p.staffing.map((s) -> s.min))
-  confirmed = _.object(pdays,Array(pdays.length).fill(0))
+  needed = _.object(dayStrings,p.staffing.map((s) -> s.min))
+  confirmed = _.object(dayStrings,Array(pdays.length).fill(0))
   signups = share.ProjectSignups.find({shiftId: p._id, status: 'confirmed'}).fetch()
   _.each(signups,((signup) ->
     pdays.forEach((day) ->
@@ -55,8 +55,11 @@ share.projectSignupsConfirmed = (p) ->
         needed[day] = needed[day] - 1
     )
   ))
-  filter = (arr) -> _.sortBy(Object.entries(arr),
-    (e) -> moment(e[0])).map((e) -> e[1])
+  filter = (arr) ->
+    _.chain(Object.entries(arr))
+    .sortBy((e) -> moment(e[0]))
+    .map((e) -> e[1])
+    .value()
   return {
     needed: filter(needed),
     confirmed: filter(confirmed),
