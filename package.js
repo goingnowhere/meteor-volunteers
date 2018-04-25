@@ -7,12 +7,9 @@ Package.describe({
 })
 
 Npm.depends({
-  flatpickr: '2.4.8',
-  jquery: '3.2.1',
-  bootstrap: '4.0.0-beta.3',
+  bootstrap: '4.0.0',
   chartjs: '0.3.24',
   'moment-range': '3.1.1',
-  // 'popper.js': '1.12.9',
 })
 
 Package.onUse((api) => {
@@ -46,7 +43,6 @@ Package.onUse((api) => {
     'tracker',
     'fortawesome:fontawesome',
     'natestrauser:select2@4.0.3',
-    'drewy:datetimepicker',
     'abate:autoform-datetimepicker',
     'peppelg:bootstrap-3-modal',
   ], 'client')
