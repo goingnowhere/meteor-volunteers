@@ -89,5 +89,6 @@
   "description_help_duty": "The description of this shift. The description of the team will be accessible. No need to repeat.",
   "start_help_rota": "The first day that shifts of this type happen.",
   "end_help_rota": "The last day that shifts of this type happen.",
-  "shifts_help_rota": "Add a minimum, maximum and start and end time for each shift in the day. Every day will have the same shifts repeated but you can modify individual shifts later."
+  "shifts_help_rota": "Add a minimum, maximum and start and end time for each shift in the day. Every day will have the same shifts repeated but you can modify individual shifts later.",
+  "update_group": "Update Group"
 }

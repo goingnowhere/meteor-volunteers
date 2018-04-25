@@ -29,7 +29,7 @@ Bounds = new SimpleSchema(
     label: () -> i18n.__("abate:volunteers","max_people")
     optional: true
     custom: () ->
-      unless this.value > this.siblingField('min')
+      unless this.value >= this.siblingField('min').value
         return "maxMoreThanMin"
     autoform:
       defaultValue: () ->
