@@ -40,8 +40,8 @@ Template.signupUserRowView.helpers
 
 Template.signupUserRowView.events events
 
-Template.tasksUserRowView.bindI18nNamespace('abate:volunteers')
 # this template is called with a taskSignups
+Template.tasksUserRowView.bindI18nNamespace('abate:volunteers')
 Template.tasksUserRowView.onCreated () ->
   template = this
   template.taskSignup = template.data
@@ -53,8 +53,8 @@ Template.tasksUserRowView.helpers
 
 Template.tasksUserRowView.events events
 
-Template.leadsUserRowView.bindI18nNamespace('abate:volunteers')
 # this template is called with a leadsSignups
+Template.leadsUserRowView.bindI18nNamespace('abate:volunteers')
 Template.leadsUserRowView.onCreated () ->
   template = this
   template.leadSignup = template.data

@@ -184,7 +184,9 @@ share.initMethods = (eventName) ->
           SimpleSchema.validate(sel, schema.omit('status','start','end'))
           userId = Meteor.userId()
           if (sel.userId == userId) || (share.isManagerOrLead(userId,[sel.parentId]))
-            collection.update(sel, {$set: {status: "bailed"}})
+            # multi : true just in case it is possible to singup for the same shift twice
+            # this should not be possible. Failsafe !
+            collection.update(sel, {$set: {status: "bailed"}}, {multi: true})
           else
             return throwError(403, 'Insufficient Permission')
 
@@ -193,6 +195,7 @@ share.initMethods = (eventName) ->
       for k,collection of share.orgUnitCollections
         do ->
           createOrgUnitMethod(collection, type)
+
   for type in ["remove","insert","update","updateGroup"]
     do ->
       for k,collection of share.dutiesCollections
