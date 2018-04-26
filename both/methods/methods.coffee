@@ -220,8 +220,14 @@ share.initMethods = (eventName) ->
       groupId = Random.id()
       _.flatten(Array.from(moment.range(start, end).by('days')).map((day) ->
         shifts.map((shiftSpecifics) ->
-          [startHour, startMin, timezone] = shiftSpecifics.startTime.split(':')
+          [startHour, startMin] = shiftSpecifics.startTime.split(':')
           [endHour, endMin] = shiftSpecifics.endTime.split(':')
+          # this is the global timezone known by moment that we use to offset
+          # the date given by the client to store it in the database as a js Date()
+          # js Date() is timezone agnostic and always stored in UTC.
+          # Using the method Date().toString() the local timezone (set on the server)
+          # is used to print the date.
+          timezone = moment().format('ZZ')
           day.utcOffset(timezone)
           shiftStart = moment(day).hour(startHour).minute(startMin).utcOffset(timezone, true)
           shiftEnd = moment(day).hour(endHour).minute(endMin).utcOffset(timezone, true)
