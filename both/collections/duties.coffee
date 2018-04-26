@@ -186,10 +186,11 @@ share.Schemas.Projects = new SimpleSchema(
     label: () -> i18n.__("abate:volunteers","start")
     autoform:
       afFieldInput:
-        type: "datetimepicker"
+        type: "flatpicker"
         placeholder: () -> i18n.__("abate:volunteers","start")
         opts: () ->
-          format: 'DD-MM-YYYY'
+          # format: 'DD-MM-YYYY'
+          dateFormat: 'd-m-Y'
           timepicker: false
   end:
     type: Date
@@ -202,10 +203,11 @@ share.Schemas.Projects = new SimpleSchema(
       defaultValue: () ->
         AutoForm.getFieldValue('start')
       afFieldInput:
-        type: "datetimepicker"
+        type: "flatpicker"
         placeholder: () -> i18n.__("abate:volunteers","end")
         opts: () ->
-          format: 'DD-MM-YYYY'
+          # format: 'DD-MM-YYYY'
+          dateFormat: 'd-m-Y'
           timepicker: false
   staffing:
     type: Array
@@ -228,11 +230,12 @@ share.Schemas.ShiftGroups.extend(
     autoform:
       afFieldHelpText: () -> i18n.__("abate:volunteers","start_help_rota")
       afFieldInput:
-        type: "datetimepicker"
+        type: "flatpickr"
         placeholder: () -> i18n.__("abate:volunteers","start")
         opts: () ->
           timepicker: false
-          format: 'DD-MM-YYYY'
+          dateFormat: 'd-m-Y'
+          # format: 'DD-MM-YYYY'
   end:
     type: Date
     label: () -> i18n.__("abate:volunteers","end")
@@ -245,11 +248,12 @@ share.Schemas.ShiftGroups.extend(
       defaultValue: () ->
         AutoForm.getFieldValue('start')
       afFieldInput:
-        type: "datetimepicker"
+        type: "flatpickr"
         placeholder: () -> i18n.__("abate:volunteers","end")
         opts: () ->
           timepicker: false
-          format: 'DD-MM-YYYY'
+          dateFormat: 'd-m-Y'
+          # format: 'DD-MM-YYYY'
   shifts:
     type: Array
     minCount: 1
