@@ -230,7 +230,7 @@ share.Schemas.ShiftGroups.extend(
     autoform:
       afFieldHelpText: () -> i18n.__("abate:volunteers","start_help_rota")
       afFieldInput:
-        type: "flatpickr"
+        type: "flatpicker"
         placeholder: () -> i18n.__("abate:volunteers","start")
         opts: () ->
           timepicker: false
@@ -248,7 +248,7 @@ share.Schemas.ShiftGroups.extend(
       defaultValue: () ->
         AutoForm.getFieldValue('start')
       afFieldInput:
-        type: "flatpickr"
+        type: "flatpicker"
         placeholder: () -> i18n.__("abate:volunteers","end")
         opts: () ->
           timepicker: false

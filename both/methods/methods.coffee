@@ -220,10 +220,11 @@ share.initMethods = (eventName) ->
       groupId = Random.id()
       _.flatten(Array.from(moment.range(start, end).by('days')).map((day) ->
         shifts.map((shiftSpecifics) ->
-          [startHour, startMin] = shiftSpecifics.startTime.split(':')
+          [startHour, startMin, timezone] = shiftSpecifics.startTime.split(':')
           [endHour, endMin] = shiftSpecifics.endTime.split(':')
-          shiftStart = moment(day).hour(startHour).minute(startMin)
-          shiftEnd = moment(day).hour(endHour).minute(endMin)
+          day.utcOffset(timezone)
+          shiftStart = moment(day).hour(startHour).minute(startMin).utcOffset(timezone, true)
+          shiftEnd = moment(day).hour(endHour).minute(endMin).utcOffset(timezone, true)
           # Deal with day wrap-around
           if shiftEnd.isBefore(shiftStart)
             shiftEnd.add(1, 'day')
