@@ -21,6 +21,7 @@ Bounds = new SimpleSchema(
     label: () -> i18n.__("abate:volunteers","min_people")
     optional: true
     autoform:
+      defaultValue: 4
       afFieldInput:
         min: 1
         placeholder: "min"
@@ -32,9 +33,9 @@ Bounds = new SimpleSchema(
       unless this.value >= this.siblingField('min').value
         return "maxMoreThanMin"
     autoform:
-      defaultValue: () ->
-        AutoForm.getFieldValue('min')
+      defaultValue: 5
       afFieldInput:
+        min: 1
         placeholder: "max"
 )
 
@@ -244,9 +245,8 @@ share.Schemas.ShiftGroups.extend(
       unless moment(this.value).isSameOrAfter(start)
         return "startBeforeEndCustom"
     autoform:
+      # TODO Add default value based on start !!!
       afFieldHelpText: () -> i18n.__("abate:volunteers","end_help_rota")
-      defaultValue: () ->
-        AutoForm.getFieldValue('start')
       afFieldInput:
         type: "flatpicker"
         placeholder: () -> i18n.__("abate:volunteers","end")
