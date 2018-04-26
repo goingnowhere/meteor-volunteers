@@ -1,5 +1,6 @@
 import Moment from 'moment'
 import { extendMoment } from 'moment-range'
+import SimpleSchema from 'simpl-schema'
 moment = extendMoment(Moment)
 
 getTeam = (type,parentId) ->
@@ -264,30 +265,83 @@ Template.projectSignupForm.onCreated () ->
   template = this
   project = template.data.project
   share.templateSub(template,"Projects.byDuty",project._id)
-  template.allDays = new ReactiveVar()
-  template.confirmed = new ReactiveVar()
-  share.meteorCall("getProjectStaffing", project._id, (err, confirmed) => template.confirmed.set(confirmed))
+  template.allDays = new ReactiveVar([])
+  template.confirmed = new ReactiveVar([])
+  share.meteorCall("getProjectStaffing", project._id,
+    (err, confirmed) -> template.confirmed.set(confirmed)
+  )
   template.autorun () ->
     if template.subscriptionsReady()
       projectLength = moment(project.end).diff(moment(project.start), 'days')
-      template.allDays.set(moment(project.start).add(num, 'days') for num in [0..projectLength])
+      template.allDays.set(
+        moment(project.start).add(num, 'days') for num in [0..projectLength]
+      )
+
 Template.projectSignupForm.helpers
-  allDays: () ->
-    Template.instance().allDays.get()
-      ?.map((day) => {label: day.format('MMM Do'), value: day.format('YYYY-MM-DD')})
-  endDays: () ->
-    start = AutoForm.getFieldValue('start')
-    days = Template.instance().allDays.get()
-      ?.filter((day) -> day.isSameOrAfter(moment(start)))
-      ?.map((day) -> {label: day.format('MMM Do'), value: day.format('YYYY-MM-DD')})
-  collection: () -> share.ProjectSignups
+  formSchema: () ->
+    allDays = Template.instance().allDays.get()
+    if allDays.length > 0
+      [firstDay, ..., lastDay] = allDays
+    else
+      firstDay = moment()
+      lastDay = moment()
+    new SimpleSchema({
+      start:
+        type: Date
+        label: () -> i18n.__("abate:volunteers","start")
+        autoform:
+          afFieldHelpText: () -> i18n.__("abate:volunteers","project_start_help")
+          group: "Period"
+          groupHelp: () -> i18n.__("abate:volunteers","project_period_help")
+          afFieldInput:
+            type: "flatpicker"
+            opts: () ->
+              dateFormat: 'd-m-Y'
+              defaultDate: firstDay.toDate()
+              enable: allDays.map((d) -> d.toDate())
+      end:
+        type: Date
+        autoform:
+          type: "hidden"
+          defaultValue: lastDay.toDate()
+      # It is easy to add the end date if needed.
+      # end:
+      #   type: Date
+      #   label: () -> i18n.__("abate:volunteers","end")
+      #   autoform:
+      #     afFieldHelpText: () -> i18n.__("abate:volunteers","project_end_help")
+      #     group: "Period"
+      #     afFieldInput:
+      #       type: "flatpicker"
+      #       opts: () ->
+      #         format: 'DD-MM-YYYY'
+      #         defaultDate: lastDay.toDate()
+      #         enable: allDays.map((d) -> d.toDate())
+      parentId:
+        type: String
+        autoform:
+          type: "hidden"
+      shiftId:
+        type: String
+        autoform:
+          type: "hidden"
+      userId:
+        type: String
+        autoform:
+          type: "hidden"
+      })
+
+  # collection: () -> share.ProjectSignups
+
   methodName: () -> "#{share.ProjectSignups._name}.insert"
+
   updateLabel: () ->
     if Template.currentData().project.policy == "public"
       i18n.__("abate:volunteers",".join")
     else
       i18n.__("abate:volunteers",".apply")
-  confirmed: () => Template.instance().confirmed.get()
+
+  confirmed: () -> Template.instance().confirmed.get()
 
 AutoForm.addHooks([
   'projectSignupsInsert',
