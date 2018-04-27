@@ -316,14 +316,14 @@
   {{> projectBody duty=project }}
   {{#if Template.subscriptionsReady }}
     {{> projectStaffingChart project=project confirmedSignups=confirmed }}
+    {{> quickForm
+      schema=formSchema
+      id="projectSignupsInsert"
+      type="method"
+      meteormethod=methodName
+      doc=signup
+    }}
   {{/if}}
-  {{> quickForm
-    schema=formSchema
-    id="projectSignupsInsert"
-    type="method"
-    meteormethod=methodName
-    doc=signup
-  }}
 </template>
 
 <template name="signupModal">

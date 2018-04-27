@@ -3,6 +3,15 @@ checkNpmVersions { 'simpl-schema': '0.3.x' }, 'abate:volunteers'
 import SimpleSchema from 'simpl-schema'
 SimpleSchema.extendOptions(['autoform'])
 
+import Moment from 'moment'
+import 'moment-timezone'
+import { extendMoment } from 'moment-range'
+
+share.timezone = new ReactiveVar('Europe/Paris')
+
+moment = extendMoment(Moment)
+moment.tz.setDefault(share.timezone.get())
+
 policyValues = ["public", "adminOnly", "requireApproval"]
 taskPriority = [ "essential", "important", "normal"]
 
@@ -187,12 +196,12 @@ share.Schemas.Projects = new SimpleSchema(
     label: () -> i18n.__("abate:volunteers","start")
     autoform:
       afFieldInput:
-        type: "flatpicker"
+        type: "datetimepicker"
         placeholder: () -> i18n.__("abate:volunteers","start")
         opts: () ->
-          # format: 'DD-MM-YYYY'
-          dateFormat: 'd-m-Y'
+          format: 'DD-MM-YYYY'
           timepicker: false
+          # altFormat: 'd-m-Y'
   end:
     type: Date
     label: () -> i18n.__("abate:volunteers","end")
@@ -204,12 +213,12 @@ share.Schemas.Projects = new SimpleSchema(
       defaultValue: () ->
         AutoForm.getFieldValue('start')
       afFieldInput:
-        type: "flatpicker"
+        type: "datetimepicker"
         placeholder: () -> i18n.__("abate:volunteers","end")
         opts: () ->
-          # format: 'DD-MM-YYYY'
-          dateFormat: 'd-m-Y'
+          format: 'DD-MM-YYYY'
           timepicker: false
+          # altFormat: 'd-m-Y'
   staffing:
     type: Array
     minCount: 1
@@ -231,12 +240,12 @@ share.Schemas.ShiftGroups.extend(
     autoform:
       afFieldHelpText: () -> i18n.__("abate:volunteers","start_help_rota")
       afFieldInput:
-        type: "flatpicker"
+        type: "datetimepicker"
         placeholder: () -> i18n.__("abate:volunteers","start")
         opts: () ->
           timepicker: false
-          dateFormat: 'd-m-Y'
-          # format: 'DD-MM-YYYY'
+          format: 'DD-MM-YYYY'
+          # altFormat: 'd-m-Y'
   end:
     type: Date
     label: () -> i18n.__("abate:volunteers","end")
@@ -248,12 +257,12 @@ share.Schemas.ShiftGroups.extend(
       # TODO Add default value based on start !!!
       afFieldHelpText: () -> i18n.__("abate:volunteers","end_help_rota")
       afFieldInput:
-        type: "flatpicker"
+        type: "datetimepicker"
         placeholder: () -> i18n.__("abate:volunteers","end")
         opts: () ->
           timepicker: false
-          dateFormat: 'd-m-Y'
-          # format: 'DD-MM-YYYY'
+          format: 'DD-MM-YYYY'
+          # altFormat: 'd-m-Y'
   shifts:
     type: Array
     minCount: 1

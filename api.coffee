@@ -9,6 +9,7 @@ periods =
   'evening': {start:20,end:24}
 share.periods = new ReactiveVar(periods)
 
+
 initAuthorization = (eventName) ->
   share.isManager = () ->
     Roles.userIsInRole(Meteor.userId(), [ 'manager', 'admin' ], eventName)
@@ -47,6 +48,7 @@ class VolunteersClass
       TaskSignups: share.TaskSignups
       LeadSignups: share.LeadSignups
   setPeriods: (periods) -> share.periods.set(periods)
+  setTimeZone: (timezone) -> share.timezone.set(timezone)
   setUserForm: (data) -> saveVolunteerForm(@eventName,data)
   isManagerOrLead: (userId,unitId) -> share.isManagerOrLead(userId,unitId)
   isManager: () -> share.isManager()

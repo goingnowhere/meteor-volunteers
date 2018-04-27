@@ -1,10 +1,15 @@
-import Moment from 'moment'
-import { extendMoment } from 'moment-range'
 import { check } from 'meteor/check'
 import { ValidatedMethod } from 'meteor/mdg:validated-method'
 
-const moment = extendMoment(Moment)
+import Moment from 'moment'
+import 'moment-timezone'
+import { extendMoment } from 'moment-range'
+
 const share = __coffeescriptShare
+
+const moment = extendMoment(Moment)
+moment.tz.setDefault(share.timezone.get())
+
 
 share.initServerMethods = (eventName) => {
   const prefix = `${eventName}.Volunteers`
@@ -13,17 +18,19 @@ share.initServerMethods = (eventName) => {
     validate(projectId) { check(projectId, String) },
     run(projectId) {
       const project = share.Projects.findOne(projectId)
-      let days = []
       if (project) {
+        let days = []
         const range = moment.range(project.start, project.end).by('days')
         days = Array.from(range)
-      }
-      const signups =
-        share.ProjectSignups.find({ shiftId: projectId }).fetch()
+        const signups = share.ProjectSignups.find({ shiftId: projectId, status: 'confirmed' }).fetch()
 
-      return days.map(day =>
-        signups.filter(signup => signup.status === 'confirmed' &&
-          day.isBetween(signup.start, signup.end, 'days', '[]')).length)
+        const confirmed = days.map((day) => {
+          const thisday = signups.filter(signup => (day.isBetween(signup.start, signup.end, 'days', '[]')))
+          return thisday.length
+        })
+        return confirmed
+      }
+      throw new Meteor.Error('InternalError', 'Project not found')
     },
   })
 }

@@ -92,5 +92,6 @@
   "shifts_help_rota": "Add a minimum, maximum and start and end time for each shift in the day. Every day will have the same shifts repeated but you can modify individual shifts later.",
   "update_group": "Update Group",
   "project_period_help": "Specify your date of arrival on site. Your choice is constrained by number of volunteer already on site.",
-  "project_start_help": "When do you plan to arrive ? Be on time !"
+  "project_start_help": "When do you plan to arrive ? Be on time ! (for strike : leave default if already on site)",
+  "project_end_help": "When do leave ? (for build : leave default if you stay for the event)"
 }

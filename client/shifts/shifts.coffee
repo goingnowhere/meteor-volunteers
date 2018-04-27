@@ -1,7 +1,11 @@
-import Moment from 'moment'
-import { extendMoment } from 'moment-range'
 import SimpleSchema from 'simpl-schema'
+
+import Moment from 'moment'
+import 'moment-timezone'
+import { extendMoment } from 'moment-range'
+
 moment = extendMoment(Moment)
+moment.tz.setDefault(share.timezone.get())
 
 getTeam = (type,parentId) ->
   switch type
@@ -260,6 +264,7 @@ AutoForm.addInputType("projectStaffing",
     return values
 )
 
+
 Template.projectSignupForm.bindI18nNamespace('abate:volunteers')
 Template.projectSignupForm.onCreated () ->
   template = this
@@ -268,23 +273,23 @@ Template.projectSignupForm.onCreated () ->
   template.allDays = new ReactiveVar([])
   template.confirmed = new ReactiveVar([])
   share.meteorCall("getProjectStaffing", project._id,
-    (err, confirmed) -> template.confirmed.set(confirmed)
+    (err, confirmed) ->
+      unless err
+        template.confirmed.set(confirmed)
   )
   template.autorun () ->
     if template.subscriptionsReady()
-      projectLength = moment(project.end).diff(moment(project.start), 'days')
-      template.allDays.set(
-        moment(project.start).add(num, 'days') for num in [0..projectLength]
-      )
+      start = moment(project.start)
+      end = moment(project.end)
+      projectLength = end.diff(start, 'days')
+      allDays = Array.from(moment.range(start,end).by('days'))
+      template.allDays.set(allDays)
 
 Template.projectSignupForm.helpers
   formSchema: () ->
     allDays = Template.instance().allDays.get()
     if allDays.length > 0
       [firstDay, ..., lastDay] = allDays
-    else
-      firstDay = moment()
-      lastDay = moment()
     new SimpleSchema({
       start:
         type: Date
@@ -294,29 +299,29 @@ Template.projectSignupForm.helpers
           group: "Period"
           groupHelp: () -> i18n.__("abate:volunteers","project_period_help")
           afFieldInput:
-            type: "flatpicker"
+            type: "datetimepicker"
             opts: () ->
-              dateFormat: 'd-m-Y'
-              defaultDate: firstDay.toDate()
-              enable: allDays.map((d) -> d.toDate())
+              # formatDate:'DD-MM-YYYY',
+              # minDate: firstDay.format('DD-MM-YYYY')
+              # maxDate: lastDay.format('DD-MM-YYYY')
+              value: firstDay.format('DD-MM-YYYY')
+              format: "DD-MM-YYYY"
+              timepicker: false
       end:
         type: Date
+        label: () -> i18n.__("abate:volunteers","end")
         autoform:
-          type: "hidden"
-          defaultValue: lastDay.toDate()
-      # It is easy to add the end date if needed.
-      # end:
-      #   type: Date
-      #   label: () -> i18n.__("abate:volunteers","end")
-      #   autoform:
-      #     afFieldHelpText: () -> i18n.__("abate:volunteers","project_end_help")
-      #     group: "Period"
-      #     afFieldInput:
-      #       type: "flatpicker"
-      #       opts: () ->
-      #         format: 'DD-MM-YYYY'
-      #         defaultDate: lastDay.toDate()
-      #         enable: allDays.map((d) -> d.toDate())
+          afFieldHelpText: () -> i18n.__("abate:volunteers","project_end_help")
+          group: "Period"
+          afFieldInput:
+            type: "datetimepicker"
+            opts: () ->
+              # formatDate:'DD-MM-YYYY',
+              # minDate: firstDay.format('DD-MM-YYYY')
+              # maxDate: lastDay.format('DD-MM-YYYY')
+              value: lastDay.format('DD-MM-YYYY')
+              format: "DD-MM-YYYY"
+              timepicker: false
       parentId:
         type: String
         autoform:

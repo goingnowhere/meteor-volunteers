@@ -1,6 +1,9 @@
 import Moment from 'moment'
+import 'moment-timezone'
 import { extendMoment } from 'moment-range'
+
 moment = extendMoment(Moment)
+moment.tz.setDefault(share.timezone.get())
 
 getDuty = (sel, type, duty, signup) ->
   sort = {sort: {start: 1, priority: 1}}

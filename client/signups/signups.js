@@ -1,7 +1,13 @@
-import moment from 'moment'
 import { ReactiveVar } from 'meteor/reactive-var'
 
+import Moment from 'moment'
+import 'moment-timezone'
+import { extendMoment } from 'moment-range'
+
 const share = __coffeescriptShare
+
+const moment = extendMoment(Moment)
+moment.tz.setDefault(share.timezone.get())
 
 Template.teamSignupsList.bindI18nNamespace('abate:volunteers')
 Template.teamSignupsList.onCreated(function onCreated() {

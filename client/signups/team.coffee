@@ -1,5 +1,11 @@
 import { Chart } from 'chart.js'
+
 import Moment from 'moment'
+import 'moment-timezone'
+import { extendMoment } from 'moment-range'
+
+moment = extendMoment(Moment)
+moment.tz.setDefault(share.timezone.get())
 
 commonEvents =
   'click [data-action="edit"]': (event,template) ->

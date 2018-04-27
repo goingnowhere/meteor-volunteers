@@ -10,6 +10,7 @@ Npm.depends({
   bootstrap: '4.0.0',
   chartjs: '0.3.24',
   'moment-range': '3.1.1',
+  'moment-timezone': '0.5.16',
 })
 
 Package.onUse((api) => {
@@ -26,6 +27,7 @@ Package.onUse((api) => {
     'check',
     'underscore',
     'momentjs:moment',
+    'aldeed:moment-timezone',
     'reywood:publish-composite@1.5.2',
     'piemonkey:roles',
     'reactive-dict',
