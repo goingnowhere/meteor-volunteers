@@ -1,4 +1,5 @@
 import { ReactiveVar } from 'meteor/reactive-var'
+import { AutoFormComponents } from 'meteor/abate:autoform-components'
 
 import Moment from 'moment'
 import 'moment-timezone'
@@ -109,7 +110,7 @@ Template.departmentSignupsList.onCreated(function onCreated() {
 
 Template.departmentSignupsList.helpers({
   allSignups: () => {
-    const departmentId = Template.instance().departmentId
+    const { departmentId } = Template.instance()
     const teamIds = share.Team.find({ parentId: departmentId }).map(t => t._id)
     const leads = share.LeadSignups.find({ parentId: { $in: teamIds }, status: 'pending' }, { sort: { createdAt: -1 } }).map(signup => ({
       ...signup,
@@ -122,12 +123,12 @@ Template.departmentSignupsList.helpers({
 })
 
 Template.departmentSignupsList.events({
-  'click [data-action="approve"]': function e(event) {
-    const signupId = $(event.target).data('signup')
+  'click [data-action="approve"]': function e(event, template) {
+    const signupId = template.$(event.target).data('signup')
     share.meteorCall('leadSignups.confirm', signupId)
   },
-  'click [data-action="refuse"]': function e(event) {
-    const signupId = $(event.target).data('signup')
+  'click [data-action="refuse"]': function e(event, template) {
+    const signupId = template.$(event.target).data('signup')
     share.meteorCall('leadSignups.refuse', signupId)
   },
 })
@@ -154,5 +155,16 @@ Template.managerSignupsList.helpers({
       duty: share.Lead.findOne(signup.shiftId),
     })).sort((a, b) => a.createdAt && b.createdAt && a.createdAt.getTime() - b.createdAt.getTime())
     return leads
+  },
+})
+
+Template.managerSignupsList.events({
+  'click [data-action="approve"]': function e(event, template) {
+    const signupId = template.$(event.target).data('signup')
+    share.meteorCall('leadSignups.confirm', signupId)
+  },
+  'click [data-action="refuse"]': function e(event, template) {
+    const signupId = template.$(event.target).data('signup')
+    share.meteorCall('leadSignups.refuse', signupId)
   },
 })
