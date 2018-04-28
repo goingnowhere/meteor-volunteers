@@ -62,7 +62,6 @@ share.initPublications = (eventName) ->
               sel = {parentId: departmentId}
               unless share.isManagerOrLead(userId,[ departmentId ])
                 sel = _.extend(sel,dutiesPublicPolicy)
-              console.log('finding dept signups', sel, duties.find(sel).fetch())
               return duties.find(sel)
             children: [
               {
@@ -296,7 +295,6 @@ share.initPublications = (eventName) ->
       sel = _.extend(sel,dutiesPublicPolicy)
       if this.userId
         sel = filterForPublic(this.userId, sel)
-      # console.log(JSON.stringify(sel, null, 4))
       ReactiveAggregate(this, duties, [
         { $match: sel },
         { $lookup: {
