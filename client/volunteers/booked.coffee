@@ -4,14 +4,19 @@ events =
     type = $(event.target).data('type')
     parentId = $(event.target).data('parentid')
     selectedUser = $("[data-shiftId='#{shiftId}']").val()
-    userId = Meteor.userId()
+    userId = $(event.target).data('userid')
     doc = {parentId: parentId, shiftId: shiftId, userId: userId}
     share.meteorCall "#{type}Signups.bail", doc
 
 Template.bookedTable.bindI18nNamespace('abate:volunteers')
 Template.bookedTable.helpers
-  'allShifts': (userId) ->
-    sel = {userId: Meteor.userId(), status: {$in: ["confirmed","pending"]}}
+  'allShifts': () ->
+    data = Template.currentData()
+    if data?.userId?
+      userId = data.userId
+    else
+      userId = Meteor.userId()
+    sel = {userId: userId, status: {$in: ["confirmed","pending"]}}
     shiftSignups = share.ShiftSignups.find(sel)
       .map((signup) -> _.extend({}, signup, {type: 'shift'}))
     projectSignups = share.ProjectSignups.find(sel)
