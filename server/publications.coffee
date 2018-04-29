@@ -341,12 +341,9 @@ share.initPublications = (eventName) ->
           priority: { $first: "$priority" },
           policy: { $first: "$policy" },
           length: { $first: {
-            $mod: [
-              { $subtract: [
-                {$hour: "$end"},
-                {$hour: "$start"},
-              ]},
-              23,
+            $divide: [
+              { $subtract: [ "$end", "$start" ]},
+              3600000,
             ]},
           },
         },
