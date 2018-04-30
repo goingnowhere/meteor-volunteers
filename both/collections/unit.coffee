@@ -65,6 +65,12 @@ CommonUnit = new SimpleSchema(
       rows: 5
       afFieldHelpText: () -> i18n.__("abate:volunteers","description_help_team")
   # TODO: the unit policy should lock the policy of all entities below
+  email:
+    type: String
+    optional: true
+    autoform:
+      label: () -> i18n.__("abate:volunteers","public_email")
+      afFieldHelpText: () -> i18n.__("abate:volunteers","public_email_help")
   policy:
     type: String
     label: () -> i18n.__("abate:volunteers","policy")
