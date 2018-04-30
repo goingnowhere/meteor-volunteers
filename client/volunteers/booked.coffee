@@ -9,13 +9,22 @@ events =
     share.meteorCall "#{type}Signups.bail", doc
 
 Template.bookedTable.bindI18nNamespace('abate:volunteers')
+
+Template.bookedTable.onCreated () ->
+  template = this
+  { data } = template
+  if data?.userId?
+    template.userId = data.userId
+  else
+    template.userId = Meteor.userId()
+  template.autorun () ->
+    share.templateSub(template,"ShiftSignups.byUser", template.userId)
+    share.templateSub(template,"ProjectsSignups.byUser", template.userId)
+    share.templateSub(template,"LeadSignups.byUser", template.userId)
+
 Template.bookedTable.helpers
   'allShifts': () ->
-    data = Template.currentData()
-    if data?.userId?
-      userId = data.userId
-    else
-      userId = Meteor.userId()
+    userId = Template.instance().userId
     sel = {userId: userId, status: {$in: ["confirmed","pending"]}}
     shiftSignups = share.ShiftSignups.find(sel)
       .map((signup) -> _.extend({}, signup, {type: 'shift'}))
