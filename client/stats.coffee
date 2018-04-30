@@ -14,7 +14,7 @@ getDuty = (sel, type, duty, signup) ->
       duration: moment.duration(v.end - v.start).humanize()
       confirmed: confirmed.count()
       volunteers: confirmed.fetch()
-      needed: v.min - confirmed.count())
+      needed: Math.max(0,v.min - confirmed.count()))
     return v
   )
 
@@ -38,8 +38,6 @@ getUnit = (sel,unit,type) ->
       {status: "confirmed", parentId: u._id}
       ).map((s) -> return s.userId)
     if type = "team"
-      console.log u
-      console.log share.getShifts({parentId: u._id})
       u.shiftRate = rate(share.getShifts({parentId: u._id}))
     return u
     )
