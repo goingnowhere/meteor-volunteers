@@ -11,9 +11,12 @@ share.periods = new ReactiveVar(periods)
 
 
 initAuthorization = (eventName) ->
+  # is the given manager ?
   share.isManager = (userId = Meteor.userId()) ->
     Roles.userIsInRole(userId, [ 'manager', 'admin' ], eventName)
+  # is the given is Manager, or Lead or the current user is manager
   share.isManagerOrLead = (userId, unitIdList) ->
+    if share.isManager() then return true
     if share.isManager(userId) then return true
     else if userId == Meteor.userId()
       Roles.userIsInRole(userId, unitIdList, eventName)
