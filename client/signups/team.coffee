@@ -117,7 +117,6 @@ Template.projectStaffingChart.helpers
     confirmedSignups = Template.currentData().confirmedSignups
     signupData = _.extend(share.projectSignupsConfirmed(project),{_id:project._id})
     if confirmedSignups
-      console.log signupData
       signupData = _.extend(signupData, {
         confirmed: confirmedSignups,
         needed: signupData.needed.map((need, index) -> Math.max(0,need - confirmedSignups[index])),

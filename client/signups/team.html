@@ -50,6 +50,7 @@
             <button class="btn btn-sm btn-circle" href="#"
               data-action="delete" data-id="{{shift._id}}" data-type="shift">
                   {{fa "trash-o"}}</button>
+            {{> Template.contentBlock shift=shift }}
           </td>
         </tr>
         {{#if $gt shift.confirmed 0}}
