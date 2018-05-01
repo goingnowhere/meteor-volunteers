@@ -351,14 +351,19 @@ share.initPublications = (eventName) ->
     ], { clientCollection: "#{eventName}.Volunteers.shiftGroups" })
 
   Meteor.publish "#{eventName}.Volunteers.volunteerForm.list", (userIds) ->
-    if share.isManagerOrLead(this.userId)
+    if share.isManager() # publish manager only information
+      share.VolunteerForm.find({userId: {$in: userIds}})
+    else if share.isLead()
+      # TODO: the fields of the should have a field 'confidential that allow
+      # here to filter which information to publish to all leads
       share.VolunteerForm.find({userId: {$in: userIds}})
     else
       return null
 
   Meteor.publish "#{eventName}.Volunteers.volunteerForm", (userId) ->
-    # XXX access to all leads, or only those leads that need to know ?
-    if share.isManagerOrLead(this.userId)
+    if share.isManager()
+      share.VolunteerForm.find({userId: userId})
+    else if share.isLead()
       share.VolunteerForm.find({userId: userId})
     else
       if !userId? or this?.userId == userId
@@ -447,7 +452,7 @@ share.initPublications = (eventName) ->
       ]))
 
   Meteor.publish "#{eventName}.Volunteers.team", (sel={}) ->
-    unless share.isManagerOrLead(this.userId)
+    unless share.isManager()
       sel = _.extend(sel,unitPublicPolicy)
     ReactiveAggregate(this, share.Team,
       [ { $match: sel } ].concat(
@@ -465,21 +470,23 @@ share.initPublications = (eventName) ->
   # not reactive
   Meteor.publish "#{eventName}.Volunteers.organization", () ->
     sel = {}
-    unless (not this.userId) || share.isManagerOrLead(this.userId)
+    unless (not this.userId) || share.isManager()
       sel = unitPublicPolicy
     dp = share.Department.find(sel)
     t = share.Team.find(sel)
     dv = share.Division.find(sel)
     return [dv,dp,t]
 
+  # XXX leads of a non public division should be able to see it
   Meteor.publish "#{eventName}.Volunteers.division", (sel={}) ->
-    if this.userId && share.isManagerOrLead(this.userId)
+    if this.userId && share.isManager()
       share.Division.find(sel)
     else
       share.Division.find(_.extend(sel,unitPublicPolicy))
 
+  # XXX leads of a non public department should be able to see it
   Meteor.publish "#{eventName}.Volunteers.department", (sel={}) ->
-    if this.userId && share.isManagerOrLead(this.userId)
+    if this.userId && share.isManager()
       share.Department.find(sel)
     else
       share.Department.find(_.extend(sel,unitPublicPolicy))
