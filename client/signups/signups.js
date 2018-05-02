@@ -15,12 +15,14 @@ Template.teamSignupsList.onCreated(function onCreated() {
   const template = this
   const teamId = template.data._id
   template.signups = new ReactiveVar([])
-  share.templateSub(template, 'ShiftSignups.byTeam', teamId)
-  share.templateSub(template, 'TaskSignups.byTeam', teamId)
-  share.templateSub(template, 'ProjectSignups.byTeam', teamId)
-  share.templateSub(template, 'LeadSignups.byTeam', template.teamId)
+  const signupSubs = [
+    share.templateSub(template, 'ShiftSignups.byTeam', teamId),
+    share.templateSub(template, 'TaskSignups.byTeam', teamId),
+    share.templateSub(template, 'ProjectSignups.byTeam', teamId),
+    share.templateSub(template, 'LeadSignups.byTeam', template.teamId),
+  ]
   template.autorun(() => {
-    if (template.subscriptionsReady()) {
+    if (signupSubs.every(sub => sub.ready())) {
       const shifts = share.ShiftSignups.find({ parentId: teamId, status: 'pending' }, { sort: { createdAt: -1 } })
         .map(signup => ({
           ...signup,
