@@ -14,7 +14,7 @@
 </template>
 
 <template name="signupUserRowView">
-  <div class="row justify-content-between align-content-center no-gutters {{#unless $eq signup.status 'confirmed'}}text-muted{{/unless}}" title="{{__ signup.status}}">
+  <div class="row no-gutters {{#unless $eq signup.status 'confirmed'}}text-muted{{/unless}}" title="{{__ signup.status}}">
     <div class="col-md-1">
       {{#if $eq signup.status "confirmed"}}<div class="text-success">{{fa "check"}}</div>{{/if}}
       {{#if $eq signup.status "pending"}}<div class="text-warning">{{fa "clock-o"}}</div>{{/if}}
@@ -28,11 +28,8 @@
         {{/if}}
       {{/if}}
     </div>
-    <div class="col-md-5 d-flex align-items-start">
-      <h5>{{duty.title}}</h5> ({{team.name}})
-      {{#if $eq signup.type "shift"}}
-        {{team.location}}
-      {{/if}}
+    <div class="col-md-5">
+      <h6>{{team.name}} &gt; {{duty.title}}</h6>
     </div>
     <div class="col-md-2 p-0">
       <button type="button" class="btn btn-primary btn-action" data-action="bail"
