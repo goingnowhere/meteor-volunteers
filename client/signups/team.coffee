@@ -22,7 +22,7 @@ commonEvents =
       when 'shift'
         share.meteorCall "teamShifts.remove", id
       when 'project'
-        share.meteorCall "Project.remove", id
+        share.meteorCall "projects.remove", id
       when 'task'
         share.meteorCall "teamTasks.remove", id
   'click [data-action="add_date"]': (event,template) ->
