@@ -8,6 +8,11 @@ moment = extendMoment(Moment)
 moment.tz.setDefault(share.timezone.get())
 
 commonEvents =
+  'click [data-action="un-enroll"]': (event,template) ->
+    userId = $(event.currentTarget).data('userid')
+    shiftId = $(event.currentTarget).data('shiftid')
+    shift = share.ShiftSignups.findOne({ userId, shiftId })
+    share.meteorCall "shiftSignups.remove", shift._id
   'click [data-action="edit"]': (event,template) ->
     id = $(event.currentTarget).data('id')
     type = $(event.currentTarget).data('type')

@@ -58,7 +58,14 @@
             <td colspan="4">
               <ol>
                 {{#each signup in shift.volunteers }}
-                  <li>{{getUserName signup.userId}} ( {{__ ".joined"}} {{ formatDate signup.createdAt }} )</li>
+                  <li>{{getUserName signup.userId}}
+                    (<a href="#"
+                        data-action="un-enroll"
+                        data-userid="{{signup.userId}}"
+                        data-shiftid="{{shift._id}}">
+                      {{__ ".remove"}}
+                    </a>)
+                  </li>
                 {{/each}}
               </ol>
             </td>
