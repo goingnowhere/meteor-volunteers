@@ -17,6 +17,8 @@ doubleBooking = (shift,collectionKey) ->
       parentDoc = share.TeamShifts.findOne({_id: shift.shiftId})
       parentRange = moment.range(moment(parentDoc.start),moment(parentDoc.end))
       return _.chain(share.ShiftSignups.find({
+        # it's a double booking only if it is a different shift
+        shiftId: { $ne: shift.shiftId },
         userId: shift.userId,
         status: {$in: ["confirmed","pending"]}}).fetch())
         .map((shift) -> share.TeamShifts.findOne({_id: shift.shiftId}))
@@ -155,25 +157,29 @@ share.initMethods = (eventName) ->
           else
             return throwError(403, 'Insufficient Permission')
       when "insert"
+        # this is actually an upsert
         Meteor.methods "#{collectionName}.insert": (doc) ->
           console.log ["#{collectionName}.insert", doc]
-          signup = _.omit(doc, 'status')
-          signup.createdAt = new Date()
-          SimpleSchema.validate(signup, schema.omit('status'))
+          SimpleSchema.validate(doc, schema.omit('status'))
           userId = Meteor.userId()
+          # signup = _.omit(doc, 'status')
+          signup = _.pick(doc,['userId','shiftId','parentId'])
+          # signup.createdAt = new Date()
           parentDoc = parentCollection.findOne(signup.shiftId)
-          # XXX In this case only the manager or the lead of the team can add a
-          # volunteer to a shift. Can the lead of a Department add a volunteer to
-          # of a team of its Department ? .
           if (signup.userId == userId) || (share.isManagerOrLead(userId,[parentDoc.parentId]))
             status =
               if parentDoc.policy == "public" then "confirmed"
               else if parentDoc.policy == "requireApproval" then "pending"
+            { start, end } = doc
             if status
               # we can double booking only on new signups
               unless doubleBooking(signup,collectionKey)
                 if Meteor.isServer
-                  collection.upsert(signup,{$set: {status: status}})
+                  res = collection.upsert(signup,{$set: {status,start,end}})
+                  if res?.insertedId?
+                    return res.insertedId
+                  else
+                    collection.findOne(signup)._id
               else
                 return throwError(409, 'Double Booking')
           else
@@ -331,13 +337,23 @@ share.initMethods = (eventName) ->
           when "public" then "confirmed"
           when "requireApproval" then "pending"
       if doc.status
-        share.LeadSignups.insert(doc, (err,res) ->
-          unless err
-            if Meteor.isServer && lead.policy == "public"
-              Roles.addUsersToRoles(doc.userId, lead.parentId, eventName)
-          else
-            return throwError(501, 'Cannot Insert')
+        signup = _.pick(doc,['userId','shiftId','parentId'])
+        # avoid to book the same shift twice
+        if Meteor.isServer
+          res = share.LeadSignups.upsert(signup, { $set: {status: doc.status} }, (err,res) ->
+            unless err
+              if lead.policy == "public"
+                Roles.addUsersToRoles(doc.userId, lead.parentId, eventName)
+            else
+              return throwError(501, 'Cannot Insert')
           )
+          # XXX we return an insertedId even if the function is called insert and should
+          # return an simple id (or throw and error)
+          if res?.insertedId?
+            return res.insertedId
+          else
+            console.log share.LeadSignups.findOne(signup)
+            share.LeadSignups.findOne(signup)._id
     else
       return throwError(403, 'Insufficient Permission')
 

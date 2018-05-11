@@ -11,8 +11,14 @@ commonEvents =
   'click [data-action="un-enroll"]': (event,template) ->
     userId = $(event.currentTarget).data('userid')
     shiftId = $(event.currentTarget).data('shiftid')
-    shift = share.ShiftSignups.findOne({ userId, shiftId })
-    share.meteorCall "shiftSignups.remove", shift._id
+    type = $(event.currentTarget).data('type')
+    switch type
+      when 'shift'
+        shift = share.ShiftSignups.findOne({ userId, shiftId })
+        share.meteorCall "shiftSignups.remove", shift._id
+      when 'project'
+        shift = share.ProjectSignups.findOne({ userId, shiftId })
+        share.meteorCall "projectSignups.remove", shift._id
   'click [data-action="edit"]': (event,template) ->
     id = $(event.currentTarget).data('id')
     type = $(event.currentTarget).data('type')
@@ -66,9 +72,9 @@ Template.teamShiftsTable.onCreated () ->
   template = this
   teamId = template.data._id
   share.templateSub(template,"ShiftSignups.byTeam",teamId)
-  share.templateSub(template,"LeadSignups.byTeam",teamId)
-  share.templateSub(template,"TaskSignups.byTeam",teamId)
-  share.templateSub(template,"ProjectSignups.byTeam",teamId)
+  # share.templateSub(template,"LeadSignups.byTeam",teamId)
+  # share.templateSub(template,"TaskSignups.byTeam",teamId)
+  # share.templateSub(template,"ProjectSignups.byTeam",teamId)
   template.shifts = new ReactiveVar([])
   template.grouping = new ReactiveVar(new Set())
   template.autorun () ->
@@ -112,7 +118,10 @@ Template.teamProjectsTable.onCreated () ->
 
 Template.teamProjectsTable.helpers
   allProjects: () ->
-    share.Projects.find({parentId: Template.instance().teamId})
+    share.Projects.find({parentId: Template.instance().teamId}).map((project) ->
+      signups = share.ProjectSignups.find({shiftId: project._id, status: 'confirmed'}).fetch()
+      _.extend(project,{volunteers: signups, confirmed: signups.length })
+      )
 
 Template.teamProjectsTable.events commonEvents
 

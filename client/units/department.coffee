@@ -1,3 +1,4 @@
+Template.departmentEdit.bindI18nNamespace('abate:volunteers')
 Template.departmentEditDetails.bindI18nNamespace('abate:volunteers')
 Template.departmentEditDetails.helpers
   'form': () -> { collection: share.Department }
@@ -15,7 +16,7 @@ Template.departmentEdit.helpers
       id: "team"
       label: i18n.__("abate:volunteers","team")
       tableFields: [ { name: 'name'} ]
-      form: { collection: share.Team }
+      form: { collection: share.Team, filter: {parentId} }
       subscription : (template) ->
         [ share.templateSub(template,"team.backend",parentId) ]
       }
@@ -23,13 +24,12 @@ Template.departmentEdit.helpers
       id: "leads"
       label: i18n.__("abate:volunteers","leads")
       tableFields: [
-       { name: 'userId', template:"leadField"},
-       { name: 'role' }
+       { name: 'title' },
+       { name: 'userId', template:"teamLeadField"},
       ]
-      form: { collection: share.Lead }
+      form: { collection: share.Lead, filter: {parentId} }
       subscription : (template) ->
-        [ share.templateSub(template,"users"),
-          share.templateSub(template,"lead.backend",parentId) ]
+        [ share.templateSub(template,"LeadSignups.byDepartment",parentId) ]
       }
     return [team,lead]
 

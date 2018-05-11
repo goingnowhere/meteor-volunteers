@@ -71,8 +71,8 @@ Template.teamSignupsList.helpers({
 
 Template.teamSignupsList.events({
   'click [data-action="approve"]': function e(event, template) {
-    const type = template.$(event.target).data('type')
-    const signupId = template.$(event.target).data('signup')
+    const type = template.$(event.currentTarget).data('type')
+    const signupId = template.$(event.currentTarget).data('signup')
     if (type === 'lead') {
       share.meteorCall(`${type}Signups.confirm`, signupId)
     } else {
@@ -81,8 +81,8 @@ Template.teamSignupsList.events({
     }
   },
   'click [data-action="refuse"]': function e(event, template) {
-    const type = template.$(event.target).data('type')
-    const signupId = template.$(event.target).data('signup')
+    const type = template.$(event.currentTarget).data('type')
+    const signupId = template.$(event.currentTarget).data('signup')
     if (type === 'lead') {
       share.meteorCall(`${type}Signups.refuse`, signupId)
     } else {
@@ -126,11 +126,11 @@ Template.departmentSignupsList.helpers({
 
 Template.departmentSignupsList.events({
   'click [data-action="approve"]': function e(event, template) {
-    const signupId = template.$(event.target).data('signup')
+    const signupId = template.$(event.currentTarget).data('signup')
     share.meteorCall('leadSignups.confirm', signupId)
   },
   'click [data-action="refuse"]': function e(event, template) {
-    const signupId = template.$(event.target).data('signup')
+    const signupId = template.$(event.currentTarget).data('signup')
     share.meteorCall('leadSignups.refuse', signupId)
   },
 })
@@ -162,11 +162,11 @@ Template.managerSignupsList.helpers({
 
 Template.managerSignupsList.events({
   'click [data-action="approve"]': function e(event, template) {
-    const signupId = template.$(event.target).data('signup')
+    const signupId = template.$(event.currentTarget).data('signup')
     share.meteorCall('leadSignups.confirm', signupId)
   },
   'click [data-action="refuse"]': function e(event, template) {
-    const signupId = template.$(event.target).data('signup')
+    const signupId = template.$(event.currentTarget).data('signup')
     share.meteorCall('leadSignups.refuse', signupId)
   },
 })

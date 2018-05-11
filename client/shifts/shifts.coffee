@@ -83,9 +83,9 @@ Template.leadListItemGroupped.events
 
 Template.leadListItemGroupped.events
   'click [data-action="apply"]': ( event, template ) ->
-    shiftId = $(event.target).data('shiftid')
-    type = $(event.target).data('type')
-    parentId = $(event.target).data('parentid')
+    shiftId = $(event.currentTarget).data('shiftid')
+    type = $(event.currentTarget).data('type')
+    parentId = $(event.currentTarget).data('parentid')
     userId = Meteor.userId()
     doc = {parentId: parentId, shiftId: shiftId, userId: userId}
     share.meteorCall "#{type}Signups.insert", doc
@@ -124,9 +124,9 @@ Template.signupModal.helpers
 Template.dutiesListItemGroupped.bindI18nNamespace('abate:volunteers')
 Template.dutiesListItemGroupped.events
   'click [data-action="chooseShifts"]': ( event, template ) ->
-    parentId = $(event.target).data('parent-id')
-    groupTitle = $(event.target).data('group-title')
-    dutyType = $(event.target).data('duty-type')
+    parentId = $(event.currentTarget).data('parent-id')
+    groupTitle = $(event.currentTarget).data('group-title')
+    dutyType = $(event.currentTarget).data('duty-type')
     Modal.show("signupModal", {
       title: groupTitle,
       parentId,
@@ -149,15 +149,15 @@ Template.dutiesListItemDate.helpers
 Template.dutiesListItemDate.events
   'click [data-action="bail"]': ( event, template ) ->
     userId = Meteor.userId()
-    shiftId = $(event.target).data('shiftid')
-    type = $(event.target).data('type')
-    parentId = $(event.target).data('parentid')
+    shiftId = $(event.currentTarget).data('shiftid')
+    type = $(event.currentTarget).data('type')
+    parentId = $(event.currentTarget).data('parentid')
     share.meteorCall "#{type}Signups.bail", {parentId, shiftId, userId}
 
   'click [data-action="apply"]': ( event, template ) ->
-    shiftId = $(event.target).data('shiftid')
-    type = $(event.target).data('type')
-    parentId = $(event.target).data('parentid')
+    shiftId = $(event.currentTarget).data('shiftid')
+    type = $(event.currentTarget).data('type')
+    parentId = $(event.currentTarget).data('parentid')
     userId = Meteor.userId()
     doc = {parentId: parentId, shiftId: shiftId, userId: userId}
     if type == 'project'

@@ -22,5 +22,9 @@
 
 <!--  Helper template used in teamEdit template -->
 <template name="teamLeadField">
-  {{#if signup.userId}}{{getUserName signup.userId}}{{else}}{{__ ".vacant"}}{{/if}}
+  {{#if signup.userId}}
+    {{getUserName signup.userId}}
+  {{else}}
+    {{__ ".vacant"}}
+  {{/if}}
 </template>

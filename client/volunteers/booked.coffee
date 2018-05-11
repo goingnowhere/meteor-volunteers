@@ -1,10 +1,10 @@
 events =
   'click [data-action="bail"]': ( event, template ) ->
-    shiftId = $(event.target).data('shiftid')
-    type = $(event.target).data('type')
-    parentId = $(event.target).data('parentid')
+    shiftId = $(event.currentTarget).data('shiftid')
+    type = $(event.currentTarget).data('type')
+    parentId = $(event.currentTarget).data('parentid')
     selectedUser = $("[data-shiftId='#{shiftId}']").val()
-    userId = $(event.target).data('userid')
+    userId = $(event.currentTarget).data('userid')
     doc = {parentId: parentId, shiftId: shiftId, userId: userId}
     share.meteorCall "#{type}Signups.bail", doc
 

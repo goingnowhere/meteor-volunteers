@@ -61,6 +61,7 @@
                   <li>{{getUserName signup.userId}}
                     (<a href="#"
                         data-action="un-enroll"
+                        data-type="shift"
                         data-userid="{{signup.userId}}"
                         data-shiftid="{{shift._id}}">
                       {{__ ".remove"}}
@@ -92,26 +93,41 @@
         <td>{{> projectDateInline project}}</td>
         <td>{{project.title}}</td>
         <td>
-          <div class="btn-group pull-right">
-            <button type="button"
-              class="btn btn-sm btn-circle dropdown-toggle {{#if grouping}}disabled{{/if}}"
-              data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-              <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu">
-              <li class="dropdown-item"><a href="#" data-action="edit" data-id="{{project._id}}" data-type="project">
-                {{fa "pencil-square-o"}} {{__ ".edit"}}</a></li>
-              <li class="dropdown-item"><a href="#" data-action="delete" data-id="{{project._id}}" data-type="project">
-                {{fa "trash-o"}} {{__ ".remove"}}</a></li>
-              <li class="dropdown-item"><a href="#" data-action="clone" data-id="{{project._id}}" data-type="project">
-                {{fa "clone"}} {{__ ".clone"}}</a></li>
-            </ul>
-          </div>
+          <button class="btn btn-sm btn-circle"
+              data-action="edit"
+              data-id="{{project._id}}"
+              data-type="project">
+              {{fa "pencil-square-o"}}</button>
+          <button class="btn btn-sm btn-circle"
+              data-action="delete"
+              data-id="{{project._id}}"
+              data-type="project">
+              {{fa "trash-o"}}</button>
+          {{> Template.contentBlock project=project }}
         </td>
       </tr>
       <tr><td colspan="4">
         {{> projectStaffingChart project=project }}
       </td></tr>
+      {{#if $gt project.confirmed 0}}
+        <tr class="shift {{family.class}}">
+          <td colspan="4">
+            <ol>
+              {{#each signup in project.volunteers }}
+                <li>{{getUserName signup.userId}}
+                  (<a href="#"
+                      data-action="un-enroll"
+                      data-type="project"
+                      data-userid="{{signup.userId}}"
+                      data-shiftid="{{project._id}}">
+                    {{__ ".remove"}}
+                  </a>)
+                </li>
+              {{/each}}
+            </ol>
+          </td>
+        </tr>
+      {{/if}}
     {{/each}}
   </table>
 </template>

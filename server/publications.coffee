@@ -490,3 +490,16 @@ share.initPublications = (eventName) ->
       share.Department.find(sel)
     else
       share.Department.find(_.extend(sel,unitPublicPolicy))
+
+  # these two publications are used in the teamEdit and departmentEdit forms
+  Meteor.publish "#{eventName}.Volunteers.team.backend", (parentId) ->
+    if this.userId && share.isManagerOrLead(this.userId,[parentId])
+      share.Team.find({parentId})
+    else
+      share.Team.find(_.extend({parentId},unitPublicPolicy))
+
+  Meteor.publish "#{eventName}.Volunteers.department.backend", (parentId) ->
+    if this.userId && share.isManagerOrLead(this.userId,[parentId])
+      share.Department.find({parentId})
+    else
+      share.Department.find(_.extend({parentId},unitPublicPolicy))

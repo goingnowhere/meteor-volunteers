@@ -40,7 +40,7 @@ Template.teamEdit.helpers
       'id': "leads"
       'label': i18n.__("abate:volunteers","leads")
       'tableFields': [
-        { name: 'title' }
+        { name: 'title' },
         { name: 'userId', template: "teamLeadField"},
       ]
       'form': { collection: share.Lead, filter: {parentId: parentId} }
@@ -60,13 +60,14 @@ Template.addTeam.helpers
 
 Template.addTeam.events
   'click [data-action="removeTeam"]': (event,template) ->
-    teamId = $(event.target).data('id')
+    teamId = $(event.currentTarget).data('id')
     share.meteorCall "team.remove", teamId
 
 Template.teamLeadField.bindI18nNamespace('abate:volunteers')
 Template.teamLeadField.onCreated () ->
   template = this
   share.templateSub(template,"LeadSignups.byTeam",template.data.parentId)
+  share.templateSub(template,"LeadSignups.byDepartment",template.data.parentId)
 
 Template.teamLeadField.helpers
   'signup': () ->
