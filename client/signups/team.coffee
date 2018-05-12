@@ -82,15 +82,16 @@ Template.teamShiftsTable.onCreated () ->
       sel = {parentId: teamId}
       date = Template.currentData().date
       if date
-        startOfDay = moment(date).startOf('day')
-        endOfDay = moment(date).endOf('day')
+        # this is already a moment object
+        startOfDay = date.clone().startOf('day')
+        endOfDay = date.clone().endOf('day')
         sel =
           $and: [
             sel,
             {
               $and: [
-                { end: { $gte: startOfDay.toDate() } },
-                { start: { $lte: endOfDay.toDate() } },
+                { start: { $gte: startOfDay.toDate() } },
+                { end: { $lte: endOfDay.toDate() } },
               ]
             }
           ]

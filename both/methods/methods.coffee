@@ -182,7 +182,7 @@ share.initMethods = (eventName) ->
                   else
                     collection.findOne(signup)._id
               else
-                return throwError(409, 'Double Booking',db)
+                return throwError(409, 'Double Booking', db)
           else
             return throwError(403, 'Insufficient Permission')
       when "bail"
