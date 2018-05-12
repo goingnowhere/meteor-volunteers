@@ -170,7 +170,7 @@ Template.dutiesListItemDate.events
           switch err.error
             when 409
               Bert.alert({
-                hideDelay: 4500,
+                hideDelay: 6500,
                 title: i18n.__("abate:volunteers","double_booking"),
                 message: i18n.__("abate:volunteers","double_booking_msg"),
                 type: 'warning',
@@ -178,6 +178,7 @@ Template.dutiesListItemDate.events
                 })
             else
               Bert.alert({
+                hideDelay: 6500,
                 title: i18n.__("abate:volunteers","error"),
                 message: err.reason,
                 type: 'danger',

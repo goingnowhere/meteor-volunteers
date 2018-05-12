@@ -22,7 +22,7 @@ doubleBooking = (shift,collectionKey) ->
         userId: shift.userId,
         status: {$in: ["confirmed","pending"]}}).fetch())
         .map((shift) -> share.TeamShifts.findOne({_id: shift.shiftId}))
-        .some((shift) ->
+        .filter((shift) ->
           shiftRange = moment.range(moment(shift.start),moment(shift.end))
           parentRange.overlaps(shiftRange))
         .value()
@@ -173,7 +173,8 @@ share.initMethods = (eventName) ->
             { start, end } = doc
             if status
               # we can double booking only on new signups
-              unless doubleBooking(signup,collectionKey)
+              db = doubleBooking(signup,collectionKey)
+              if db.length == 0
                 if Meteor.isServer
                   res = collection.upsert(signup,{$set: {status,start,end}})
                   if res?.insertedId?
@@ -181,7 +182,7 @@ share.initMethods = (eventName) ->
                   else
                     collection.findOne(signup)._id
               else
-                return throwError(409, 'Double Booking')
+                return throwError(409, 'Double Booking',db)
           else
             return throwError(403, 'Insufficient Permission')
       when "bail"
