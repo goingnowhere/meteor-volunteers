@@ -44,13 +44,15 @@
             <span class="badge badge-pill badge-primary">{{shift.needed}} / {{shift.confirmed}}</span>
           </td>
           <td>
-            <button class="btn btn-sm btn-circle" href="#"
-              data-action="edit" data-id="{{shift._id}}" data-type="shift">
-                  {{fa "pencil-square-o"}}</button>
-            <button class="btn btn-sm btn-circle" href="#"
-              data-action="delete" data-id="{{shift._id}}" data-type="shift">
-                  {{fa "trash-o"}}</button>
-            {{> Template.contentBlock shift=shift }}
+            <div class="btn-group inline pull-left">
+              <button class="btn btn-sm btn-circle" href="#"
+                data-action="edit" data-id="{{shift._id}}" data-type="shift">
+                    {{fa "pencil-square-o"}}</button>
+              <button class="btn btn-sm btn-circle" href="#"
+                data-action="delete" data-id="{{shift._id}}" data-type="shift">
+                    {{fa "trash-o"}}</button>
+              {{> Template.contentBlock shift=shift }}
+            </div>
           </td>
         </tr>
         {{#if $gt shift.confirmed 0}}
@@ -93,17 +95,19 @@
         <td>{{> projectDateInline project}}</td>
         <td>{{project.title}}</td>
         <td>
-          <button class="btn btn-sm btn-circle"
-              data-action="edit"
-              data-id="{{project._id}}"
-              data-type="project">
-              {{fa "pencil-square-o"}}</button>
-          <button class="btn btn-sm btn-circle"
-              data-action="delete"
-              data-id="{{project._id}}"
-              data-type="project">
-              {{fa "trash-o"}}</button>
-          {{> Template.contentBlock project=project }}
+          <div class="btn-group inline pull-left">
+            <button class="btn btn-sm btn-circle"
+                data-action="edit"
+                data-id="{{project._id}}"
+                data-type="project">
+                {{fa "pencil-square-o"}}</button>
+            <button class="btn btn-sm btn-circle"
+                data-action="delete"
+                data-id="{{project._id}}"
+                data-type="project">
+                {{fa "trash-o"}}</button>
+            {{> Template.contentBlock project=project }}
+          </div>
         </td>
       </tr>
       <tr><td colspan="4">
