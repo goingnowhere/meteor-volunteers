@@ -52,19 +52,26 @@
         {{#if $gt shift.confirmed 0}}
           <tr class="shift {{family.class}}">
             <td colspan="4">
-              <ol>
-                {{#each signup in shift.volunteers }}
-                  <li>{{getUserName signup.userId}}
-                    (<a href="#"
-                        data-action="un-enroll"
-                        data-type="shift"
-                        data-userid="{{signup.userId}}"
-                        data-shiftid="{{shift._id}}">
-                      {{__ ".remove"}}
-                    </a>)
-                  </li>
-                {{/each}}
-              </ol>
+              <table class="table table-borderless">
+                <tbody>
+                  {{#each signup in shift.volunteers }}
+                    <tr>
+                      <td>{{$incr @index}}</td>
+                      <td>{{getUserName signup.userId}}</td>
+                      <td>
+                        <button
+                           class="btn btn-sm btn-circle"
+                            data-action="un-enroll"
+                            data-type="shift"
+                            data-userid="{{signup.userId}}"
+                            data-shiftid="{{shift._id}}">
+                            {{fa "trash-o"}}
+                        </button>
+                      </td>
+                    </tr>
+                  {{/each}}
+                </tbody>
+              </table>
             </td>
           </tr>
         {{/if}}
@@ -110,19 +117,37 @@
       {{#if $gt project.confirmed 0}}
         <tr class="shift {{family.class}}">
           <td colspan="4">
-            <ol>
-              {{#each signup in project.volunteers }}
-                <li>{{getUserName signup.userId}}
-                  (<a href="#"
-                      data-action="un-enroll"
-                      data-type="project"
-                      data-userid="{{signup.userId}}"
-                      data-shiftid="{{project._id}}">
-                    {{__ ".remove"}}
-                  </a>)
-                </li>
-              {{/each}}
-            </ol>
+            <table class="table">
+              <thead>
+                <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">{{__ ".name"}}</th>
+                  <th scope="col">{{__ ".arrival"}}</th>
+                  <th scope="col">{{__ ".departure"}}</th>
+                  <th scope="col"></th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#each signup in project.volunteers }}
+                  <tr>
+                    <td>{{$incr @index}}</td>
+                    <td>{{getUserName signup.userId}}</td>
+                    <td>{{formatDate signup.start}}</td>
+                    <td>{{formatDate signup.end}}</td>
+                    <td>
+                      <button
+                         class="btn btn-sm btn-circle"
+                          data-action="un-enroll"
+                          data-type="project"
+                          data-userid="{{signup.userId}}"
+                          data-shiftid="{{project._id}}">
+                          {{fa "trash-o"}}
+                      </button>
+                    </td>
+                  </tr>
+                {{/each}}
+              </tbody>
+            </table>
           </td>
         </tr>
       {{/if}}

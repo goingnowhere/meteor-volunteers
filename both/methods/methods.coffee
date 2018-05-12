@@ -27,7 +27,7 @@ doubleBooking = (shift,collectionKey) ->
           parentRange.overlaps(shiftRange))
         .value()
     else
-      return false
+      return []
 
 share.initMethods = (eventName) ->
 
@@ -180,7 +180,7 @@ share.initMethods = (eventName) ->
                   if res?.insertedId?
                     return res.insertedId
                   else
-                    collection.findOne(signup)._id
+                    return collection.findOne(signup)._id
               else
                 return throwError(409, 'Double Booking', db)
           else

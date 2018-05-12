@@ -96,5 +96,7 @@
   "project_end_help": "When do leave ? (for build : leave default if you stay for the event)",
   "method_error": "We hit a problem while executing talking to the server",
   "public_email": "Public Email",
-  "public_email_help": "This is the public email for this unit"
+  "public_email_help": "This is the public email for this unit",
+  "arrival": "Arrival",
+  "departure": "Departure"
 }
