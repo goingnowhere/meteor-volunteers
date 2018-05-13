@@ -133,6 +133,8 @@ Template.dutiesListItemGroupped.events
       dutyType,
     })
 
+Template.dutyListItem.bindI18nNamespace('abate:volunteers')
+
 Template.dutiesListItemDate.bindI18nNamespace('abate:volunteers')
 Template.dutiesListItemDate.helpers
   # TODO update when upgrading to mongodb > 3.2
@@ -189,7 +191,7 @@ Template.dutiesListItemDate.events
     'sameDay': (start, end) -> moment(start).isSame(moment(end),"day")
   }
 
-  Template.shiftDate.helpers sameDayHelper
+Template.shiftDate.helpers sameDayHelper
 Template.shiftDateInline.helpers sameDayHelper
 
 Template.projectDate.helpers
