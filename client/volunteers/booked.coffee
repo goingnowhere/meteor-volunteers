@@ -1,4 +1,37 @@
 events =
+  'click [data-action="edit"]': ( event, template ) ->
+    type = $(event.currentTarget).data('type')
+    if type == 'project'
+      shiftId = $(event.currentTarget).data('shiftid')
+      parentId = $(event.currentTarget).data('parentid')
+      selectedUser = $("[data-shiftId='#{shiftId}']").val()
+      userId = $(event.currentTarget).data('userid')
+      doc = {parentId: parentId, shiftId: shiftId, userId: userId}
+      project = share.Projects.findOne(shiftId)
+      signup = share.ProjectSignups.findOne(doc)
+      AutoFormComponents.ModalShowWithTemplate("projectSignupForm",{ project, signup})
+
+  'click [data-action="info"]': ( event, template ) ->
+    shiftId = $(event.currentTarget).data('shiftid')
+    type = $(event.currentTarget).data('type')
+    parentId = $(event.currentTarget).data('parentid')
+    selectedUser = $("[data-shiftId='#{shiftId}']").val()
+    userId = $(event.currentTarget).data('userid')
+    doc = {parentId: parentId, shiftId: shiftId, userId: userId}
+    team = share.Team.findOne(parentId)
+    switch type
+      when 'project'
+        duty = _.extend(share.Projects.findOne(shiftId),{type: 'project'})
+        break
+      when 'shift'
+        duty = _.extend(share.TeamShifts.findOne(shiftId),{type: 'shift'})
+        break
+      else
+        break
+    duty = _.extend(duty, {team})
+    console.log duty
+    AutoFormComponents.ModalShowWithTemplate("dutyListItem",duty)
+
   'click [data-action="bail"]': ( event, template ) ->
     shiftId = $(event.currentTarget).data('shiftid')
     type = $(event.currentTarget).data('type')

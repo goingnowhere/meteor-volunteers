@@ -28,7 +28,7 @@
   "user": "User",
   "update_volunteer_profile": "Update Profile",
   "notes": "Notes",
-  "bail": "Bail",
+  "bail": "Cancel",
   "skills": "Skills",
   "skills_help": "These are the skills that we require and search. Pick a few in relation to your abilities.",
   "quirks": "Quirks",
@@ -98,5 +98,7 @@
   "public_email": "Public Email",
   "public_email_help": "This is the public email for this unit",
   "arrival": "Arrival",
-  "departure": "Departure"
+  "departure": "Departure",
+  "info": "Information",
+  "change_dates": "Change Dates"
 }

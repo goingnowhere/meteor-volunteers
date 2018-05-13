@@ -4,7 +4,7 @@
     <div class="row">
       <div class="container-fluid">
         {{#each shift in allShifts }}
-          <div class="flex-column bookedTableItem p-2">
+          <div class="flex-column bookedTableItem p-0">
             {{> signupUserRowView signup=shift}}
           </div>
         {{/each}}
@@ -15,29 +15,55 @@
 
 <template name="signupUserRowView">
   <div class="row no-gutters {{#unless $eq signup.status 'confirmed'}}text-muted{{/unless}}" title="{{__ signup.status}}">
-    <div class="col-md-1">
-      {{#if $eq signup.status "confirmed"}}<div class="text-success">{{fa "check"}}</div>{{/if}}
-      {{#if $eq signup.status "pending"}}<div class="text-warning">{{fa "clock-o"}}</div>{{/if}}
-    </div>
-    <div class="col-md-4">
-      {{#if $eq signup.type "project"}}
-        {{> projectDateInline signup }}
-      {{else}}
-        {{#if $eq signup.type "shift"}}
-          {{> shiftDateInline duty }}
+    <div class="container-fluid">
+    <div class="row p-2">
+      <div class="col-md-4">
+        {{#if $eq signup.type "project"}}
+          {{> projectDateInline signup }}
+        {{else}}
+          {{#if $eq signup.type "shift"}}
+            {{> shiftDateInline duty }}
+          {{/if}}
         {{/if}}
+      </div>
+      <div class="col">
+        <h6>{{team.name}} &gt; {{duty.title}}</h6>
+      </div>
+    </div>
+    <div class="row px-1 py-0">
+      <div class="col-md-3">
+        {{#if $eq signup.status "confirmed"}}<div class="text-success">{{fa "check"}} {{__ ".confirmed"}}</div>{{/if}}
+        {{#if $eq signup.status "pending"}}<div class="text-warning">{{fa "clock-o"}} {{__ ".pending"}}</div>{{/if}}
+      </div>
+      <div class="col px-1 py-0"></div>
+
+      <div class="col-md-3 px-1 py-0">
+        <button type="button" class="btn btn-primary btn-action" data-action="info"
+          data-shiftId="{{signup.shiftId}}" data-type="{{signup.type}}"
+          data-parentId="{{signup.parentId}}" data-userId={{signup.userId}}>
+          {{__ ".info"}}
+        </button>
+      </div>
+
+      {{#if $eq signup.type "project"}}
+        <div class="col-md-3 px-1 py-0">
+          <button type="button" class="btn btn-primary btn-action" data-action="edit"
+            data-shiftId="{{signup.shiftId}}" data-type="{{signup.type}}"
+            data-parentId="{{signup.parentId}}" data-userId={{signup.userId}}>
+            {{__ ".change_dates"}}
+          </button>
+        </div>
       {{/if}}
+
+      <div class="col-md-2 p-0">
+        <button type="button" class="btn btn-primary btn-action" data-action="bail"
+          data-shiftId="{{signup.shiftId}}" data-type="{{signup.type}}"
+          data-parentId="{{signup.parentId}}" data-userId={{signup.userId}}>
+          {{__ ".bail"}}
+        </button>
+      </div>
     </div>
-    <div class="col-md-5">
-      <h6>{{team.name}} &gt; {{duty.title}}</h6>
-    </div>
-    <div class="col-md-2 p-0">
-      <button type="button" class="btn btn-primary btn-action" data-action="bail"
-        data-shiftId="{{signup.shiftId}}" data-type="{{signup.type}}"
-        data-parentId="{{signup.parentId}}" data-userId={{signup.userId}}>
-        {{__ ".bail"}}
-      </button>
-    </div>
+  </div>
   </div>
 </template>
 

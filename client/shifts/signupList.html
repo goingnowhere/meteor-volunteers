@@ -21,7 +21,7 @@
 <template name="signupsListTeam">
   {{#if $and Template.subscriptionsReady ($gt ($len allShifts) 0) }}
     {{#each duty in allShifts }}
-      <div class="p-2 signupsListItem">
+      <div class="px-2 pb-0 signupsListItem">
         {{> dutiesListItemGroupped duty=duty }}
       </div>
     {{/each}}
