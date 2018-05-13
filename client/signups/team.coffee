@@ -66,6 +66,10 @@ commonEvents =
       },
       data: shift,
     }, shift.title)
+  'click [data-action="delete_group"]': (event,template) ->
+    id = $(event.currentTarget).data('id')
+    shift = share.TeamShifts.findOne(id)
+    share.meteorCall "teamShifts.group.remove", _.pick(shift,['groupId','parentId'])
 
 Template.teamShiftsTable.bindI18nNamespace('abate:volunteers')
 Template.teamShiftsTable.onCreated () ->

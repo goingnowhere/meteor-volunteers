@@ -235,6 +235,14 @@ share.initMethods = (eventName) ->
 
   prefix = "#{eventName}.Volunteers"
 
+  Meteor.methods "#{prefix}.teamShifts.group.remove": (group) ->
+    console.log ["#{prefix}.teamShifts.group.remove", group]
+    check(group, {groupId: String, parentId: String})
+    if share.isManagerOrLead(Meteor.userId(),[group.parentId])
+      share.TeamShifts.remove(group)
+    else
+      return throwError(403, 'Insufficient Permission')
+
   groupSchema = new SimpleSchema(share.Schemas.Common)
   groupSchema.extend(share.SubSchemas.DayDates)
   groupSchema.extend({

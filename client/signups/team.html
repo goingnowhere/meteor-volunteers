@@ -19,6 +19,12 @@
             {{fa "calendar"}} {{__ ".add_date"}}
           </button>
         </td>
+        <td>
+          <button type="button" class="btn btn-default btn-sm"
+            data-id="{{family.first._id}}" data-type="shift" data-action="delete_group">
+            {{fa "trash-o"}} {{__ ".delete_rota"}}
+          </button>
+        </td>
       </tr>
     </thead>
     <tbody>
@@ -36,7 +42,7 @@
           </span>
           </th>
           <td> {{> shiftDateInline shift}} </td>
-          <td>
+          <td colspan="2">
             <span class="badge badge-pill badge-primary">{{shift.needed}} / {{shift.confirmed}}</span>
           </td>
           <td>
