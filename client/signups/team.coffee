@@ -85,12 +85,7 @@ Template.teamShiftsTable.onCreated () ->
         sel =
           $and: [
             sel,
-            {
-              $and: [
-                { start: { $gte: startOfDay.toDate() } },
-                { end: { $lte: endOfDay.toDate() } },
-              ]
-            }
+            { start: { $gte: startOfDay.toDate() , $lte: endOfDay.toDate() } },
           ]
       shifts = share.getShifts(sel)
       template.shifts.set(shifts)
