@@ -72,9 +72,6 @@ Template.teamShiftsTable.onCreated () ->
   template = this
   teamId = template.data._id
   share.templateSub(template,"ShiftSignups.byTeam",teamId)
-  # share.templateSub(template,"LeadSignups.byTeam",teamId)
-  # share.templateSub(template,"TaskSignups.byTeam",teamId)
-  # share.templateSub(template,"ProjectSignups.byTeam",teamId)
   template.shifts = new ReactiveVar([])
   template.grouping = new ReactiveVar(new Set())
   template.autorun () ->
@@ -120,11 +117,26 @@ Template.teamProjectsTable.onCreated () ->
 Template.teamProjectsTable.helpers
   allProjects: () ->
     share.Projects.find({parentId: Template.instance().teamId}).map((project) ->
-      signups = share.ProjectSignups.find({shiftId: project._id, status: 'confirmed'}).fetch()
+      signups = share.ProjectSignups.find(
+        {shiftId: project._id, status: 'confirmed'},
+        {sort: { start: 1} }
+      ).fetch()
       _.extend(project,{volunteers: signups, confirmed: signups.length })
-      )
+    )
 
-Template.teamProjectsTable.events commonEvents
+Template.teamProjectsTable.events _.extend(
+  commonEvents,
+  'click [data-action="edit-enrollment"]': (event,template) ->
+    userId = $(event.currentTarget).data('userid')
+    shiftId = $(event.currentTarget).data('shiftid')
+    type = $(event.currentTarget).data('type')
+    signup = share.ProjectSignups.findOne({ userId, shiftId })
+    project = share.Projects.findOne(shiftId)
+    AutoFormComponents.ModalShowWithTemplate("projectSignupForm",{
+      project,
+      signup
+      }, project.title)
+)
 
 Template.projectStaffingChart.bindI18nNamespace('abate:volunteers')
 Template.projectStaffingChart.helpers

@@ -269,6 +269,8 @@ AutoForm.addInputType("projectStaffing",
 Template.projectSignupForm.bindI18nNamespace('abate:volunteers')
 Template.projectSignupForm.onCreated () ->
   template = this
+  if template.data?.signup
+    template.signup = template.data.signup
   project = template.data.project
   share.templateSub(template,"Projects.byDuty",project._id)
   template.allDays = new ReactiveVar([])
@@ -288,9 +290,14 @@ Template.projectSignupForm.onCreated () ->
 
 Template.projectSignupForm.helpers
   formSchema: () ->
-    allDays = Template.instance().allDays.get()
-    if allDays.length > 0
-      [firstDay, ..., lastDay] = allDays
+    if Template.instance().signup?.start
+      signup = Template.instance().signup
+      firstDay = moment(signup.start)
+      lastDay = moment(signup.end)
+    else
+      allDays = Template.instance().allDays.get()
+      if allDays.length > 0
+        [firstDay, ..., lastDay] = allDays
     new SimpleSchema({
       start:
         type: Date
@@ -337,9 +344,8 @@ Template.projectSignupForm.helpers
           type: "hidden"
       })
 
-  # collection: () -> share.ProjectSignups
-
-  methodName: () -> "#{share.ProjectSignups._name}.insert"
+  methodNameInsert: () -> "#{share.ProjectSignups._name}.insert"
+  methodNameUpdate: () -> "#{share.ProjectSignups._name}.update"
 
   updateLabel: () ->
     if Template.currentData().project.policy == "public"
@@ -351,8 +357,9 @@ Template.projectSignupForm.helpers
 
 AutoForm.addHooks([
   'projectSignupsInsert',
+  'projectSignupsUpdate',
   'InsertShiftGroupFormId',
 ],
   onSuccess: () ->
-    Modal.hide()
+    AutoFormComponents.modalHide()
 )

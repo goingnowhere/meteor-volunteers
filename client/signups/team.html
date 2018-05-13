@@ -135,14 +135,21 @@
                     <td>{{formatDate signup.start}}</td>
                     <td>{{formatDate signup.end}}</td>
                     <td>
-                      <button
-                         class="btn btn-sm btn-circle"
-                          data-action="un-enroll"
-                          data-type="project"
-                          data-userid="{{signup.userId}}"
-                          data-shiftid="{{project._id}}">
-                          {{fa "trash-o"}}
-                      </button>
+                      <div class="btn-group inline pull-left">
+                        <button class="btn btn-sm btn-circle"
+                            data-action="edit-enrollment"
+                            data-userid="{{signup.userId}}"
+                            data-shiftid="{{project._id}}"
+                            data-type="project">
+                            {{fa "pencil-square-o"}}</button>
+                        <button class="btn btn-sm btn-circle"
+                            data-action="un-enroll"
+                            data-type="project"
+                            data-userid="{{signup.userId}}"
+                            data-shiftid="{{project._id}}">
+                            {{fa "trash-o"}}
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 {{/each}}
