@@ -31,6 +31,7 @@
             {{/if}}
             {{#if ($eq shift.policy 'private')}}{{fa 'user-secret'}}{{/if}}
             {{#if ($eq shift.policy 'requireApproval')}}{{fa 'lock'}}{{/if}}
+            {{#if ($eq shift.policy 'adminOnly')}}{{fa 'user-secret'}}{{/if}}
           </span>
           </th>
           <td> {{> shiftDateInline shift}} </td>

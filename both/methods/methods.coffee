@@ -166,16 +166,18 @@ share.initMethods = (eventName) ->
           signup = _.pick(doc,['userId','shiftId','parentId'])
           # signup.createdAt = new Date()
           parentDoc = parentCollection.findOne(signup.shiftId)
-          if (signup.userId == userId) || (share.isManagerOrLead(userId,[parentDoc.parentId]))
+          isAdmin = share.isManagerOrLead(userId,[parentDoc.parentId])
+          if (signup.userId == userId) || isAdmin
             status =
               if parentDoc.policy == "public" then "confirmed"
               else if parentDoc.policy == "requireApproval" then "pending"
-            { start, end } = doc
+              else if (parentDoc.policy == "adminOnly" && isAdmin) then "pending"
             if status
               # we can double booking only on new signups
               db = doubleBooking(signup,collectionKey)
               if db.length == 0
                 if Meteor.isServer
+                  { start, end } = doc
                   res = collection.upsert(signup,{$set: {status,start,end}})
                   if res?.insertedId?
                     return res.insertedId
@@ -183,6 +185,8 @@ share.initMethods = (eventName) ->
                     return collection.findOne(signup)._id
               else
                 return throwError(409, 'Double Booking', db)
+            else
+                return throwError(500, 'Invalid status', db)
           else
             return throwError(403, 'Insufficient Permission')
       when "bail"
