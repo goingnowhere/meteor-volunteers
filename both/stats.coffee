@@ -1,3 +1,4 @@
+import { Promise } from 'meteor/promise';
 import Moment from 'moment'
 import 'moment-timezone'
 import { extendMoment } from 'moment-range'

@@ -66,6 +66,8 @@ Package.onUse((api) => {
     'both/collections/timeseries.coffee',
     'both/collections/initCollections.coffee',
 
+    'both/stats.coffee',
+
     'both/methods/methods.coffee',
 
     'api.coffee',
@@ -99,7 +101,6 @@ Package.onUse((api) => {
     'client/signups/signups.html',
     'client/signups/signups.js',
 
-    'client/stats.coffee',
   ], 'client')
 
   api.add_files([
