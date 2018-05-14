@@ -100,5 +100,6 @@
   "arrival": "Arrival",
   "departure": "Departure",
   "info": "Information",
-  "change_dates": "Change Dates"
+  "change_dates": "Change Dates",
+  "admin_only": "Admin Only"
 }
