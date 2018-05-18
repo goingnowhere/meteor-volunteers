@@ -60,6 +60,7 @@ Package.onUse((api) => {
     'both/router.coffee',
     'both/routerControllers.js',
 
+    'both/collections/subSchemas.coffee',
     'both/collections/duties.coffee',
     'both/collections/unit.coffee',
     'both/collections/volunteer.coffee',

@@ -208,17 +208,53 @@ Template.addShift.helpers
   }
   'data': () -> parentId: Template.currentData().team?._id
 
+
+ShiftGroups = new SimpleSchema(share.Schemas.Common)
+ShiftGroups.extend(share.SubSchemas.DayDates)
+ShiftGroups.extend(
+  shifts:
+    type: Array
+    minCount: 1
+    autoform:
+      afFieldHelpText: () -> i18n.__("abate:volunteers","shifts_help_rota")
+  'shifts.$':
+    label: ''
+    type: share.SubSchemas.Bounds.extend(
+      startTime:
+        type: String
+        autoform:
+          afFieldInput:
+            type: 'timepicker'
+            placeholder: () -> i18n.__("abate:volunteers","start")
+            opts: () ->
+              format: 'HH:mm'
+              datepicker: false
+              formatTime: 'HH:mm'
+      endTime:
+        type: String
+        autoform:
+          afFieldInput:
+            type: 'timepicker'
+            placeholder: () -> i18n.__("abate:volunteers","end")
+            opts: () ->
+              format: 'HH:mm'
+              datepicker: false
+              formatTime: 'HH:mm'
+    )
+)
+
 Template.addShiftGroup.bindI18nNamespace('abate:volunteers')
 Template.addShiftGroup.helpers
-  'form': () -> {
-    schema: share.Schemas.ShiftGroups,
-    insert: {
-      id: "InsertShiftGroupFormId",
-      method: "#{share.eventName}.Volunteers.teamShifts.group.insert",
-      label: i18n.__("abate:volunteers","new_shift_group"),
+  'form': () ->
+    return {
+      schema: ShiftGroups,
+      insert: {
+        id: "InsertShiftGroupFormId",
+        method: "#{share.eventName}.Volunteers.teamShifts.group.insert",
+        label: i18n.__("abate:volunteers","new_shift_group"),
+      }
     }
-  }
-  'data': () -> parentId: Template.currentData().team?._id
+  'data': () -> { parentId: Template.currentData().team?._id }
 
 Template.addTask.bindI18nNamespace('abate:volunteers')
 Template.addTask.helpers
@@ -266,7 +302,6 @@ AutoForm.addInputType("projectStaffing",
       ).get()
     return values
 )
-
 
 Template.projectSignupForm.bindI18nNamespace('abate:volunteers')
 Template.projectSignupForm.onCreated () ->

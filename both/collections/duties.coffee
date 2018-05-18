@@ -24,31 +24,7 @@ SimpleSchema.setDefaultMessages
 
 share.Schemas = {}
 
-Bounds = new SimpleSchema(
-  min:
-    type: Number
-    label: () -> i18n.__("abate:volunteers","min_people")
-    optional: true
-    autoform:
-      defaultValue: 4
-      afFieldInput:
-        min: 1
-        placeholder: "min"
-  max:
-    type: Number
-    label: () -> i18n.__("abate:volunteers","max_people")
-    optional: true
-    custom: () ->
-      unless this.value >= this.siblingField('min').value
-        return "maxMoreThanMin"
-    autoform:
-      defaultValue: 5
-      afFieldInput:
-        min: 1
-        placeholder: "max"
-)
-
-Common = new SimpleSchema(
+share.Schemas.Common = new SimpleSchema(
   parentId:
     type: String
     autoform:
@@ -82,9 +58,14 @@ Common = new SimpleSchema(
   groupId:
     type: String
     optional: true
-    autoValue: () ->
-      if not this.field('groupId').isSet
-        Random.id()
+    # autoValue: () ->
+    #   if not this.field('groupId').isSet
+    #     Random.id()
+    autoform:
+      type: "hidden"
+  rotaId:
+    type: Number
+    optional: true
     autoform:
       type: "hidden"
 )
@@ -118,50 +99,15 @@ share.Schemas.TeamTasks = new SimpleSchema(
     autoform:
       omit: true
 )
-share.Schemas.TeamTasks.extend(Common)
-share.Schemas.TeamTasks.extend(Bounds)
+share.Schemas.TeamTasks.extend(share.Schemas.Common)
+share.Schemas.TeamTasks.extend(share.SubSchemas.Bounds)
 
-share.Schemas.TeamShifts = new SimpleSchema(
-  start:
-    type: Date
-    label: () -> i18n.__("abate:volunteers","start")
-    autoform:
-      # defaultValue: () ->
-      #   AutoForm.getFieldValue('start')
-      afFieldInput:
-        type: "datetimepicker"
-        placeholder: () -> i18n.__("abate:volunteers","start")
-        opts: () ->
-          step: 15
-          format: 'DD-MM-YYYY HH:mm'
-          defaultTime:'05:00'
-          # minDate:
-          # maxDate:
-  end:
-    type: Date
-    label: () -> i18n.__("abate:volunteers","end")
-    custom: () ->
-      start = moment(this.field('start').value)
-      unless moment(this.value).isAfter(start)
-        return "startBeforeEndCustom"
-    autoform:
-      defaultValue: () ->
-        AutoForm.getFieldValue('start')
-      afFieldInput:
-        type: "datetimepicker"
-        placeholder: () -> i18n.__("abate:volunteers","end")
-        opts: () ->
-          step: 15
-          format: 'DD-MM-YYYY HH:mm'
-          defaultTime:'08:00'
-          # minDate:
-          # maxDate:
-)
+share.Schemas.TeamShifts = new SimpleSchema()
+share.Schemas.TeamShifts.extend(share.SubSchemas.DayDatesTimes)
+share.Schemas.TeamShifts.extend(share.Schemas.Common)
+share.Schemas.TeamShifts.extend(share.SubSchemas.Bounds)
 
-share.Schemas.TeamShifts.extend(Common)
-share.Schemas.TeamShifts.extend(Bounds)
-
-share.Schemas.Lead = new SimpleSchema(Common)
+share.Schemas.Lead = new SimpleSchema(share.Schemas.Common)
 share.Schemas.Lead.extend(
   responsibilities:
     type: String
@@ -190,35 +136,8 @@ share.Schemas.Lead.extend(
       defaultValue: "requireApproval"
 )
 
-share.Schemas.Projects = new SimpleSchema(
-  start:
-    type: Date
-    label: () -> i18n.__("abate:volunteers","start")
-    autoform:
-      afFieldInput:
-        type: "datetimepicker"
-        placeholder: () -> i18n.__("abate:volunteers","start")
-        opts: () ->
-          format: 'DD-MM-YYYY'
-          timepicker: false
-          # altFormat: 'd-m-Y'
-  end:
-    type: Date
-    label: () -> i18n.__("abate:volunteers","end")
-    custom: () ->
-      start = moment(this.field('start').value)
-      unless moment(this.value).isAfter(start)
-        return "startBeforeEndCustom"
-    autoform:
-      defaultValue: () ->
-        AutoForm.getFieldValue('start')
-      afFieldInput:
-        type: "datetimepicker"
-        placeholder: () -> i18n.__("abate:volunteers","end")
-        opts: () ->
-          format: 'DD-MM-YYYY'
-          timepicker: false
-          # altFormat: 'd-m-Y'
+share.Schemas.Projects = new SimpleSchema(share.SubSchemas.DayDates)
+share.Schemas.Projects.extend(
   staffing:
     type: Array
     minCount: 1
@@ -228,68 +147,6 @@ share.Schemas.Projects = new SimpleSchema(
       days = moment(this.field('end').value).diff(moment(this.field('start').value), 'days') + 1
       unless this.value.length == days
         return "numberOfDaysCustom"
-  'staffing.$': Bounds
+  'staffing.$': share.SubSchemas.Bounds
 )
-share.Schemas.Projects.extend(Common)
-
-share.Schemas.ShiftGroups = new SimpleSchema(Common)
-share.Schemas.ShiftGroups.extend(
-  start:
-    type: Date
-    label: () -> i18n.__("abate:volunteers","start")
-    autoform:
-      afFieldHelpText: () -> i18n.__("abate:volunteers","start_help_rota")
-      afFieldInput:
-        type: "datetimepicker"
-        placeholder: () -> i18n.__("abate:volunteers","start")
-        opts: () ->
-          timepicker: false
-          format: 'DD-MM-YYYY'
-          # altFormat: 'd-m-Y'
-  end:
-    type: Date
-    label: () -> i18n.__("abate:volunteers","end")
-    custom: () ->
-      start = moment(this.field('start').value)
-      unless moment(this.value).isSameOrAfter(start)
-        return "startBeforeEndCustom"
-    autoform:
-      # TODO Add default value based on start !!!
-      afFieldHelpText: () -> i18n.__("abate:volunteers","end_help_rota")
-      afFieldInput:
-        type: "datetimepicker"
-        placeholder: () -> i18n.__("abate:volunteers","end")
-        opts: () ->
-          timepicker: false
-          format: 'DD-MM-YYYY'
-          # altFormat: 'd-m-Y'
-  shifts:
-    type: Array
-    minCount: 1
-    autoform:
-      afFieldHelpText: () -> i18n.__("abate:volunteers","shifts_help_rota")
-  'shifts.$':
-    label: ''
-    type: Bounds.extend(
-      startTime:
-        type: String
-        autoform:
-          afFieldInput:
-            type: 'timepicker'
-            placeholder: () -> i18n.__("abate:volunteers","start")
-            opts: () ->
-              format: 'HH:mm'
-              datepicker: false
-              formatTime: 'HH:mm'
-      endTime:
-        type: String
-        autoform:
-          afFieldInput:
-            type: 'timepicker'
-            placeholder: () -> i18n.__("abate:volunteers","end")
-            opts: () ->
-              format: 'HH:mm'
-              datepicker: false
-              formatTime: 'HH:mm'
-    )
-)
+share.Schemas.Projects.extend(share.Schemas.Common)

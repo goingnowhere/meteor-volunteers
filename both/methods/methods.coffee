@@ -235,15 +235,26 @@ share.initMethods = (eventName) ->
 
   prefix = "#{eventName}.Volunteers"
 
+  groupSchema = new SimpleSchema(share.Schemas.Common)
+  groupSchema.extend(share.SubSchemas.DayDates)
+  groupSchema.extend({
+    shifts: { type: Array , minCount: 1 }
+    'shifts.$': {
+      type: share.SubSchemas.Bounds.extend({
+        startTime: String,
+        endTime: String})
+    }
+  })
+
   Meteor.methods "#{prefix}.teamShifts.group.insert": (group) ->
     console.log ["#{prefix}.teamShifts.group.insert", group]
-    share.Schemas.ShiftGroups.validate(group)
+    groupSchema.validate(group)
     {shifts, start, end} = group
     details = _.omit(group, 'shifts', 'start', 'end')
     if share.isManagerOrLead(Meteor.userId(),[group.parentId])
       groupId = Random.id()
       _.flatten(Array.from(moment.range(start, end).by('days')).map((day) ->
-        shifts.map((shiftSpecifics) ->
+        shifts.map((shiftSpecifics,rotaId) ->
           [startHour, startMin] = shiftSpecifics.startTime.split(':')
           [endHour, endMin] = shiftSpecifics.endTime.split(':')
           # this is the global timezone known by moment that we use to offset
@@ -264,6 +275,7 @@ share.initMethods = (eventName) ->
             start: shiftStart.toDate(),
             end: shiftEnd.toDate(),
             groupId,
+            rotaId
           }, details))
         ), true).forEach((constructedShift) ->
           share.TeamShifts.insert(constructedShift)

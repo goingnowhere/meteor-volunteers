@@ -87,8 +87,6 @@
   "description_help_team": "The description of the team as it is going to be show in the shift listing and team page.",
   "name_help_duty": "The name of the shift. The name of the team is always going to be prepend to the name of the shift. E.g. TeamName > ShiftName",
   "description_help_duty": "The description of this shift. The description of the team will be accessible. No need to repeat.",
-  "start_help_rota": "The first day that shifts of this type happen.",
-  "end_help_rota": "The last day that shifts of this type happen.",
   "shifts_help_rota": "Add a minimum, maximum and start and end time for each shift in the day. Every day will have the same shifts repeated but you can modify individual shifts later.",
   "update_group": "Update Group",
   "project_period_help": "Specify your date of arrival on site. Your choice is constrained by number of volunteer already on site.",

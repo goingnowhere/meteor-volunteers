@@ -25,6 +25,7 @@
       {{#each shift in family.shifts }}
         <tr class="shift {{family.class}}" data-id="{{shift._id}}" data-type="{{shift.type}}">
           <th scope="row">
+            #{{shift.rotaId}}
             <span>
             {{#if $eq shift.priority "essential"}}
               <span class="text-danger">{{fa "exclamation-circle"}}</span>
