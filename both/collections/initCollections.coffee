@@ -102,3 +102,8 @@ share.initCollections = (eventName) ->
     shift: share.TeamShifts
     task: share.TeamTasks
     project: share.Projects
+  share.signupCollections =
+    lead: share.LeadSignups
+    shift: share.ShiftSignups
+    task: share.TaskSignups
+    project: share.ProjectSignups

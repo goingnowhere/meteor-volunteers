@@ -23,9 +23,13 @@ doubleBooking = (shift,collectionKey) ->
         status: {$in: ["confirmed","pending"]}}).fetch())
         .map((shift) -> share.TeamShifts.findOne({_id: shift.shiftId}))
         .filter((shift) ->
-          shiftRange = moment.range(moment(shift.start),moment(shift.end))
-          parentRange.overlaps(shiftRange))
-        .value()
+            if shift
+              shiftRange = moment.range(moment(shift.start),moment(shift.end))
+              parentRange.overlaps(shiftRange)
+            else
+              console.log "Warning: This user Signed is signed up for a shift that does not exist"
+              false
+        ).value()
     else
       return []
 
@@ -57,7 +61,7 @@ share.initMethods = (eventName) ->
             collection.insert(doc, (err,newDocId) ->
               unless err
                 if Meteor.isServer
-                  Roles.createRole(newDocId)
+                  Roles.createRole(newDocId, {unlessExists: true})
                   Roles.addRolesToParent(newDocId, parentRole) if parentRole?
               else
                 return throwError(501, 'Cannot Insert')
@@ -162,9 +166,7 @@ share.initMethods = (eventName) ->
           console.log ["#{collectionName}.insert", doc]
           SimpleSchema.validate(doc, schema.omit('status'))
           userId = Meteor.userId()
-          # signup = _.omit(doc, 'status')
           signup = _.pick(doc,['userId','shiftId','parentId'])
-          # signup.createdAt = new Date()
           parentDoc = parentCollection.findOne(signup.shiftId)
           isAdmin = share.isManagerOrLead(userId,[parentDoc.parentId])
           if (signup.userId == userId) || isAdmin
@@ -357,8 +359,10 @@ share.initMethods = (eventName) ->
           if res?.insertedId?
             return res.insertedId
           else
-            console.log share.LeadSignups.findOne(signup)
-            share.LeadSignups.findOne(signup)._id
+          # XXX this part of the code is executed on the client and the LeadSignups
+          # that we are inserting might not exist. In theory here we should make a
+          # subscription and pull it from the server before trying to 'findOne'
+            return share.LeadSignups.findOne(signup)._id
     else
       return throwError(403, 'Insufficient Permission')
 
