@@ -23,12 +23,12 @@ doubleBooking = (shift,collectionKey) ->
         status: {$in: ["confirmed","pending"]}}).fetch())
         .map((signup) -> share.TeamShifts.findOne({_id: signup.shiftId}))
         .filter((shift) ->
-            if shift # this should not be necessary as stale signups are deleted
-              shiftRange = moment.range(moment(shift.start),moment(shift.end))
-              parentRange.overlaps(shiftRange)
-            else
-              console.log "Warning: This user Signed is signed up for a shift that does not exist"
-              false
+          if shift # this should not be necessary as stale signups are deleted
+            shiftRange = moment.range(moment(shift.start),moment(shift.end))
+            parentRange.overlaps(shiftRange)
+          else
+            console.log "Warning: This user Signed is signed up for a shift that does not exist"
+            false
         ).value()
     else
       return []
