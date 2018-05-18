@@ -79,7 +79,7 @@ commonSignups = new SimpleSchema(
       omit: true
   status:
     type: String
-    allowedValues: ["confirmed", "pending", "refused", "bailed"]
+    allowedValues: ["confirmed", "pending", "refused", "bailed", "cancelled"]
     autoform:
       type: "hidden"
       defaultValue: "pending"

@@ -21,9 +21,9 @@ doubleBooking = (shift,collectionKey) ->
         shiftId: { $ne: shift.shiftId },
         userId: shift.userId,
         status: {$in: ["confirmed","pending"]}}).fetch())
-        .map((shift) -> share.TeamShifts.findOne({_id: shift.shiftId}))
+        .map((signup) -> share.TeamShifts.findOne({_id: signup.shiftId}))
         .filter((shift) ->
-            if shift
+            if shift # this should not be necessary as stale signups are deleted
               shiftRange = moment.range(moment(shift.start),moment(shift.end))
               parentRange.overlaps(shiftRange)
             else
@@ -47,6 +47,14 @@ share.initMethods = (eventName) ->
           if share.isManagerOrLead(Meteor.userId(),[Id])
             if Meteor.isServer then Roles.deleteRole(Id)
             collection.remove(Id)
+            # delete all shifts and signups associated to this team
+            # XXX if this is a dept, we should remove also all teams
+            for k,collection of share.dutiesCollections
+              do ->
+                collection.remove({parentId: Id})
+            for k,collection of share.signupCollections
+              do ->
+                collection.update({shiftId: Id},{$set: {status: 'cancelled'}})
           else
             return throwError(403, 'Insufficient Permission')
       when "insert"
@@ -90,7 +98,7 @@ share.initMethods = (eventName) ->
 
   # Generic function to create insert,update,remove methods.
   # Security check : user must be manager
-  createDutiesMethod = (collection,type) ->
+  createDutiesMethod = (collection,type,kind) ->
     collectionName = collection._name
     switch type
       when "remove"
@@ -100,6 +108,9 @@ share.initMethods = (eventName) ->
           doc = collection.findOne(Id)
           if share.isManagerOrLead(Meteor.userId(),[doc.parentId])
             collection.remove(Id)
+            for k,collection of share.signupCollections
+              do ->
+                collection.update({shiftId: Id},{$set: {status: 'cancelled'}})
           else
             throwError(403, 'Insufficient Permission')
       when "insert"
@@ -205,15 +216,15 @@ share.initMethods = (eventName) ->
 
   for type in ["remove","insert","update"]
     do ->
-      for k,collection of share.orgUnitCollections
+      for kind,collection of share.orgUnitCollections
         do ->
-          createOrgUnitMethod(collection, type)
+          createOrgUnitMethod(collection, type, kind)
 
   for type in ["remove","insert","update","updateGroup"]
     do ->
-      for k,collection of share.dutiesCollections
+      for kind,collection of share.dutiesCollections
         do ->
-          createDutiesMethod(collection,type)
+          createDutiesMethod(collection,type, kind)
 
   for type in ['remove', 'update', 'insert', 'bail']
     do ->
