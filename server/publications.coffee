@@ -454,6 +454,7 @@ share.initPublications = (eventName) ->
   Meteor.publish "#{eventName}.Volunteers.team", (sel={}) ->
     unless share.isManager()
       sel = _.extend(sel,unitPublicPolicy)
+    console.log "I hunt for a bug",sel
     ReactiveAggregate(this, share.Team,
       [ { $match: sel } ].concat(
         teamPipeline.concat( [

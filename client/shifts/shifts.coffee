@@ -208,10 +208,18 @@ Template.addShift.helpers
   }
   'data': () -> parentId: Template.currentData().team?._id
 
-
 ShiftGroups = new SimpleSchema(share.Schemas.Common)
 ShiftGroups.extend(share.SubSchemas.DayDates)
 ShiftGroups.extend(
+  oldshifts:
+    type: Array
+    autoform:
+      panelClass: "d-none"
+  'oldshifts.$':
+    type: share.SubSchemas.Bounds.extend({
+      startTime: String,
+      endTime: String,
+      rotaId: Number })
   shifts:
     type: Array
     minCount: 1
@@ -226,20 +234,17 @@ ShiftGroups.extend(
           afFieldInput:
             type: 'timepicker'
             placeholder: () -> i18n.__("abate:volunteers","start")
-            opts: () ->
-              format: 'HH:mm'
-              datepicker: false
-              formatTime: 'HH:mm'
       endTime:
         type: String
         autoform:
           afFieldInput:
             type: 'timepicker'
             placeholder: () -> i18n.__("abate:volunteers","end")
-            opts: () ->
-              format: 'HH:mm'
-              datepicker: false
-              formatTime: 'HH:mm'
+      rotaId:
+        type: Number
+        optional: true
+        autoform:
+          type: "hidden"
     )
 )
 
@@ -253,8 +258,13 @@ Template.addShiftGroup.helpers
         method: "#{share.eventName}.Volunteers.teamShifts.group.insert",
         label: i18n.__("abate:volunteers","new_shift_group"),
       }
+      update: {
+        id: "UpdateShiftGroupFormId",
+        method: "#{share.eventName}.Volunteers.teamShifts.group.update",
+        label: i18n.__("abate:volunteers","update_group"),
+      },
     }
-  'data': () -> { parentId: Template.currentData().team?._id }
+  'data': () -> Template.currentData()
 
 Template.addTask.bindI18nNamespace('abate:volunteers')
 Template.addTask.helpers
@@ -396,6 +406,7 @@ AutoForm.addHooks([
   'projectSignupsInsert',
   'projectSignupsUpdate',
   'InsertShiftGroupFormId',
+  'UpdateShiftGroupFormId'
 ],
   onSuccess: () ->
     AutoFormComponents.modalHide()

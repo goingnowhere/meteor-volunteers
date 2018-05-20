@@ -40,10 +40,7 @@ commonEvents =
     id = $(event.currentTarget).data('id')
     type = $(event.currentTarget).data('type')
     collection = share.dutiesCollections[type]
-    shift = collection.findOne(id)
-    delete shift._id
-    delete shift.start
-    delete shift.end
+    shift = _.omit(collection.findOne(id),'_id','start','end')
     AutoFormComponents.ModalShowWithTemplate("insertUpdateTemplate",
       { form: {
         collection,
@@ -54,22 +51,41 @@ commonEvents =
     id = $(event.currentTarget).data('id')
     type = $(event.currentTarget).data('type')
     collection = share.dutiesCollections[type]
-    shift = collection.findOne(id)
-    AutoFormComponents.ModalShowWithTemplate("insertUpdateTemplate", {
-      form: {
-        collection,
-        omitFields:"start, end, staffing, min, max, estimatedTime, dueDate",
-        update: {
-          method: "#{collection._name}.group.update",
-          label: i18n.__("abate:volunteers","update_group"),
-        },
-      },
-      data: shift,
-    }, shift.title)
+    protoShift = collection.findOne(id)
+    protoShiftFiltered = _.pick(protoShift,
+      'title', 'description',
+      'priority', 'policy', 'groupId', 'parentId')
+    shiftStartDay = moment(protoShift.start).startOf('day').toDate()
+    shiftStartNextDay = moment(protoShift.start).add(1,'day').startOf('day').toDate()
+    shiftEndDay = moment(protoShift.start).endOf('day').toDate()
+    protoDayShifts = collection.find({
+      groupId: protoShift.groupId,
+      start: { $gte: shiftStartDay , $lt: shiftStartNextDay }
+    }).map(({min, max, start, end, rotaId}) ->
+      startTime = moment(start).format('HH:mm')
+      endTime = moment(end).format('HH:mm')
+      {startTime, endTime, min, max, rotaId}
+    )
+    minDay = collection.find(
+      {groupId: protoShift.groupId},
+      {sort: { start: 1}, limit:1}).fetch()[0]
+    maxDay = collection.find(
+      {groupId: protoShift.groupId},
+      {sort: { start: -1 }, limit: 1}).fetch()[0]
+
+    AutoFormComponents.ModalShowWithTemplate('addShiftGroup',
+      _.extend(protoShiftFiltered,{
+        _id: "fake",
+        start: minDay.start,
+        end: maxDay.start,
+        shifts: protoDayShifts,
+        oldshifts: protoDayShifts})
+    , protoShift.title)
   'click [data-action="delete_group"]': (event,template) ->
     id = $(event.currentTarget).data('id')
     shift = share.TeamShifts.findOne(id)
     share.meteorCall "teamShifts.group.remove", _.pick(shift,['groupId','parentId'])
+
 
 Template.teamShiftsTable.bindI18nNamespace('abate:volunteers')
 Template.teamShiftsTable.onCreated () ->

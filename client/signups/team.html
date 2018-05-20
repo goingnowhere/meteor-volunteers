@@ -6,19 +6,19 @@
     {{#each family in groupedShifts}}
     <thead class="thead-default">
       <tr class="shiftFamily table-active">
-        <td colspan="2"><h5>{{family.title}}</h5></td>
+        <td colspan="3"><h5>{{family.title}}</h5></td>
         <td>
           <button type="button" class="btn btn-default btn-sm"
             data-id="{{family.first._id}}" data-type="shift" data-action="edit_group">
             {{fa "pencil-square-o"}} {{__ ".edit_group"}}
           </button>
         </td>
-        <td>
+        <!-- <td>
           <button type="button" class="btn btn-default btn-sm"
             data-id="{{family.first._id}}" data-type="shift" data-action="add_date">
             {{fa "calendar"}} {{__ ".add_date"}}
           </button>
-        </td>
+        </td> -->
         <td>
           <button type="button" class="btn btn-default btn-sm"
             data-id="{{family.first._id}}" data-type="shift" data-action="delete_group">
@@ -31,7 +31,7 @@
       {{#each shift in family.shifts }}
         <tr class="shift {{family.class}}" data-id="{{shift._id}}" data-type="{{shift.type}}">
           <th scope="row">
-            #{{shift.rotaId}}
+            <!-- #{{shift.rotaId}} -->
             <span>
             {{#if $eq shift.priority "essential"}}
               <span class="text-danger">{{fa "exclamation-circle"}}</span>
@@ -47,9 +47,9 @@
           </td>
           <td>
             <div class="btn-group inline pull-left">
-              <button class="btn btn-sm btn-circle" href="#"
+              <!-- <button class="btn btn-sm btn-circle" href="#"
                 data-action="edit" data-id="{{shift._id}}" data-type="shift">
-                    {{fa "pencil-square-o"}}</button>
+                    {{fa "pencil-square-o"}}</button> -->
               <button class="btn btn-sm btn-circle" href="#"
                 data-action="delete" data-id="{{shift._id}}" data-type="shift">
                     {{fa "trash-o"}}</button>
