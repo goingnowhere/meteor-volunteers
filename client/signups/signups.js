@@ -114,7 +114,10 @@ Template.departmentSignupsList.helpers({
   allSignups: () => {
     const { departmentId } = Template.instance()
     const teamIds = share.Team.find({ parentId: departmentId }).map(t => t._id)
-    const leads = share.LeadSignups.find({ parentId: { $in: teamIds }, status: 'pending' }, { sort: { createdAt: -1 } }).map(signup => ({
+    const leads = share.LeadSignups.find(
+      { parentId: { $in: teamIds }, status: 'pending' },
+      { sort: { createdAt: -1 } },
+    ).map(signup => ({
       ...signup,
       type: 'lead',
       unit: share.Team.findOne(signup.parentId),

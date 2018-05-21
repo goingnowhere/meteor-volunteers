@@ -64,7 +64,7 @@
                 <tbody>
                   {{#each signup in shift.volunteers }}
                     <tr>
-                      <td>{{$incr @index}}</td>
+                      <td>{{$incr @index}} {{#if signup.enrolled}}{{fa "plus-square"}}{{/if}}</td>
                       <td>{{getUserName signup.userId}}</td>
                       <td>
                         <button

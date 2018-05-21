@@ -77,6 +77,12 @@ commonSignups = new SimpleSchema(
       else this.unset()
     autoform:
       omit: true
+  enrolled:
+    type: Boolean
+    optional: true
+    autoform:
+      type: "hidden"
+      defaultValue: false
   status:
     type: String
     allowedValues: ["confirmed", "pending", "refused", "bailed", "cancelled"]

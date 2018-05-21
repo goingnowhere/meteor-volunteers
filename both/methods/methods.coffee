@@ -413,7 +413,7 @@ share.initMethods = (eventName) ->
     else
       return throwError(403, 'Insufficient Permission')
 
-  Meteor.methods "#{prefix}.leadSignups.insert": (doc) ->
+  Meteor.methods "#{prefix}.leadSignups.insert": (doc,enrolled=false) ->
     console.log ["#{prefix}.leadSignups.insert",doc]
     SimpleSchema.validate(doc,share.Schemas.LeadSignups.omit('status'))
     userId = Meteor.userId()
@@ -427,7 +427,9 @@ share.initMethods = (eventName) ->
         signup = _.pick(doc,['userId','shiftId','parentId'])
         # avoid to book the same shift twice
         if Meteor.isServer
-          res = share.LeadSignups.upsert(signup, { $set: {status: doc.status} }, (err,res) ->
+          res = share.LeadSignups.upsert(signup, {
+            $set: {status: doc.status, enrolled}
+          }, (err,res) ->
             unless err
               if lead.policy == "public"
                 Roles.addUsersToRoles(doc.userId, lead.parentId, eventName)
