@@ -177,7 +177,8 @@ share.initMethods = (eventName) ->
               if db.length == 0
                 if Meteor.isServer
                   { start, end, enrolled } = doc
-                  res = collection.upsert(signup,{$set: {status,start,end,enrolled}})
+                  res = collection.upsert(signup,{
+                    $set: {status,start,end,enrolled,notification:false}})
                   if res?.insertedId?
                     return res.insertedId
                   else
@@ -429,12 +430,13 @@ share.initMethods = (eventName) ->
         # avoid to book the same shift twice
         if Meteor.isServer
           { enrolled, status } = doc
-          res = share.LeadSignups.upsert(signup, { $set: {status, enrolled} }, (err,res) ->
-            unless err
-              if lead.policy == "public"
-                Roles.addUsersToRoles(doc.userId, lead.parentId, eventName)
-            else
-              return throwError(501, 'Cannot Insert')
+          res = share.LeadSignups.upsert(signup, {
+            $set: {status, enrolled,notification:false} }, (err,res) ->
+              unless err
+                if lead.policy == "public"
+                  Roles.addUsersToRoles(doc.userId, lead.parentId, eventName)
+              else
+                return throwError(501, 'Cannot Insert')
           )
           # XXX we return an insertedId even if the function is called insert and should
           # return an simple id (or throw and error)
