@@ -100,5 +100,7 @@
   "info": "Information",
   "change_dates": "Change Dates",
   "admin_only": "Admin Only",
-  "delete_rota": "Delete Rota"
+  "delete_rota": "Delete Rota",
+  "voluntold": "VolunTold",
+  "voluntell": "VolunTell"
 }

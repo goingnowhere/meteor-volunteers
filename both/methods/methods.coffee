@@ -153,6 +153,7 @@ share.initMethods = (eventName) ->
           SimpleSchema.validate(doc.modifier, schema, { modifier: true })
           olddoc = collection.findOne(doc._id)
           if share.isManagerOrLead(Meteor.userId(),[olddoc.parentId])
+            doc.modifier.$set.enrolled = false
             collection.update(doc._id, doc.modifier)
           else
             return throwError(403, 'Insufficient Permission')
@@ -175,8 +176,8 @@ share.initMethods = (eventName) ->
               db = doubleBooking(signup,collectionKey)
               if db.length == 0
                 if Meteor.isServer
-                  { start, end } = doc
-                  res = collection.upsert(signup,{$set: {status,start,end}})
+                  { start, end, enrolled } = doc
+                  res = collection.upsert(signup,{$set: {status,start,end,enrolled}})
                   if res?.insertedId?
                     return res.insertedId
                   else
@@ -184,7 +185,7 @@ share.initMethods = (eventName) ->
               else
                 return throwError(409, 'Double Booking', db)
             else
-                return throwError(500, 'Invalid status', db)
+              return throwError(500, 'Invalid status', db)
           else
             return throwError(403, 'Insufficient Permission')
       when "bail"
@@ -195,7 +196,7 @@ share.initMethods = (eventName) ->
           if (sel.userId == userId) || (share.isManagerOrLead(userId,[sel.parentId]))
             # multi : true just in case it is possible to singup for the same shift twice
             # this should not be possible. Failsafe !
-            collection.update(sel, {$set: {status: "bailed"}}, {multi: true})
+            collection.update(sel, {$set: {status: "bailed", enrolled: false}}, {multi: true})
           else
             return throwError(403, 'Insufficient Permission')
 
@@ -413,7 +414,7 @@ share.initMethods = (eventName) ->
     else
       return throwError(403, 'Insufficient Permission')
 
-  Meteor.methods "#{prefix}.leadSignups.insert": (doc,enrolled=false) ->
+  Meteor.methods "#{prefix}.leadSignups.insert": (doc) ->
     console.log ["#{prefix}.leadSignups.insert",doc]
     SimpleSchema.validate(doc,share.Schemas.LeadSignups.omit('status'))
     userId = Meteor.userId()
@@ -427,9 +428,8 @@ share.initMethods = (eventName) ->
         signup = _.pick(doc,['userId','shiftId','parentId'])
         # avoid to book the same shift twice
         if Meteor.isServer
-          res = share.LeadSignups.upsert(signup, {
-            $set: {status: doc.status, enrolled}
-          }, (err,res) ->
+          { enrolled, status } = doc
+          res = share.LeadSignups.upsert(signup, { $set: {status, enrolled} }, (err,res) ->
             unless err
               if lead.policy == "public"
                 Roles.addUsersToRoles(doc.userId, lead.parentId, eventName)

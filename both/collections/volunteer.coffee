@@ -77,12 +77,20 @@ commonSignups = new SimpleSchema(
       else this.unset()
     autoform:
       omit: true
+  # true if the user was enrolled for this shift by an admin
   enrolled:
     type: Boolean
     optional: true
+    defaultValue: false
     autoform:
       type: "hidden"
-      defaultValue: false
+  # true if the notification for this shift was already sent
+  notification:
+    type: Boolean
+    optional: true
+    defaultValue: false
+    autoform:
+      type: "hidden"
   status:
     type: String
     allowedValues: ["confirmed", "pending", "refused", "bailed", "cancelled"]

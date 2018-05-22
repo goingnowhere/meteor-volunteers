@@ -64,7 +64,13 @@
                 <tbody>
                   {{#each signup in shift.volunteers }}
                     <tr>
-                      <td>{{$incr @index}} {{#if signup.enrolled}}{{fa "plus-square"}}{{/if}}</td>
+                      <td>{{$incr @index}}
+                          {{#if signup.enrolled}}
+                            <small data-toggle="tooltip" data-placement="top" title="{{__ '.voluntold'}}">
+                              {{fa "hand-spock-o"}}
+                            </small>
+                          {{/if}}
+                      </td>
                       <td>{{getUserName signup.userId}}</td>
                       <td>
                         <button
