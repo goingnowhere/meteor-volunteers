@@ -71,7 +71,9 @@
                             </small>
                           {{/if}}
                       </td>
-                      <td>{{getUserName signup.userId}}</td>
+                      <td>{{> Template.dynamic template=userInfoTemplate data=signup}}
+                        <!-- {{getUserName signup.userId}} -->
+                      </td>
                       <td>
                         <button
                            class="btn btn-sm btn-circle"

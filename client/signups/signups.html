@@ -1,5 +1,6 @@
 <!-- all Restricted shifts and tasks requests for a given team -->
 <template name="teamSignupsList">
+  {{debug}}
   <ul class="list-group">
     {{#each signup in allSignups}}
       <li class="list-group-item p-2">
@@ -17,7 +18,8 @@
             {{/if}}
           </div>
           <div class="col" data-action="user-info" data-id="{{ signup.userId }}">
-            <button class="btn btn-default btn-sm">{{getUserName signup.userId}}</button>
+            {{> Template.dynamic template=userInfoTemplate data=signup}}
+            <!-- <button class="btn btn-default btn-sm">{{getUserName signup.userId}}</button> -->
             <small>{{__ ".created"}}: {{createdAgo signup.createdAt}}</small>
           </div>
           <div class="col">
