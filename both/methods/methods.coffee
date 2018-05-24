@@ -154,6 +154,7 @@ share.initMethods = (eventName) ->
           olddoc = collection.findOne(doc._id)
           if share.isManagerOrLead(Meteor.userId(),[olddoc.parentId])
             doc.modifier.$set.enrolled = false
+            doc.modifier.$set.reviewed = (olddoc.status == 'pending' && doc.status != 'pending')
             collection.update(doc._id, doc.modifier)
           else
             return throwError(403, 'Insufficient Permission')
@@ -390,7 +391,11 @@ share.initMethods = (eventName) ->
     check(shiftId,String)
     olddoc = share.LeadSignups.findOne(shiftId)
     if share.isManagerOrLead(Meteor.userId(),[olddoc.parentId])
-      share.LeadSignups.update(shiftId, { $set: { status: 'confirmed' } }, (err,res) ->
+      modifier = { $set: {
+        status: 'confirmed',
+        reviewed: (olddoc.status == 'pending')
+      }}
+      share.LeadSignups.update(shiftId, modifier, (err,res) ->
         unless err
           if Meteor.isServer
             Roles.addUsersToRoles(olddoc.userId, olddoc.parentId, eventName)
@@ -405,7 +410,11 @@ share.initMethods = (eventName) ->
     check(shiftId,String)
     olddoc = share.LeadSignups.findOne(shiftId)
     if share.isManagerOrLead(Meteor.userId(),[olddoc.parentId])
-      share.LeadSignups.update(shiftId, { $set: { status: 'refused' } }, (err,res) ->
+      modifier = { $set: {
+        status: 'refused',
+        reviewed: (olddoc.status == 'pending')
+      }}
+      share.LeadSignups.update(shiftId, modifier, (err,res) ->
         unless err
           if Meteor.isServer
             Roles.removeUsersFromRoles(olddoc.userId, olddoc.parentId, eventName)

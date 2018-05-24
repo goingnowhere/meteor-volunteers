@@ -84,19 +84,26 @@ commonSignups = new SimpleSchema(
     defaultValue: false
     autoform:
       type: "hidden"
-  # true if the notification for this shift was already sent
-  notification:
-    type: Boolean
-    optional: true
-    defaultValue: false
-    autoform:
-      type: "hidden"
   status:
     type: String
     allowedValues: ["confirmed", "pending", "refused", "bailed", "cancelled"]
     autoform:
       type: "hidden"
       defaultValue: "pending"
+  # true if the user an admin confirmed or refused the shift
+  reviewed:
+    type: Boolean
+    optional: true
+    defaultValue: false
+    autoform:
+      omit: true
+  # true if the notification for this shift was already sent
+  notification:
+    type: Boolean
+    optional: true
+    defaultValue: false
+    autoform:
+      omit: true
 )
 share.Schemas.ShiftSignups = commonSignups
 share.Schemas.TaskSignups = commonSignups

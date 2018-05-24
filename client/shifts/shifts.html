@@ -15,7 +15,7 @@
             <h5 class="mb-0">{{ duty.length }} {{__ ".shift_length_hours"}}</h5>
           </div>
         </div>
-        <div class="col-4">
+        <div class="col">
           <button
             class="btn btn-action btn-primary"
             data-parent-id="{{duty.parentId}}"
@@ -87,7 +87,7 @@
   {{else}}
     {{> shiftDate }}
   {{/if}}
-  <div class="col-4 p-0">
+  <div class="col p-0">
     {{#if $and signup.status ($neq signup.status 'bailed')}}
       <div class="d-flex">
         <button class="btn btn-action disabled
@@ -175,9 +175,11 @@
         <small title="{{__ priority}}" class="{{#if $eq priority 'essential'}}text-secondary{{else}}text-primary{{/if}}">{{fa "exclamation-circle"}}</small>{{/unless}}
       </h5>
     </div>
+    {{#if team.location}}
     <div class="col-md-3">
       <strong>{{__ ".location"}}</strong> {{team.location}}
     </div>
+    {{/if}}
   </div>
 </template>
 
