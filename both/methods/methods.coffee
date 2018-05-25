@@ -108,9 +108,9 @@ share.initMethods = (eventName) ->
           doc = collection.findOne(Id)
           if share.isManagerOrLead(Meteor.userId(),[doc.parentId])
             collection.remove(Id)
-            for k,collection of share.signupCollections
+            for k,scollection of share.signupCollections
               do ->
-                collection.update({shiftId: Id},{$set: {status: 'cancelled'}})
+                scollection.update({shiftId: Id},{$set: {status: 'cancelled'}})
           else
             throwError(403, 'Insufficient Permission')
       when "insert"
@@ -132,6 +132,12 @@ share.initMethods = (eventName) ->
             throwError(403, 'Insufficient Permission')
       else
         console.warn "type #{type} for #{collectionName} ERROR"
+
+  for type in ["remove","insert","update"]
+    do ->
+      for kind,collection of share.dutiesCollections
+        do ->
+          createDutiesMethod(collection,type, kind)
 
   createSignupMethod = (collectionKey, parentCollection, type) ->
     collection = share[collectionKey]
@@ -207,12 +213,6 @@ share.initMethods = (eventName) ->
       for kind,collection of share.orgUnitCollections
         do ->
           createOrgUnitMethod(collection, type, kind)
-
-  for type in ["remove","insert","update"]
-    do ->
-      for kind,collection of share.dutiesCollections
-        do ->
-          createDutiesMethod(collection,type, kind)
 
   for type in ['remove', 'update', 'insert', 'bail']
     do ->
