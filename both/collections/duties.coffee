@@ -58,9 +58,6 @@ share.Schemas.Common = new SimpleSchema(
   groupId:
     type: String
     optional: true
-    # autoValue: () ->
-    #   if not this.field('groupId').isSet
-    #     Random.id()
     autoform:
       type: "hidden"
   rotaId:
@@ -106,6 +103,7 @@ share.Schemas.TeamShifts = new SimpleSchema()
 share.Schemas.TeamShifts.extend(share.SubSchemas.DayDatesTimes)
 share.Schemas.TeamShifts.extend(share.Schemas.Common)
 share.Schemas.TeamShifts.extend(share.SubSchemas.Bounds)
+share.Schemas.TeamShifts.extend(share.SubSchemas.AssociatedProject)
 
 share.Schemas.Lead = new SimpleSchema(share.Schemas.Common)
 share.Schemas.Lead.extend(

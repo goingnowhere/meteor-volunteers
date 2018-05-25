@@ -55,7 +55,7 @@ share.SubSchemas.DayDates = new SimpleSchema(
     label: () -> i18n.__("abate:volunteers","end")
     custom: () ->
       start = moment(this.field('start').value)
-      unless moment(this.value).isAfter(start)
+      unless moment(this.value).isSameOrAfter(start)
         return "startBeforeEndCustom"
     autoform:
       defaultValue: () ->
@@ -98,4 +98,18 @@ share.SubSchemas.DayDatesTimes = new SimpleSchema(
         opts: () ->
           format: 'DD-MM-YYYY HH:mm'
           defaultTime:'08:00'
+)
+
+# this one is a subschema because it used in the Rota Schema
+share.SubSchemas.AssociatedProject = new SimpleSchema(
+  projectId:
+    type: String
+    label: () -> i18n.__("abate:volunteers",".associated_project")
+    optional: true
+    autoform:
+      type: "select2"
+      options: share.getTeamProjects
+      afFieldHelpText: () -> i18n.__("abate:volunteers",".associated_project_help")
+      afFieldInput:
+        select2Options: () -> {width: '100%'}
 )

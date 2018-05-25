@@ -255,9 +255,9 @@ share.initMethods = (eventName) ->
     console.log ["#{prefix}.teamShifts.group.update", doc]
     doc.modifier.$set.shifts = doc.modifier.$set.shifts.filter(Boolean)
     groupSchema.validate(doc.modifier,{modifier: true})
-    if share.isManagerOrLead(Meteor.userId(),[doc.parentId])
+    { parentId, groupId } = doc.modifier.$set
+    if share.isManagerOrLead(Meteor.userId(),[parentId])
       genericModifier = _.omit(doc.modifier.$set,'shifts','start','end',)
-      { parentId, groupId } = doc.modifier.$set
       { start, end, shifts , oldshifts } = doc.modifier.$set
 
       # remove all shifts that are not in the new range
@@ -277,13 +277,16 @@ share.initMethods = (eventName) ->
           start: {
             $gte: moment(day).startOf('day').toDate(),
             $lt:  moment(day).add(1,'day').startOf('day').toDate() }}
-        # remove first, update what is left later
+        # remove old shifts
         oldshifts.forEach((shiftSpecifics) ->
           { rotaId, startTime, endTime, min, max } = shiftSpecifics
           unless _.find(shifts,(r) -> r.oldRotaId == rotaId)
-            console.log "remove shift for #{day} #{startTime}, #{endTime}, #{rotaId}"
+            console.log "remove shift for #{moment(day).format("DD-MM-YYYY")} #{startTime}, #{endTime}, #{rotaId}"
             share.TeamShifts.remove(_.extend(sel,{rotaId}))
         )
+        # update old shifts and add new shift of a given day
+
+        console.log "looking at ",moment(day).format("DD-MM-YYYY")
         shifts.forEach((shiftSpecifics,idx) ->
           { oldRotaId, rotaId, startTime, endTime, min, max } = shiftSpecifics
           sel.rotaId = oldRotaId
@@ -298,13 +301,12 @@ share.initMethods = (eventName) ->
             min, max, rotaId})
 
           if oldRotaId?
-            console.log "update shift for #{day} #{startTime}, #{endTime}, #{oldRotaId} -> #{rotaId}"
-            share.TeamShifts.update(sel, { $set: modifier })
+            console.log "upsert shift for #{moment(day).format("DD-MM-YYYY")} #{startTime}, #{endTime}, #{oldRotaId} -> #{rotaId}"
+            share.TeamShifts.upsert(sel, { $set: modifier })
           else
-            console.log "insert shift for #{day} #{startTime}, #{endTime}, #{oldRotaId} -> #{rotaId}"
+            console.log "insert shift for #{moment(day).format("DD-MM-YYYY")} #{startTime}, #{endTime}, #{oldRotaId} -> #{rotaId}"
             share.TeamShifts.insert(modifier)
         )
-
       )
     else
       throwError(403, 'Insufficient Permission')
@@ -312,9 +314,9 @@ share.initMethods = (eventName) ->
   Meteor.methods "#{prefix}.teamShifts.group.insert": (group) ->
     console.log ["#{prefix}.teamShifts.group.insert", group]
     groupSchema.validate(group)
-    {shifts, start, end} = group
+    {shifts, start, end, parentId} = group
     details = _.omit(group, 'shifts', 'start', 'end')
-    if share.isManagerOrLead(Meteor.userId(),[group.parentId])
+    if share.isManagerOrLead(Meteor.userId(),[parentId])
       groupId = Random.id()
       _.flatten(Array.from(moment.range(start, end).by('days')).map((day) ->
         shifts.map((shiftSpecifics,rotaId) ->

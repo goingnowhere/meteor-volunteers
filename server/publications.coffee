@@ -219,12 +219,18 @@ share.initPublications = (eventName) ->
       return {
         find: () ->
           if userId == actualUserId || share.isManager()
-            sel = {userId: userId}
-            return signups.find(sel)
+            return signups.find({userId})
           else return null
         children: [
           { find: (signup) -> return duties.find(signup.shiftId) }
-          # { find: (signup) -> return share.Team.find(signup.parentId) }
+          { find: (signup) ->
+            unit = share.Team.find(signup.parentId)
+            if unit.count() > 0
+              return unit
+            else
+              unit = share.Department.find(signup.parentId)
+              return unit
+          }
           {
             find: (signup) ->
               if signup
@@ -258,19 +264,6 @@ share.initPublications = (eventName) ->
                 else return null
               else return null
             children: [
-              # { find: (signup,duty) ->
-              #   if duty
-              #     if type == "TeamShifts" || type == "TeamTasks"
-              #       return share.Team.find(duty.parentId)
-              #     else if type == "Lead"
-              #       t = share.Team.find(duty.parentId)
-              #       if t.count() > 0 then return t else
-              #       dt = share.Department.find(duty.parentId)
-              #       if dt.count() > 0 then return dt else
-              #       dv = share.Division.find(duty.parentId)
-              #       return dv
-              #   else return null
-              # },
               {
                 find: (signup,duty) ->
                   if signup
@@ -289,6 +282,28 @@ share.initPublications = (eventName) ->
   createPublicationDuty("TeamTasks",share.TeamTasks,share.TaskSignups)
   createPublicationDuty("Projects",share.Projects,share.ProjectSignups)
   createPublicationDuty("Lead",share.Lead,share.LeadSignups)
+
+  createPublicationSimpleDuty = (type,duties,signups) ->
+    Meteor.publishComposite("#{eventName}.Volunteers.#{type}.simple", () ->
+      return {
+        find: () -> return duties.find()
+        children: [
+          { find: (duty) ->
+            unit = share.Team.find(duty.parentId)
+            if unit.count() > 0
+              return unit
+            else
+              unit = share.Department.find(duty.parentId)
+              return unit
+          }
+        ]
+      }
+    )
+
+  createPublicationSimpleDuty("TeamShifts")
+  createPublicationSimpleDuty("TeamTasks")
+  createPublicationSimpleDuty("Projects")
+  createPublicationSimpleDuty("Lead")
 
   createPublicationAllDuties = (type,duties,signups) ->
     Meteor.publish "#{eventName}.Volunteers.#{type}", (sel={},limit=10) ->

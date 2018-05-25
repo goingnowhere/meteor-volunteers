@@ -209,15 +209,15 @@ Template.addShift.helpers
   'data': () -> parentId: Template.currentData().team?._id
 
 ShiftGroups = new SimpleSchema(share.Schemas.Common)
+# ShiftGroups.extend(share.SubSchemas.AssociatedProject)
 ShiftGroups.extend(share.SubSchemas.DayDates)
 ShiftGroups.extend(
   oldshifts:
     type: Array
     optional: true
+    minCount: 0
     autoform:
       panelClass: "d-none"
-      minCount: 0
-      defaultValue: []
       afArrayField:
         initialCount: 0
   'oldshifts.$':

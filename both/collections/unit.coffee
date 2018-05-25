@@ -17,6 +17,14 @@ share.getLocationList = (sel={}) ->
   locations = _.union.apply null, share.Team.find(sel).map((team) -> team.location)
   _.map locations, (loc) -> {value: loc, label: loc}
 
+share.getTeamProjects = (sel={}) ->
+  console.log "AAA"
+  share.getProjects(sel).map((project) ->
+    team = share.Team.findOne(project.parentId)
+    console.log "#{team.name} > #{project.title}"
+    return {value: project._id, label: "#{team.name} > #{project.title}"}
+  )
+
 CommonUnit = new SimpleSchema(
   parentId:
     type: String
