@@ -9,19 +9,19 @@
         <td colspan="3"><h5>{{family.title}}</h5></td>
         <td>
           <button type="button" class="btn btn-default btn-sm"
-            data-id="{{family.first._id}}" data-type="shift" data-action="edit_group">
+            data-id="{{getRandomShiftId family.groupId}}" data-type="shift" data-action="edit_group">
             {{fa "pencil-square-o"}} {{__ ".edit_group"}}
           </button>
         </td>
         <!-- <td>
           <button type="button" class="btn btn-default btn-sm"
-            data-id="{{family.first._id}}" data-type="shift" data-action="add_date">
+            data-id="" data-type="shift" data-action="add_date">
             {{fa "calendar"}} {{__ ".add_date"}}
           </button>
         </td> -->
         <td>
           <button type="button" class="btn btn-default btn-sm"
-            data-id="{{family.first._id}}" data-type="shift" data-action="delete_group">
+            data-groupid="{{family.groupId}}" data-parentid="{{_id}}" data-type="shift" data-action="delete_group">
             {{fa "trash-o"}} {{__ ".delete_rota"}}
           </button>
         </td>
@@ -29,7 +29,7 @@
     </thead>
     <tbody>
       {{#each shift in family.shifts }}
-        <tr class="shift {{family.class}}" data-id="{{shift._id}}" data-type="{{shift.type}}">
+        <tr class="shift family-{{family.groupId}}" data-id="{{shift._id}}" data-type="{{shift.type}}">
           <th scope="row">
             <!-- #{{shift.rotaId}} -->
             <span>
@@ -58,7 +58,7 @@
           </td>
         </tr>
         {{#if $gt shift.confirmed 0}}
-          <tr class="shift {{family.class}}">
+          <tr class="shift family-{{family.groupId}}">
             <td colspan="4">
               <table class="table table-borderless">
                 <tbody>

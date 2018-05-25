@@ -48,6 +48,7 @@ commonEvents =
         }, data: shift
       }, shift.title)
   'click [data-action="edit_group"]': (event,template) ->
+    template.shiftUpdateDep.changed()
     id = $(event.currentTarget).data('id')
     type = $(event.currentTarget).data('type')
     collection = share.dutiesCollections[type]
@@ -82,19 +83,21 @@ commonEvents =
         oldshifts: protoDayShifts})
     , protoShift.title)
   'click [data-action="delete_group"]': (event,template) ->
-    id = $(event.currentTarget).data('id')
-    shift = share.TeamShifts.findOne(id)
-    share.meteorCall "teamShifts.group.remove", _.pick(shift,['groupId','parentId'])
+    groupId = $(event.currentTarget).data('groupid')
+    parentId = $(event.currentTarget).data('parentid')
+    share.meteorCall "teamShifts.group.remove", {groupId, parentId}
 
 
 Template.teamShiftsTable.bindI18nNamespace('abate:volunteers')
 Template.teamShiftsTable.onCreated () ->
   template = this
   teamId = template.data._id
-  share.templateSub(template,"ShiftSignups.byTeam",teamId)
   template.shifts = new ReactiveVar([])
   template.grouping = new ReactiveVar(new Set())
+  template.shiftUpdateDep = new Tracker.Dependency
   template.autorun () ->
+    template.shiftUpdateDep.depend()
+    share.templateSub(template,"ShiftSignups.byTeam",teamId)
     if template.subscriptionsReady()
       sel = {parentId: teamId}
       date = Template.currentData().date
@@ -116,10 +119,11 @@ Template.teamShiftsTable.helpers
     .groupBy('groupId')
     .map((v,k) ->
       title: v[0].title
-      first: v[0]
-      class: "family-#{k}"
+      groupId: k
       shifts: v
     ).value()
+  'getRandomShiftId': (groupId) ->
+    share.TeamShifts.findOne({groupId})?._id
 
 Template.teamShiftsTable.events commonEvents
 

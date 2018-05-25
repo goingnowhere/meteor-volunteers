@@ -102,5 +102,7 @@
   "admin_only": "Admin Only",
   "delete_rota": "Delete Rota",
   "voluntold": "VolunTold",
-  "voluntell": "VolunTell"
+  "voluntell": "VolunTell",
+  "associated_project": "Associated Project",
+  "associated_project_help": "The visibility of this shift is restricted to the users enrolled in this project."
 }

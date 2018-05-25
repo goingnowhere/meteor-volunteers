@@ -213,8 +213,13 @@ ShiftGroups.extend(share.SubSchemas.DayDates)
 ShiftGroups.extend(
   oldshifts:
     type: Array
+    optional: true
     autoform:
       panelClass: "d-none"
+      minCount: 0
+      defaultValue: []
+      afArrayField:
+        initialCount: 0
   'oldshifts.$':
     type: share.SubSchemas.Bounds.extend({
       startTime: String,

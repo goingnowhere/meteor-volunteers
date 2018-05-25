@@ -242,7 +242,7 @@ share.initMethods = (eventName) ->
         rotaId: { type: Number, optional: true } })
       optional: true
     }
-    oldshifts: Array,
+    oldshifts: {type: Array, optional: true}
     'oldshifts.$': {
       type: share.SubSchemas.Bounds.extend({
         startTime: String,
@@ -253,6 +253,7 @@ share.initMethods = (eventName) ->
 
   Meteor.methods "#{prefix}.teamShifts.group.update": (doc) ->
     console.log ["#{prefix}.teamShifts.group.update", doc]
+    doc.modifier.$set.shifts = doc.modifier.$set.shifts.filter(Boolean)
     groupSchema.validate(doc.modifier,{modifier: true})
     if share.isManagerOrLead(Meteor.userId(),[doc.parentId])
       genericModifier = _.omit(doc.modifier.$set,'shifts','start','end',)
@@ -276,6 +277,13 @@ share.initMethods = (eventName) ->
           start: {
             $gte: moment(day).startOf('day').toDate(),
             $lt:  moment(day).add(1,'day').startOf('day').toDate() }}
+        # remove first, update what is left later
+        oldshifts.forEach((shiftSpecifics) ->
+          { rotaId, startTime, endTime, min, max } = shiftSpecifics
+          unless _.find(shifts,(r) -> r.oldRotaId == rotaId)
+            console.log "remove shift for #{day} #{startTime}, #{endTime}, #{rotaId}"
+            share.TeamShifts.remove(_.extend(sel,{rotaId}))
+        )
         shifts.forEach((shiftSpecifics,idx) ->
           { oldRotaId, rotaId, startTime, endTime, min, max } = shiftSpecifics
           sel.rotaId = oldRotaId
@@ -290,18 +298,13 @@ share.initMethods = (eventName) ->
             min, max, rotaId})
 
           if oldRotaId?
-            # console.log "update shift for #{day} #{startTime}, #{endTime}, #{oldRotaId} -> #{rotaId}"
+            console.log "update shift for #{day} #{startTime}, #{endTime}, #{oldRotaId} -> #{rotaId}"
             share.TeamShifts.update(sel, { $set: modifier })
           else
-            # console.log "insert shift for #{day} #{startTime}, #{endTime}, #{oldRotaId} -> #{rotaId}"
+            console.log "insert shift for #{day} #{startTime}, #{endTime}, #{oldRotaId} -> #{rotaId}"
             share.TeamShifts.insert(modifier)
         )
-        oldshifts.forEach((shiftSpecifics,idx) ->
-          { rotaId, startTime, endTime, min, max } = shiftSpecifics
-          unless _.find(shifts,(r) -> r.oldRotaId == rotaId)
-            # console.log "remove shift for #{day} #{startTime}, #{endTime}, #{rotaId}"
-            share.TeamShifts.remove(_.extend(sel,{rotaId}))
-        )
+
       )
     else
       throwError(403, 'Insufficient Permission')
