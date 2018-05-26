@@ -89,7 +89,7 @@ Template.signupsList.onCreated () ->
     if quirks and skills
       share.templateSub(template,"team.ByUserPref",quirks,skills,limit)
     else
-      share.templateSub(template,"team",limit)
+      share.templateSub(template,"team")
 
 Template.signupsList.helpers
   'allTeams': () ->
