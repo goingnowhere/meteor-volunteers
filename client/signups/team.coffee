@@ -100,18 +100,18 @@ Template.teamShiftsTable.onCreated () ->
     share.templateSub(template,"ShiftSignups.byTeam",teamId)
     if template.subscriptionsReady()
       sel = {parentId: teamId}
-      date = Template.currentData().date
-      if date
+      currentDate = Template.currentData().date
+      if currentDate
         # this is already a moment object
-        startOfDay = date.clone().startOf('day')
-        endOfDay = date.clone().endOf('day')
+        startOfDay = currentDate.clone().startOf('day')
+        endOfDay = currentDate.clone().endOf('day')
         sel =
           $and: [
             sel,
             { start: { $gte: startOfDay.toDate() , $lte: endOfDay.toDate() } },
           ]
-      shifts = share.getShifts(sel)
-      template.shifts.set(shifts)
+      # getShift is in stats.coffee
+      template.shifts.set(share.getShifts(sel))
 
 Template.teamShiftsTable.helpers
   'groupedShifts': () ->

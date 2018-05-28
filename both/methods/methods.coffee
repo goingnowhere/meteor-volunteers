@@ -460,7 +460,8 @@ share.initMethods = (eventName) ->
           # XXX this part of the code is executed on the client and the LeadSignups
           # that we are inserting might not exist. In theory here we should make a
           # subscription and pull it from the server before trying to 'findOne'
-            return share.LeadSignups.findOne(signup)._id
+            leadsu = share.LeadSignups.findOne(signup)
+            return if leadsu? then leadsu._id
     else
       return throwError(403, 'Insufficient Permission')
 

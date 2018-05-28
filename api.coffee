@@ -52,6 +52,7 @@ class VolunteersClass
       ProjectSignups: share.ProjectSignups
       TaskSignups: share.TaskSignups
       LeadSignups: share.LeadSignups
+      UnitAggregation: share.UnitAggregation
   setPeriods: (periods) -> share.periods.set(periods)
   setTimeZone: (timezone) -> share.timezone.set(timezone)
   setUserForm: (data) -> saveVolunteerForm(@eventName,data)

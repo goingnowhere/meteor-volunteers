@@ -74,7 +74,6 @@ commonSignups = new SimpleSchema(
     optional: true
     autoValue: () ->
       if this.isInsert then return new Date
-      else this.unset()
     autoform:
       omit: true
   # true if the user was enrolled for this shift by an admin

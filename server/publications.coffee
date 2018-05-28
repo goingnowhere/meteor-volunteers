@@ -469,7 +469,6 @@ share.initPublications = (eventName) ->
   Meteor.publish "#{eventName}.Volunteers.team", (sel={}) ->
     unless share.isManager()
       sel = _.extend(sel,unitPublicPolicy)
-    console.log "I hunt for a bug",sel
     ReactiveAggregate(this, share.Team,
       [ { $match: sel } ].concat(
         teamPipeline.concat( [
@@ -492,6 +491,23 @@ share.initPublications = (eventName) ->
     t = share.Team.find(sel)
     dv = share.Division.find(sel)
     return [dv,dp,t]
+
+  Meteor.publish "#{eventName}.Volunteers.unitAggregation.byDepartment", (deptId) ->
+    if this.userId && share.isManagerOrLead(this.userId,[deptId])
+      parentId = deptId
+      dept = share.Department.findOne(parentId)
+      teams = share.Team.find({ parentId }).fetch()
+      share.DepartmentStats(parentId)
+      teams.forEach((team) -> share.TeamStats(team._id))
+      teams.push(dept)
+      share.UnitAggregation.find({_id: {$in: _.pluck(teams,'_id')}})
+    else null
+
+  Meteor.publish "#{eventName}.Volunteers.unitAggregation.byTeam", (teamId) ->
+    if this.userId && share.isManagerOrLead(this.userId,[teamId])
+      share.TeamStats(teamId)
+      share.UnitAggregation.find({_id: teamId})
+    else null
 
   # XXX leads of a non public division should be able to see it
   Meteor.publish "#{eventName}.Volunteers.division", (sel={}) ->

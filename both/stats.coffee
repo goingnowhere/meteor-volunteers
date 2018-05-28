@@ -1,4 +1,3 @@
-import { Promise } from 'meteor/promise';
 import Moment from 'moment'
 import 'moment-timezone'
 import { extendMoment } from 'moment-range'
@@ -6,40 +5,110 @@ import { extendMoment } from 'moment-range'
 moment = extendMoment(Moment)
 moment.tz.setDefault(share.timezone.get())
 
-getDuty = (sel, type, duty, signup) ->
+# signups -> userId list
+uniqueVolunteers = (allSignups) ->
+  if allSignups
+    _.chain(allSignups).map((s) -> s.userId).uniq().value()
+  else []
+
+# (sel,type,duty,signup) -> {
+#   type: string,
+#   duration,
+#   confirmed: int,
+#   needed: int,
+#   volunteers: userId list } list
+# (sel,type,duty,signup) -> duty list
+getDuties = (sel, type, duty, signup) ->
   sort = {sort: {start: 1, priority: 1}}
   duty.find(sel).map((v) ->
-    confirmed = signup.find({status: "confirmed", shiftId: v._id},sort)
-    _.extend(v,
+    confirmedSignups = signup.find({status: "confirmed", shiftId: v._id},sort)
+    signups = confirmedSignups.fetch()
+    volunteers = uniqueVolunteers(signups)
+    volunteerNumber = confirmedSignups.count()
+    return _.extend(v,
       type: type
       duration: moment.duration(v.end - v.start).humanize()
-      confirmed: confirmed.count()
-      volunteers: confirmed.fetch()
-      needed: Math.max(0,v.min - confirmed.count()))
-    return v
+      confirmed: volunteerNumber
+      needed: Math.max(0,v.min - volunteerNumber)
+      volunteers: volunteers
+      signups: signups
+    )
   )
 
 # return a shift/task/lead document together with updated signups information
-share.getShifts = (sel) -> getDuty(sel,"shift",share.TeamShifts,share.ShiftSignups)
-share.getProjects = (sel) -> getDuty(sel,"project",share.Projects,share.ProjectSignups)
-share.getTasks = (sel) -> getDuty(sel,"task",share.TeamTasks,share.TaskSignups)
-share.getLeads = (sel) -> getDuty(sel,"lead",share.Lead,share.LeadSignups)
+share.getShifts = (sel) -> getDuties(sel,"shift",share.TeamShifts,share.ShiftSignups)
+share.getProjects = (sel) -> getDuties(sel,"project",share.Projects,share.ProjectSignups)
+share.getTasks = (sel) -> getDuties(sel,"task",share.TeamTasks,share.TaskSignups)
+share.getLeads = (sel) -> getDuties(sel,"lead",share.Lead,share.LeadSignups)
 
+# sel -> signup list
+getSignups = (sel) ->
+  shifts = share.ShiftSignups.find(sel).fetch()
+  projects = share.ProjectSignups.find(sel).fetch()
+  leads = share.LeadSignups.find(sel).fetch()
+  tasks = share.TaskSignups.find(sel).fetch()
+  return shifts.concat(projects).concat(leads).concat(tasks)
+
+# sel -> userId list
+getVolunteers = (sel) ->
+  allSignups = getSignups(sel)
+  return uniqueVolunteers(allSignups)
+
+# duties -> { needed: int , confirmed: int}
 rate = (l) ->
   _.reduce(l,(
     (acc,shift) -> {
-      needed: acc.needed + shift.min,
-      confirmed: acc.confirmed + shift.confirmed
+      needed: acc.needed + (if shift.min then shift.min else 0),
+      confirmed: acc.confirmed + (if shift.confirmed then shift.confirmed else 0)
     }
   ),{needed: 0, confirmed: 0})
 
-getUnit = (sel,unit,type) ->
+# sel * type -> {
+#   volunteers: userId list,
+#   shiftRate -> { needed: int , confirmed: int},
+#   leadRate -> { needed: int , confirmed: int},
+#   volunteerNumber: int,
+#   teamsNumber: int,
+#   leads : userId list
+#}
+# sel * type -> unit list
+getUnits = (sel,type) ->
+  unit = (
+    if type == "team" then share.Team
+    else if type == "department" then share.Department
+  )
   unit.find(sel).map((u) ->
-    u.leads = share.LeadSignups.find(
-      {status: "confirmed", parentId: u._id}
-      ).map((s) -> return s.userId)
-    if type = "team"
-      u.shiftRate = rate(share.getShifts({parentId: u._id}))
+    if type == "team"
+      shifts = share.getShifts({parentId: u._id})
+      leads = share.getLeads({parentId: u._id})
+      u.volunteers = getVolunteers({parentId: u._id})
+      u.shiftRate = rate(shifts)
+      u.leadRate = rate(leads)
+      u.volunteerNumber = u.volunteers.length
+      u.leads = uniqueVolunteers(share.LeadSignups.find(sel).fetch())
+    if type == "department"
+      teamsOfThisDept = getUnits({parentId: u._id},"team")
+      u.teamsNumber = teamsOfThisDept.length
+      u.shiftRate = _.reduce(teamsOfThisDept,
+          (acc,t) -> (
+            {
+              needed: acc.needed + t.shiftRate.needed,
+              confirmed: acc.confirmed + t.shiftRate.confirmed
+            }
+          ),
+          { needed: 0, confirmed: 0 }
+        )
+      u.leadRate = _.reduce(teamsOfThisDept,
+        (acc,t) -> {
+          needed: acc.needed + t.leadRate.needed,
+          confirmed: acc.confirmed + t.leadRate.confirmed
+        },
+        { needed: 0, confirmed: 0 }
+      )
+      u.volunteerNumber = _.chain(teamsOfThisDept)
+        .map((t) -> t.volunteerNumber)
+        .reduce(((acc,t) -> acc+t), 0 )
+        .value()
     return u
     )
 
@@ -69,58 +138,22 @@ share.projectSignupsConfirmed = (p) ->
     days: dayStrings
   }
 
-class TeamStatsClass
-  constructor: (@teamId) ->
-  # all shifts,tasks,projects that are not yet completely covered
-  # can be ordered by priority to get all the important shifts that are
-  # not covered
-  shiftsLow: () ->
-    _.filter(share.getShifts({parentId: @teamId}),((shift) -> shift.min < shift.signups))
-  tasksLow: () ->
-    _.filter(share.getTasks({parentId: @teamId}),((shift) -> shift.min < shift.signups))
-  projectLow: () ->
-    _.filter(share.getProjects({parentId: @teamId}),((shift) -> shift.min < shift.signups))
-
+share.TeamStats = (parentId) ->
   # All pending requests for tasks, shifts and leads
-  pendingRequests: () ->
-    shifts = share.ShiftSignups.find({parentId: @teamId, status:'pending'})
-    leads = share.LeadSignups.find({parentId: @teamId, status:'pending'})
-    tasks = share.TaskSignups.find({parentId: @teamId, status:'pending'})
-    projects = share.ProjectSignups.find({parentId: @teamId, status:'pending'})
-    shifts.fetch().concat(leads.fetch()).concat(projects.fetch())
+  share.UnitAggregation.upsert(parentId,{ $set: {
+    pendingRequests: getSignups({parentId, status:'pending'})
+    team: getUnits({_id: parentId},"team")[0]
+    volunteerNumber: getVolunteers({parentId}).length
+  }})
 
-  # total number of shifts vs total number of signups
-  shiftRate: () -> rate(share.getShifts({parentId: @teamId}))
-  # total number of tasks vs total number of signups
-  taskRate: () -> rate(share.getTasks({parentId: @teamId}))
-  # total number of volunteers only considering shifts
-  volunteerNumber: () ->
-    _.uniq(share.ShiftSignups.find(
-      {parentId: @teamId},
-      {sort: {userId: 1}, fields: {userId: true}}
-      ).map((s) -> s.userId),true).length
+share.DepartmentStats = (parentId) ->
+  sel = {$or: [{_id: parentId},{parentId}]}
+  share.UnitAggregation.upsert(parentId,{ $set: {
+    dept: getUnits({_id: parentId},"department")[0]
+    volunteerNumber: getVolunteers(sel).length
+  }})
 
-class DepartmentStatsClass
-  constructor: (@departmentId) ->
-  # the list of teams of this Department with associated leads
-  # can get the number by counting and order by teams without lead
-  # or by the shiftRate or pendingRequests
-  teams: () -> getUnit({parentId: @departmentId},share.Team,"team")
-  leadsActivity: () -> []
-  pendingRequests: () -> []
-  # total number of volunteers involved with this Department
-  volunteerRate: () ->
-    _.reduce(getUnit({parentId: @departmentId},share.Team,"team"),
-      (acc,t) -> {
-        needed: acc.needed + t.shiftRate.needed,
-        confirmed: acc.confirmed + t.shiftRate.confirmed
-      }
-    )
-  #signups over time
-
-# TODO
-class DivisionStatsClass
-  constructor: (@divisionId) ->
+share.DivisionStats = (id) ->
   teamsNumber: () -> 0
   teamsWithLead: () -> []
   teamsLowRate: () -> []
@@ -129,6 +162,3 @@ class DivisionStatsClass
   volunteerNumber: () -> 0
   #signups over time
   overallRate: () -> 0
-
-share.TeamStats = (id) -> new TeamStatsClass(id)
-share.DepartmentStats = (id) -> new DepartmentStatsClass(id)

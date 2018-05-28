@@ -66,7 +66,9 @@ Template.signupsListTeam.helpers
       if dutyType in ['lead', 'project']
         sel.type = dutyType
       else
-        shiftGroups = share.shiftGroups.find(sel).map((group) => _.extend(group, {type: 'shift', team}))
+        shiftGroups = share.shiftGroups.find(sel).map(
+          (group) -> _.extend(group, {type: 'shift', team})
+        )
       otherDuties = ShiftTitles.find(sel).fetch()
       return shiftGroups.concat(otherDuties)
     else []

@@ -5,6 +5,8 @@ share.initCollections = (eventName) ->
 
   prefix = "#{eventName}."
 
+  share.UnitAggregation = new Mongo.Collection "#{prefix}Volunteers.unitAggregation"
+  
   share.TimeSeries = new Mongo.Collection "#{prefix}Volunteers.timeSeries"
   share.TimeSeries.attachSchema(share.Schemas.TimeSeries)
   # duties

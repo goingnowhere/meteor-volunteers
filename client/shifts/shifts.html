@@ -31,9 +31,8 @@
 
 <template name="leadListItemGroupped">
   {{#if $and Template.subscriptionsReady ($gt ($len allLeads) 0) }}
-  {{name}}
   <div class="row justify-content-between align-content-center no-gutters">
-    <div class="container-fluid p-0 signupsListItem">
+    <div class="container-fluid signupsListItem">
         {{#each lead in allLeads }}
           {{> leadListItem lead }}
         {{/each}}
@@ -192,7 +191,7 @@
 </template>
 
 <template name="leadTitle">
-  <h5 class="mb-1 mr-auto"><small>{{fa "user-circle"}}</small> {{__ ".lead"}}: {{team.name}}</h5>
+  <h5 class="mb-1 mr-auto"><small>{{fa "user-circle"}}</small>{{team.name}}</h5>
 </template>
 
 <!-- Create a new shift give for a given team
@@ -303,16 +302,23 @@
 
 <template name="leadBody">
   <div class="row no-gutters">
-    <p class="card-text">{{description}}</p>
+    <p class="card-text">
+      <strong>{{__ ".title"}}: </strong>{{title}}<br><br>
+      {{description}}
+    </p>
   </div>
+  {{#if responsibilities }}
   <div class="row no-gutters">
     <h5 class="mb-2 text-muted">{{__ ".responsibilities"}}</h5>
     <p class="card-text"> {{responsibilities}}</p>
   </div>
+  {{/if}}
+  {{#if qualificatons }}
   <div class="row no-gutters">
     <h5 class="mb-2 text-muted">{{__ ".qualificatons"}}</h5>
     <p class="card-text">{{qualificatons}}</p>
   </div>
+  {{/if}}
 </template>
 
 <template name="shiftBody">

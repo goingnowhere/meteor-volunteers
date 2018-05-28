@@ -15,46 +15,39 @@ Template.teamSignupsList.onCreated(function onCreated() {
   const template = this
   const teamId = template.data._id
   template.signups = new ReactiveVar([])
-  const signupSubs = [
-    share.templateSub(template, 'ShiftSignups.byTeam', teamId),
-    share.templateSub(template, 'TaskSignups.byTeam', teamId),
-    share.templateSub(template, 'ProjectSignups.byTeam', teamId),
-    share.templateSub(template, 'LeadSignups.byTeam', template.teamId),
-  ]
+  share.templateSub(template, 'ShiftSignups.byTeam', teamId)
+  share.templateSub(template, 'TaskSignups.byTeam', teamId)
+  share.templateSub(template, 'ProjectSignups.byTeam', teamId)
+  share.templateSub(template, 'LeadSignups.byTeam', template.teamId)
   template.autorun(() => {
-    if (signupSubs.every(sub => sub.ready())) {
-      const shifts = share.ShiftSignups.find({ parentId: teamId, status: 'pending' }, { sort: { createdAt: -1 } })
-        .map(signup => ({
-          ...signup,
-          type: 'shift',
-          duty: share.TeamShifts.findOne(signup.shiftId),
-        }))
-      const tasks = share.TaskSignups.find({ parentId: teamId, status: 'pending' }, { sort: { createdAt: -1 } })
-        .map(signup => ({
-          ...signup,
-          type: 'task',
-          duty: share.TeamTasks.findOne(signup.shiftId),
-        }))
-      const projects = share.ProjectSignups.find({ parentId: teamId, status: 'pending' }, { sort: { createdAt: -1 } })
-        .map(signup => ({
-          ...signup,
-          type: 'project',
-          duty: share.Projects.findOne(signup.shiftId),
-        }))
-      const leads = share.LeadSignups.find({ parentId: teamId, status: 'pending' }, { sort: { createdAt: -1 } })
-        .map(signup => ({
-          ...signup,
-          type: 'lead',
-          duty: share.Lead.findOne(signup.shiftId),
-        }))
+    if (template.subscriptionsReady()) {
+      const sel = { parentId: teamId, status: 'pending' }
+      const shifts = share.ShiftSignups.find(sel).map(signup => ({
+        ...signup,
+        type: 'shift',
+        duty: share.TeamShifts.findOne(signup.shiftId),
+      }))
+      const tasks = share.TaskSignups.find(sel).map(signup => ({
+        ...signup,
+        type: 'task',
+        duty: share.TeamTasks.findOne(signup.shiftId),
+      }))
+      const projects = share.ProjectSignups.find(sel).map(signup => ({
+        ...signup,
+        type: 'project',
+        duty: share.Projects.findOne(signup.shiftId),
+      }))
+      const leads = share.LeadSignups.find(sel).map(signup => ({
+        ...signup,
+        type: 'lead',
+        duty: share.Lead.findOne(signup.shiftId),
+      }))
       const signups = [
         ...shifts,
         ...tasks,
         ...projects,
         ...leads,
       ].sort((a, b) => a.createdAt && b.createdAt && a.createdAt.getTime() - b.createdAt.getTime())
-
-      share.templateSub(template, 'volunteerForm.list', signups.map(signup => signup.userId))
       template.signups.set(signups)
     }
   })
@@ -64,9 +57,8 @@ Template.teamSignupsList.helpers({
   allSignups() {
     return Template.instance().signups.get()
   },
-  createdAgo(date) {
-    return moment(date).fromNow()
-  },
+  /* XXX this does not work. date is undefined because createdAt is not there ... */
+  createdAgo(date) { return moment(date).fromNow() },
 })
 
 Template.teamSignupsList.events({
@@ -113,11 +105,9 @@ Template.departmentSignupsList.onCreated(function onCreated() {
 Template.departmentSignupsList.helpers({
   allSignups: () => {
     const { departmentId } = Template.instance()
-    const teamIds = share.Team.find({ parentId: departmentId }).map(t => t._id)
-    const leads = share.LeadSignups.find(
-      { parentId: { $in: teamIds }, status: 'pending' },
-      { sort: { createdAt: -1 } },
-    ).map(signup => ({
+    const teamIds = _.pluck(share.Team.find({ parentId: departmentId }, { _id: 1 }), '_id')
+    const sel = { parentId: { $in: teamIds }, status: 'pending' }
+    const leads = share.LeadSignups.find(sel).map(signup => ({
       ...signup,
       type: 'lead',
       unit: share.Team.findOne(signup.parentId),
