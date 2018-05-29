@@ -104,5 +104,7 @@
   "voluntold": "VolunTold",
   "voluntell": "VolunTell",
   "associated_project": "Associated Project",
-  "associated_project_help": "The visibility of this shift is restricted to the users enrolled in this project."
+  "associated_project_help": "The visibility of this shift is restricted to the users enrolled in this project.",
+  "more_needed": "More needed",
+  "full": "Full"
 }
