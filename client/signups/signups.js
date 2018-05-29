@@ -105,7 +105,8 @@ Template.departmentSignupsList.onCreated(function onCreated() {
 Template.departmentSignupsList.helpers({
   allSignups: () => {
     const { departmentId } = Template.instance()
-    const teamIds = _.pluck(share.Team.find({ parentId: departmentId }, { _id: 1 }), '_id')
+    const teams = share.Team.find({ parentId: departmentId }, { _id: 1 }).fetch()
+    const teamIds = _.pluck(teams, '_id')
     const sel = { parentId: { $in: teamIds }, status: 'pending' }
     const leads = share.LeadSignups.find(sel).map(signup => ({
       ...signup,

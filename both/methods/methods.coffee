@@ -462,6 +462,7 @@ share.initMethods = (eventName) ->
           # subscription and pull it from the server before trying to 'findOne'
             leadsu = share.LeadSignups.findOne(signup)
             return if leadsu? then leadsu._id
+            
     else
       return throwError(403, 'Insufficient Permission')
 

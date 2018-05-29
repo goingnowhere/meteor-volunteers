@@ -8,7 +8,10 @@ moment.tz.setDefault(share.timezone.get())
 # signups -> userId list
 uniqueVolunteers = (allSignups) ->
   if allSignups
-    _.chain(allSignups).map((s) -> s.userId).uniq().value()
+    _.chain(allSignups)
+    .pluck('userId')
+    .uniq()
+    .value()
   else []
 
 # (sel,type,duty,signup) -> {
