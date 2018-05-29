@@ -56,9 +56,9 @@
           </td>
           <td>
             <div class="btn-group inline pull-left">
-              <!-- <button class="btn btn-sm btn-circle" href="#"
+              <button class="btn btn-sm btn-circle" href="#"
                 data-action="edit" data-id="{{shift._id}}" data-type="shift">
-                    {{fa "pencil-square-o"}}</button> -->
+                    {{fa "pencil-square-o"}}</button>
               <button class="btn btn-sm btn-circle" href="#"
                 data-action="delete" data-id="{{shift._id}}" data-type="shift">
                     {{fa "trash-o"}}</button>
@@ -80,9 +80,7 @@
                             </small>
                           {{/if}}
                       </td>
-                      <td>{{> Template.dynamic template=userInfoTemplate data=signup}}
-                        <!-- {{getUserName signup.userId}} -->
-                      </td>
+                      <td> {{> Template.dynamic template=userInfoTemplate data=signup}} </td>
                       <td>
                         <button
                            class="btn btn-sm btn-circle"
@@ -156,7 +154,7 @@
                 {{#each signup in project.volunteers }}
                   <tr>
                     <td>{{$incr @index}}</td>
-                    <td>{{getUserName signup.userId}}</td>
+                    <td> {{> Template.dynamic template=userInfoTemplate data=signup}} </td>
                     <td>{{formatDate signup.start}}</td>
                     <td>{{formatDate signup.end}}</td>
                     <td>
