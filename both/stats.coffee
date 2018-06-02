@@ -91,6 +91,7 @@ getUnits = (sel,type) ->
       u.leads = uniqueVolunteers(share.LeadSignups.find(sel).fetch())
     if type == "department"
       teamsOfThisDept = getUnits({parentId: u._id},"team")
+      u.teamIds = _.pluck(teamsOfThisDept,'_id')
       u.teamsNumber = teamsOfThisDept.length
       u.shiftRate = _.reduce(teamsOfThisDept,
           (acc,t) -> (
@@ -143,18 +144,23 @@ share.projectSignupsConfirmed = (p) ->
 
 share.TeamStats = (parentId) ->
   # All pending requests for tasks, shifts and leads
-  share.UnitAggregation.upsert(parentId,{ $set: {
+  stats = {
     pendingRequests: getSignups({parentId, status:'pending'})
     team: getUnits({_id: parentId},"team")[0]
     volunteerNumber: getVolunteers({parentId}).length
-  }})
+  }
+  share.UnitAggregation.upsert(parentId,{ $set: stats })
+  return stats
 
 share.DepartmentStats = (parentId) ->
   sel = {$or: [{_id: parentId},{parentId}]}
-  share.UnitAggregation.upsert(parentId,{ $set: {
-    dept: getUnits({_id: parentId},"department")[0]
-    volunteerNumber: getVolunteers(sel).length
-  }})
+  dept = getUnits({_id: parentId},"department")[0]
+  signupSel = { parentId: {$in: dept.teamIds}, status: 'pending'}
+  pendingLeadRequests = share.LeadSignups.find(signupSel).count()
+  volunteerNumber = getVolunteers(sel).length
+  stats =  { dept, volunteerNumber, pendingLeadRequests }
+  share.UnitAggregation.upsert(parentId,{ $set: stats })
+  return stats
 
 share.DivisionStats = (id) ->
   teamsNumber: () -> 0

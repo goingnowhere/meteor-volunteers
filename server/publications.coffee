@@ -495,12 +495,10 @@ share.initPublications = (eventName) ->
   Meteor.publish "#{eventName}.Volunteers.unitAggregation.byDepartment", (deptId) ->
     if this.userId && share.isManagerOrLead(this.userId,[deptId])
       parentId = deptId
-      dept = share.Department.findOne(parentId)
-      teams = share.Team.find({ parentId }).fetch()
-      share.DepartmentStats(parentId)
-      teams.forEach((team) -> share.TeamStats(team._id))
-      teams.push(dept)
-      share.UnitAggregation.find({_id: {$in: _.pluck(teams,'_id')}})
+      stats = share.DepartmentStats(parentId)
+      teamIds = stats.dept.teamIds
+      teamIds.push(parentId)
+      share.UnitAggregation.find({_id: {$in: teamIds}})
     else null
 
   Meteor.publish "#{eventName}.Volunteers.unitAggregation.byTeam", (teamId) ->
