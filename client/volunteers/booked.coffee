@@ -29,7 +29,6 @@ events =
       else
         break
     duty = _.extend(duty, {team})
-    console.log duty
     AutoFormComponents.ModalShowWithTemplate("dutyListItem",duty)
 
   'click [data-action="bail"]': ( event, template ) ->
@@ -65,7 +64,9 @@ Template.bookedTable.helpers
       .map((signup) -> _.extend({}, signup, {type: 'project'}))
     leadSignups = share.LeadSignups.find({status: "pending"})
       .map((signup) -> _.extend({}, signup, {type: 'lead'}))
-    return leadSignups.concat(shiftSignups.concat(projectSignups))
+    _.chain(leadSignups.concat(shiftSignups.concat(projectSignups)))
+    .sortBy((s) -> s.start)
+    .value()
 
 Template.bookedTable.events events
 
