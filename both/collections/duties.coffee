@@ -41,6 +41,13 @@ share.Schemas.Common = new SimpleSchema(
     autoform:
       afFieldHelpText: () -> i18n.__("abate:volunteers","description_help_duty")
       rows: 5
+  information:
+    type: String
+    label: () -> i18n.__("abate:volunteers","practical_information")
+    optional: true
+    autoform:
+      afFieldHelpText: () -> i18n.__("abate:volunteers","practical_information_help_duty")
+      rows: 5
   priority:
     type: String
     label: () -> i18n.__("abate:volunteers","priority")

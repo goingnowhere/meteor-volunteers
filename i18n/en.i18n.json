@@ -106,5 +106,7 @@
   "associated_project": "Associated Project",
   "associated_project_help": "The visibility of this shift is restricted to the users enrolled in this project.",
   "more_needed": "More needed",
-  "full": "Full"
+  "full": "Full",
+  "practical_information": "Practical Information",
+  "practical_information_help_duty": "Write here all practical information specific to this shift (where to meet, what to wear, what to bring, etc.). This is going to be sent to each volunteer before the shift"
 }
