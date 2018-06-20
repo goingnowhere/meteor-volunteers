@@ -87,6 +87,34 @@ commonEvents =
     parentId = $(event.currentTarget).data('parentid')
     share.meteorCall "teamShifts.group.remove", {groupId, parentId}
 
+Template.teamShiftsRota.bindI18nNamespace('abate:volunteers')
+Template.teamShiftsRota.onCreated () ->
+  template = this
+  teamId = template.data._id
+  template.shifts = new ReactiveVar([])
+  template.grouping = new ReactiveVar(new Set())
+  template.shiftUpdateDep = new Tracker.Dependency
+  share.templateSub(template,"ShiftSignups.byTeam",teamId)
+  template.autorun () ->
+    if template.subscriptionsReady()
+      sel = {parentId: teamId}
+      template.shifts.set(share.getShifts(sel))
+
+Template.teamShiftsRota.helpers
+  'groupedShifts': () ->
+    _.chain(Template.instance().shifts.get())
+    .map((s) -> _.extend(s,{ startday: moment(s.start).format("MM-DD-YY")}) )
+    .groupBy('startday')
+    .map((v1,k1) ->
+      day: k1
+      shifts: _.chain(v1)
+        .groupBy('groupId')
+        .map((v,k) ->
+          title: v[0].title
+          groupId: k
+          shifts: v
+        ).value()
+    ).value()
 
 Template.teamShiftsTable.bindI18nNamespace('abate:volunteers')
 Template.teamShiftsTable.onCreated () ->

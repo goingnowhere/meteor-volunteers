@@ -104,6 +104,60 @@
   </table>
 </template>
 
+<template name="teamShiftsRota">
+  <div class="container">
+    <div class="row">
+      <div class="col">
+        {{#each day in groupedShifts}}
+          <div class="card">
+            <div class="card-header"><h4 div="card-title">Shift for the day : {{day.day}}</h4></div>
+            <div class="card-body">
+              <table class="table">
+                {{#each family in day.shifts}}
+                <thead class="thead-default">
+                  <tr class="shiftFamily table-active">
+                    <td colspan="3"><h5>{{family.title}}</h5></td>
+                  </tr>
+                </thead>
+                <tbody>
+                  {{#each shift in family.shifts }}
+                    <tr class="shift family-{{family.groupId}}" data-id="{{shift._id}}" data-type="{{shift.type}}">
+                      <td> <h2>{{> shiftDateInline shift}} </h2></td>
+                      <td colspan="2">
+                        {{#if $neq shift.needed 0}}
+                          <span class="inline">{{shift.needed}} {{__ ".more_needed"}}</span>
+                        {{else}}
+                            {{__ ".full"}}
+                        {{/if}}
+                      </td>
+                    </tr>
+                    {{#if $gt shift.confirmed 0}}
+                      <tr class="shift family-{{family.groupId}}">
+                        <td colspan="4"><tr>
+                          <ul>
+                            {{#each signup in shift.signups }}
+                              <li>
+                                <!-- {{> Template.dynamic template=userInfoTemplate data=signup}} -->
+                                {{getUserName signup.userId}}
+                              </li>
+                            {{/each}}
+                          </ul>
+                          </tr>
+                        </td>
+                      </tr>
+                    {{/if}}
+                  {{/each}}
+                </tbody>
+                {{/each}}
+              </table>
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</template>
+
 <!-- used to display all projects for a given team
      Args: team
 -->
