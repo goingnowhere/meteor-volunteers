@@ -6,7 +6,7 @@
     {{#each family in groupedShifts}}
     <thead class="thead-default">
       <tr class="shiftFamily table-active">
-        <td colspan="3"><h5>{{family.title}}</h5></td>
+        <td colspan="4"><h5>{{family.title}}</h5></td>
         <td>
           <button type="button" class="btn btn-default btn-sm"
             data-id="{{getRandomShiftId family.groupId}}" data-type="shift" data-action="edit_group">
@@ -19,12 +19,13 @@
             {{fa "calendar"}} {{__ ".add_date"}}
           </button>
         </td> -->
-        <td>
+<!--        <td>
           <button type="button" class="btn btn-default btn-sm"
             data-groupid="{{family.groupId}}" data-parentid="{{_id}}" data-type="shift" data-action="delete_group">
             {{fa "trash-o"}} {{__ ".delete_rota"}}
           </button>
         </td>
+-->
       </tr>
     </thead>
     <tbody>
@@ -116,14 +117,14 @@
                 {{#each family in day.shifts}}
                 <thead class="thead-default">
                   <tr class="shiftFamily table-active">
-                    <td colspan="3"><h5>{{family.title}}</h5></td>
+                    <td colspan="2"><h5>{{family.title}}</h5></td>
                   </tr>
                 </thead>
                 <tbody>
                   {{#each shift in family.shifts }}
                     <tr class="shift family-{{family.groupId}}" data-id="{{shift._id}}" data-type="{{shift.type}}">
                       <td> <h2>{{> shiftDateInline shift}} </h2></td>
-                      <td colspan="2">
+                      <td>
                         {{#if $neq shift.needed 0}}
                           <span class="inline">{{shift.needed}} {{__ ".more_needed"}}</span>
                         {{else}}
@@ -133,7 +134,7 @@
                     </tr>
                     {{#if $gt shift.confirmed 0}}
                       <tr class="shift family-{{family.groupId}}">
-                        <td colspan="4"><tr>
+                        <td colspan="2">
                           <ul>
                             {{#each signup in shift.signups }}
                               <li>
@@ -142,7 +143,6 @@
                               </li>
                             {{/each}}
                           </ul>
-                          </tr>
                         </td>
                       </tr>
                     {{/if}}
