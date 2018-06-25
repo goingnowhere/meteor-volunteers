@@ -139,7 +139,7 @@
                             {{#each signup in shift.signups }}
                               <li>
                                 <!-- {{> Template.dynamic template=userInfoTemplate data=signup}} -->
-                                {{getUserName signup.userId}}
+								{{getUserName signup.userId}}  - <a href="mailto:{{getUserEmail signup.userId}}">{{getUserEmail signup.userId}}</a>
                               </li>
                             {{/each}}
                           </ul>
