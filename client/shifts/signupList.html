@@ -2,7 +2,7 @@
   <div class="container-fluid p-0">
     {{#each team in allTeams }}
       {{#if $eq dutyType 'lead' }}
-        {{> leadListItemGroupped team }}
+        <div>{{> React component=LeadListItemGrouped teamId=team._id }}</div>
       {{else }}
         {{> signupsListTeam team=team filters=filters dutyType=dutyType }}
       {{/if}}

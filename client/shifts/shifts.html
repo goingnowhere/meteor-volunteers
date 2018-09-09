@@ -29,57 +29,6 @@
   {{/if}}
 </template>
 
-<template name="leadListItemGroupped">
-  {{#if $and Template.subscriptionsReady ($gt ($len allLeads) 0) }}
-  <div class="row justify-content-between align-content-center no-gutters">
-    <div class="container-fluid signupsListItem">
-        {{#each lead in allLeads }}
-          {{> leadListItem lead }}
-        {{/each}}
-      {{#if loadMore}}
-        <div class="row align-content-right no-gutters">
-          <div class="col-md-2 offset-md-8">
-            <button class="btn btn-default btn-primary"
-              data-action="loadMoreLeads">{{__ ".load_more_leads"}}</button>
-          </div>
-        </div>
-      {{/if}}
-    </div>
-  </div>
-  {{/if}}
-</template>
-
-<template name="leadListItem">
-  <div class="row justify-content-between align-content-center no-gutters">
-    <div class="col-lg-6 col-md-8 col-sm-10">
-      {{> leadTitle }}
-    </div>
-    <div class="col">
-      {{#if $and signup.status ($neq signup.status 'bailed')}}
-        <button class="btn btn-default btn-action disabled
-          {{#if $eq signup.status 'confirmed'}}btn-success{{/if}}">
-          {{__ signup.status }}
-        </button>
-      {{else}}
-        {{#unless $eq policy "adminOnly"}}
-          <button class="btn btn-primary btn-action" data-shiftid="{{_id}}"
-            data-parentid="{{parentId}}" data-type="{{type}}" data-action="apply">
-            {{#if $eq policy "public"}}{{__ ".join"}}{{/if}}
-            {{#if $eq policy "requireApproval"}}{{__ ".apply"}}{{/if}}
-          </button>
-        {{else}}
-          {{__ ".admin_only"}}
-        {{/unless}}
-      {{/if}}
-    </div>
-  </div>
-  <div class="row">
-    <div class="col">
-      {{> leadBody }}
-    </div>
-  </div>
-</template>
-
 <template name="dutiesListItemDate">
   {{#if $eq type "project"}}
     {{> projectDate }}
@@ -154,44 +103,14 @@
 
 <template name="dutiesListItemTitle">
   {{#if $eq type "shift"}}
-    {{> shiftTitle }}
+    <div>{{> React component=ShiftTitle team=team title=title priority=priority }}</div>
   {{/if}}
   {{#if $eq type "task"}}
-    {{> taskTitle }}
+    <div>{{> React component=TaskTitle team=team title=title }}</div>
   {{/if}}
   {{#if $eq type "project"}}
-    {{> projectTitle }}
+    <div>{{> React component=ProjectTitle team=team title=title }}</div>
   {{/if}}
-</template>
-
-<!-- helper display to format the date of a task. used in dutiesListItem and ... -->
-<template name="shiftTitle">
-  <div class="row">
-    <div class="col">
-      <h5 class="mb-1 mr-auto">
-        <small>{{fa "calendar"}} </small>
-        {{team.name}} &gt; {{title}}{{#unless $eq priority 'normal'}}
-        <small title="{{__ priority}}" class="{{#if $eq priority 'essential'}}text-secondary{{else}}text-primary{{/if}}">{{fa "exclamation-circle"}}</small>{{/unless}}
-      </h5>
-    </div>
-    {{#if team.location}}
-    <div class="col-md-3">
-      <strong>{{__ ".location"}}</strong> {{team.location}}
-    </div>
-    {{/if}}
-  </div>
-</template>
-
-<template name="taskTitle">
-  <h5 class="mb-1 mr-auto"><small>{{fa "tasks"}} </small>{{team.name}} &gt; {{title}}</h5>
-</template>
-
-<template name="projectTitle">
-  <h5 class="mb-1 mr-auto"><small>{{fa "calendar-o"}} </small>{{team.name}} &gt; {{title}}</h5>
-</template>
-
-<template name="leadTitle">
-  <h5 class="mb-1 mr-auto"><small>{{fa "user-circle"}}</small>{{team.name}}</h5>
 </template>
 
 <!-- Create a new shift give for a given team
@@ -298,27 +217,6 @@
 <template name="taskDate">
   <!-- <div class="row">{{> taskDate duty}}</div> -->
   <div class="row">{{__ ".estimated_time"}} {{estimatedTime}}</div>
-</template>
-
-<template name="leadBody">
-  <div class="row no-gutters">
-    <p class="card-text">
-      <strong>{{__ ".title"}}: </strong>{{title}}<br><br>
-      {{description}}
-    </p>
-  </div>
-  {{#if responsibilities }}
-  <div class="row no-gutters">
-    <h5 class="mb-2 text-muted">{{__ ".responsibilities"}}</h5>
-    <p class="card-text"> {{responsibilities}}</p>
-  </div>
-  {{/if}}
-  {{#if qualificatons }}
-  <div class="row no-gutters">
-    <h5 class="mb-2 text-muted">{{__ ".qualificatons"}}</h5>
-    <p class="card-text">{{qualificatons}}</p>
-  </div>
-  {{/if}}
 </template>
 
 <template name="shiftBody">

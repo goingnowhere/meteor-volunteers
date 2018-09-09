@@ -1,4 +1,5 @@
 import SimpleSchema from 'simpl-schema'
+import { LeadListItemGroupedContainer } from '../components/shifts/LeadListItemGrouped.jsx'
 
 ShiftTitles = new Mongo.Collection(null)
 
@@ -94,6 +95,7 @@ Template.signupsList.onCreated () ->
       share.templateSub(template,"team")
 
 Template.signupsList.helpers
+  LeadListItemGrouped: () -> LeadListItemGroupedContainer,
   'allTeams': () ->
     template = Template.instance()
     limit = template.limit.get()

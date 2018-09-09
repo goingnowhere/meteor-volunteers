@@ -11,6 +11,9 @@ Npm.depends({
   chartjs: '0.3.24',
   'moment-range': '3.1.1',
   'moment-timezone': '0.5.16',
+  react: '16.5.0',
+  'react-dom': '16.5.0',
+  'react-fontawesome': '1.6.1',
 })
 
 Package.onUse((api) => {
@@ -48,6 +51,8 @@ Package.onUse((api) => {
     'natestrauser:select2@4.0.3',
     'abate:autoform-datetimepicker',
     'peppelg:bootstrap-3-modal',
+    'react-template-helper',
+    'react-meteor-data',
   ], 'client')
 
   api.use([

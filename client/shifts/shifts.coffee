@@ -4,8 +4,18 @@ import Moment from 'moment'
 import 'moment-timezone'
 import { extendMoment } from 'moment-range'
 
+import { ShiftTitle } from '../components/shifts/ShiftTitle';
+import { TaskTitle } from '../components/shifts/TaskTitle';
+import { ProjectTitle } from '../components/shifts/ProjectTitle';
+
 moment = extendMoment(Moment)
 moment.tz.setDefault(share.timezone.get())
+
+Template.dutiesListItemTitle.helpers({
+  ShiftTitle: () -> ShiftTitle,
+  TaskTitle: () -> TaskTitle,
+  ProjectTitle: () -> ProjectTitle,
+})
 
 getTeam = (type,parentId) ->
   switch type
@@ -39,56 +49,6 @@ addLocalDatesCollection = (duties,type,filter) ->
       )
     DatesLocal.upsert(duty._id,duty)
   )
-
-Template.leadListItemGroupped.bindI18nNamespace('abate:volunteers')
-Template.leadListItemGroupped.onCreated () ->
-  template = this
-  team = template.data
-  template.limit = new ReactiveVar(2)
-  userId = Meteor.userId()
-
-  sel = {parentId: team._id}
-  template.autorun () ->
-    limit = template.limit.get()
-    share.templateSub(template,"Lead",sel,limit)
-    share.templateSub(template,"LeadSignups.byUser", userId)
-
-Template.leadListItemGroupped.helpers
-  'loadMore': () ->
-    template = Template.instance()
-    team = Template.currentData()
-    if team
-      sel = {parentId: team._id}
-      share.Lead.find(sel).count() >= template.limit.get()
-  'allLeads': () ->
-    template = Template.instance()
-    team = Template.currentData()
-    userId = Meteor.userId()
-    if team
-      sel = {parentId: team._id}
-      leads = share.Lead.find(sel).map((lead) ->
-        lead.team = getTeam('lead',lead.parentId)
-        sel = {userId: userId, shiftId: lead._id}
-        lead.signup = share.LeadSignups.findOne(sel)
-        lead.type = 'lead'
-        return lead
-      )
-      # _.filter(leads,(lead) -> ! lead.signup.status? )
-      leads
-
-Template.leadListItemGroupped.events
-  'click [data-action="loadMoreLeads"]': ( event, template ) ->
-    limit = template.limit.get()
-    template.limit.set(limit+2)
-
-Template.leadListItemGroupped.events
-  'click [data-action="apply"]': ( event, template ) ->
-    shiftId = $(event.currentTarget).data('shiftid')
-    type = $(event.currentTarget).data('type')
-    parentId = $(event.currentTarget).data('parentid')
-    userId = Meteor.userId()
-    doc = {parentId: parentId, shiftId: shiftId, userId: userId}
-    share.meteorCall "#{type}Signups.insert", doc
 
 Template.signupModal.onCreated () ->
   template = this
