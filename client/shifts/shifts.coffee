@@ -4,17 +4,14 @@ import Moment from 'moment'
 import 'moment-timezone'
 import { extendMoment } from 'moment-range'
 
-import { ShiftTitle } from '../components/shifts/ShiftTitle';
-import { TaskTitle } from '../components/shifts/TaskTitle';
-import { ProjectTitle } from '../components/shifts/ProjectTitle';
+import { DutiesListItem } from '../components/shifts/DutiesListItem';
+import { DutyBody } from '../components/shifts/DutyBody';
 
 moment = extendMoment(Moment)
 moment.tz.setDefault(share.timezone.get())
 
-Template.dutiesListItemTitle.helpers({
-  ShiftTitle: () -> ShiftTitle,
-  TaskTitle: () -> TaskTitle,
-  ProjectTitle: () -> ProjectTitle,
+Template.dutyListItem.helpers({
+  DutiesListItem: () -> DutiesListItem,
 })
 
 getTeam = (type,parentId) ->
@@ -92,6 +89,9 @@ Template.dutiesListItemGroupped.events
       parentId,
       dutyType,
     })
+Template.dutiesListItemGroupped.helpers({
+  DutiesListItem: () -> DutiesListItem,
+})
 
 Template.dutyListItem.bindI18nNamespace('abate:volunteers')
 
@@ -301,6 +301,7 @@ Template.projectSignupForm.onCreated () ->
       template.allDays.set(allDays)
 
 Template.projectSignupForm.helpers
+  DutyBody: () -> DutyBody
   formSchema: () ->
     if Template.instance().signup?.start
       signup = Template.instance().signup

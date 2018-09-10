@@ -1,11 +1,10 @@
 <template name="dutyListItem">
-  {{> dutiesListItemTitle }}
-  {{> dutiesListItemContent }}
+  <div>{{> React component=DutiesListItem duty=this }}</div>
 </template>
 
 <template name="dutiesListItemGroupped">
   {{#if Template.subscriptionsReady }}
-    {{> dutyListItem duty}}
+    <div>{{> React component=DutiesListItem duty=duty}}</div>
     <div class="row no-gutters pt-2 align-items-center">
       {{#if $eq duty.type 'project'}}
         {{> dutiesListItemDate duty }}
@@ -69,48 +68,6 @@
       {{/unless}}
     {{/if}}
   </div>
-</template>
-
-<template name="dutiesListItemContent">
-  <div class="row no-gutters">
-    {{#if $eq type "shift"}}
-      {{> shiftBody }}
-    {{/if}}
-    {{#if $eq type "task"}}
-      {{> taskBody }}
-    {{/if}}
-    {{#if $eq type "project"}}
-      {{> projectBody }}
-    {{/if}}
-  </div>
-  <div class="row no-gutters">
-    {{#if $or team.quirks team.skills}}
-      <ul class="list-inline my-1">
-        {{#each skill in team.skills}}
-          <li class="list-inline-item">
-            <span class="badge badge-secondary badge-pill">{{skill}}</span>
-          </li>
-        {{/each}}
-        {{#each quirk in team.quirks}}
-          <li class="list-inline-item">
-            <span class="badge badge-primary badge-pill">{{quirk}}</span>
-          </li>
-        {{/each}}
-      </ul>
-    {{/if}}
-  </div>
-</template>
-
-<template name="dutiesListItemTitle">
-  {{#if $eq type "shift"}}
-    <div>{{> React component=ShiftTitle team=team title=title priority=priority }}</div>
-  {{/if}}
-  {{#if $eq type "task"}}
-    <div>{{> React component=TaskTitle team=team title=title }}</div>
-  {{/if}}
-  {{#if $eq type "project"}}
-    <div>{{> React component=ProjectTitle team=team title=title }}</div>
-  {{/if}}
 </template>
 
 <!-- Create a new shift give for a given team
@@ -219,20 +176,8 @@
   <div class="row">{{__ ".estimated_time"}} {{estimatedTime}}</div>
 </template>
 
-<template name="shiftBody">
-  <p class="card-text">{{description}}</p>
-</template>
-
-<template name="taskBody">
-  <p class="card-text">{{description}}</p>
-</template>
-
-<template name="projectBody">
-  <p class="card-text">{{description}}</p>
-</template>
-
 <template name="projectSignupForm">
-  {{> projectBody duty=project }}
+  <div>{{> React component=DutyBody description=project.description }}</div>
   {{#if Template.subscriptionsReady }}
     {{> projectStaffingChart project=project confirmedSignups=confirmed }}
     {{#if signup._id}}
