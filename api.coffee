@@ -53,6 +53,10 @@ class VolunteersClass
       TaskSignups: share.TaskSignups
       LeadSignups: share.LeadSignups
       UnitAggregation: share.UnitAggregation
+    @components = {}
+    if Meteor.isClient
+      BookedTableModule = require('./client/components/volunteers/BookedTable.jsx')
+      @components = {BookedTableContainer: BookedTableModule.BookedTableContainer}
   setPeriods: (periods) -> share.periods.set(periods)
   setTimeZone: (timezone) -> share.timezone.set(timezone)
   setUserForm: (data) -> saveVolunteerForm(@eventName,data)

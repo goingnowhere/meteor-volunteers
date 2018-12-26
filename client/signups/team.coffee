@@ -4,6 +4,9 @@ import Moment from 'moment'
 import 'moment-timezone'
 import { extendMoment } from 'moment-range'
 
+import { ProjectDateInline } from '../components/common/ProjectDateInline.jsx'
+import { ShiftDateInline } from '../components/common/ShiftDateInline.jsx'
+
 moment = extendMoment(Moment)
 moment.tz.setDefault(share.timezone.get())
 
@@ -142,6 +145,7 @@ Template.teamShiftsTable.onCreated () ->
       template.shifts.set(share.getShifts(sel))
 
 Template.teamShiftsTable.helpers
+  ShiftDateInline: () -> ShiftDateInline
   'groupedShifts': () ->
     _.chain(Template.instance().shifts.get())
     .groupBy('groupId')
@@ -162,6 +166,7 @@ Template.teamProjectsTable.onCreated () ->
   share.templateSub(template,"ProjectSignups.byTeam",template.teamId)
 
 Template.teamProjectsTable.helpers
+  ProjectDateInline: () -> ProjectDateInline
   allProjects: () ->
     share.Projects.find({parentId: Template.instance().teamId}).map((project) ->
       signups = share.ProjectSignups.find(

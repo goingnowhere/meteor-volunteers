@@ -1,3 +1,4 @@
+/* globals Package, Npm */
 Package.describe({
   name: 'abate:volunteers',
   version: '0.0.1',
@@ -90,12 +91,11 @@ Package.onUse((api) => {
     'client/shifts/signupList.html',
     'client/shifts/signupList.coffee',
 
-    'client/volunteers/booked.html',
-    'client/volunteers/booked.coffee',
     'client/volunteers/userform.html',
     'client/volunteers/userform.coffee',
     'client/volunteers/volunteerForm.html',
     'client/volunteers/volunteerForm.coffee',
+    'client/components/volunteers/BookedTable.jsx',
 
     'client/units/team.html',
     'client/units/team.coffee',

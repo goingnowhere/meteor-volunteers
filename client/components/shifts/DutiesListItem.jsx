@@ -28,7 +28,7 @@ const DutiesListItemContent = ({ description, team }) => (
       <DutyBody description={description} />
     </div>
     <div className="row no-gutters">
-      {!(team.quirks || team.skills) ? null : (
+      {!(team.quirks && team.skills) ? null : (
         <ul className="list-inline my-1">
           {team.skills.map(skill => (
             <li key={skill} className="list-inline-item">

@@ -42,7 +42,7 @@
             {{#if ($eq shift.policy 'adminOnly')}}{{fa 'user-secret'}}{{/if}}
           </span>
           </th>
-          <td> {{> shiftDateInline shift}} </td>
+          <td> {{> React component=ShiftDateInline start=shift.start end=shift.end}} </td>
           <td colspan="2">
             <!-- {{> progressBarShifts shift}} -->
             <div data-toggle="tooltip" data-placement="top" title="Min/Max: {{shift.min}}/{{shift.max}} - Confirmed: {{shift.confirmed}}">
@@ -123,7 +123,7 @@
                 <tbody>
                   {{#each shift in family.shifts }}
                     <tr class="shift family-{{family.groupId}}" data-id="{{shift._id}}" data-type="{{shift.type}}">
-                      <td> <h2>{{> shiftDateInline shift}} </h2></td>
+                      <td> <h2>{{> React component=ShiftDateInline start=shift.start end=shift.end}} </h2></td>
                       <td>
                         {{#if $neq shift.needed 0}}
                           <span class="inline">{{shift.needed}} {{__ ".more_needed"}}</span>
@@ -170,7 +170,7 @@
             <div class="text-danger">{{fa "exclamation-circle"}}</div>
           {{/if}}
         </td>
-        <td>{{> projectDateInline project}}</td>
+        <td>{{> React component=ProjectDateInline start=project.start end=project.end }}</td>
         <td>{{project.title}}</td>
         <td>
           <div class="btn-group inline pull-left">

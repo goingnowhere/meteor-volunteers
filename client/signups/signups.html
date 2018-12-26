@@ -8,10 +8,14 @@
           <div class="col">
             {{ signup.duty.title }}
             {{#if $eq signup.type 'shift'}}
-              {{> shiftDateInline signup.duty }}
+              <div>
+                {{> React component=ShiftDateInline start=signup.duty.start end=signup.duty.end }}
+              </div>
             {{/if}}
             {{#if $eq signup.type 'project'}}
-              {{> projectDateInline signup }}
+              <div>
+                {{> React component=ProjectDateInline start=signup.start end=signup.end }}
+              </div>
             {{/if}}
             {{#if $eq signup.type 'task'}}
               {{> taskDate signup.duty }}

@@ -1,9 +1,11 @@
 import { ReactiveVar } from 'meteor/reactive-var'
 import { AutoFormComponents } from 'meteor/abate:autoform-components'
-
 import Moment from 'moment'
 import 'moment-timezone'
 import { extendMoment } from 'moment-range'
+
+import { ProjectDateInline } from '../components/common/ProjectDateInline.jsx'
+import { ShiftDateInline } from '../components/common/ShiftDateInline.jsx'
 
 const share = __coffeescriptShare
 
@@ -54,6 +56,8 @@ Template.teamSignupsList.onCreated(function onCreated() {
 })
 
 Template.teamSignupsList.helpers({
+  ProjectDateInline: () => ProjectDateInline,
+  ShiftDateInline: () => ShiftDateInline,
   allSignups() {
     return Template.instance().signups.get()
   },

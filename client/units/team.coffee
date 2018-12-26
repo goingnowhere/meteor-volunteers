@@ -23,6 +23,7 @@ Template.teamEdit.helpers
     shift =  {
       id: "shift"
       label: i18n.__("abate:volunteers","shifts")
+      # TODO Convert multiAddView to use React
       tableFields: [ { name: 'title'}, {name: 'start',template: "shiftDateInline"} ]
       form: { collection: share.TeamShifts, filter: {parentId: parentId} }
       subscription : (template) ->
