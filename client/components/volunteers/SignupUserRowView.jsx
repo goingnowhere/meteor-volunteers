@@ -66,6 +66,7 @@ const editProject = ({ duty, signup }) => () => {
 
 const showInfo = ({ duty, team }) => () => {
   // TODO can we modify dutyListItem to take separate team and duty?
+  // TODO this doesn't seem to actually work
   AutoFormComponents.ModalShowWithTemplate('dutyListItem', { ...duty, team })
 }
 

@@ -1,8 +1,9 @@
+/* globals __coffeescriptShare */
 import { ReactiveVar } from 'meteor/reactive-var'
 import { AutoFormComponents } from 'meteor/abate:autoform-components'
-import Moment from 'moment'
-import 'moment-timezone'
-import { extendMoment } from 'moment-range'
+import { Template } from 'meteor/templating'
+import Moment from 'moment-timezone'
+import { extendMoment } from 'moment-range' // eslint-disable-line import/no-unresolved
 
 import { ProjectDateInline } from '../components/common/ProjectDateInline.jsx'
 import { ShiftDateInline } from '../components/common/ShiftDateInline.jsx'

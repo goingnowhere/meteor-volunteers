@@ -1,6 +1,5 @@
 /* global __coffeescriptShare */
-import { moment as Moment } from 'meteor/momentjs:moment'
-import 'moment-timezone'
+import Moment from 'moment-timezone'
 import { extendMoment } from 'moment-range' // eslint-disable-line
 
 const share = __coffeescriptShare
