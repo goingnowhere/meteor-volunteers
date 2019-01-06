@@ -16,7 +16,7 @@ share.initPublications = (eventName) ->
   # all given a team id, return all signups related to this team.
   # Restricted to team lead
   createPublicationTeam = (type,signups,duties) ->
-    Meteor.publishComposite("#{eventName}.Volunteers.#{type}.byTeam",(teamId) ->
+    Meteor.publishComposite("#{eventName}.Volunteers.#{type}.byTeam",(teamId = '') ->
       userId = this.userId
       return {
         find: () ->
@@ -52,7 +52,7 @@ share.initPublications = (eventName) ->
   # all given a department id, return all teams and all signups related
   # to this department. Restricted to department lead
   createPublicationDept = (type,signups,duties) ->
-    Meteor.publishComposite("#{eventName}.Volunteers.#{type}.byDepartment", (departmentId) ->
+    Meteor.publishComposite("#{eventName}.Volunteers.#{type}.byDepartment", (departmentId = '') ->
       userId = this.userId
       return {
         find: () -> return share.Team.find({parentId: departmentId})
@@ -117,7 +117,7 @@ share.initPublications = (eventName) ->
   # all given a division id, return all teams and all signups related
   # to this division. Restricted to division lead
   createPublicationDivision = (type,signups,duties) ->
-    Meteor.publishComposite("#{eventName}.Volunteers.#{type}.byDivision", (divisionId) ->
+    Meteor.publishComposite("#{eventName}.Volunteers.#{type}.byDivision", (divisionId = '') ->
       userId = this.userId
       return {
         find: () -> return share.Department.find({parentId: divisionId})
@@ -214,7 +214,7 @@ share.initPublications = (eventName) ->
   # given a user id return all signups, shift and teams related to this user.
   # restricted to user or manager
   createPublicationUser = (type,signups,duties) ->
-    Meteor.publishComposite("#{eventName}.Volunteers.#{type}.byUser", (userId) ->
+    Meteor.publishComposite("#{eventName}.Volunteers.#{type}.byUser", (userId = this.userId) ->
       actualUserId = this.userId
       return {
         find: () ->
@@ -251,7 +251,7 @@ share.initPublications = (eventName) ->
   # given a duty id return the team and all signups related to the current user
   # Restricted to user or duty.parentId lead
   createPublicationDuty = (type,duties,signups) ->
-    Meteor.publishComposite("#{eventName}.Volunteers.#{type}.byDuty", (id,userId = this.userId) ->
+    Meteor.publishComposite("#{eventName}.Volunteers.#{type}.byDuty", (id = '',userId = this.userId) ->
       actualUserId = this.userId
       return {
         find: () -> return duties.find(id)
@@ -365,7 +365,7 @@ share.initPublications = (eventName) ->
       },
     ], { clientCollection: "#{eventName}.Volunteers.shiftGroups" })
 
-  Meteor.publish "#{eventName}.Volunteers.volunteerForm.list", (userIds) ->
+  Meteor.publish "#{eventName}.Volunteers.volunteerForm.list", (userIds = []) ->
     if share.isManager() # publish manager only information
       share.VolunteerForm.find({userId: {$in: userIds}})
     else if share.isLead()
@@ -375,10 +375,8 @@ share.initPublications = (eventName) ->
     else
       return null
 
-  Meteor.publish "#{eventName}.Volunteers.volunteerForm", (userId) ->
-    if share.isManager()
-      share.VolunteerForm.find({userId: userId})
-    else if share.isLead()
+  Meteor.publish "#{eventName}.Volunteers.volunteerForm", (userId = this.userId) ->
+    if share.isManager() or share.isLead()
       share.VolunteerForm.find({userId: userId})
     else
       if !userId? or this?.userId == userId
@@ -522,13 +520,13 @@ share.initPublications = (eventName) ->
       share.Department.find(_.extend(sel,unitPublicPolicy))
 
   # these two publications are used in the teamEdit and departmentEdit forms
-  Meteor.publish "#{eventName}.Volunteers.team.backend", (parentId) ->
+  Meteor.publish "#{eventName}.Volunteers.team.backend", (parentId = '') ->
     if this.userId && share.isManagerOrLead(this.userId,[parentId])
       share.Team.find({parentId})
     else
       share.Team.find(_.extend({parentId},unitPublicPolicy))
 
-  Meteor.publish "#{eventName}.Volunteers.department.backend", (parentId) ->
+  Meteor.publish "#{eventName}.Volunteers.department.backend", (parentId = '') ->
     if this.userId && share.isManagerOrLead(this.userId,[parentId])
       share.Department.find({parentId})
     else
