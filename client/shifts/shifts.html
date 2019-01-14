@@ -121,9 +121,10 @@
   </div>
 </Template>
 
+<!-- Isn't used anywhere? -->
 <template name="shiftsTasksTableRowView">
   <div>
-    <a href="{{pathFor teamViewEventName _id=teamId}}">{{teamName}}</a>:
+    <a href="{pathFor teamViewEventName _id=teamId}}">{{teamName}}</a>:
     {{title}}
     {{#if $and ($eq type "lead") ($eq status "pending")}} {{fa "exclamation-triangle"}}{{/if}}
   </div>

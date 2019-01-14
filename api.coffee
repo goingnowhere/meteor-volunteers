@@ -22,7 +22,8 @@ initAuthorization = (eventName) ->
     else return false
   # is the given user a Lead of any team or dept ?
   share.isLead = (userId = Meteor.userId()) ->
-    (Roles.getRolesForUser(userId, eventName).length > 0)
+    # TODO Get rid of 'user' role?
+    (Roles.getRolesForUser(userId, eventName).filter((role) => role != 'user').length > 0)
 
 saveVolunteerForm = (eventName,data) ->
   Meteor.call('FormBuilder.dynamicForms.upsert',{name: "VolunteerForm"}, data)
@@ -31,7 +32,6 @@ saveVolunteerForm = (eventName,data) ->
 class VolunteersClass
   constructor: (@eventName) ->
     share.initCollections(@eventName)
-    share.initRouters(@eventName)
     share.initMethods(@eventName)
     if Meteor.isServer
       share.initServerMethods(@eventName)

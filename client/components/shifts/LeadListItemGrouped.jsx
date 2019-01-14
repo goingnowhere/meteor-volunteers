@@ -22,7 +22,7 @@ export const LeadListItemGrouped = ({
           <div className="row align-content-right no-gutters">
             <div className="col-md-2 offset-md-8">
               <button
-                className="btn btn-default btn-primary"
+                className="btn btn-light btn-primary"
                 type="button"
                 onClick={loadMoreLeads}
               >

@@ -25,7 +25,7 @@ export const LeadListItem = ({
       <div className="col">
         {signup.status && signup.status !== 'bailed' ? (
           <button
-            className={`btn btn-default btn-action disabled ${
+            className={`btn btn-light btn-action disabled ${
               signup.status === 'confirmed' ? 'btn-success' : ''
             }`}
             type="button"

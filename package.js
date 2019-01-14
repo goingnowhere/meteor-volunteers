@@ -35,7 +35,6 @@ Package.onUse((api) => {
     'reactive-dict',
     'reactive-var',
     'random',
-    'iron:router',
     'universe:i18n',
     'universe:i18n-blaze',
     'abate:autoform-components',
@@ -61,8 +60,6 @@ Package.onUse((api) => {
   // Order Matters !
   api.add_files([
     'both/global.coffee',
-    'both/router.coffee',
-    'both/routerControllers.js',
 
     'both/collections/subSchemas.coffee',
     'both/collections/duties.coffee',

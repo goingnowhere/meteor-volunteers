@@ -25,11 +25,9 @@ const share = __coffeescriptShare
 
 export const BookedTableContainer = withTracker(({ userId }) => {
   const bookedUserId = userId || Meteor.userId()
-  const loaded = [
-    Meteor.subscribe('nowhere2018.Volunteers.ShiftSignups.byUser', bookedUserId).ready(),
-    Meteor.subscribe('nowhere2018.Volunteers.ProjectsSignups.byUser', bookedUserId).ready(),
-    Meteor.subscribe('nowhere2018.Volunteers.LeadSignups.byUser', bookedUserId).ready(),
-  ]
+  const loaded = Meteor.subscribe('nowhere2018.Volunteers.ShiftSignups.byUser', bookedUserId).ready()
+    && Meteor.subscribe('nowhere2018.Volunteers.ProjectsSignups.byUser', bookedUserId).ready()
+    && Meteor.subscribe('nowhere2018.Volunteers.LeadSignups.byUser', bookedUserId).ready()
   let allShifts = []
   if (loaded) {
     const sel = { userId: bookedUserId, status: { $in: ['confirmed', 'pending'] } }

@@ -9,8 +9,8 @@ Template.addVolunteerForm.helpers
   'form': () ->
     if Template.instance().subscriptionsReady()
       form = share.form.get()
-      dform = FormBuilder.Collections.DynamicForms.findOne({name: "VolunteerForm"})
-      fields = _.chain(dform.form).map((f) -> if f.group then f.group else f.name).uniq().value()
+      # dform = FormBuilder.Collections.DynamicForms.findOne({name: "VolunteerForm"})
+      # fields = _.chain(dform.form).map((f) -> if f.group then f.group else f.name).uniq().value()
       if form then {
         collection: form
         # fields: fields

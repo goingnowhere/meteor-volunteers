@@ -8,19 +8,19 @@
       <tr class="shiftFamily table-active">
         <td colspan="4"><h5>{{family.title}}</h5></td>
         <td>
-          <button type="button" class="btn btn-default btn-sm"
+          <button type="button" class="btn btn-light btn-sm"
             data-id="{{getRandomShiftId family.groupId}}" data-type="shift" data-action="edit_group">
             {{fa "pencil-square-o"}} {{__ ".edit_group"}}
           </button>
         </td>
         <!-- <td>
-          <button type="button" class="btn btn-default btn-sm"
+          <button type="button" class="btn btn-light btn-sm"
             data-id="" data-type="shift" data-action="add_date">
             {{fa "calendar"}} {{__ ".add_date"}}
           </button>
         </td> -->
 <!--        <td>
-          <button type="button" class="btn btn-default btn-sm"
+          <button type="button" class="btn btn-light btn-sm"
             data-groupid="{{family.groupId}}" data-parentid="{{_id}}" data-type="shift" data-action="delete_group">
             {{fa "trash-o"}} {{__ ".delete_rota"}}
           </button>
@@ -284,7 +284,7 @@
         <td>
           <div class="btn-group pull-right">
             <button type="button"
-              class="btn btn-default btn-circle dropdown-toggle {{#if grouping}}disabled{{/if}}"
+              class="btn btn-light btn-circle dropdown-toggle {{#if grouping}}disabled{{/if}}"
               data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
               <span class="caret"></span>
             </button>
