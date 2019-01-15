@@ -1,5 +1,5 @@
 import { checkNpmVersions } from 'meteor/tmeasday:check-npm-versions'
-checkNpmVersions { 'simpl-schema': '0.3.x' }, 'abate:volunteers'
+checkNpmVersions { 'simpl-schema': '0.3.x' }, 'goingnowhere:volunteers'
 import SimpleSchema from 'simpl-schema'
 SimpleSchema.extendOptions(['autoform'])
 
@@ -31,36 +31,36 @@ share.Schemas.Common = new SimpleSchema(
       type: "hidden"
   title:
     type: String
-    label: () -> i18n.__("abate:volunteers","title")
+    label: () -> i18n.__("goingnowhere:volunteers","title")
     autoform:
-      afFieldHelpText: () -> i18n.__("abate:volunteers","name_help_duty")
+      afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","name_help_duty")
   description:
     type: String
-    label: () -> i18n.__("abate:volunteers","description")
+    label: () -> i18n.__("goingnowhere:volunteers","description")
     optional: true
     autoform:
-      afFieldHelpText: () -> i18n.__("abate:volunteers","description_help_duty")
+      afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","description_help_duty")
       rows: 5
   information:
     type: String
-    label: () -> i18n.__("abate:volunteers","practical_information")
+    label: () -> i18n.__("goingnowhere:volunteers","practical_information")
     optional: true
     autoform:
-      afFieldHelpText: () -> i18n.__("abate:volunteers","practical_information_help_duty")
+      afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","practical_information_help_duty")
       rows: 5
   priority:
     type: String
-    label: () -> i18n.__("abate:volunteers","priority")
+    label: () -> i18n.__("goingnowhere:volunteers","priority")
     allowedValues: taskPriority
     autoform:
-      afFieldHelpText: () -> i18n.__("abate:volunteers","priority_help_duty")
+      afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","priority_help_duty")
       defaultValue: "normal"
   policy:
     type: String
-    label: () -> i18n.__("abate:volunteers","policy")
+    label: () -> i18n.__("goingnowhere:volunteers","policy")
     allowedValues: policyValues
     autoform:
-      afFieldHelpText: () -> i18n.__("abate:volunteers","policy_help_duty")
+      afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","policy_help_duty")
       defaultValue: "public"
   groupId:
     type: String
@@ -81,7 +81,7 @@ share.Schemas.TeamTasks = new SimpleSchema(
     defaultValue: "1-3hs"
   dueDate:
     type: Date
-    label: () -> i18n.__("abate:volunteers","due_date")
+    label: () -> i18n.__("goingnowhere:volunteers","due_date")
     optional: true
     autoValue: () ->
       if this.field('dueDate').isSet
@@ -89,7 +89,7 @@ share.Schemas.TeamTasks = new SimpleSchema(
     autoform:
       afFieldInput:
         type: "datetimepicker"
-        placeholder: () -> i18n.__("abate:volunteers","due_date")
+        placeholder: () -> i18n.__("goingnowhere:volunteers","due_date")
         opts: () ->
           step: 60
           format: 'DD-MM-YYYY HH:mm'
@@ -116,28 +116,28 @@ share.Schemas.Lead = new SimpleSchema(share.Schemas.Common)
 share.Schemas.Lead.extend(
   responsibilities:
     type: String
-    label: () -> i18n.__("abate:volunteers","responsibilities")
+    label: () -> i18n.__("goingnowhere:volunteers","responsibilities")
     optional: true
     autoform:
       rows: 5
   qualificatons:
     type: String
-    label: () -> i18n.__("abate:volunteers","qualificatons")
+    label: () -> i18n.__("goingnowhere:volunteers","qualificatons")
     optional: true
     autoform:
       rows: 5
   notes:
     type: String
-    label: () -> i18n.__("abate:volunteers","notes")
+    label: () -> i18n.__("goingnowhere:volunteers","notes")
     optional: true
     autoform:
       rows: 5
   policy:
     type: String
-    label: () -> i18n.__("abate:volunteers","policy")
+    label: () -> i18n.__("goingnowhere:volunteers","policy")
     allowedValues: policyValues
     autoform:
-      afFieldHelpText: () -> i18n.__("abate:volunteers","policy_help_duty")
+      afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","policy_help_duty")
       defaultValue: "requireApproval"
 )
 

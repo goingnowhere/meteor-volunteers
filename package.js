@@ -1,9 +1,9 @@
 /* globals Package, Npm */
 Package.describe({
-  name: 'abate:volunteers',
-  version: '0.0.1',
-  summary: 'Volunteers form',
-  git: '',
+  name: 'goingnowhere:volunteers',
+  version: '0.0.2',
+  summary: 'Meteor volunteer management module',
+  git: 'https://github.com/goingnowhere/meteor-volunteers',
   documentation: 'README.md',
 })
 

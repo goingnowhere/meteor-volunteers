@@ -16,7 +16,7 @@ export const TaskUserRowView = ({ team, task }) => (
 
 // This isn't currently used anywhere, below is the old coffeescript wiring:
 // # this template is called with a taskSignups
-// Template.tasksUserRowView.bindI18nNamespace('abate:volunteers')
+// Template.tasksUserRowView.bindI18nNamespace('goingnowhere:volunteers')
 // Template.tasksUserRowView.onCreated () ->
 //   template = this
 //   template.taskSignup = template.data

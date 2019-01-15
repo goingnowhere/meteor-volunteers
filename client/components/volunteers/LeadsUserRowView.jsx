@@ -10,7 +10,7 @@ export const LeadsUserRowView = ({ unit, lead }) => (
 
 // This isn't currently used anywhere, below is the old coffeescript wiring:
 // # this template is called with a leadsSignups
-// Template.leadsUserRowView.bindI18nNamespace('abate:volunteers')
+// Template.leadsUserRowView.bindI18nNamespace('goingnowhere:volunteers')
 // Template.leadsUserRowView.onCreated () ->
 //   template = this
 //   template.leadSignup = template.data

@@ -15,8 +15,8 @@ Template.addVolunteerForm.helpers
         collection: form
         # fields: fields
         insert:
-          label: i18n.__("abate:volunteers","create_volunteer_profile")
+          label: i18n.__("goingnowhere:volunteers","create_volunteer_profile")
         update:
-          label: i18n.__("abate:volunteers","update_volunteer_profile")
+          label: i18n.__("goingnowhere:volunteers","update_volunteer_profile")
       }
   'data': () -> share.VolunteerForm.findOne({userId: Meteor.userId()})

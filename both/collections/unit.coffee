@@ -1,5 +1,5 @@
 import { checkNpmVersions } from 'meteor/tmeasday:check-npm-versions'
-checkNpmVersions { 'simpl-schema': '0.3.x' }, 'abate:volunteers'
+checkNpmVersions { 'simpl-schema': '0.3.x' }, 'goingnowhere:volunteers'
 import SimpleSchema from 'simpl-schema'
 SimpleSchema.extendOptions(['autoform'])
 
@@ -32,17 +32,17 @@ CommonUnit = new SimpleSchema(
       type: "hidden"
   name:
     type: String
-    label: () -> i18n.__("abate:volunteers","name")
+    label: () -> i18n.__("goingnowhere:volunteers","name")
     autoform:
-      afFieldHelpText: () -> i18n.__("abate:volunteers","name_help_team")
+      afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","name_help_team")
   skills:
     type: Array
-    label: () -> i18n.__("abate:volunteers","skills")
+    label: () -> i18n.__("goingnowhere:volunteers","skills")
     optional: true
     autoform:
       type: "select2"
       options: share.getSkillsList
-      afFieldHelpText: () -> i18n.__("abate:volunteers","skills_help_team")
+      afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","skills_help_team")
       afFieldInput:
         multiple: true
         select2Options: () -> {
@@ -52,12 +52,12 @@ CommonUnit = new SimpleSchema(
   "skills.$": String
   quirks:
     type: Array
-    label: () -> i18n.__("abate:volunteers","quirks")
+    label: () -> i18n.__("goingnowhere:volunteers","quirks")
     optional: true
     autoform:
       type: "select2"
       options: share.getQuirksList
-      afFieldHelpText: () -> i18n.__("abate:volunteers","quirks_help_team")
+      afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","quirks_help_team")
       afFieldInput:
         multiple: true
         select2Options: () -> {
@@ -67,42 +67,42 @@ CommonUnit = new SimpleSchema(
   "quirks.$": String
   description:
     type: String
-    label: () -> i18n.__("abate:volunteers","description")
+    label: () -> i18n.__("goingnowhere:volunteers","description")
     optional: true
     autoform:
       rows: 5
-      afFieldHelpText: () -> i18n.__("abate:volunteers","description_help_team")
+      afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","description_help_team")
   # TODO: the unit policy should lock the policy of all entities below
   email:
     type: String
     optional: true
     autoform:
-      label: () -> i18n.__("abate:volunteers","public_email")
-      afFieldHelpText: () -> i18n.__("abate:volunteers","public_email_help")
+      label: () -> i18n.__("goingnowhere:volunteers","public_email")
+      afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","public_email_help")
   policy:
     type: String
-    label: () -> i18n.__("abate:volunteers","policy")
+    label: () -> i18n.__("goingnowhere:volunteers","policy")
     allowedValues: unitPolicy
     defaultValue: "public"
     autoform:
-      afFieldHelpText: () -> i18n.__("abate:volunteers","policy_help_team")
+      afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","policy_help_team")
 )
 
 share.Schemas.Team = new SimpleSchema(CommonUnit)
 share.Schemas.Team.extend(
   location:
     type: String
-    label: () -> i18n.__("abate:volunteers","location")
+    label: () -> i18n.__("goingnowhere:volunteers","location")
     optional: true
     autoform:
       type: "select2"
       options: share.getLocationList
-      afFieldHelpText: () -> i18n.__("abate:volunteers","location_help_team")
+      afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","location_help_team")
       afFieldInput:
         select2Options: () -> {
           tags: true,
           width: "100%",
-          placeholder: i18n.__("abate:volunteers","select_location"),
+          placeholder: i18n.__("goingnowhere:volunteers","select_location"),
           allowClear: true
         }
 )

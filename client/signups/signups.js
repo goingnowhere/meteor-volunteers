@@ -13,7 +13,7 @@ const share = __coffeescriptShare
 const moment = extendMoment(Moment)
 moment.tz.setDefault(share.timezone.get())
 
-Template.teamSignupsList.bindI18nNamespace('abate:volunteers')
+Template.teamSignupsList.bindI18nNamespace('goingnowhere:volunteers')
 Template.teamSignupsList.onCreated(function onCreated() {
   const template = this
   const teamId = template.data._id
@@ -100,7 +100,7 @@ Template.teamSignupsList.events({
   },
 })
 
-Template.departmentSignupsList.bindI18nNamespace('abate:volunteers')
+Template.departmentSignupsList.bindI18nNamespace('goingnowhere:volunteers')
 Template.departmentSignupsList.onCreated(function onCreated() {
   const template = this
   template.departmentId = this.data._id
@@ -134,7 +134,7 @@ Template.departmentSignupsList.events({
   },
 })
 
-Template.managerSignupsList.bindI18nNamespace('abate:volunteers')
+Template.managerSignupsList.bindI18nNamespace('goingnowhere:volunteers')
 Template.managerSignupsList.onCreated(function onCreated() {
   const template = this
   share.templateSub(template, 'LeadSignups.Manager')

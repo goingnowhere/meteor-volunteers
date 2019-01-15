@@ -1,10 +1,10 @@
 
-Template.teamEditDetails.bindI18nNamespace('abate:volunteers')
+Template.teamEditDetails.bindI18nNamespace('goingnowhere:volunteers')
 Template.teamEditDetails.helpers
   'form': () -> { collection: share.Team }
   'data': () -> Template.currentData()
 
-Template.teamEdit.bindI18nNamespace('abate:volunteers')
+Template.teamEdit.bindI18nNamespace('goingnowhere:volunteers')
 Template.teamEdit.onCreated () ->
   template = this
   template.teamId = template.data._id
@@ -15,14 +15,14 @@ Template.teamEdit.onCreated () ->
 Template.teamEdit.helpers
   'main': () ->
     id: "details"
-    label: i18n.__("abate:volunteers","details")
+    label: i18n.__("goingnowhere:volunteers","details")
     form: { collection: share.Team }
     data: Template.currentData()
   'tabs': () ->
     parentId = if Template.currentData() then Template.currentData()._id
     shift =  {
       id: "shift"
-      label: i18n.__("abate:volunteers","shifts")
+      label: i18n.__("goingnowhere:volunteers","shifts")
       # TODO Convert multiAddView to use React
       tableFields: [ { name: 'title'}, {name: 'start',template: "shiftDateInline"} ]
       form: { collection: share.TeamShifts, filter: {parentId: parentId} }
@@ -31,7 +31,7 @@ Template.teamEdit.helpers
       }
     task =  {
       id: "task"
-      label: i18n.__("abate:volunteers","tasks")
+      label: i18n.__("goingnowhere:volunteers","tasks")
       tableFields: [ { name: 'title'}, {name: 'dueDate'} ]
       form: { collection: share.TeamTasks, filter: {parentId: parentId} }
       subscription : (template) ->
@@ -39,7 +39,7 @@ Template.teamEdit.helpers
       }
     lead =  {
       'id': "leads"
-      'label': i18n.__("abate:volunteers","leads")
+      'label': i18n.__("goingnowhere:volunteers","leads")
       'tableFields': [
         { name: 'title' },
         { name: 'userId', template: "teamLeadField"},
@@ -50,7 +50,7 @@ Template.teamEdit.helpers
       }
     return [shift,task,lead]
 
-Template.addTeam.bindI18nNamespace('abate:volunteers')
+Template.addTeam.bindI18nNamespace('goingnowhere:volunteers')
 Template.addTeam.onCreated () ->
   template = this
   template.departmentId = template.data.departmentId
@@ -64,7 +64,7 @@ Template.addTeam.events
     teamId = $(event.currentTarget).data('id')
     share.meteorCall "team.remove", teamId
 
-Template.teamLeadField.bindI18nNamespace('abate:volunteers')
+Template.teamLeadField.bindI18nNamespace('goingnowhere:volunteers')
 Template.teamLeadField.onCreated () ->
   template = this
   share.templateSub(template,"LeadSignups.byTeam",template.data.parentId)

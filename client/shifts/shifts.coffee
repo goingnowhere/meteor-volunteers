@@ -78,7 +78,7 @@ Template.signupModal.helpers
     sel = {title: title}
     DatesLocal.find(sel, {sort: { "start": 1 }})
 
-Template.dutiesListItemGroupped.bindI18nNamespace('abate:volunteers')
+Template.dutiesListItemGroupped.bindI18nNamespace('goingnowhere:volunteers')
 Template.dutiesListItemGroupped.events
   'click [data-action="chooseShifts"]': ( event, template ) ->
     parentId = $(event.currentTarget).data('parent-id')
@@ -93,9 +93,9 @@ Template.dutiesListItemGroupped.helpers({
   DutiesListItem: () -> DutiesListItem,
 })
 
-Template.dutyListItem.bindI18nNamespace('abate:volunteers')
+Template.dutyListItem.bindI18nNamespace('goingnowhere:volunteers')
 
-Template.dutiesListItemDate.bindI18nNamespace('abate:volunteers')
+Template.dutiesListItemDate.bindI18nNamespace('goingnowhere:volunteers')
 Template.dutiesListItemDate.helpers
   # TODO update when upgrading to mongodb > 3.2
   gaps: () ->
@@ -133,15 +133,15 @@ Template.dutiesListItemDate.events
             when 409
               Bert.alert({
                 hideDelay: 6500,
-                title: i18n.__("abate:volunteers","double_booking"),
-                message: i18n.__("abate:volunteers","double_booking_msg"),
+                title: i18n.__("goingnowhere:volunteers","double_booking"),
+                message: i18n.__("goingnowhere:volunteers","double_booking_msg"),
                 type: 'warning',
                 style: 'growl-top-right',
                 })
             else
               Bert.alert({
                 hideDelay: 6500,
-                title: i18n.__("abate:volunteers","error"),
+                title: i18n.__("goingnowhere:volunteers","error"),
                 message: err.reason,
                 type: 'danger',
                 style: 'growl-top-right',
@@ -159,12 +159,12 @@ Template.projectDate.helpers
   end: () -> Template.instance().data.end
   longformDay: (date) -> moment(date).format('dddd')
 
-Template.addShift.bindI18nNamespace('abate:volunteers')
+Template.addShift.bindI18nNamespace('goingnowhere:volunteers')
 Template.addShift.helpers
   'form': () -> {
     collection: share.TeamShifts,
-    update: {label: i18n.__("abate:volunteers","update_shift") },
-    insert: {label: i18n.__("abate:volunteers","new_shift") }
+    update: {label: i18n.__("goingnowhere:volunteers","update_shift") },
+    insert: {label: i18n.__("goingnowhere:volunteers","new_shift") }
   }
   'data': () -> parentId: Template.currentData().team?._id
 
@@ -189,7 +189,7 @@ ShiftGroups.extend(
     type: Array
     minCount: 1
     autoform:
-      afFieldHelpText: () -> i18n.__("abate:volunteers","shifts_help_rota")
+      afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","shifts_help_rota")
   'shifts.$':
     label: ''
     type: share.SubSchemas.Bounds.extend(
@@ -198,13 +198,13 @@ ShiftGroups.extend(
         autoform:
           afFieldInput:
             type: 'timepicker'
-            placeholder: () -> i18n.__("abate:volunteers","start")
+            placeholder: () -> i18n.__("goingnowhere:volunteers","start")
       endTime:
         type: String
         autoform:
           afFieldInput:
             type: 'timepicker'
-            placeholder: () -> i18n.__("abate:volunteers","end")
+            placeholder: () -> i18n.__("goingnowhere:volunteers","end")
       rotaId:
         type: Number
         optional: true
@@ -213,7 +213,7 @@ ShiftGroups.extend(
     )
 )
 
-Template.addShiftGroup.bindI18nNamespace('abate:volunteers')
+Template.addShiftGroup.bindI18nNamespace('goingnowhere:volunteers')
 Template.addShiftGroup.helpers
   'form': () ->
     return {
@@ -221,23 +221,23 @@ Template.addShiftGroup.helpers
       insert: {
         id: "InsertShiftGroupFormId",
         method: "#{share.eventName}.Volunteers.teamShifts.group.insert",
-        label: i18n.__("abate:volunteers","new_shift_group"),
+        label: i18n.__("goingnowhere:volunteers","new_shift_group"),
       }
       update: {
         id: "UpdateShiftGroupFormId",
         method: "#{share.eventName}.Volunteers.teamShifts.group.update",
-        label: i18n.__("abate:volunteers","update_group"),
+        label: i18n.__("goingnowhere:volunteers","update_group"),
       },
     }
   'data': () -> Template.currentData()
 
-Template.addTask.bindI18nNamespace('abate:volunteers')
+Template.addTask.bindI18nNamespace('goingnowhere:volunteers')
 Template.addTask.helpers
   'form': () -> { collection: share.TeamTasks }
   'data': () ->
     parentId: Template.currentData().team?._id
 
-Template.addProject.bindI18nNamespace('abate:volunteers')
+Template.addProject.bindI18nNamespace('goingnowhere:volunteers')
 Template.addProject.helpers
   'form': () -> { collection: share.Projects }
   'data': () ->
@@ -248,7 +248,7 @@ AutoForm.addHooks ['InsertTeamShiftsFormId','UpdateTeamShiftsFormId'],
     if this.template.data.var
       this.template.data.var.set({add: false, teamId: result.teamId})
 
-Template.projectStaffingInput.bindI18nNamespace('abate:volunteers')
+Template.projectStaffingInput.bindI18nNamespace('goingnowhere:volunteers')
 Template.projectStaffingInput.helpers
   day: (index) ->
     start = AutoForm.getFieldValue('start')
@@ -278,7 +278,7 @@ AutoForm.addInputType("projectStaffing",
     return values
 )
 
-Template.projectSignupForm.bindI18nNamespace('abate:volunteers')
+Template.projectSignupForm.bindI18nNamespace('goingnowhere:volunteers')
 Template.projectSignupForm.onCreated () ->
   template = this
   if template.data?.signup
@@ -314,11 +314,11 @@ Template.projectSignupForm.helpers
     new SimpleSchema({
       start:
         type: Date
-        label: () -> i18n.__("abate:volunteers","start")
+        label: () -> i18n.__("goingnowhere:volunteers","start")
         autoform:
-          afFieldHelpText: () -> i18n.__("abate:volunteers","project_start_help")
+          afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","project_start_help")
           group: "Period"
-          groupHelp: () -> i18n.__("abate:volunteers","project_period_help")
+          groupHelp: () -> i18n.__("goingnowhere:volunteers","project_period_help")
           afFieldInput:
             type: "datetimepicker"
             opts: () ->
@@ -330,9 +330,9 @@ Template.projectSignupForm.helpers
               timepicker: false
       end:
         type: Date
-        label: () -> i18n.__("abate:volunteers","end")
+        label: () -> i18n.__("goingnowhere:volunteers","end")
         autoform:
-          afFieldHelpText: () -> i18n.__("abate:volunteers","project_end_help")
+          afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","project_end_help")
           group: "Period"
           afFieldInput:
             type: "datetimepicker"
@@ -362,9 +362,9 @@ Template.projectSignupForm.helpers
 
   updateLabel: () ->
     if Template.currentData().project.policy == "public"
-      i18n.__("abate:volunteers",".join")
+      i18n.__("goingnowhere:volunteers",".join")
     else
-      i18n.__("abate:volunteers",".apply")
+      i18n.__("goingnowhere:volunteers",".apply")
 
   confirmed: () -> Template.instance().confirmed.get()
 

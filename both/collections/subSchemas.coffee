@@ -1,5 +1,5 @@
 import { checkNpmVersions } from 'meteor/tmeasday:check-npm-versions'
-checkNpmVersions { 'simpl-schema': '0.3.x' }, 'abate:volunteers'
+checkNpmVersions { 'simpl-schema': '0.3.x' }, 'goingnowhere:volunteers'
 import SimpleSchema from 'simpl-schema'
 SimpleSchema.extendOptions(['autoform'])
 
@@ -17,7 +17,7 @@ share.SubSchemas = {}
 share.SubSchemas.Bounds = new SimpleSchema(
   min:
     type: Number
-    label: () -> i18n.__("abate:volunteers","min_people")
+    label: () -> i18n.__("goingnowhere:volunteers","min_people")
     optional: true
     autoform:
       defaultValue: 4
@@ -26,7 +26,7 @@ share.SubSchemas.Bounds = new SimpleSchema(
         placeholder: "min"
   max:
     type: Number
-    label: () -> i18n.__("abate:volunteers","max_people")
+    label: () -> i18n.__("goingnowhere:volunteers","max_people")
     optional: true
     custom: () ->
       unless this.value >= this.siblingField('min').value
@@ -41,18 +41,18 @@ share.SubSchemas.Bounds = new SimpleSchema(
 share.SubSchemas.DayDates = new SimpleSchema(
   start:
     type: Date
-    label: () -> i18n.__("abate:volunteers","start")
+    label: () -> i18n.__("goingnowhere:volunteers","start")
     autoform:
       afFieldInput:
         type: "datetimepicker"
-        placeholder: () -> i18n.__("abate:volunteers","start")
+        placeholder: () -> i18n.__("goingnowhere:volunteers","start")
         opts: () ->
           format: 'DD-MM-YYYY'
           timepicker: false
           # altFormat: 'd-m-Y'
   end:
     type: Date
-    label: () -> i18n.__("abate:volunteers","end")
+    label: () -> i18n.__("goingnowhere:volunteers","end")
     custom: () ->
       start = moment(this.field('start').value)
       unless moment(this.value).isSameOrAfter(start)
@@ -62,7 +62,7 @@ share.SubSchemas.DayDates = new SimpleSchema(
         AutoForm.getFieldValue('start')
       afFieldInput:
         type: "datetimepicker"
-        placeholder: () -> i18n.__("abate:volunteers","end")
+        placeholder: () -> i18n.__("goingnowhere:volunteers","end")
         opts: () ->
           format: 'DD-MM-YYYY'
           timepicker: false
@@ -74,17 +74,17 @@ share.SubSchemas.DayDates = new SimpleSchema(
 share.SubSchemas.DayDatesTimes = new SimpleSchema(
   start:
     type: Date
-    label: () -> i18n.__("abate:volunteers","start")
+    label: () -> i18n.__("goingnowhere:volunteers","start")
     autoform:
       afFieldInput:
         type: "datetimepicker"
-        placeholder: () -> i18n.__("abate:volunteers","start")
+        placeholder: () -> i18n.__("goingnowhere:volunteers","start")
         opts: () ->
           format: 'DD-MM-YYYY HH:mm'
           defaultTime:'05:00'
   end:
     type: Date
-    label: () -> i18n.__("abate:volunteers","end")
+    label: () -> i18n.__("goingnowhere:volunteers","end")
     custom: () ->
       start = moment(this.field('start').value)
       unless moment(this.value).isAfter(start)
@@ -94,7 +94,7 @@ share.SubSchemas.DayDatesTimes = new SimpleSchema(
         AutoForm.getFieldValue('start')
       afFieldInput:
         type: "datetimepicker"
-        placeholder: () -> i18n.__("abate:volunteers","end")
+        placeholder: () -> i18n.__("goingnowhere:volunteers","end")
         opts: () ->
           format: 'DD-MM-YYYY HH:mm'
           defaultTime:'08:00'
@@ -104,12 +104,12 @@ share.SubSchemas.DayDatesTimes = new SimpleSchema(
 share.SubSchemas.AssociatedProject = new SimpleSchema(
   projectId:
     type: String
-    label: () -> i18n.__("abate:volunteers",".associated_project")
+    label: () -> i18n.__("goingnowhere:volunteers",".associated_project")
     optional: true
     autoform:
       type: "select2"
       options: share.getTeamProjects
-      afFieldHelpText: () -> i18n.__("abate:volunteers",".associated_project_help")
+      afFieldHelpText: () -> i18n.__("goingnowhere:volunteers",".associated_project_help")
       afFieldInput:
         select2Options: () -> {width: '100%'}
 )

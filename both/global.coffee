@@ -15,7 +15,7 @@ share.meteorCall = (name,args...,lastArg) ->
   Meteor.call("#{share.eventName}.Volunteers.#{name}", args... , (err,res) ->
     if !callback && err
       Bert.alert({
-        title: i18n.__("abate:volunteers","method_error"),
+        title: i18n.__("goingnowhere:volunteers","method_error"),
         message: err.reason,
         type: 'danger',
         style: 'growl-top-right',

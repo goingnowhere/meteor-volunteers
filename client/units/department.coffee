@@ -1,5 +1,5 @@
-Template.departmentEdit.bindI18nNamespace('abate:volunteers')
-Template.departmentEditDetails.bindI18nNamespace('abate:volunteers')
+Template.departmentEdit.bindI18nNamespace('goingnowhere:volunteers')
+Template.departmentEditDetails.bindI18nNamespace('goingnowhere:volunteers')
 Template.departmentEditDetails.helpers
   'form': () -> { collection: share.Department }
   'data': () -> Template.currentData()
@@ -7,14 +7,14 @@ Template.departmentEditDetails.helpers
 Template.departmentEdit.helpers
   'main': () ->
     id: "details"
-    label: i18n.__("abate:volunteers","details")
+    label: i18n.__("goingnowhere:volunteers","details")
     form: { collection: share.Department }
     data: Template.currentData()
   'tabs': () ->
     parentId = if Template.currentData() then Template.currentData()._id
     team =  {
       id: "team"
-      label: i18n.__("abate:volunteers","team")
+      label: i18n.__("goingnowhere:volunteers","team")
       tableFields: [ { name: 'name'} ]
       form: { collection: share.Team, filter: {parentId} }
       subscription : (template) ->
@@ -22,7 +22,7 @@ Template.departmentEdit.helpers
       }
     lead =  {
       id: "leads"
-      label: i18n.__("abate:volunteers","leads")
+      label: i18n.__("goingnowhere:volunteers","leads")
       tableFields: [
        { name: 'title' },
        { name: 'userId', template:"teamLeadField"},

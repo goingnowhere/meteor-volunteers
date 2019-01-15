@@ -90,7 +90,7 @@ commonEvents =
     parentId = $(event.currentTarget).data('parentid')
     share.meteorCall "teamShifts.group.remove", {groupId, parentId}
 
-Template.teamShiftsRota.bindI18nNamespace('abate:volunteers')
+Template.teamShiftsRota.bindI18nNamespace('goingnowhere:volunteers')
 Template.teamShiftsRota.onCreated () ->
   template = this
   teamId = template.data._id
@@ -119,7 +119,7 @@ Template.teamShiftsRota.helpers
         ).value()
     ).value()
 
-Template.teamShiftsTable.bindI18nNamespace('abate:volunteers')
+Template.teamShiftsTable.bindI18nNamespace('goingnowhere:volunteers')
 Template.teamShiftsTable.onCreated () ->
   template = this
   teamId = template.data._id
@@ -159,7 +159,7 @@ Template.teamShiftsTable.helpers
 
 Template.teamShiftsTable.events commonEvents
 
-Template.teamProjectsTable.bindI18nNamespace('abate:volunteers')
+Template.teamProjectsTable.bindI18nNamespace('goingnowhere:volunteers')
 Template.teamProjectsTable.onCreated () ->
   template = this
   template.teamId = template.data._id
@@ -190,7 +190,7 @@ Template.teamProjectsTable.events _.extend(
       }, project.title)
 )
 
-Template.projectStaffingChart.bindI18nNamespace('abate:volunteers')
+Template.projectStaffingChart.bindI18nNamespace('goingnowhere:volunteers')
 Template.projectStaffingChart.helpers
   stackedBarData: (project) ->
     confirmedSignups = Template.currentData().confirmedSignups

@@ -25,7 +25,7 @@ addLocalDutiesCollection = (team,duties,type,filter,limit) ->
     ShiftTitles.insert(duty)
   ).value()
 
-Template.signupsListTeam.bindI18nNamespace('abate:volunteers')
+Template.signupsListTeam.bindI18nNamespace('goingnowhere:volunteers')
 Template.signupsListTeam.onCreated () ->
   template = this
   {team, dutyType = ''} = template.data
@@ -80,7 +80,7 @@ Template.signupsListTeam.events
     limit = template.limit.get()
     template.limit.set(limit+2)
 
-Template.signupsList.bindI18nNamespace('abate:volunteers')
+Template.signupsList.bindI18nNamespace('goingnowhere:volunteers')
 Template.signupsList.onCreated () ->
   template = this
   template.limit = new ReactiveVar(4)

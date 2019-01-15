@@ -11,14 +11,14 @@ Template.addDivision.events
 Template.divisionEdit.helpers
   'main': () ->
     id: "details"
-    label: i18n.__("abate:volunteers","details")
+    label: i18n.__("goingnowhere:volunteers","details")
     form: { collection: share.Division }
     data: Template.currentData()
   'tabs': () ->
     parentId = if Template.currentData() then Template.currentData()._id
     dept = {
       id: "dept"
-      label: i18n.__("abate:volunteers","departments")
+      label: i18n.__("goingnowhere:volunteers","departments")
       tableFields: [ { name: 'name'} ]
       form: { collection: share.Department }
       subscription : (template) ->
@@ -26,7 +26,7 @@ Template.divisionEdit.helpers
       }
     lead = {
       id: "leads"
-      label: i18n.__("abate:volunteers","leads")
+      label: i18n.__("goingnowhere:volunteers","leads")
       tableFields: [
         { name: 'userId', template:"leadField"},
         { name: 'role' }

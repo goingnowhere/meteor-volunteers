@@ -18,37 +18,37 @@ share.Schemas.VolunteerForm = new SimpleSchema(
       omit: true
   skills:
     type: Array
-    label: () -> i18n.__("abate:volunteers","skills")
+    label: () -> i18n.__("goingnowhere:volunteers","skills")
     optional: false
     autoform:
       # XXX bug in autoform https://github.com/aldeed/meteor-autoform/issues/1635
-      # group: () -> i18n.__("abate:volunteers","preferences")
+      # group: () -> i18n.__("goingnowhere:volunteers","preferences")
       group: "Preferences"
-      groupHelp: () -> i18n.__("abate:volunteers","preferences_help")
+      groupHelp: () -> i18n.__("goingnowhere:volunteers","preferences_help")
       type: "select2"
       options: share.getSkillsList
-      afFieldHelpText: () -> i18n.__("abate:volunteers","skills_help")
+      afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","skills_help")
       afFieldInput:
         multiple: true
         select2Options: () -> {width: '100%'}
   "skills.$": String
   quirks:
     type: Array
-    label: () -> i18n.__("abate:volunteers","quirks")
+    label: () -> i18n.__("goingnowhere:volunteers","quirks")
     optional: false
     autoform:
-      # group: () -> i18n.__("abate:volunteers","preferences")
+      # group: () -> i18n.__("goingnowhere:volunteers","preferences")
       group: "Preferences"
       type: "select2"
       options: share.getQuirksList
-      afFieldHelpText: () -> i18n.__("abate:volunteers","quirks_help")
+      afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","quirks_help")
       afFieldInput:
         multiple: true
         select2Options: () -> {width: '100%'}
   "quirks.$": String
   private_notes:
     type: String
-    label: () -> i18n.__("abate:volunteers","private_notes")
+    label: () -> i18n.__("goingnowhere:volunteers","private_notes")
     optional: true
     max: 1000
     autoform:
@@ -110,10 +110,10 @@ share.Schemas.LeadSignups = commonSignups
 share.Schemas.ProjectSignups = new SimpleSchema(
   start:
     type: Date
-    label: () -> i18n.__("abate:volunteers", "start")
+    label: () -> i18n.__("goingnowhere:volunteers", "start")
   end:
     type: Date
-    label: () -> i18n.__("abate:volunteers", "end")
+    label: () -> i18n.__("goingnowhere:volunteers", "end")
     custom: () ->
       start = moment(this.field('start').value)
       if !moment(this.value).isSameOrAfter(start)
