@@ -1,3 +1,4 @@
+import { initMethods } from './both/methods/methods'
 
 share.form = new ReactiveVar(share.VolunteerForm)
 periods =
@@ -32,7 +33,7 @@ saveVolunteerForm = (eventName,data) ->
 class VolunteersClass
   constructor: (@eventName) ->
     share.initCollections(@eventName)
-    share.initMethods(@eventName)
+    initMethods(@eventName)
     if Meteor.isServer
       share.initServerMethods(@eventName)
     initAuthorization(@eventName)

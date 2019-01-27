@@ -1,4 +1,5 @@
 import SimpleSchema from 'simpl-schema'
+import moment from 'moment-timezone'
 
 # this is the base Volunteers form schema
 share.Schemas.VolunteerForm = new SimpleSchema(

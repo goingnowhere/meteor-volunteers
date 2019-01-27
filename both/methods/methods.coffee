@@ -1,6 +1,7 @@
 import SimpleSchema from 'simpl-schema'
 import Moment from 'moment'
 import { extendMoment } from 'moment-range'
+import { findConflicts } from './methods'
 moment = extendMoment(Moment)
 
 throwError = (error, reason, details) ->
@@ -10,28 +11,6 @@ throwError = (error, reason, details) ->
   else if Meteor.isServer
     throw error
   return
-
-doubleBooking = (shift,collectionKey) ->
-  switch collectionKey
-    when 'ShiftSignups'
-      parentDoc = share.TeamShifts.findOne({_id: shift.shiftId})
-      parentRange = moment.range(moment(parentDoc.start),moment(parentDoc.end))
-      return _.chain(share.ShiftSignups.find({
-        # it's a double booking only if it is a different shift
-        shiftId: { $ne: shift.shiftId },
-        userId: shift.userId,
-        status: {$in: ["confirmed","pending"]}}).fetch())
-        .map((signup) -> share.TeamShifts.findOne({_id: signup.shiftId}))
-        .filter((shift) ->
-          if shift # this should not be necessary as stale signups are deleted
-            shiftRange = moment.range(moment(shift.start),moment(shift.end))
-            parentRange.overlaps(shiftRange)
-          else
-            console.log "Warning: This user Signed is signed up for a shift that does not exist"
-            false
-        ).value()
-    else
-      return []
 
 share.initMethods = (eventName) ->
 
@@ -166,30 +145,29 @@ share.initMethods = (eventName) ->
             return throwError(403, 'Insufficient Permission')
       when "insert"
         # this is actually an upsert
-        Meteor.methods "#{collectionName}.insert": (doc) ->
-          console.log ["#{collectionName}.insert", doc]
-          SimpleSchema.validate(doc, schema.omit('status'))
+        Meteor.methods "#{collectionName}.insert": (wholeSignup) ->
+          console.log ["#{collectionName}.insert", wholeSignup]
+          SimpleSchema.validate(wholeSignup, schema.omit('status'))
           userId = Meteor.userId()
-          signup = _.pick(doc,['userId','shiftId','parentId'])
-          parentDoc = parentCollection.findOne(signup.shiftId)
+          signupIdentifiers = _.pick(wholeSignup,['userId','shiftId','parentId'])
+          parentDoc = parentCollection.findOne(signupIdentifiers.shiftId)
           isAdmin = share.isManagerOrLead(userId,[parentDoc.parentId])
-          if (signup.userId == userId) || isAdmin
+          if (signupIdentifiers.userId == userId) || isAdmin
             status =
               if parentDoc.policy == "public" then "confirmed"
               else if parentDoc.policy == "requireApproval" then "pending"
               else if (parentDoc.policy == "adminOnly" && isAdmin) then "pending"
             if status
-              # we can double booking only on new signups
-              db = doubleBooking(signup,collectionKey)
+              db = findConflicts(wholeSignup,collectionKey)
               if db.length == 0
                 if Meteor.isServer
-                  { start, end, enrolled } = doc
-                  res = collection.upsert(signup,{
+                  { start, end, enrolled } = wholeSignup
+                  res = collection.upsert(signupIdentifiers,{
                     $set: {status,start,end,enrolled,notification:false}})
                   if res?.insertedId?
                     return res.insertedId
                   else
-                    return collection.findOne(signup)._id
+                    return collection.findOne(signupIdentifiers)._id
               else
                 return throwError(409, 'Double Booking', db)
             else
