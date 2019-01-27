@@ -4,7 +4,7 @@ import Fa from 'react-fontawesome'
 import { withTracker } from 'meteor/react-meteor-data'
 import { AutoFormComponents } from 'meteor/abate:autoform-components'
 
-import { __ } from '../common/i18n'
+import { t, T } from '../common/i18n'
 import { ProjectDateInline } from '../common/ProjectDateInline.jsx'
 import { ShiftDateInline } from '../common/ShiftDateInline.jsx'
 
@@ -16,7 +16,7 @@ export const SignupUserRowView = ({
   showInfo,
   bail,
 }) => (
-  <div className={`row no-gutters ${signup.status !== 'confirmed' ? 'text-muted' : ''}`} title={__(signup.status)}>
+  <div className={`row no-gutters ${signup.status !== 'confirmed' ? 'text-muted' : ''}`} title={t(signup.status)}>
     <div className="container-fluid">
       <div className="row p-2">
         <div className="col">
@@ -29,28 +29,28 @@ export const SignupUserRowView = ({
       </div>
       <div className="row px-1 py-0">
         <div className="col">
-          {signup.status === 'confirmed' && <div className="text-success"><Fa name="check" /> {__('confirmed')}</div>}
-          {signup.status === 'pending' && <div className="text-warning"><Fa name="clock-o" /> {__('pending')}</div>}
+          {signup.status === 'confirmed' && <div className="text-success"><Fa name="check" /> <T>confirmed</T></div>}
+          {signup.status === 'pending' && <div className="text-warning"><Fa name="clock-o" /> <T>pending</T></div>}
         </div>
         <div className="col px-1 py-0" />
 
         <div className="col px-1 py-0">
           <button type="button" onClick={showInfo} className="btn btn-primary btn-action">
-            {__('info')}
+            <T>info</T>
           </button>
         </div>
 
         {signup.type === 'project' && (
           <div className="col px-1 py-0">
             <button type="button" onClick={editProject} className="btn btn-primary btn-action">
-              {__('change_dates')}
+              <T>change_dates</T>
             </button>
           </div>
         )}
 
         <div className="col px-0">
           <button type="button" onClick={bail} className="btn btn-primary btn-action">
-            {__('bail')}
+            <T>bail</T>
           </button>
         </div>
       </div>

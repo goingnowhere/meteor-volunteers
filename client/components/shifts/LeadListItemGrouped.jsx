@@ -4,7 +4,7 @@ import { ReactiveVar } from 'meteor/reactive-var'
 import { withTracker } from 'meteor/react-meteor-data'
 import React from 'react'
 
-import { __ } from '../common/i18n'
+import { T } from '../common/i18n'
 import { LeadListItem } from './LeadListItem.jsx'
 
 export const LeadListItemGrouped = ({
@@ -26,7 +26,7 @@ export const LeadListItemGrouped = ({
                 type="button"
                 onClick={loadMoreLeads}
               >
-                {__('load_more_leads')}
+                <T>load_more_leads</T>
               </button>
             </div>
           </div>

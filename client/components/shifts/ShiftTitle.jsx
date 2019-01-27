@@ -1,7 +1,7 @@
 import React from 'react'
 import Fa from 'react-fontawesome'
 
-import { __ } from '../common/i18n'
+import { t, T } from '../common/i18n'
 
 export const ShiftTitle = ({ team, title, priority }) => (
   <div className="row">
@@ -10,7 +10,7 @@ export const ShiftTitle = ({ team, title, priority }) => (
         <small><Fa name="calendar" /> </small>
         {team.name} &gt; {title}
         {priority !== 'normal' && (
-          <small title={__(priority)} className={priority === 'essential' ? 'text-secondary' : 'text-primary'}>
+          <small title={t(priority)} className={priority === 'essential' ? 'text-secondary' : 'text-primary'}>
             <Fa name="exclamation-circle" />
           </small>
         )}
@@ -18,7 +18,7 @@ export const ShiftTitle = ({ team, title, priority }) => (
     </div>
     {team.location && (
       <div className="col-md-3">
-        <strong>{__('location')}</strong> {team.location}
+        <strong><T>location</T></strong> {team.location}
       </div>
     )}
   </div>

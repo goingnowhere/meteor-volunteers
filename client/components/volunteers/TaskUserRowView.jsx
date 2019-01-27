@@ -1,7 +1,7 @@
 import React from 'react'
 import Fa from 'react-fontawesome'
 
-import { __ } from '../common/i18n'
+import { T } from '../common/i18n'
 import { formatDate } from '../common/dates'
 
 export const TaskUserRowView = ({ team, task }) => (
@@ -9,7 +9,7 @@ export const TaskUserRowView = ({ team, task }) => (
     <td>{team.name} {task.title}</td>
     <td>
       <Fa name="task" />
-      {formatDate(task.dueDate)} - {__('.estimated_time')} {task.estimatedTime}
+      {formatDate(task.dueDate)} - <T>estimated_time</T> {task.estimatedTime}
     </td>
   </tr>
 )

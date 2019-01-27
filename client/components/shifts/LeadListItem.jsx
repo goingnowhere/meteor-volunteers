@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import React, { Fragment } from 'react'
 
-import { __ } from '../common/i18n'
+import { T } from '../common/i18n'
 import { LeadTitle } from './LeadTitle.jsx'
 import { LeadBody } from './LeadBody.jsx'
 
@@ -30,7 +30,7 @@ export const LeadListItem = ({
             }`}
             type="button"
           >
-            { __(signup.status) }
+            <T>signup.status</T>
           </button>
         ) : policy !== 'adminOnly' ? (
           <button
@@ -38,11 +38,11 @@ export const LeadListItem = ({
             type="button"
             onClick={apply}
           >
-            {policy === 'public' && __('.join')}
-            {policy === 'requireApproval' && __('.apply')}
+            {policy === 'public' && <T>join</T>}
+            {policy === 'requireApproval' && <T>apply</T>}
           </button>
         ) : (
-          <div>{__('.admin_only')}</div>
+          <div><T>admin_only</T></div>
         )}
       </div>
     </div>
