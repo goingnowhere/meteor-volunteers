@@ -51,25 +51,8 @@ share.initCollections = (eventName) ->
 
   # Data for the volunteer Form
   share.VolunteerForm = new Mongo.Collection "#{prefix}Volunteers.volunteerForm"
-  share.VolunteerForm.attachSchema(share.Schemas.VolunteerForm)
-  share.form = new ReactiveVar(share.VolunteerForm)
   if Meteor.isServer
-    share.form.get()._ensureIndex( { userId: 1 } )
-
-  share.extendVolunteerForm = (data) ->
-    form = share.form.get()
-    schema = new SimpleSchema(share.Schemas.VolunteerForm)
-    newschema = schema.extend(FormBuilder.toSimpleSchema(data))
-    form.attachSchema(newschema, {replace: true})
-    share.form.set(form)
-
-  # Update the VolunteersForm schema each time the Form is updated.
-  # XXX this should be called something like "eventName-VolunteerForm" XXX
-  FormBuilder.Collections.DynamicForms.find({name: "VolunteerForm"}).observe(
-    added:   (doc) -> share.extendVolunteerForm(doc)
-    changed: (doc) -> share.extendVolunteerForm(doc)
-    removed: (doc) -> share.extendVolunteerForm(doc)
-  )
+    share.VolunteerForm._ensureIndex( { userId: 1 } )
 
   # User duties
   # we enforce using a unique index that a person cannot sign twice for the same duty

@@ -1,21 +1,10 @@
 import { checkNpmVersions } from 'meteor/tmeasday:check-npm-versions'
 checkNpmVersions { 'simpl-schema': '0.3.x' }, 'goingnowhere:volunteers'
 import SimpleSchema from 'simpl-schema'
+import { getSkillsList, getQuirksList, getLocationList } from './unit'
 SimpleSchema.extendOptions(['autoform'])
 
 unitPolicy = ["public";"private"]
-
-share.getSkillsList = (sel={}) ->
-  tags = _.union.apply null, share.Team.find(sel).map((team) -> team.skills)
-  _.map tags, (tag) -> {value: tag, label: tag}
-
-share.getQuirksList = (sel={}) ->
-  tags = _.union.apply null, share.Team.find(sel).map((team) -> team.quirks)
-  _.map tags, (tag) -> {value: tag, label: tag}
-
-share.getLocationList = (sel={}) ->
-  locations = _.union.apply null, share.Team.find(sel).map((team) -> team.location)
-  _.map locations, (loc) -> {value: loc, label: loc}
 
 share.getTeamProjects = (sel={}) ->
   console.log "AAA"
@@ -41,7 +30,7 @@ CommonUnit = new SimpleSchema(
     optional: true
     autoform:
       type: "select2"
-      options: share.getSkillsList
+      options: getSkillsList
       afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","skills_help_team")
       afFieldInput:
         multiple: true
@@ -56,7 +45,7 @@ CommonUnit = new SimpleSchema(
     optional: true
     autoform:
       type: "select2"
-      options: share.getQuirksList
+      options: getQuirksList
       afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","quirks_help_team")
       afFieldInput:
         multiple: true
@@ -96,7 +85,7 @@ share.Schemas.Team.extend(
     optional: true
     autoform:
       type: "select2"
-      options: share.getLocationList
+      options: getLocationList
       afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","location_help_team")
       afFieldInput:
         select2Options: () -> {

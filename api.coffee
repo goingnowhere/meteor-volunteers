@@ -1,4 +1,5 @@
 import { initMethods } from './both/methods/methods'
+import { getSkillsList, getQuirksList } from './both/collections/unit'
 
 share.form = new ReactiveVar(share.VolunteerForm)
 periods =
@@ -25,10 +26,6 @@ initAuthorization = (eventName) ->
   share.isLead = (userId = Meteor.userId()) ->
     # TODO Get rid of 'user' role?
     (Roles.getRolesForUser(userId, eventName).filter((role) => role != 'user').length > 0)
-
-saveVolunteerForm = (eventName,data) ->
-  Meteor.call('FormBuilder.dynamicForms.upsert',{name: "VolunteerForm"}, data)
-  share.extendVolunteerForm({form: data})
 
 class VolunteersClass
   constructor: (@eventName) ->
@@ -60,11 +57,10 @@ class VolunteersClass
       @components = {BookedTableContainer: BookedTableModule.BookedTableContainer}
   setPeriods: (periods) -> share.periods.set(periods)
   setTimeZone: (timezone) -> share.timezone.set(timezone)
-  setUserForm: (data) -> saveVolunteerForm(@eventName,data)
   isManagerOrLead: (userId,unitId) -> share.isManagerOrLead(userId,unitId)
   isManager: () -> share.isManager()
   isLead: () -> share.isLead()
   teamStats: (id) -> share.TeamStats(id)
   deptStats: (id) -> share.DepartmentStats(id)
-  getSkillsList: share.getSkillsList
-  getQuirksList: share.getQuirksList
+  getSkillsList: getSkillsList
+  getQuirksList: getQuirksList

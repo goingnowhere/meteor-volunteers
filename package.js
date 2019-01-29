@@ -86,10 +86,6 @@ Package.onUse((api) => {
     'client/shifts/signupList.html',
     'client/shifts/signupList.coffee',
 
-    'client/volunteers/userform.html',
-    'client/volunteers/userform.coffee',
-    'client/volunteers/volunteerForm.html',
-    'client/volunteers/volunteerForm.coffee',
     'client/components/volunteers/BookedTable.jsx',
 
     'client/units/team.html',

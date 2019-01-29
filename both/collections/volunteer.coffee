@@ -1,5 +1,6 @@
 import SimpleSchema from 'simpl-schema'
 import moment from 'moment-timezone'
+import { getSkillsList, getQuirksList } from './unit'
 
 # this is the base Volunteers form schema
 share.Schemas.VolunteerForm = new SimpleSchema(
@@ -27,7 +28,7 @@ share.Schemas.VolunteerForm = new SimpleSchema(
       group: "Preferences"
       groupHelp: () -> i18n.__("goingnowhere:volunteers","preferences_help")
       type: "select2"
-      options: share.getSkillsList
+      options: getSkillsList
       afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","skills_help")
       afFieldInput:
         multiple: true
@@ -41,7 +42,7 @@ share.Schemas.VolunteerForm = new SimpleSchema(
       # group: () -> i18n.__("goingnowhere:volunteers","preferences")
       group: "Preferences"
       type: "select2"
-      options: share.getQuirksList
+      options: getQuirksList
       afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","quirks_help")
       afFieldInput:
         multiple: true

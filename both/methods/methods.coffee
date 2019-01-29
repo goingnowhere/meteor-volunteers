@@ -330,27 +330,27 @@ share.initMethods = (eventName) ->
     console.log ["#{prefix}.volunteerForm.remove",formId]
     check(formId,String)
     if share.isManager()
-      share.form.get().remove(formId)
+      share.VolunteerForm.remove(formId)
     else
       return throwError(403, 'Insufficient Permission')
 
   Meteor.methods "#{prefix}.volunteerForm.update": (doc) ->
     console.log ["#{prefix}.volunteerForm.update",doc]
-    schema = share.form.get().simpleSchema()
+    schema = share.VolunteerForm.simpleSchema()
     SimpleSchema.validate(doc.modifier,schema,{ modifier: true })
-    oldDoc = share.form.get().findOne(doc._id)
+    oldDoc = share.VolunteerForm.findOne(doc._id)
     if (Meteor.userId() == oldDoc.userId) || share.isManager()
-      share.form.get().update(doc._id,doc.modifier)
+      share.VolunteerForm.update(doc._id,doc.modifier)
     else
       return throwError(403, 'Insufficient Permission')
 
   Meteor.methods "#{prefix}.volunteerForm.insert": (doc) ->
     console.log ["#{prefix}.volunteerForm.insert",doc]
-    schema = share.form.get().simpleSchema()
+    schema = share.VolunteerForm.simpleSchema()
     SimpleSchema.validate(doc,schema)
     if Meteor.userId()
       doc.userId = Meteor.userId()
-      share.form.get().insert(doc)
+      share.VolunteerForm.insert(doc)
     else
       return throwError(403, 'Insufficient Permission')
 
