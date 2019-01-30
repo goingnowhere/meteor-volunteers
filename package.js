@@ -38,7 +38,6 @@ Package.onUse((api) => {
     'universe:i18n',
     'universe:i18n-blaze',
     'abate:autoform-components',
-    'abate:formbuilder',
     'mdg:validated-method',
   ], ['client', 'server'])
 
