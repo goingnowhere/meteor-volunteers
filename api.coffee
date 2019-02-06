@@ -1,7 +1,6 @@
 import { initMethods } from './both/methods/methods'
 import { getSkillsList, getQuirksList } from './both/collections/unit'
 
-share.form = new ReactiveVar(share.VolunteerForm)
 periods =
   'night': {start:0,end:4},
   'dawn': {start:4,end:8},

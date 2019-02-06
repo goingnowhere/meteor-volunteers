@@ -54,8 +54,8 @@ const mapProps = ({ teamId, reactiveLimit }) => {
   const userId = Meteor.userId()
   const limit = reactiveLimit.get()
 
-  const leadSub = Meteor.subscribe('nowhere2018.Volunteers.Lead', { parentId: teamId }, limit)
-  const leadSignupSub = Meteor.subscribe('nowhere2018.Volunteers.LeadSignups.byUser', userId)
+  const leadSub = Meteor.subscribe(`${share.eventName}.Volunteers.Lead`, { parentId: teamId }, limit)
+  const leadSignupSub = Meteor.subscribe(`${share.eventName}.Volunteers.LeadSignups.byUser`, userId)
   const loaded = leadSub.ready() && leadSignupSub.ready()
 
   const showLoadMore = loaded && share.Lead.find({ parentId: teamId }).count() >= limit
