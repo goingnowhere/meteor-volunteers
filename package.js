@@ -12,8 +12,8 @@ Npm.depends({
   chartjs: '0.3.24',
   'moment-range': '3.1.1',
   'moment-timezone': '0.5.23',
-  react: '16.5.0',
-  'react-dom': '16.5.0',
+  react: '16.8.0',
+  'react-dom': '16.8.0',
   'react-fontawesome': '1.6.1',
 })
 

@@ -1,5 +1,5 @@
 import { checkNpmVersions } from 'meteor/tmeasday:check-npm-versions'
-checkNpmVersions { 'simpl-schema': '0.3.x' }, 'goingnowhere:volunteers'
+checkNpmVersions { 'simpl-schema': '1.x' }, 'goingnowhere:volunteers'
 import SimpleSchema from 'simpl-schema'
 import { getSkillsList, getQuirksList, getLocationList } from './unit'
 SimpleSchema.extendOptions(['autoform'])
