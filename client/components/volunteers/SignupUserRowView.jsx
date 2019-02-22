@@ -7,11 +7,12 @@ import { AutoFormComponents } from 'meteor/abate:autoform-components'
 import { t, T } from '../common/i18n'
 import { ProjectDateInline } from '../common/ProjectDateInline.jsx'
 import { ShiftDateInline } from '../common/ShiftDateInline.jsx'
+import { findOrgUnit } from '../../../both/collections/unit'
 
-export const SignupUserRowView = ({
-  signup,
-  team,
-  duty,
+export const SignupUserRowViewComponent = ({
+  signup = {},
+  team = {},
+  duty = {},
   editProject,
   showInfo,
   bail,
@@ -77,11 +78,14 @@ const bail = signup => () => {
     shiftId,
     userId,
   } = signup
-  share.meteorCall(`${type}Signups.bail`, { parentId, shiftId, userId })
+  if (window.confirm('Are you sure you want to cancel this shift?')) {
+    share.meteorCall(`${type}Signups.bail`, { parentId, shiftId, userId })
+  }
 }
 
-export const SignupUserRowViewContainer = withTracker(({ signup }) => {
-  const team = share.Team.findOne(signup.parentId)
+export const SignupUserRowView = withTracker(({ signup }) => {
+  const orgUnit = findOrgUnit(signup.parentId)
+  const team = orgUnit && orgUnit.unit
   const duty = share.dutiesCollections[signup.type].findOne(signup.shiftId)
   return {
     signup,
@@ -91,4 +95,4 @@ export const SignupUserRowViewContainer = withTracker(({ signup }) => {
     showInfo: showInfo({ duty, team }),
     bail: bail(signup),
   }
-})(SignupUserRowView)
+})(SignupUserRowViewComponent)

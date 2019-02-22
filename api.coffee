@@ -53,7 +53,7 @@ class VolunteersClass
     @components = {}
     if Meteor.isClient
       BookedTableModule = require('./client/components/volunteers/BookedTable.jsx')
-      @components = {BookedTableContainer: BookedTableModule.BookedTableContainer}
+      @components = {BookedTable: BookedTableModule.BookedTable}
   setPeriods: (periods) -> share.periods.set(periods)
   setTimeZone: (timezone) -> share.timezone.set(timezone)
   isManagerOrLead: (userId,unitId) -> share.isManagerOrLead(userId,unitId)

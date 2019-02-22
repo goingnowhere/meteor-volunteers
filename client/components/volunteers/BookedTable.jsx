@@ -3,9 +3,9 @@ import React from 'react'
 import { withTracker } from 'meteor/react-meteor-data'
 import { _ } from 'meteor/underscore'
 
-import { SignupUserRowViewContainer } from './SignupUserRowView.jsx'
+import { SignupUserRowView } from './SignupUserRowView.jsx'
 
-export const BookedTable = ({
+export const BookedTableComponent = ({
   allShifts,
 }) => (
   <div className="container-fluid p-0 bookedTable">
@@ -13,7 +13,7 @@ export const BookedTable = ({
       <div className="container-fluid">
         {allShifts.map(shift => (
           <div key={shift._id} className="flex-column bookedTableItem p-0">
-            <SignupUserRowViewContainer signup={shift} />
+            <SignupUserRowView signup={shift} />
           </div>
         ))}
       </div>
@@ -23,7 +23,7 @@ export const BookedTable = ({
 
 const share = __coffeescriptShare
 
-export const BookedTableContainer = withTracker(({ userId }) => {
+export const BookedTable = withTracker(({ userId }) => {
   const bookedUserId = userId || Meteor.userId()
   Meteor.subscribe(`${share.eventName}.Volunteers.ShiftSignups.byUser`, bookedUserId).ready()
   Meteor.subscribe(`${share.eventName}.Volunteers.ProjectSignups.byUser`, bookedUserId).ready()
@@ -41,4 +41,4 @@ export const BookedTableContainer = withTracker(({ userId }) => {
   return {
     allShifts,
   }
-})(BookedTable)
+})(BookedTableComponent)

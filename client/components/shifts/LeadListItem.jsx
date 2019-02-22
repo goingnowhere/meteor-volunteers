@@ -30,7 +30,7 @@ export const LeadListItem = ({
             }`}
             type="button"
           >
-            <T>signup.status</T>
+            <T>{signup.status}</T>
           </button>
         ) : policy !== 'adminOnly' ? (
           <button
