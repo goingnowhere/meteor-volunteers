@@ -76,6 +76,8 @@
   "select_location": "Elegir localización",
   "double_booking": "Reserva duplicada",
   "double_booking_msg": "No puedes estar en dos sitios a la vez",
+  "shift_full": "Turno completo",
+  "shift_full_msg": "Tenemos el máximo número de voluntarios",
   "confirmed": "Confirmado",
   "priority_help_duty": "Los turnos Esenciales serán propuestos primero, seguido por los Importantes y luego los Normales. Elige 'Normal' si no estás seguro.",
   "policy_help_duty": "los turnos que 'NecesitanAprobación' no requieren la validación de un Líder de Equipo. Los usuarios pueden unirse libremente al Turno público. SoloAdministradores no aparecerá en la lista",

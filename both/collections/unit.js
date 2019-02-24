@@ -40,4 +40,5 @@ export const findOrgUnit = (unitId) => {
       type: 'division',
     }
   }
+  return {}
 }

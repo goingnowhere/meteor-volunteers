@@ -1,7 +1,7 @@
 import SimpleSchema from 'simpl-schema'
 import Moment from 'moment'
 import { extendMoment } from 'moment-range'
-import { findConflicts } from './methods'
+
 moment = extendMoment(Moment)
 
 throwError = (error, reason, details) ->
@@ -118,86 +118,11 @@ share.initMethods = (eventName) ->
         do ->
           createDutiesMethod(collection,type, kind)
 
-  createSignupMethod = (collectionKey, parentCollection, type) ->
-    collection = share[collectionKey]
-    schema = share.Schemas[collectionKey]
-    collectionName = collection._name
-    switch type
-      when "remove"
-        Meteor.methods "#{collectionName}.remove": (shiftId) ->
-          console.log ["#{collectionName}.remove", shiftId]
-          check(shiftId, String)
-          olddoc = collection.findOne(shiftId)
-          if share.isManagerOrLead(Meteor.userId(),[olddoc.parentId])
-            collection.remove(shiftId)
-          else
-            return throwError(403, 'Insufficient Permission')
-      when "update"
-        Meteor.methods "#{collectionName}.update": (doc) ->
-          console.log ["#{collectionName}.update", doc]
-          SimpleSchema.validate(doc.modifier, schema, { modifier: true })
-          olddoc = collection.findOne(doc._id)
-          if share.isManagerOrLead(Meteor.userId(),[olddoc.parentId])
-            doc.modifier.$set.enrolled = false
-            doc.modifier.$set.reviewed = (olddoc.status == 'pending' && doc.status != 'pending')
-            collection.update(doc._id, doc.modifier)
-          else
-            return throwError(403, 'Insufficient Permission')
-      when "insert"
-        # this is actually an upsert
-        Meteor.methods "#{collectionName}.insert": (wholeSignup) ->
-          console.log ["#{collectionName}.insert", wholeSignup]
-          SimpleSchema.validate(wholeSignup, schema.omit('status'))
-          userId = Meteor.userId()
-          signupIdentifiers = _.pick(wholeSignup,['userId','shiftId','parentId'])
-          parentDoc = parentCollection.findOne(signupIdentifiers.shiftId)
-          isAdmin = share.isManagerOrLead(userId,[parentDoc.parentId])
-          if (signupIdentifiers.userId == userId) || isAdmin
-            status =
-              if parentDoc.policy == "public" then "confirmed"
-              else if parentDoc.policy == "requireApproval" then "pending"
-              else if (parentDoc.policy == "adminOnly" && isAdmin) then "pending"
-            if status
-              db = findConflicts(wholeSignup,collectionKey)
-              if db.length == 0
-                if Meteor.isServer
-                  { start, end, enrolled } = wholeSignup
-                  res = collection.upsert(signupIdentifiers,{
-                    $set: {status,start,end,enrolled,notification:false}})
-                  if res?.insertedId?
-                    return res.insertedId
-                  else
-                    return collection.findOne(signupIdentifiers)._id
-              else
-                return throwError(409, 'Double Booking', db)
-            else
-              return throwError(500, 'Invalid status', db)
-          else
-            return throwError(403, 'Insufficient Permission')
-      when "bail"
-        Meteor.methods "#{collectionName}.bail": (sel) ->
-          console.log ["#{collectionName}.bail", sel]
-          SimpleSchema.validate(sel, schema.omit('status','start','end'))
-          userId = Meteor.userId()
-          if (sel.userId == userId) || (share.isManagerOrLead(userId,[sel.parentId]))
-            # multi : true just in case it is possible to singup for the same shift twice
-            # this should not be possible. Failsafe !
-            collection.update(sel, {$set: {status: "bailed", enrolled: false}}, {multi: true})
-          else
-            return throwError(403, 'Insufficient Permission')
-
   for type in ["remove","insert","update"]
     do ->
       for kind,collection of share.orgUnitCollections
         do ->
           createOrgUnitMethod(collection, type, kind)
-
-  for type in ['remove', 'update', 'insert', 'bail']
-    do ->
-      # XXX I think here we can do the same using share.dutiesCollections
-      createSignupMethod('ShiftSignups', share.TeamShifts, type)
-      createSignupMethod('TaskSignups', share.TeamTasks, type)
-      createSignupMethod('ProjectSignups', share.Projects, type)
 
   prefix = "#{eventName}.Volunteers"
 

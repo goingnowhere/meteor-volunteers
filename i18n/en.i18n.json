@@ -76,6 +76,8 @@
   "select_location": "Select Location",
   "double_booking": "Double Booking",
   "double_booking_msg": "You cannot be in two places at once",
+  "shift_full": "Shift Full",
+  "shift_full_msg": "We already have the maximum number of volunteers",
   "confirmed": "Confirmed",
   "priority_help_duty": "Essential shift will be proposed first, then Important, then Normal. Choose normal if unsure.",
   "policy_help_duty": "RequireApproval shift do not need lead's validation. users can freely join Public shift. AdminOnly will not be listed",

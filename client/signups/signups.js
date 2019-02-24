@@ -2,15 +2,13 @@
 import { ReactiveVar } from 'meteor/reactive-var'
 import { AutoFormComponents } from 'meteor/abate:autoform-components'
 import { Template } from 'meteor/templating'
-import Moment from 'moment-timezone'
-import { extendMoment } from 'moment-range' // eslint-disable-line import/no-unresolved
+import moment from 'moment-timezone'
 
 import { ProjectDateInline } from '../components/common/ProjectDateInline.jsx'
 import { ShiftDateInline } from '../components/common/ShiftDateInline.jsx'
 
 const share = __coffeescriptShare
 
-const moment = extendMoment(Moment)
 moment.tz.setDefault(share.timezone.get())
 
 Template.teamSignupsList.bindI18nNamespace('goingnowhere:volunteers')
@@ -73,8 +71,7 @@ Template.teamSignupsList.events({
     if (type === 'lead') {
       share.meteorCall(`${type}Signups.confirm`, signupId)
     } else {
-      const signup = { _id: signupId, modifier: { $set: { status: 'confirmed' } } }
-      share.meteorCall(`${type}Signups.update`, signup)
+      share.meteorCall(`${type}Signups.setStatus`, { id: signupId, status: 'confirmed' })
     }
   },
   'click [data-action="refuse"]': function e(event, template) {
@@ -83,8 +80,7 @@ Template.teamSignupsList.events({
     if (type === 'lead') {
       share.meteorCall(`${type}Signups.refuse`, signupId)
     } else {
-      const signup = { _id: signupId, modifier: { $set: { status: 'refused' } } }
-      share.meteorCall(`${type}Signups.update`, signup)
+      share.meteorCall(`${type}Signups.setStatus`, { id: signupId, status: 'refused' })
     }
   },
   'click [data-action="user-info"]': function e(event, template) {

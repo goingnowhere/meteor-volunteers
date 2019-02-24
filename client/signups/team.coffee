@@ -4,6 +4,7 @@ import Moment from 'moment'
 import 'moment-timezone'
 import { extendMoment } from 'moment-range'
 
+import { projectSignupsConfirmed } from '../../both/stats'
 import { ProjectDateInline } from '../components/common/ProjectDateInline.jsx'
 import { ShiftDateInline } from '../components/common/ShiftDateInline.jsx'
 
@@ -194,7 +195,7 @@ Template.projectStaffingChart.bindI18nNamespace('goingnowhere:volunteers')
 Template.projectStaffingChart.helpers
   stackedBarData: (project) ->
     confirmedSignups = Template.currentData().confirmedSignups
-    signupData = _.extend(share.projectSignupsConfirmed(project),{_id:project._id})
+    signupData = _.extend(projectSignupsConfirmed(project), { _id: project._id })
     if confirmedSignups
       signupData = _.extend(signupData, {
         confirmed: confirmedSignups,

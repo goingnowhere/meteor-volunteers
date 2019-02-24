@@ -1,6 +1,7 @@
 import SimpleSchema from 'simpl-schema'
 import moment from 'moment-timezone'
 import { getSkillsList, getQuirksList } from './unit'
+import { signupStatuses } from './volunteer'
 
 # this is the base Volunteers form schema
 share.Schemas.VolunteerForm = new SimpleSchema(
@@ -87,7 +88,7 @@ commonSignups = new SimpleSchema(
       type: "hidden"
   status:
     type: String
-    allowedValues: ["confirmed", "pending", "refused", "bailed", "cancelled"]
+    allowedValues: signupStatuses
     autoform:
       type: "hidden"
       defaultValue: "pending"
@@ -117,8 +118,9 @@ share.Schemas.ProjectSignups = new SimpleSchema(
     type: Date
     label: () -> i18n.__("goingnowhere:volunteers", "end")
     custom: () ->
-      start = moment(this.field('start').value)
-      if !moment(this.value).isSameOrAfter(start)
-        return "minDateCustom"
+      if this.isSet
+        start = moment(this.field('start').value)
+        if !moment(this.value).isSameOrAfter(start)
+          return "minDateCustom"
 )
 share.Schemas.ProjectSignups.extend(commonSignups)

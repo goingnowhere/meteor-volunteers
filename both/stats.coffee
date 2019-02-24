@@ -1,8 +1,5 @@
-import Moment from 'moment'
-import 'moment-timezone'
-import { extendMoment } from 'moment-range'
+import moment from 'moment-timezone'
 
-moment = extendMoment(Moment)
 moment.tz.setDefault(share.timezone.get())
 
 # signups -> userId list
@@ -115,32 +112,6 @@ getUnits = (sel,type) ->
         .value()
     return u
     )
-
-share.projectSignupsConfirmed = (p) ->
-  range = moment.range(moment(p.start),moment(p.end))
-  pdays = Array.from(range.by('day'))
-  dayStrings = pdays.map((m) -> m.toISOString())
-  needed = _.object(dayStrings,p.staffing.map((s) -> s.min))
-  confirmed = _.object(dayStrings,Array(pdays.length).fill(0))
-  signups = share.ProjectSignups.find({shiftId: p._id, status: 'confirmed'}).fetch()
-  _.each(signups,((signup) ->
-    pdays.forEach((day) ->
-      dayString = day.toISOString()
-      if day.isBetween(signup.start, signup.end, 'days', '[]')
-        confirmed[dayString] = confirmed[dayString] + 1
-        needed[dayString] = needed[dayString] - 1
-    )
-  ))
-  filter = (arr) ->
-    _.chain(Object.entries(arr))
-    .sortBy((e) -> moment(e[0]))
-    .map((e) -> e[1])
-    .value()
-  return {
-    needed: filter(needed),
-    confirmed: filter(confirmed),
-    days: dayStrings
-  }
 
 share.TeamStats = (parentId) ->
   # All pending requests for tasks, shifts and leads

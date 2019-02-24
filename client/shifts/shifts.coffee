@@ -129,23 +129,30 @@ Template.dutiesListItemDate.events
     else
       share.meteorCall "#{type}Signups.insert", doc, (err,res) ->
         if err
-          switch err.error
-            when 409
-              Bert.alert({
-                hideDelay: 6500,
-                title: i18n.__("goingnowhere:volunteers","double_booking"),
-                message: i18n.__("goingnowhere:volunteers","double_booking_msg"),
-                type: 'warning',
-                style: 'growl-top-right',
-                })
-            else
-              Bert.alert({
-                hideDelay: 6500,
-                title: i18n.__("goingnowhere:volunteers","error"),
-                message: err.reason,
-                type: 'danger',
-                style: 'growl-top-right',
-              })
+          if err.error == 409 && err.message == 'Double Booking'
+            Bert.alert({
+              hideDelay: 6500,
+              title: i18n.__("goingnowhere:volunteers","double_booking"),
+              message: i18n.__("goingnowhere:volunteers","double_booking_msg"),
+              type: 'warning',
+              style: 'growl-top-right',
+            })
+          else if err.error == 409
+            Bert.alert({
+              hideDelay: 6500,
+              title: i18n.__("goingnowhere:volunteers","shift_full"),
+              message: i18n.__("goingnowhere:volunteers","shift_full_msg"),
+              type: 'warning',
+              style: 'growl-top-right',
+            })
+          else
+            Bert.alert({
+              hideDelay: 6500,
+              title: i18n.__("goingnowhere:volunteers","error"),
+              message: err.reason,
+              type: 'danger',
+              style: 'growl-top-right',
+            })
 
   sameDayHelper = {
     'sameDay': (start, end) -> moment(start).isSame(moment(end),"day")
