@@ -1,3 +1,4 @@
+# import { setPickerTimezone } from 'meteor/abate:autoform-datetimepicker'
 import { initMethods } from './both/methods/methods'
 import { getSkillsList, getQuirksList } from './both/collections/unit'
 
@@ -55,7 +56,11 @@ class VolunteersClass
       BookedTableModule = require('./client/components/volunteers/BookedTable.jsx')
       @components = {BookedTable: BookedTableModule.BookedTable}
   setPeriods: (periods) -> share.periods.set(periods)
-  setTimeZone: (timezone) -> share.timezone.set(timezone)
+  setTimeZone: (timezone) ->
+    share.timezone.set(timezone)
+    share.setMethodTimezone(timezone)
+    if Meteor.isClient
+      require('meteor/abate:autoform-datetimepicker').setPickerTimezone(timezone)
   isManagerOrLead: (userId,unitId) -> share.isManagerOrLead(userId,unitId)
   isManager: () -> share.isManager()
   isLead: () -> share.isLead()

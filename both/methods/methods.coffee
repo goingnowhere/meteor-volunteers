@@ -1,5 +1,5 @@
 import SimpleSchema from 'simpl-schema'
-import Moment from 'moment'
+import Moment from 'moment-timezone'
 import { extendMoment } from 'moment-range'
 
 moment = extendMoment(Moment)
@@ -11,6 +11,9 @@ throwError = (error, reason, details) ->
   else if Meteor.isServer
     throw error
   return
+
+share.setMethodTimezone = (timezone) ->
+  moment.tz.setDefault(timezone)
 
 share.initMethods = (eventName) ->
 
@@ -173,7 +176,7 @@ share.initMethods = (eventName) ->
       shifts = shifts.filter(Boolean).map((s,idx) ->
         _.extend(s,{oldRotaId: s.rotaId, rotaId:idx}))
       Array.from(moment.range(start, end).by('days')).forEach((day) ->
-        timezone = moment().format('ZZ')
+        timezone = moment(day).format('ZZ')
         day.utcOffset(timezone)
         sel = {
           parentId, groupId,
@@ -230,7 +233,7 @@ share.initMethods = (eventName) ->
           # js Date() is timezone agnostic and always stored in UTC.
           # Using the method Date().toString() the local timezone (set on the server)
           # is used to print the date.
-          timezone = moment().format('ZZ')
+          timezone = moment(day).format('ZZ')
           day.utcOffset(timezone)
           shiftStart = moment(day).hour(startHour).minute(startMin).utcOffset(timezone, true)
           shiftEnd = moment(day).hour(endHour).minute(endMin).utcOffset(timezone, true)

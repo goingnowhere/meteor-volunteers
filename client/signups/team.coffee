@@ -1,7 +1,6 @@
 import { Chart } from 'chart.js'
 
-import Moment from 'moment'
-import 'moment-timezone'
+import Moment from 'moment-timezone'
 import { extendMoment } from 'moment-range'
 
 import { projectSignupsConfirmed } from '../../both/stats'

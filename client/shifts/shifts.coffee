@@ -1,7 +1,6 @@
 import SimpleSchema from 'simpl-schema'
 
-import Moment from 'moment'
-import 'moment-timezone'
+import Moment from 'moment-timezone'
 import { extendMoment } from 'moment-range'
 
 import { DutiesListItem } from '../components/shifts/DutiesListItem';
