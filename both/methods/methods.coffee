@@ -166,16 +166,22 @@ share.initMethods = (eventName) ->
       genericModifier = _.omit(doc.modifier.$set,'shifts','start','end',)
       { start, end, shifts , oldshifts } = doc.modifier.$set
 
-      # remove all shifts that are not in the new range
-      # share.TeamShifts.remove({ groupId, parentId, $or: [
-      #   { start: { $gt: start }},
-      #   { start: { $lt: end }}, ]
-      # })
+      # Remove shifts outside of the altered rota dates
+      # TODO When not using autoform extract this and add a check with user about deleting shifts
+      [startHour, startMin] = shifts[0].startTime.split(':')
+      [endHour, endMin] = shifts[shifts.length - 1].endTime.split(':')
+      firstShiftStart = moment(start).hour(startHour).minute(startMin)
+      lastShiftEnd = moment(end).hour(endHour).minute(endMin)
+      share.TeamShifts.remove({ groupId, parentId, $or: [
+        { start: { $lt: firstShiftStart.toDate() }},
+        { end: { $gt: lastShiftEnd.toDate() }}, ]
+      })
 
       oldshifts = oldshifts.filter(Boolean)
       shifts = shifts.filter(Boolean).map((s,idx) ->
         _.extend(s,{oldRotaId: s.rotaId, rotaId:idx}))
       Array.from(moment.range(start, end).by('days')).forEach((day) ->
+        # Do we need to do this per day or can we get a country code instead of a offset?
         timezone = moment(day).format('ZZ')
         day.utcOffset(timezone)
         sel = {
