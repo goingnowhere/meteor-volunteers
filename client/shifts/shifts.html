@@ -2,74 +2,6 @@
   <div>{{> React component=DutiesListItem duty=this }}</div>
 </template>
 
-<template name="dutiesListItemGroupped">
-  {{#if Template.subscriptionsReady }}
-    <div>{{> React component=DutiesListItem duty=duty}}</div>
-    <div class="row no-gutters pt-2 align-items-center">
-      {{#if $eq duty.type 'project'}}
-        {{> dutiesListItemDate duty }}
-      {{else}}
-        <div class="col">
-          <div class="btn-action">
-            <h5 class="mb-0">{{ duty.length }} {{__ ".shift_length_hours"}}</h5>
-          </div>
-        </div>
-        <div class="col">
-          <button
-            class="btn btn-action btn-primary"
-            data-parent-id="{{duty.parentId}}"
-            data-group-title="{{duty.title}}"
-            data-duty-type="{{duty.type}}"
-            data-action="chooseShifts"
-          >{{__ ".choose_shifts"}}</button>
-        </div>
-      {{/if}}
-    </div>
-  {{/if}}
-</template>
-
-<template name="dutiesListItemDate">
-  {{#if $eq type "project"}}
-    {{> projectDate }}
-  {{else}}
-    {{> shiftDate }}
-  {{/if}}
-  <div class="col p-0">
-    {{#if $and signup.status ($neq signup.status 'bailed')}}
-      <div class="d-flex">
-        <button class="btn btn-action disabled
-          {{#if $eq signup.status 'confirmed'}}btn-success{{/if}}">
-          {{__ signup.status }}
-        </button>
-        <button class="btn btn-primary btn-action" data-shiftid="{{_id}}"
-          data-parentid="{{parentId}}" data-type="{{type}}" data-action="bail">
-            {{__ ".cancel" }}
-        </button>
-      </div>
-    {{else}}
-      {{#unless $eq policy "adminOnly"}}
-        <button class="btn btn-primary btn-action" data-shiftid="{{_id}}"
-          data-parentid="{{parentId}}" data-type="{{type}}" data-action="apply"
-          disabled="{{#unless spotsleft}}true{{/unless}}">
-          {{#if $eq type "project"}}
-            {{__ ".choose_date"}}
-          {{else}}
-            {{#if $eq policy "public"}}{{__ ".join"}}{{/if}}
-            {{#if $eq policy "requireApproval"}}{{__ ".apply"}}{{/if}}
-            {{#if gaps}}
-              ({{gaps}} {{__ ".people_needed"}})
-            {{else}}
-              ({{spotsleft}} {{__ ".spots_left"}})
-            {{/if}}
-          {{/if}}
-        </button>
-      {{else}}
-        {{__ ".admin_only"}}
-      {{/unless}}
-    {{/if}}
-  </div>
-</template>
-
 <!-- Create a new shift give for a given team
    args: Team
 -->
@@ -143,29 +75,12 @@
   </div>
 </template>
 
-<!-- helper display to format the date of a shift. used in dutiesListItem and ... -->
-<template name="shiftDate">
-  <div class="col"><h5 class="m-0">{{formatDate start}}</h5></div>
-  <div class="col"><h5 class="m-0">{{formatTime start}} -
-    {{#if sameDay start end}}
-      {{formatTime end}}
-    {{else}}
-      {{formatTime end}} {{differenceTime start end}}
-    {{/if}}
-  </h5></div>
-</template>
-
 <template name="shiftDateInline">
   {{#if sameDay start end}}
     <h6>{{formatDateTime start}} - {{formatTime end}}</h6>
   {{else}}
     <h6>{{formatDateTime start}} - {{formatTime end}} {{differenceTime start end}}</h6>
   {{/if}}
-</template>
-
-<template name="projectDate">
-  <div class="col"><h5 class="mb-0">{{formatDate start}}</h5><h6>{{longformDay start}}</h6></div>
-  <div class="col"><h5 class="mb-0">{{formatDate end}}</h5><h6>{{longformDay end}}</h6></div>
 </template>
 
 <template name="taskDate">
@@ -193,24 +108,4 @@
         doc=signup}}
     {{/if}}
   {{/if}}
-</template>
-
-<template name="signupModal">
-  <div class="modal fade">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header">
-          {{title}}
-          <button type="button" class="close" data-dismiss="modal">
-            <span aria-hidden="true">&times;</span> <span class="sr-only">Close</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          {{#each dutydate in allDates }}
-            <div class="list-item row align-items-center px-2">{{> dutiesListItemDate dutydate }}</div>
-          {{/each}}
-        </div>
-      </div>
-    </div>
-  </div>
 </template>

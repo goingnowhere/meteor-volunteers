@@ -7,6 +7,7 @@ import { AutoFormComponents } from 'meteor/abate:autoform-components'
 import { t, T } from '../common/i18n'
 import { ProjectDateInline } from '../common/ProjectDateInline.jsx'
 import { ShiftDateInline } from '../common/ShiftDateInline.jsx'
+import { bailCall } from '../../utils/signups'
 import { findOrgUnit } from '../../../both/collections/unit'
 
 export const SignupUserRowViewComponent = ({
@@ -71,18 +72,6 @@ const showInfo = ({ duty, team }) => () => {
   AutoFormComponents.ModalShowWithTemplate('dutyListItem', { ...duty, team })
 }
 
-const bail = signup => () => {
-  const {
-    type,
-    parentId,
-    shiftId,
-    userId,
-  } = signup
-  if (window.confirm('Are you sure you want to cancel this shift?')) {
-    share.meteorCall(`${type}Signups.bail`, { parentId, shiftId, userId })
-  }
-}
-
 export const SignupUserRowView = withTracker(({ signup }) => {
   const orgUnit = findOrgUnit(signup.parentId)
   const team = orgUnit && orgUnit.unit
@@ -93,6 +82,6 @@ export const SignupUserRowView = withTracker(({ signup }) => {
     duty,
     editProject: editProject({ duty, signup }),
     showInfo: showInfo({ duty, team }),
-    bail: bail(signup),
+    bail: bailCall(signup),
   }
 })(SignupUserRowViewComponent)

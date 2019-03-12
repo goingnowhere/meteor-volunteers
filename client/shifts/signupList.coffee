@@ -1,5 +1,6 @@
 import SimpleSchema from 'simpl-schema'
 import { LeadListItemGroupedContainer } from '../components/shifts/LeadListItemGrouped.jsx'
+import { DutiesListItemGrouped } from '../components/shifts/DutiesListItemGrouped.jsx'
 
 ShiftTitles = new Mongo.Collection(null)
 
@@ -58,6 +59,7 @@ Template.signupsListTeam.onCreated () ->
           addLocalDutiesCollection(team,share.Projects,'project',sel,limit)
 
 Template.signupsListTeam.helpers
+  DutiesListItemGrouped: () -> DutiesListItemGrouped
   'allShifts': () ->
     template = Template.instance()
     {team, dutyType = ''} = template.data

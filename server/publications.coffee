@@ -322,7 +322,7 @@ share.initPublications = (eventName) ->
         { $group: {
           _id: "$_id",
           signedUp: { $sum: { "$cond": [
-            { $eq: [ "$signups.status", "confirmed" ] },1,0 ]
+            { $in: [ "$signups.status", [ "confirmed", "pending" ] ] },1,0 ]
           }},
           min: { $first: "$min" },
           max: { $first: "$max" },

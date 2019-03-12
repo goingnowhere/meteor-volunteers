@@ -6,18 +6,18 @@ import React from 'react'
 
 import { T } from '../common/i18n'
 import { LeadListItem } from './LeadListItem.jsx'
+import { applyCall } from '../../utils/signups'
 
 export const LeadListItemGrouped = ({
   allLeads,
   loaded,
   showLoadMore,
-  apply,
   loadMoreLeads,
 }) => (
   <div className="row justify-content-between align-content-center no-gutters">
     {loaded && allLeads.length > 0 && (
       <div className="container-fluid signupsListItem">
-        {allLeads.map(lead => <LeadListItem key={lead._id} lead={lead} apply={apply(lead)} />)}
+        {allLeads.map(lead => <LeadListItem key={lead._id} lead={lead} apply={applyCall(lead)} />)}
         {showLoadMore && (
           <div className="row align-content-right no-gutters">
             <div className="col-md-2 offset-md-8">
@@ -71,15 +71,10 @@ const mapProps = ({ teamId, reactiveLimit }) => {
     reactiveLimit.set(limit + 2)
   }
 
-  const apply = ({ _id, type, parentId }) => () => {
-    share.meteorCall(`${type}Signups.insert`, { parentId, shiftId: _id, userId })
-  }
-
   return {
     allLeads,
     loaded,
     showLoadMore,
-    apply,
     loadMoreLeads,
   }
 }

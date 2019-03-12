@@ -15,6 +15,7 @@ Npm.depends({
   react: '16.8.0',
   'react-dom': '16.8.0',
   'react-fontawesome': '1.6.1',
+  'react-modal': '3.8.1',
 })
 
 Package.onUse((api) => {
@@ -50,6 +51,7 @@ Package.onUse((api) => {
     'peppelg:bootstrap-3-modal',
     'react-template-helper',
     'react-meteor-data',
+    'themeteorchef:bert',
   ], 'client')
 
   api.use([
