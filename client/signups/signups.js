@@ -1,4 +1,5 @@
 /* globals __coffeescriptShare */
+import { Meteor } from 'meteor/meteor'
 import { ReactiveVar } from 'meteor/reactive-var'
 import { AutoFormComponents } from 'meteor/abate:autoform-components'
 import { Template } from 'meteor/templating'
@@ -137,22 +138,15 @@ Template.managerSignupsList.onCreated(function onCreated() {
 })
 
 Template.managerSignupsList.helpers({
-  allSignups: () => {
-    const divisionIds = share.Division.find().map(t => t._id)
-    const deptIds = share.Department.find({ parentId: { $in: divisionIds } }).map(t => t._id)
-    const teamIds = share.Team.find({ parentId: { $in: deptIds } }).map(t => t._id)
-    const leads = share.LeadSignups.find({
-      parentId: { $in: teamIds.concat(deptIds).concat(divisionIds) },
-      status: 'pending',
-    }, { sort: { createdAt: -1 } }).map(signup => ({
-      ...signup,
-      type: 'lead',
-      // XXX this should be either team, dept or division
-      unit: share.Department.findOne(signup.parentId),
-      duty: share.Lead.findOne(signup.shiftId),
-    })).sort((a, b) => a.createdAt && b.createdAt && a.createdAt.getTime() - b.createdAt.getTime())
-    return leads
-  },
+  allSignups: () => share.LeadSignups.find({
+    status: 'pending',
+  }, { sort: { createdAt: -1 } }).map(signup => ({
+    ...signup,
+    type: 'lead',
+    // XXX this should be either team, dept or division
+    unit: share.Department.findOne(signup.parentId),
+    duty: share.Lead.findOne(signup.shiftId),
+  })),
 })
 
 Template.managerSignupsList.events({
