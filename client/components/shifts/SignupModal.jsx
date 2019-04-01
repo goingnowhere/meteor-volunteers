@@ -18,7 +18,7 @@ export const SignupModalComponent = ({
     isOpen={modalOpen}
     className="modal-dialog modal-lg"
     // We need to force Bootstrap to behave
-    style={{ overlay: { zIndex: 1030, backgroundColor: '#0008' } }}
+    style={{ overlay: { zIndex: 1030, backgroundColor: '#0008', overflowY: 'auto' } }}
     onRequestClose={() => showModal(false)}
   >
     <div className="modal-content">
