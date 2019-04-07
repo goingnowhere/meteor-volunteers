@@ -20,7 +20,7 @@ uniqueVolunteers = (allSignups) ->
 # (sel,type,duty,signup) -> duty list
 getDuties = (sel, type, duty, signup) ->
   sort = {sort: {start: 1, priority: 1}}
-  duty.find(sel).map((v) ->
+  duty.find(sel, sort).map((v) ->
     confirmedSignups = signup.find({status: "confirmed", shiftId: v._id},sort)
     signups = confirmedSignups.fetch()
     volunteers = uniqueVolunteers(signups)
