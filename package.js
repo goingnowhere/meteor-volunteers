@@ -8,30 +8,30 @@ Package.describe({
 })
 
 Npm.depends({
-  bootstrap: '4.0.0',
-  chartjs: '0.3.24',
-  'moment-range': '3.1.1',
+  bootstrap: '4.3.1',
+  'chart.js': '2.8.0',
+  'moment-range': '4.0.2',
   'moment-timezone': '0.5.23',
-  react: '16.8.0',
-  'react-dom': '16.8.0',
+  react: '16.8.6',
+  'react-dom': '16.8.6',
   'react-fontawesome': '1.6.1',
   'react-modal': '3.8.1',
 })
 
 Package.onUse((api) => {
-  api.versionsFrom('1.4')
+  api.versionsFrom('1.8')
 
   api.use([
     'mongo',
     'coffeescript',
     'ecmascript',
     'tmeasday:check-npm-versions',
-    'aldeed:collection2@3.0.0',
+    'aldeed:collection2@3.0.2',
     'aldeed:autoform@6.3.0',
     'aldeed:autoform-select2',
     'check',
     'underscore',
-    'reywood:publish-composite@1.5.2',
+    'reywood:publish-composite@1.7.0',
     'piemonkey:roles',
     'reactive-dict',
     'reactive-var',

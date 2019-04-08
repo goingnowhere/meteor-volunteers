@@ -2,14 +2,34 @@
   "lockfileVersion": 1,
   "dependencies": {
     "bootstrap": {
-      "version": "4.0.0",
-      "resolved": "https://registry.npmjs.org/bootstrap/-/bootstrap-4.0.0.tgz",
-      "integrity": "sha512-gulJE5dGFo6Q61V/whS6VM4WIyrlydXfCgkE+Gxe5hjrJ8rXLLZlALq7zq2RPhOc45PSwQpJkrTnc2KgD6cvmA=="
+      "version": "4.3.1",
+      "resolved": "https://registry.npmjs.org/bootstrap/-/bootstrap-4.3.1.tgz",
+      "integrity": "sha512-rXqOmH1VilAt2DyPzluTi2blhk17bO7ef+zLLPlWvG494pDxcM234pJ8wTc/6R40UWizAIIMgxjvxZg5kmsbag=="
     },
-    "chartjs": {
-      "version": "0.3.24",
-      "resolved": "https://registry.npmjs.org/chartjs/-/chartjs-0.3.24.tgz",
-      "integrity": "sha1-Ot3rWuNgaz6J40bCfVLKFYQW6T0="
+    "chart.js": {
+      "version": "2.8.0",
+      "resolved": "https://registry.npmjs.org/chart.js/-/chart.js-2.8.0.tgz",
+      "integrity": "sha512-Di3wUL4BFvqI5FB5K26aQ+hvWh8wnP9A3DWGvXHVkO13D3DSnaSsdZx29cXlEsYKVkn1E2az+ZYFS4t0zi8x0w=="
+    },
+    "chartjs-color": {
+      "version": "2.3.0",
+      "resolved": "https://registry.npmjs.org/chartjs-color/-/chartjs-color-2.3.0.tgz",
+      "integrity": "sha512-hEvVheqczsoHD+fZ+tfPUE+1+RbV6b+eksp2LwAhwRTVXEjCSEavvk+Hg3H6SZfGlPh/UfmWKGIvZbtobOEm3g=="
+    },
+    "chartjs-color-string": {
+      "version": "0.6.0",
+      "resolved": "https://registry.npmjs.org/chartjs-color-string/-/chartjs-color-string-0.6.0.tgz",
+      "integrity": "sha512-TIB5OKn1hPJvO7JcteW4WY/63v6KwEdt6udfnDE9iCAZgy+V4SrbSxoIbTw/xkUIapjEI4ExGtD0+6D3KyFd7A=="
+    },
+    "color-convert": {
+      "version": "0.5.3",
+      "resolved": "https://registry.npmjs.org/color-convert/-/color-convert-0.5.3.tgz",
+      "integrity": "sha1-vbbGnOZg+t/+CwAHzER+G59ygr0="
+    },
+    "color-name": {
+      "version": "1.1.4",
+      "resolved": "https://registry.npmjs.org/color-name/-/color-name-1.1.4.tgz",
+      "integrity": "sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA=="
     },
     "d": {
       "version": "1.0.0",
@@ -52,9 +72,9 @@
       "integrity": "sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg=="
     },
     "moment-range": {
-      "version": "3.1.1",
-      "resolved": "https://registry.npmjs.org/moment-range/-/moment-range-3.1.1.tgz",
-      "integrity": "sha1-XFLPn6sp253ZvNhtN+UrBKenJxo="
+      "version": "4.0.2",
+      "resolved": "https://registry.npmjs.org/moment-range/-/moment-range-4.0.2.tgz",
+      "integrity": "sha512-n8sceWwSTjmz++nFHzeNEUsYtDqjgXgcOBzsHi+BoXQU2FW+eU92LUaK8gqOiSu5PG57Q9sYj1Fz4LRDj4FtKA=="
     },
     "moment-timezone": {
       "version": "0.5.23",
@@ -77,14 +97,14 @@
       "integrity": "sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ=="
     },
     "react": {
-      "version": "16.8.0",
-      "resolved": "https://registry.npmjs.org/react/-/react-16.8.0.tgz",
-      "integrity": "sha512-g+nikW2D48kqgWSPwNo0NH9tIGG3DsQFlrtrQ1kj6W77z5ahyIHG0w8kPpz4Sdj6gyLnz0lEd/xsjOoGge2MYQ=="
+      "version": "16.8.6",
+      "resolved": "https://registry.npmjs.org/react/-/react-16.8.6.tgz",
+      "integrity": "sha512-pC0uMkhLaHm11ZSJULfOBqV4tIZkx87ZLvbbQYunNixAAvjnC+snJCg0XQXn9VIsttVsbZP/H/ewzgsd5fxKXw=="
     },
     "react-dom": {
-      "version": "16.8.0",
-      "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-16.8.0.tgz",
-      "integrity": "sha512-dBzoAGYZpW9Yggp+CzBPC7q1HmWSeRc93DWrwbskmG1eHJWznZB/p0l/Sm+69leIGUS91AXPB/qB3WcPnKx8Sw=="
+      "version": "16.8.6",
+      "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-16.8.6.tgz",
+      "integrity": "sha512-1nL7PIq9LTL3fthPqwkvr2zY7phIPjYrT0jp4HjyEQrEROnw4dG41VVwi/wfoCneoleqrNX7iAD+pXebJZwrwA=="
     },
     "react-fontawesome": {
       "version": "1.6.1",
@@ -92,9 +112,9 @@
       "integrity": "sha1-7dzhfn3HMaoJ/UoYZoimF5OhbFw="
     },
     "react-is": {
-      "version": "16.8.4",
-      "resolved": "https://registry.npmjs.org/react-is/-/react-is-16.8.4.tgz",
-      "integrity": "sha512-PVadd+WaUDOAciICm/J1waJaSvgq+4rHE/K70j0PFqKhkTBsPv/82UGQJNXAngz1fOQLLxI6z1sEDmJDQhCTAA=="
+      "version": "16.8.6",
+      "resolved": "https://registry.npmjs.org/react-is/-/react-is-16.8.6.tgz",
+      "integrity": "sha512-aUk3bHfZ2bRSVFFbbeVS4i+lNPZr3/WM5jT2J5omUVV1zzcs1nAaf3l51ctA5FFvCRbhrH0bdAsRRQddFJZPtA=="
     },
     "react-lifecycles-compat": {
       "version": "3.0.4",
@@ -107,9 +127,9 @@
       "integrity": "sha512-aLKeZM9pgXpIKVwopRHMuvqKWiBajkqisDA8UzocdCF6S4fyKVfLWmZR5G1Q0ODBxxxxf2XIwiCP8G/11GJAuw=="
     },
     "scheduler": {
-      "version": "0.13.4",
-      "resolved": "https://registry.npmjs.org/scheduler/-/scheduler-0.13.4.tgz",
-      "integrity": "sha512-cvSOlRPxOHs5dAhP9yiS/6IDmVAVxmk33f0CtTJRkmUWcb1Us+t7b1wqdzoC0REw2muC9V5f1L/w5R5uKGaepA=="
+      "version": "0.13.6",
+      "resolved": "https://registry.npmjs.org/scheduler/-/scheduler-0.13.6.tgz",
+      "integrity": "sha512-IWnObHt413ucAYKsD9J1QShUKkbKLQQHdxRyw73sw4FN26iWr3DY/H34xGPe4nmL1DwXyWmSWmMrA9TfQbE/XQ=="
     },
     "warning": {
       "version": "3.0.0",

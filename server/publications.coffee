@@ -1,3 +1,5 @@
+import { ReactiveAggregate } from 'meteor/jcbernack:reactive-aggregate'
+
 share.initPublications = (eventName) ->
 
   dutiesPublicPolicy = { policy: { $in: ["public", "requireApproval"] } }
