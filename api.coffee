@@ -51,6 +51,9 @@ class VolunteersClass
       TaskSignups: share.TaskSignups
       LeadSignups: share.LeadSignups
       UnitAggregation: share.UnitAggregation
+      orgUnitCollections: share.orgUnitCollections
+      dutiesCollections: share.dutiesCollections
+      signupCollections: share.signupCollections
     @components = {}
     if Meteor.isClient
       BookedTableModule = require('./client/components/volunteers/BookedTable.jsx')
