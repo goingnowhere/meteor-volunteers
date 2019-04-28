@@ -88,7 +88,7 @@ const createSignupMethods = (collectionKey, parentCollection) => {
     [`${collectionName}.update`](doc) {
       // Only used for project timing updates, can get rid of if we dump autoform for projects
       console.log(`${collectionName}.update`, doc)
-      if (collectionName !== 'ProjectSignups') {
+      if (collectionKey !== 'ProjectSignups') {
         throw new Meteor.Error(405, 'Only possible for Project signups')
       }
       check(doc, { modifier: Object, _id: String })
