@@ -64,10 +64,11 @@ class VolunteersClass
     share.setMethodTimezone(timezone)
     if Meteor.isClient
       require('meteor/abate:autoform-datetimepicker').setPickerTimezone(timezone)
-  isManagerOrLead: (userId,unitId) -> share.isManagerOrLead(userId,unitId)
-  isManager: () -> share.isManager()
-  isLead: () -> share.isLead()
-  teamStats: (id) -> share.TeamStats(id)
-  deptStats: (id) -> share.DepartmentStats(id)
+  # Need to wrap functions as are initialised after constructor runs
+  isManagerOrLead: (args...) => share.isManagerOrLead(args...)
+  isManager: (args...) => share.isManager(args...)
+  isLead: (args...) => share.isLead(args...)
+  teamStats: (args...) => share.TeamStats(args...)
+  deptStats: (args...) => share.DepartmentStats(args...)
   getSkillsList: getSkillsList
   getQuirksList: getQuirksList
