@@ -130,32 +130,3 @@ Template.departmentSignupsList.events({
     share.meteorCall('leadSignups.refuse', signupId)
   },
 })
-
-Template.managerSignupsList.bindI18nNamespace('goingnowhere:volunteers')
-Template.managerSignupsList.onCreated(function onCreated() {
-  const template = this
-  share.templateSub(template, 'LeadSignups.Manager')
-})
-
-Template.managerSignupsList.helpers({
-  allSignups: () => share.LeadSignups.find({
-    status: 'pending',
-  }, { sort: { createdAt: -1 } }).map(signup => ({
-    ...signup,
-    type: 'lead',
-    // XXX this should be either team, dept or division
-    unit: share.Department.findOne(signup.parentId),
-    duty: share.Lead.findOne(signup.shiftId),
-  })),
-})
-
-Template.managerSignupsList.events({
-  'click [data-action="approve"]': function e(event, template) {
-    const signupId = template.$(event.currentTarget).data('signup')
-    share.meteorCall('leadSignups.confirm', signupId)
-  },
-  'click [data-action="refuse"]': function e(event, template) {
-    const signupId = template.$(event.currentTarget).data('signup')
-    share.meteorCall('leadSignups.refuse', signupId)
-  },
-})

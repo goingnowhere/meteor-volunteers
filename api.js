@@ -5,6 +5,7 @@ import { initMethods } from './both/methods/methods'
 import { getSkillsList, getQuirksList } from './both/collections/unit'
 
 export { BookedTable } from './client/components/volunteers/BookedTable.jsx'
+export { SignupApproval } from './client/components/teamLeads/SignupApproval.jsx'
 
 const share = __coffeescriptShare
 

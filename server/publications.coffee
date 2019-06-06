@@ -163,56 +163,6 @@ share.initPublications = (eventName) ->
   createPublicationDivision("ProjectSignups",share.ProjectSignups,share.Projects)
   createPublicationDivision("LeadSignups",share.LeadSignups,share.Lead)
 
-  # return all divisions, departments and teams signups. restricted to manager
-  createPublicationManager = (type,signups,duties) ->
-    Meteor.publishComposite("#{eventName}.Volunteers.#{type}.Manager", () ->
-      userId = this.userId
-      return {
-        find: () -> return share.Division.find()
-        children: [
-          {
-            find: (division) -> return share.Department.find({parentId: division._id})
-            children: [
-              {
-                find: (dept,division) -> return share.Team.find({parentId: dept._id})
-                children: [
-                  {
-                    find: (team,dept,division) ->
-                      sel = {parentId: {$in: [team._id, dept._id, division._id]}}
-                      unless share.isManagerOrLead(userId,[ division._id ])
-                        sel = _.extend(sel,dutiesPublicPolicy)
-                      return duties.find(sel)
-                    children: [
-                      {
-                        find: (duty,team,dept,division) ->
-                          if share.isManagerOrLead(userId,[ division._id ])
-                            return signups.find({parentId: {$in: [team._id, dept._id, division._id]}})
-                          else return null
-                        children: [
-                          { find: (signup,duty,team,dept,division) ->
-                            if signup
-                              if share.isManagerOrLead(userId,[ division._id ])
-                                return Meteor.users.find(signup.userId)
-                              else return null
-                            else return null
-                          }
-                        ]
-                      }
-                    ]
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    )
-
-  createPublicationManager("ShiftSignups",share.ShiftSignups,share.TeamShifts)
-  createPublicationManager("TaskSignups",share.TaskSignups,share.TeamTasks)
-  createPublicationManager("ProjectSignups",share.ProjectSignups,share.Projects)
-  createPublicationManager("LeadSignups",share.LeadSignups,share.Lead)
-
   # given a user id return all signups, shift and teams related to this user.
   # restricted to user or manager
   createPublicationUser = (type,signups,duties) ->

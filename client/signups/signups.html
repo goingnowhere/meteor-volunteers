@@ -70,33 +70,3 @@
     </tbody>
   </table>
 </template>
-
-<!-- TODO : department Lead requests for a division -->
-
-<!-- all division and departments Lead request for the manager -->
-<template name="managerSignupsList">
-  <table class="table table-striped">
-    <tbody>
-      {{#each signup in allSignups}}
-        <tr>
-          <td>
-              {{fa "user-circle"}}
-              {{#if signup.userId}}{{getUserName signupuserId}}{{else}}{{__ ".vacant"}}{{/if}}
-          </td>
-          <td>{{signup.duty.title}} <small>{{signup.unit.name}}</small></td>
-          <td>{{getUserName signup.userId}}</td>
-          <td>
-            <button class="btn btn-light btn-sm" data-action="approve"
-              data-signup="{{ signup._id }}">
-                {{__ '.approve' }}
-            </button>
-            <button class="btn btn-light btn-sm" data-action="refuse"
-              data-signup="{{ signup._id }}">
-                {{__ '.refuse' }}
-            </button>
-          </td>
-        </tr>
-      {{/each}}
-    </tbody>
-  </table>
-</template>
