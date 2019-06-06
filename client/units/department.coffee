@@ -37,3 +37,18 @@ AutoForm.addHooks ['InsertDepartmentFormId'],
   onSuccess: (formType, result) ->
     console.log this.template
     # this.template.currentLead.set({teamId:result._id})
+
+Template.addDepartment.bindI18nNamespace('goingnowhere:volunteers')
+Template.addDepartment.onCreated () ->
+  template = this
+  template.divisionId = template.data.divisionId
+
+Template.addDepartment.helpers
+  'form': () -> { collection: share.Department }
+  'data': () -> { parentId : Template.instance().divisionId }
+
+Template.addDepartment.events
+  'click [data-action="removeDepartment"]': (event,template) ->
+    teamId = $(event.currentTarget).data('id')
+    share.meteorCall "department.remove", teamId
+

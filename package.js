@@ -40,6 +40,7 @@ Package.onUse((api) => {
     'universe:i18n-blaze',
     'abate:autoform-components',
     'mdg:validated-method',
+    'react-meteor-data',
   ], ['client', 'server'])
 
   api.use([
@@ -50,7 +51,6 @@ Package.onUse((api) => {
     'abate:autoform-datetimepicker',
     'peppelg:bootstrap-3-modal',
     'react-template-helper',
-    'react-meteor-data',
     'themeteorchef:bert',
   ], 'client')
 
@@ -72,8 +72,6 @@ Package.onUse((api) => {
     'both/stats.coffee',
 
     'both/methods/methods.coffee',
-
-    'api.coffee',
   ], ['server', 'client'])
 
   api.add_files([
@@ -110,7 +108,7 @@ Package.onUse((api) => {
 
   api.add_files(['i18n/en.i18n.json'], ['client', 'server'])
 
-  api.export(['VolunteersClass'])
+  api.mainModule('api.js')
 })
 
 // Package.onTest(function (api) {
