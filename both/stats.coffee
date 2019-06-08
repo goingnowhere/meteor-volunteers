@@ -81,7 +81,7 @@ getUnits = (sel,type) ->
     if type == "team"
       shifts = share.getShifts({parentId: u._id})
       leads = share.getLeads({parentId: u._id})
-      u.volunteers = getVolunteers({parentId: u._id})
+      u.volunteers = getVolunteers({parentId: u._id, status: 'confirmed'})
       u.shiftRate = rate(shifts)
       u.leadRate = rate(leads)
       u.volunteerNumber = u.volunteers.length
@@ -118,7 +118,7 @@ share.TeamStats = (parentId) ->
   stats = {
     pendingRequests: getSignups({parentId, status:'pending'})
     team: getUnits({_id: parentId},"team")[0]
-    volunteerNumber: getVolunteers({parentId}).length
+    volunteerNumber: getVolunteers({parentId, status: 'confirmed'}).length
   }
   share.UnitAggregation.upsert(parentId,{ $set: stats })
   return stats
