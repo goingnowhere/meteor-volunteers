@@ -5,6 +5,7 @@ import { withTracker } from 'meteor/react-meteor-data'
 import React from 'react'
 import ReactModal from 'react-modal'
 
+import { collections } from '../../../both/collections/initCollections'
 import { findOrgUnit } from '../../../both/collections/unit'
 import { DutiesListItemDate } from './DutiesListItemDate.jsx'
 
@@ -53,7 +54,7 @@ const addLocalDatesCollection = (duties, type, filter) => {
     DatesLocal.upsert(duty._id, {
       type,
       team: orgUnit && orgUnit.unit,
-      signup: share.signupCollections[type].findOne({
+      signup: collections.signupCollections[type].findOne({
         userId: Meteor.userId(),
         shiftId: duty._id,
       }),
@@ -83,7 +84,7 @@ export const SignupModal = withTracker(({ modalOpen, duty, ...props }) => {
       Meteor.subscribe(`${share.eventName}.Volunteers.${signupSubNames[type]}.byUser`, userId),
     ]
     if (subs.every(sub => sub.ready())) {
-      addLocalDatesCollection(share.dutiesCollections[type], type, { title, parentId })
+      addLocalDatesCollection(collections.dutiesCollections[type], type, { title, parentId })
     }
   }
   return {

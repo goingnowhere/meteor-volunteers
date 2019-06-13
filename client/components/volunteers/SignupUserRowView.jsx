@@ -1,4 +1,3 @@
-/* global __coffeescriptShare */
 import React from 'react'
 import Fa from 'react-fontawesome'
 import { withTracker } from 'meteor/react-meteor-data'
@@ -8,6 +7,7 @@ import { t, T } from '../common/i18n'
 import { ProjectDateInline } from '../common/ProjectDateInline.jsx'
 import { ShiftDateInline } from '../common/ShiftDateInline.jsx'
 import { bailCall } from '../../utils/signups'
+import { collections } from '../../../both/collections/initCollections'
 import { findOrgUnit } from '../../../both/collections/unit'
 
 export const SignupUserRowViewComponent = ({
@@ -60,8 +60,6 @@ export const SignupUserRowViewComponent = ({
   </div>
 )
 
-const share = __coffeescriptShare
-
 const editProject = ({ duty, signup }) => () => {
   AutoFormComponents.ModalShowWithTemplate('projectSignupForm', { project: duty, signup })
 }
@@ -75,7 +73,7 @@ const showInfo = ({ duty, team }) => () => {
 export const SignupUserRowView = withTracker(({ signup }) => {
   const orgUnit = findOrgUnit(signup.parentId)
   const team = orgUnit && orgUnit.unit
-  const duty = share.dutiesCollections[signup.type].findOne(signup.shiftId)
+  const duty = collections.dutiesCollections[signup.type].findOne(signup.shiftId)
   return {
     signup,
     team,

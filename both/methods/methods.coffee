@@ -1,6 +1,7 @@
 import SimpleSchema from 'simpl-schema'
 import Moment from 'moment-timezone'
 import { extendMoment } from 'moment-range'
+import { collections } from '../collections/initCollections'
 
 moment = extendMoment(Moment)
 
@@ -28,10 +29,10 @@ share.initMethods = (eventName) ->
             collection.remove(Id)
             # delete all shifts and signups associated to this team
             # XXX if this is a dept, we should remove also all teams
-            for k,collection of share.dutiesCollections
+            for k,collection of collections.dutiesCollections
               do ->
                 collection.remove({parentId: Id})
-            for k,collection of share.signupCollections
+            for k,collection of collections.signupCollections
               do ->
                 collection.update({shiftId: Id},{$set: {status: 'cancelled'}})
           else
@@ -87,7 +88,7 @@ share.initMethods = (eventName) ->
           doc = collection.findOne(Id)
           if share.isManagerOrLead(Meteor.userId(),[doc.parentId])
             collection.remove(Id)
-            for k,scollection of share.signupCollections
+            for k,scollection of collections.signupCollections
               do ->
                 scollection.update({shiftId: Id},{$set: {status: 'cancelled'}})
           else
@@ -114,13 +115,13 @@ share.initMethods = (eventName) ->
 
   for type in ["remove","insert","update"]
     do ->
-      for kind,collection of share.dutiesCollections
+      for kind,collection of collections.dutiesCollections
         do ->
           createDutiesMethod(collection,type, kind)
 
   for type in ["remove","insert","update"]
     do ->
-      for kind,collection of share.orgUnitCollections
+      for kind,collection of collections.orgUnitCollections
         do ->
           createOrgUnitMethod(collection, type, kind)
 

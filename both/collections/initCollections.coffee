@@ -1,4 +1,5 @@
 import SimpleSchema from 'simpl-schema'
+import { initCollections } from './initCollections'
 
 share.initCollections = (eventName) ->
   share.eventName = eventName
@@ -75,18 +76,5 @@ share.initCollections = (eventName) ->
   if Meteor.isServer
     share.ProjectSignups._ensureIndex( { userId: 1, shiftId: 1 } )
 
-  # shortcut to recover all related collections more easily
-  share.orgUnitCollections =
-    team: share.Team
-    department: share.Department
-    division: share.Division
-  share.dutiesCollections =
-    lead: share.Lead
-    shift: share.TeamShifts
-    task: share.TeamTasks
-    project: share.Projects
-  share.signupCollections =
-    lead: share.LeadSignups
-    shift: share.ShiftSignups
-    task: share.TaskSignups
-    project: share.ProjectSignups
+  # migrate to JS:
+  initCollections(eventName)

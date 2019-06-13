@@ -3,6 +3,7 @@ import { Chart } from 'chart.js'
 import moment from 'moment-timezone'
 
 import { projectSignupsConfirmed } from '../../both/stats'
+import { collections } from '../../both/collections/initCollections'
 import { ProjectDateInline } from '../components/common/ProjectDateInline.jsx'
 import { ShiftDateInline } from '../components/common/ShiftDateInline.jsx'
 
@@ -21,7 +22,7 @@ commonEvents =
   'click [data-action="edit"]': (event,template) ->
     id = $(event.currentTarget).data('id')
     type = $(event.currentTarget).data('type')
-    collection = share.dutiesCollections[type]
+    collection = collections.dutiesCollections[type]
     shift = collection.findOne(id)
     AutoFormComponents.ModalShowWithTemplate("insertUpdateTemplate",
       {form:{collection}, data: shift}, "", 'lg')
@@ -38,7 +39,7 @@ commonEvents =
   'click [data-action="add_date"]': (event,template) ->
     id = $(event.currentTarget).data('id')
     type = $(event.currentTarget).data('type')
-    collection = share.dutiesCollections[type]
+    collection = collections.dutiesCollections[type]
     shift = _.omit(collection.findOne(id),'_id','start','end')
     AutoFormComponents.ModalShowWithTemplate("insertUpdateTemplate",
       { form: {
@@ -50,7 +51,7 @@ commonEvents =
     template.shiftUpdateDep.changed()
     id = $(event.currentTarget).data('id')
     type = $(event.currentTarget).data('type')
-    collection = share.dutiesCollections[type]
+    collection = collections.dutiesCollections[type]
     protoShift = collection.findOne(id)
     protoShiftFiltered = _.pick(protoShift,
       'title', 'description',

@@ -5,6 +5,7 @@ import moment from 'moment-timezone'
 
 import { initMethods } from './both/methods/methods'
 import { getSkillsList, getQuirksList } from './both/collections/unit'
+import { collections } from './both/collections/initCollections'
 
 export { BookedTable } from './client/components/volunteers/BookedTable.jsx'
 export { SignupApproval } from './client/components/teamLeads/SignupApproval.jsx'
@@ -17,11 +18,17 @@ const initAuthorization = (eventName) => {
     Roles.userIsInRole(userId, ['manager', 'admin'], eventName)
   // is the given is Manager, or Lead of one of the unitIdList
   share.isManagerOrLead = (userId, unitIdList) =>
+    // TODO isLead didn't used to include list, so check if this would break anything then
+    // pull these functions together
     share.isManager(userId) || Roles.userIsInRole(userId, unitIdList, eventName)
   // is the given user a Lead of any team or dept ?
-  share.isLead = (userId = Meteor.userId()) =>
-    // TODO Get rid of 'user' role?
-    Roles.getRolesForUser(userId, eventName).filter(role => role !== 'user').length > 0
+  share.isLead = (userId = Meteor.userId(), unitIdList) => {
+    if (!unitIdList) {
+      // TODO Get rid of 'user' role?
+      return Roles.getRolesForUser(userId, eventName).filter(role => role !== 'user').length > 0
+    }
+    return Roles.userIsInRole(userId, unitIdList, eventName)
+  }
 }
 
 // TODO migrated from coffeescript, can most likely simplify
@@ -46,6 +53,7 @@ export class VolunteersClass {
 
     this.Schemas = share.Schemas
     this.Collections = {
+      ...collections,
       VolunteerForm: share.VolunteerForm,
       Team: share.Team,
       Division: share.Division,
@@ -59,9 +67,6 @@ export class VolunteersClass {
       TaskSignups: share.TaskSignups,
       LeadSignups: share.LeadSignups,
       UnitAggregation: share.UnitAggregation,
-      orgUnitCollections: share.orgUnitCollections,
-      dutiesCollections: share.dutiesCollections,
-      signupCollections: share.signupCollections,
     }
   }
 
