@@ -10,8 +10,6 @@ import { ShiftDateInline } from '../components/common/ShiftDateInline.jsx'
 
 const share = __coffeescriptShare
 
-moment.tz.setDefault(share.timezone.get())
-
 Template.teamSignupsList.bindI18nNamespace('goingnowhere:volunteers')
 Template.teamSignupsList.onCreated(function onCreated() {
   const template = this

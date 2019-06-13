@@ -66,7 +66,6 @@ Package.onUse((api) => {
     'both/collections/duties.coffee',
     'both/collections/unit.coffee',
     'both/collections/volunteer.coffee',
-    'both/collections/timeseries.coffee',
     'both/collections/initCollections.coffee',
 
     'both/stats.coffee',

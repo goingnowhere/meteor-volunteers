@@ -1,7 +1,5 @@
 import moment from 'moment-timezone'
 
-moment.tz.setDefault(share.timezone.get())
-
 # signups -> userId list
 uniqueVolunteers = (allSignups) ->
   if allSignups

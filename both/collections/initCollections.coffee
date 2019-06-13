@@ -5,12 +5,10 @@ share.initCollections = (eventName) ->
 
   prefix = "#{eventName}."
 
+  # Used to store stats but doesn't seem to cache so may not be needed
   share.UnitAggregation = new Mongo.Collection "#{prefix}Volunteers.unitAggregation"
   
-  share.TimeSeries = new Mongo.Collection "#{prefix}Volunteers.timeSeries"
-  share.TimeSeries.attachSchema(share.Schemas.TimeSeries)
   # duties
-
   share.TeamTasks = new Mongo.Collection "#{prefix}Volunteers.teamTasks"
   share.TeamTasks.attachSchema(share.Schemas.TeamTasks)
   if Meteor.isServer

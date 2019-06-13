@@ -1,6 +1,8 @@
 /* globals __coffeescriptShare */
 import { Meteor } from 'meteor/meteor'
 import { Roles } from 'meteor/piemonkey:roles'
+import moment from 'moment-timezone'
+
 import { initMethods } from './both/methods/methods'
 import { getSkillsList, getQuirksList } from './both/collections/unit'
 
@@ -68,8 +70,7 @@ export class VolunteersClass {
   getQuirksList = getQuirksList
 
   setTimeZone = (timezone) => {
-    share.timezone.set(timezone)
-    share.setMethodTimezone(timezone)
+    moment.tz.setDefault(timezone)
     if (Meteor.isClient) {
       // eslint-disable-next-line global-require
       require('meteor/abate:autoform-datetimepicker').setPickerTimezone(timezone)

@@ -1,8 +1,4 @@
-import Moment from 'moment-timezone'
-import { extendMoment } from 'moment-range'
-
-moment = extendMoment(Moment)
-moment.tz.setDefault(share.timezone.get())
+import moment from 'moment-timezone'
 
 Template.registerHelper "formatDateTime",(date) -> moment(date).format("MMM Do, HH:mm")
 Template.registerHelper "formatDate",(date) -> moment(date).format("MMM Do (ddd)")

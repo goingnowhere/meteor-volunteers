@@ -1,11 +1,4 @@
-/* global __coffeescriptShare */
-import Moment from 'moment-timezone'
-import { extendMoment } from 'moment-range' // eslint-disable-line
-
-const share = __coffeescriptShare
-
-const moment = extendMoment(Moment)
-moment.tz.setDefault(share.timezone.get())
+import moment from 'moment-timezone'
 
 export const formatDateTime = date => moment(date).format('MMM Do, HH:mm')
 export const formatDate = date => moment(date).format('MMM Do (ddd)')

@@ -4,7 +4,6 @@ import { extendMoment } from 'moment-range' // eslint-disable-line import/no-unr
 
 const share = __coffeescriptShare
 const moment = extendMoment(Moment)
-moment.tz.setDefault(share.timezone.get())
 
 export const projectSignupsConfirmed = (p) => {
   const pdays = Array.from(moment.range(moment(p.start), moment(p.end)).by('day'))

@@ -9,7 +9,6 @@ import { extendMoment } from 'moment-range'
 const share = __coffeescriptShare
 
 const moment = extendMoment(Moment)
-moment.tz.setDefault(share.timezone.get())
 
 share.initServerMethods = (eventName) => {
   const prefix = `${eventName}.Volunteers`

@@ -1,14 +1,10 @@
 import { Chart } from 'chart.js'
 
-import Moment from 'moment-timezone'
-import { extendMoment } from 'moment-range'
+import moment from 'moment-timezone'
 
 import { projectSignupsConfirmed } from '../../both/stats'
 import { ProjectDateInline } from '../components/common/ProjectDateInline.jsx'
 import { ShiftDateInline } from '../components/common/ShiftDateInline.jsx'
-
-moment = extendMoment(Moment)
-moment.tz.setDefault(share.timezone.get())
 
 commonEvents =
   'click [data-action="un-enroll"]': (event,template) ->

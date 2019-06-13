@@ -6,10 +6,7 @@ SimpleSchema.extendOptions(['autoform'])
 import Moment from 'moment-timezone'
 import { extendMoment } from 'moment-range'
 
-share.timezone = new ReactiveVar('Europe/Paris')
-
 moment = extendMoment(Moment)
-moment.tz.setDefault(share.timezone.get())
 
 policyValues = ["public", "adminOnly", "requireApproval"]
 taskPriority = [ "essential", "important", "normal"]

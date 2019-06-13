@@ -12,9 +12,6 @@ throwError = (error, reason, details) ->
     throw error
   return
 
-share.setMethodTimezone = (timezone) ->
-  moment.tz.setDefault(timezone)
-
 share.initMethods = (eventName) ->
 
   # Generic function to create insert,update,remove methods for groups within

@@ -7,7 +7,6 @@ import { DutiesListItem } from '../components/shifts/DutiesListItem';
 import { DutyBody } from '../components/shifts/DutyBody';
 
 moment = extendMoment(Moment)
-moment.tz.setDefault(share.timezone.get())
 
 Template.dutyListItem.helpers({
   DutiesListItem: () -> DutiesListItem,

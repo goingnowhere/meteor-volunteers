@@ -10,7 +10,6 @@ import { projectSignupsConfirmed } from '../stats'
 
 const share = __coffeescriptShare
 const moment = extendMoment(Moment)
-moment.tz.setDefault(share.timezone.get())
 
 const findConflicts = ({
   userId,
