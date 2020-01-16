@@ -3,9 +3,10 @@ import React, { Fragment, Component } from 'react'
 import { T } from '../common/i18n'
 import { DutiesListItem } from './DutiesListItem.jsx'
 import { DutiesListItemDate } from './DutiesListItemDate.jsx'
-import { SignupModal } from './SignupModal.jsx'
+import { SignupModalContents } from './SignupModalContents.jsx'
+import { Modal } from '../common/Modal.jsx'
 
-// TODO can't seem to use hooks in a component mounted by Blaze template
+// TODO can't seem to use hooks in a component within a Meteor module
 export class DutiesListItemGrouped extends Component {
   constructor(props) {
     super(props)
@@ -22,7 +23,9 @@ export class DutiesListItemGrouped extends Component {
     // const [modalOpen, showModal] = useState(false)
     return (
       <Fragment>
-        <SignupModal duty={duty} modalOpen={modalOpen} showModal={this.showModal} />
+        <Modal isOpen={modalOpen} closeModal={() => this.showModal(false)} title={duty.title}>
+          <SignupModalContents duty={duty} />
+        </Modal>
         <DutiesListItem duty={duty} />
         <div className="row no-gutters pt-2 align-items-center">
           {duty.type === 'project'
