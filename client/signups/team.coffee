@@ -4,6 +4,7 @@ import moment from 'moment-timezone'
 
 import { projectSignupsConfirmed } from '../../both/stats'
 import { collections } from '../../both/collections/initCollections'
+import { getShifts } from '../../both/stats'
 import { ProjectDateInline } from '../components/common/ProjectDateInline.jsx'
 import { ShiftDateInline } from '../components/common/ShiftDateInline.jsx'
 
@@ -12,13 +13,8 @@ commonEvents =
     userId = $(event.currentTarget).data('userid')
     shiftId = $(event.currentTarget).data('shiftid')
     type = $(event.currentTarget).data('type')
-    switch type
-      when 'shift'
-        shift = share.ShiftSignups.findOne({ userId, shiftId })
-        share.meteorCall "shiftSignups.remove", shift._id
-      when 'project'
-        shift = share.ProjectSignups.findOne({ userId, shiftId })
-        share.meteorCall "projectSignups.remove", shift._id
+    shift = collections.signups.findOne({ userId, shiftId })
+    share.meteorCall "signups.remove", shift._id
   'click [data-action="edit"]': (event,template) ->
     id = $(event.currentTarget).data('id')
     type = $(event.currentTarget).data('type')
@@ -94,11 +90,11 @@ Template.teamShiftsRota.onCreated () ->
   template.shifts = new ReactiveVar([])
   template.grouping = new ReactiveVar(new Set())
   template.shiftUpdateDep = new Tracker.Dependency
-  share.templateSub(template,"ShiftSignups.byTeam",teamId)
+  share.templateSub(template,"Signups.byTeam",teamId,'shift')
   template.autorun () ->
     if template.subscriptionsReady()
       sel = {parentId: teamId}
-      template.shifts.set(share.getShifts(sel))
+      template.shifts.set(getShifts(sel))
 
 Template.teamShiftsRota.helpers
   'groupedShifts': () ->
@@ -125,7 +121,7 @@ Template.teamShiftsTable.onCreated () ->
   template.shiftUpdateDep = new Tracker.Dependency
   template.autorun () ->
     template.shiftUpdateDep.depend()
-    share.templateSub(template,"ShiftSignups.byTeam",teamId)
+    share.templateSub(template,"Signups.byTeam",teamId,'shift')
     if template.subscriptionsReady()
       sel = {parentId: teamId}
       currentDate = Template.currentData().date
@@ -138,8 +134,7 @@ Template.teamShiftsTable.onCreated () ->
             sel,
             { start: { $gte: startOfDay.toDate() , $lte: endOfDay.toDate() } },
           ]
-      # getShift is in stats.coffee
-      template.shifts.set(share.getShifts(sel))
+      template.shifts.set(getShifts(sel))
 
 Template.teamShiftsTable.helpers
   ShiftDateInline: () -> ShiftDateInline
@@ -160,13 +155,13 @@ Template.teamProjectsTable.bindI18nNamespace('goingnowhere:volunteers')
 Template.teamProjectsTable.onCreated () ->
   template = this
   template.teamId = template.data._id
-  share.templateSub(template,"ProjectSignups.byTeam",template.teamId)
+  share.templateSub(template,"Signups.byTeam",template.teamId,'project')
 
 Template.teamProjectsTable.helpers
   ProjectDateInline: () -> ProjectDateInline
   allProjects: () ->
     share.Projects.find({parentId: Template.instance().teamId}).map((project) ->
-      signups = share.ProjectSignups.find(
+      signups = collections.signups.find(
         {shiftId: project._id, status: 'confirmed'},
         {sort: { start: 1} }
       ).fetch()
@@ -179,7 +174,7 @@ Template.teamProjectsTable.events _.extend(
     userId = $(event.currentTarget).data('userid')
     shiftId = $(event.currentTarget).data('shiftid')
     type = $(event.currentTarget).data('type')
-    signup = share.ProjectSignups.findOne({ userId, shiftId })
+    signup = collections.signups.findOne({ userId, shiftId })
     project = share.Projects.findOne(shiftId)
     AutoFormComponents.ModalShowWithTemplate("projectSignupForm",{
       project,

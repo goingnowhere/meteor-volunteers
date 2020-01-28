@@ -1,8 +1,9 @@
 /* global __coffeescriptShare */
 import React from 'react'
+import { Meteor } from 'meteor/meteor'
 import { withTracker } from 'meteor/react-meteor-data'
-import { _ } from 'meteor/underscore'
 
+import { collections } from '../../../both/collections/initCollections'
 import { SignupUserRowView } from './SignupUserRowView.jsx'
 
 export const BookedTableComponent = ({
@@ -25,20 +26,12 @@ const share = __coffeescriptShare
 
 export const BookedTable = withTracker(({ userId }) => {
   const bookedUserId = userId || Meteor.userId()
-  Meteor.subscribe(`${share.eventName}.Volunteers.ShiftSignups.byUser`, bookedUserId).ready()
-  Meteor.subscribe(`${share.eventName}.Volunteers.ProjectSignups.byUser`, bookedUserId).ready()
-  Meteor.subscribe(`${share.eventName}.Volunteers.LeadSignups.byUser`, bookedUserId).ready()
-  let allShifts = []
-  const sel = { userId: bookedUserId, status: { $in: ['confirmed', 'pending'] } }
-  const shiftSignups = share.ShiftSignups.find(sel)
-    .map(signup => ({ ...signup, type: 'shift' }))
-  const projectSignups = share.ProjectSignups.find(sel)
-    .map(signup => ({ ...signup, type: 'project' }))
-  const leadSignups = share.LeadSignups.find(sel)
-    .map(signup => ({ ...signup, type: 'lead' }))
-  allShifts = _.sortBy([...leadSignups, ...shiftSignups, ...projectSignups], s => s.start)
+  Meteor.subscribe(`${share.eventName}.Volunteers.Signups.byUser`, bookedUserId).ready()
 
+  const sel = { userId: bookedUserId, status: { $in: ['confirmed', 'pending'] } }
+  // TODO when moving to methods improve sort here. As mini mongo doesn't support aggregations
+  // can't do it without querying for each shift
   return {
-    allShifts,
+    allShifts: collections.signups.find(sel, { sort: { type: 1, start: 1 } }).fetch(),
   }
 })(BookedTableComponent)

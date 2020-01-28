@@ -2,9 +2,10 @@
 import { Meteor } from 'meteor/meteor'
 import { check } from 'meteor/check'
 import { ValidatedMethod } from 'meteor/mdg:validated-method'
-
 import Moment from 'moment-timezone'
 import { extendMoment } from 'moment-range'
+
+import { collections } from '../both/collections/initCollections'
 
 const share = __coffeescriptShare
 
@@ -21,7 +22,7 @@ share.initServerMethods = (eventName) => {
         let days = []
         const range = moment.range(project.start, project.end).by('days')
         days = Array.from(range)
-        const signups = share.ProjectSignups.find({ shiftId: projectId, status: 'confirmed' }).fetch()
+        const signups = collections.signups.find({ shiftId: projectId, status: 'confirmed' }).fetch()
 
         const confirmed = days.map((day) => {
           const thisday = signups.filter(signup => (day.isBetween(signup.start, signup.end, 'days', '[]')))
@@ -33,15 +34,14 @@ share.initServerMethods = (eventName) => {
     },
   })
 
-  // TODO generalise to other signups
   Meteor.methods({
-    'LeadSignups.list.manager'() { //eslint-disable-line
+    'signups.list.manager'(type) { //eslint-disable-line
       if (!share.isManager()) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
-      return share.LeadSignups.aggregate([
+      return collections.signups.aggregate([
         {
-          $match: { status: 'pending' },
+          $match: { type, status: 'pending' },
         }, {
           $lookup: {
             from: share.Department._name,

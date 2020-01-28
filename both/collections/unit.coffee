@@ -2,13 +2,14 @@ import { checkNpmVersions } from 'meteor/tmeasday:check-npm-versions'
 checkNpmVersions { 'simpl-schema': '1.x' }, 'goingnowhere:volunteers'
 import SimpleSchema from 'simpl-schema'
 import { getSkillsList, getQuirksList, getLocationList } from './unit'
+import { getProjects } from '../../both/stats'
+
 SimpleSchema.extendOptions(['autoform'])
 
 unitPolicy = ["public";"private"]
 
 share.getTeamProjects = (sel={}) ->
-  console.log "AAA"
-  share.getProjects(sel).map((project) ->
+  getProjects(sel).map((project) ->
     team = share.Team.findOne(project.parentId)
     console.log "#{team.name} > #{project.title}"
     return {value: project._id, label: "#{team.name} > #{project.title}"}

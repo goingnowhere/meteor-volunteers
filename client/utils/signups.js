@@ -7,7 +7,6 @@ import { t } from '../components/common/i18n'
 const share = __coffeescriptShare
 
 export const bailCall = ({
-  type,
   parentId,
   _id,
   shiftId = _id,
@@ -15,7 +14,11 @@ export const bailCall = ({
 }) => () => {
   // I18N
   if (window.confirm('Are you sure you want to cancel this shift?')) {
-    share.meteorCall(`${type}Signups.bail`, { parentId, shiftId, userId })
+    share.meteorCall('signups.bail', {
+      parentId,
+      shiftId,
+      userId,
+    })
   }
 }
 
@@ -55,11 +58,16 @@ export const applyCall = ({
   parentId,
   userId = Meteor.userId(),
 }) => () => {
-  const signup = { parentId, shiftId, userId }
+  const signup = {
+    parentId,
+    shiftId,
+    userId,
+    type,
+  }
   if (type === 'project') {
     const project = share.Projects.findOne(shiftId)
     AutoFormComponents.ModalShowWithTemplate('projectSignupForm', { signup, project }, project.title)
   } else {
-    share.meteorCall(`${type}Signups.insert`, signup, applyErrorCallback)
+    share.meteorCall('signups.insert', signup, applyErrorCallback)
   }
 }

@@ -131,7 +131,7 @@ share.Schemas.Lead.extend(
   policy:
     type: String
     label: () -> i18n.__("goingnowhere:volunteers","policy")
-    allowedValues: policyValues
+    allowedValues: ["requireApproval", "adminOnly"]
     autoform:
       afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","policy_help_duty")
       defaultValue: "requireApproval"

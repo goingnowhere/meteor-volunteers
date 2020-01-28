@@ -1,8 +1,8 @@
 import SimpleSchema from 'simpl-schema'
-
 import Moment from 'moment-timezone'
 import { extendMoment } from 'moment-range'
 
+import { collections } from '../../both/collections/initCollections'
 import { DutiesListItem } from '../components/shifts/DutiesListItem';
 import { DutyBody } from '../components/shifts/DutyBody';
 
@@ -145,7 +145,7 @@ Template.projectSignupForm.onCreated () ->
   if template.data?.signup
     template.signup = template.data.signup
   project = template.data.project
-  share.templateSub(template,"Projects.byDuty",project._id)
+  share.templateSub(template,"Signups.byDuty",project._id,"project")
   template.allDays = new ReactiveVar([])
   template.confirmed = new ReactiveVar([])
   share.meteorCall("getProjectStaffing", project._id,
@@ -216,10 +216,15 @@ Template.projectSignupForm.helpers
         type: String
         autoform:
           type: "hidden"
+      type:
+        type: String
+        autoform:
+          type: "hidden"
+        defaultValue: 'project'
       })
 
-  methodNameInsert: () -> "#{share.ProjectSignups._name}.insert"
-  methodNameUpdate: () -> "#{share.ProjectSignups._name}.update"
+  methodNameInsert: () -> "#{collections.signups._name}.insert"
+  methodNameUpdate: () -> "#{collections.signups._name}.update"
 
   updateLabel: () ->
     if Template.currentData().project.policy == "public"

@@ -5,6 +5,7 @@ import { AutoFormComponents } from 'meteor/abate:autoform-components'
 import { Template } from 'meteor/templating'
 import moment from 'moment-timezone'
 
+import { collections } from '../../both/collections/initCollections'
 import { ProjectDateInline } from '../components/common/ProjectDateInline.jsx'
 import { ShiftDateInline } from '../components/common/ShiftDateInline.jsx'
 
@@ -15,39 +16,17 @@ Template.teamSignupsList.onCreated(function onCreated() {
   const template = this
   const teamId = template.data._id
   template.signups = new ReactiveVar([])
-  share.templateSub(template, 'ShiftSignups.byTeam', teamId)
-  share.templateSub(template, 'TaskSignups.byTeam', teamId)
-  share.templateSub(template, 'ProjectSignups.byTeam', teamId)
-  share.templateSub(template, 'LeadSignups.byTeam', template.teamId)
+  share.templateSub(template, 'Signups.byTeam', teamId, 'shift')
+  share.templateSub(template, 'Signups.byTeam', teamId, 'task')
+  share.templateSub(template, 'Signups.byTeam', teamId, 'project')
+  share.templateSub(template, 'Signups.byTeam', teamId, 'lead')
   template.autorun(() => {
     if (template.subscriptionsReady()) {
       const sel = { parentId: teamId, status: 'pending' }
-      const shifts = share.ShiftSignups.find(sel).map(signup => ({
+      const signups = collections.signups.find(sel, { sort: { createdAt: 1 } }).map(signup => ({
         ...signup,
-        type: 'shift',
-        duty: share.TeamShifts.findOne(signup.shiftId),
+        duty: collections.dutiesCollections[signup.type].findOne(signup.shiftId),
       }))
-      const tasks = share.TaskSignups.find(sel).map(signup => ({
-        ...signup,
-        type: 'task',
-        duty: share.TeamTasks.findOne(signup.shiftId),
-      }))
-      const projects = share.ProjectSignups.find(sel).map(signup => ({
-        ...signup,
-        type: 'project',
-        duty: share.Projects.findOne(signup.shiftId),
-      }))
-      const leads = share.LeadSignups.find(sel).map(signup => ({
-        ...signup,
-        type: 'lead',
-        duty: share.Lead.findOne(signup.shiftId),
-      }))
-      const signups = [
-        ...shifts,
-        ...tasks,
-        ...projects,
-        ...leads,
-      ].sort((a, b) => a.createdAt && b.createdAt && a.createdAt.getTime() - b.createdAt.getTime())
       template.signups.set(signups)
     }
   })
@@ -65,22 +44,12 @@ Template.teamSignupsList.helpers({
 
 Template.teamSignupsList.events({
   'click [data-action="approve"]': function e(event, template) {
-    const type = template.$(event.currentTarget).data('type')
     const signupId = template.$(event.currentTarget).data('signup')
-    if (type === 'lead') {
-      share.meteorCall(`${type}Signups.confirm`, signupId)
-    } else {
-      share.meteorCall(`${type}Signups.setStatus`, { id: signupId, status: 'confirmed' })
-    }
+    share.meteorCall('signups.confirm', signupId)
   },
   'click [data-action="refuse"]': function e(event, template) {
-    const type = template.$(event.currentTarget).data('type')
     const signupId = template.$(event.currentTarget).data('signup')
-    if (type === 'lead') {
-      share.meteorCall(`${type}Signups.refuse`, signupId)
-    } else {
-      share.meteorCall(`${type}Signups.setStatus`, { id: signupId, status: 'refused' })
-    }
+    share.meteorCall('signups.refuse', signupId)
   },
   'click [data-action="user-info"]': function e(event, template) {
     const userId = template.$(event.currentTarget).data('id')
@@ -99,7 +68,7 @@ Template.departmentSignupsList.bindI18nNamespace('goingnowhere:volunteers')
 Template.departmentSignupsList.onCreated(function onCreated() {
   const template = this
   template.departmentId = this.data._id
-  share.templateSub(template, 'LeadSignups.byDepartment', template.departmentId)
+  share.templateSub(template, 'Signups.byDept', template.departmentId, 'lead')
 })
 
 Template.departmentSignupsList.helpers({
@@ -107,8 +76,8 @@ Template.departmentSignupsList.helpers({
     const { departmentId } = Template.instance()
     const teams = share.Team.find({ parentId: departmentId }, { _id: 1 }).fetch()
     const teamIds = _.pluck(teams, '_id')
-    const sel = { parentId: { $in: teamIds }, status: 'pending' }
-    const leads = share.LeadSignups.find(sel).map(signup => ({
+    const sel = { parentId: { $in: teamIds }, status: 'pending', type: 'lead' }
+    const leads = collections.signups.find(sel).map(signup => ({
       ...signup,
       type: 'lead',
       unit: share.Team.findOne(signup.parentId),
@@ -121,10 +90,10 @@ Template.departmentSignupsList.helpers({
 Template.departmentSignupsList.events({
   'click [data-action="approve"]': function e(event, template) {
     const signupId = template.$(event.currentTarget).data('signup')
-    share.meteorCall('leadSignups.confirm', signupId)
+    share.meteorCall('signups.confirm', signupId)
   },
   'click [data-action="refuse"]': function e(event, template) {
     const signupId = template.$(event.currentTarget).data('signup')
-    share.meteorCall('leadSignups.refuse', signupId)
+    share.meteorCall('signups.refuse', signupId)
   },
 })

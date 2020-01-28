@@ -34,7 +34,7 @@ const addLocalDatesCollection = (duties, type, filter) => {
     DatesLocal.upsert(duty._id, {
       type,
       team: orgUnit && orgUnit.unit,
-      signup: collections.signupCollections[type].findOne({
+      signup: collections.signups.findOne({
         userId: Meteor.userId(),
         shiftId: duty._id,
       }),
@@ -43,23 +43,12 @@ const addLocalDatesCollection = (duties, type, filter) => {
   })
 }
 
-const dutySubNames = {
-  shift: 'TeamShifts',
-  task: 'TeamTasks',
-  project: 'Projects',
-}
-const signupSubNames = {
-  shift: 'ShiftSignups',
-  task: 'TaskSignups',
-  project: 'ProjectSignups',
-}
-
 export const SignupModalContents = withTracker(({ duty, ...props }) => {
   const { type, title, parentId } = duty
   const userId = Meteor.userId()
   const subs = [
-    Meteor.subscribe(`${share.eventName}.Volunteers.${dutySubNames[type]}`, { title, parentId }),
-    Meteor.subscribe(`${share.eventName}.Volunteers.${signupSubNames[type]}.byUser`, userId),
+    Meteor.subscribe(`${share.eventName}.Volunteers.duties`, type, { title, parentId }),
+    Meteor.subscribe(`${share.eventName}.Volunteers.Signups.byUser`, userId),
   ]
   if (subs.every(sub => sub.ready())) {
     addLocalDatesCollection(collections.dutiesCollections[type], type, { title, parentId })

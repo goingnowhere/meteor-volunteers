@@ -5,21 +5,13 @@ import { T } from '../common/i18n'
 
 const share = __coffeescriptShare
 
-const approve = (type, signupId, reload) => {
-  if (type === 'lead') {
-    share.meteorCall(`${type}Signups.confirm`, signupId)
-  } else {
-    share.meteorCall(`${type}Signups.setStatus`, { id: signupId, status: 'confirmed' })
-  }
+const approve = (signupId, reload) => {
+  share.meteorCall('signups.confirm', signupId)
   reload()
 }
 
-const refuse = (type, signupId, reload) => {
-  if (type === 'lead') {
-    share.meteorCall(`${type}Signups.refuse`, signupId)
-  } else {
-    share.meteorCall(`${type}Signups.setStatus`, { id: signupId, status: 'refused' })
-  }
+const refuse = (signupId, reload) => {
+  share.meteorCall('signups.refuse', signupId)
   reload()
 }
 
@@ -62,10 +54,10 @@ export const SignupApproval = ({
         {/* <small>{{__ ".created"}}: {{createdAgo signup.createdAt}}</small> */}
       </div>
       <div className="col">
-        <button type="button" className="btn btn-light btn-sm" onClick={() => approve('lead', _id, reloadSignups)}>
+        <button type="button" className="btn btn-light btn-sm" onClick={() => approve(_id, reloadSignups)}>
           <T>approve</T>
         </button>
-        <button type="button" className="btn btn-light btn-sm" onClick={() => refuse('lead', _id, reloadSignups)}>
+        <button type="button" className="btn btn-light btn-sm" onClick={() => refuse(_id, reloadSignups)}>
           <T>refuse</T>
         </button>
       </div>

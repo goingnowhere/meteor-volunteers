@@ -8,7 +8,7 @@ import { T } from '../common/i18n'
 import { LeadListItem } from './LeadListItem.jsx'
 import { applyCall } from '../../utils/signups'
 
-export const LeadListItemGrouped = ({
+export const LeadListItemGroupedComponent = ({
   allLeads,
   loaded,
   showLoadMore,
@@ -55,7 +55,7 @@ const mapProps = ({ teamId, reactiveLimit }) => {
   const limit = reactiveLimit.get()
 
   const leadSub = Meteor.subscribe(`${share.eventName}.Volunteers.Lead`, { parentId: teamId }, limit)
-  const leadSignupSub = Meteor.subscribe(`${share.eventName}.Volunteers.LeadSignups.byUser`, userId)
+  const leadSignupSub = Meteor.subscribe(`${share.eventName}.Volunteers.Signups.byUser`, userId, ['lead'])
   const loaded = leadSub.ready() && leadSignupSub.ready()
 
   const showLoadMore = loaded && share.Lead.find({ parentId: teamId }).count() >= limit
@@ -80,9 +80,9 @@ const mapProps = ({ teamId, reactiveLimit }) => {
 }
 
 // TODO probably need to store WithTracker on the instance
-export const LeadListItemGroupedContainer = (props) => {
+export const LeadListItemGrouped = (props) => {
   const reactiveLimit = new ReactiveVar(2)
-  const WithTracker = withTracker(mapProps)(LeadListItemGrouped)
+  const WithTracker = withTracker(mapProps)(LeadListItemGroupedComponent)
   return (
     <WithTracker reactiveLimit={reactiveLimit} {...props} />
   )

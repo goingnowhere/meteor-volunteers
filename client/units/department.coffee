@@ -29,7 +29,7 @@ Template.departmentEdit.helpers
       ]
       form: { collection: share.Lead, filter: {parentId} }
       subscription : (template) ->
-        [ share.templateSub(template,"LeadSignups.byDepartment",parentId) ]
+        [ share.templateSub(template,"Signups.byDept",parentId,"lead") ]
       }
     return [team,lead]
 

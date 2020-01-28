@@ -22,6 +22,7 @@ export const SignupUserRowViewComponent = ({
     <div className="container-fluid">
       <div className="row p-2">
         <div className="col">
+          {signup.type === 'lead' && team.name}
           {signup.type === 'project' && <ProjectDateInline {...signup} />}
           {signup.type === 'shift' && <ShiftDateInline {...duty} />}
         </div>

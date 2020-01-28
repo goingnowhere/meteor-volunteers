@@ -65,10 +65,7 @@ Package.onUse((api) => {
     'both/collections/subSchemas.coffee',
     'both/collections/duties.coffee',
     'both/collections/unit.coffee',
-    'both/collections/volunteer.coffee',
     'both/collections/initCollections.coffee',
-
-    'both/stats.coffee',
 
     'both/methods/methods.coffee',
   ], ['server', 'client'])

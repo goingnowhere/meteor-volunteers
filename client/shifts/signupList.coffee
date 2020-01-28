@@ -1,5 +1,5 @@
 import SimpleSchema from 'simpl-schema'
-import { LeadListItemGroupedContainer } from '../components/shifts/LeadListItemGrouped.jsx'
+import { LeadListItemGrouped } from '../components/shifts/LeadListItemGrouped.jsx'
 import { DutiesListItemGrouped } from '../components/shifts/DutiesListItemGrouped.jsx'
 
 ShiftTitles = new Mongo.Collection(null)
@@ -43,17 +43,17 @@ Template.signupsListTeam.onCreated () ->
       when "shift"
         share.templateSub(template,"shiftGroups",sel)
       when "task"
-        share.templateSub(template,"TeamTasks",sel,limit)
+        share.templateSub(template,"duties",dutyType,sel,limit)
         if template.subscriptionsReady()
-          addLocalDutiesCollection(team,share.TeamTasks,'task',sel,limit)
+          addLocalDutiesCollection(team,share.TeamTasks,dutyType,sel,limit)
       when "project"
-        share.templateSub(template,"Projects",sel,limit)
+        share.templateSub(template,"duties",dutyType,sel,limit)
         if template.subscriptionsReady()
-          addLocalDutiesCollection(team,share.Projects,'project',sel,limit)
+          addLocalDutiesCollection(team,share.Projects,dutyType,sel,limit)
       else
         share.templateSub(template,"shiftGroups",sel)
-        share.templateSub(template,"TeamTasks",sel,limit)
-        share.templateSub(template,"Projects",sel,limit)
+        share.templateSub(template,"duties","task",sel,limit)
+        share.templateSub(template,"duties","project",sel,limit)
         if template.subscriptionsReady()
           addLocalDutiesCollection(team,share.TeamTasks,'task',sel,limit)
           addLocalDutiesCollection(team,share.Projects,'project',sel,limit)
@@ -97,7 +97,7 @@ Template.signupsList.onCreated () ->
       share.templateSub(template,"team")
 
 Template.signupsList.helpers
-  LeadListItemGrouped: () -> LeadListItemGroupedContainer,
+  LeadListItemGrouped: () -> LeadListItemGrouped,
   'allTeams': () ->
     template = Template.instance()
     limit = template.limit.get()

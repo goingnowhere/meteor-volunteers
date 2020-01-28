@@ -1,4 +1,5 @@
 import i18n from 'meteor/universe:i18n'
+import { t } from '../../../both/utils/i18n'
 
-export const t = i18n.createTranslator('goingnowhere:volunteers')
+export { t } from '../../../both/utils/i18n'
 export const T = i18n.createComponent(t)

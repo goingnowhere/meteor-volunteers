@@ -7,7 +7,7 @@ export const isEarlyEntryOpen = () => {
   return moment().isBefore(earlyEntryClose)
 }
 
-export const areShiftChangesOpen = (dutyType, signup, parentDuty) => {
+export const areShiftChangesOpen = ({ start, shiftId, type }, parentDuty) => {
   if (isEarlyEntryOpen()) {
     return true
   }
@@ -15,10 +15,10 @@ export const areShiftChangesOpen = (dutyType, signup, parentDuty) => {
   const eventStart = moment('2019-07-09')
 
   let startDate
-  if (dutyType === 'project') {
-    startDate = moment(signup.start)
-  } else if (dutyType === 'shift') {
-    const duty = parentDuty || collections.dutiesCollections[dutyType].findOne(signup.shiftId)
+  if (type === 'project') {
+    startDate = moment(start)
+  } else if (type === 'shift') {
+    const duty = parentDuty || collections.dutiesCollections[type].findOne(shiftId)
     startDate = moment(duty && duty.start)
   } else {
     return true

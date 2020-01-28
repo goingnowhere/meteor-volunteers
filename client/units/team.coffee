@@ -1,3 +1,4 @@
+import { collections } from '../../both/collections/initCollections'
 
 Template.teamEditDetails.bindI18nNamespace('goingnowhere:volunteers')
 Template.teamEditDetails.helpers
@@ -8,9 +9,9 @@ Template.teamEdit.bindI18nNamespace('goingnowhere:volunteers')
 Template.teamEdit.onCreated () ->
   template = this
   template.teamId = template.data._id
-  share.templateSub(template,"ShiftSignups.byTeam",template.teamId)
-  share.templateSub(template,"TaskSignups.byTeam",template.teamId)
-  share.templateSub(template,"LeadSignups.byTeam",template.teamId)
+  share.templateSub(template,"Signups.byTeam",template.teamId,'shift')
+  share.templateSub(template,"Signups.byTeam",template.teamId,'task')
+  share.templateSub(template,"Signups.byTeam",template.teamId,'lead')
 
 Template.teamEdit.helpers
   'main': () ->
@@ -27,7 +28,7 @@ Template.teamEdit.helpers
       tableFields: [ { name: 'title'}, {name: 'start',template: "shiftDateInline"} ]
       form: { collection: share.TeamShifts, filter: {parentId: parentId} }
       subscription : (template) ->
-        [ share.templateSub(template,"ShiftSignups.byTeam",parentId) ]
+        [ share.templateSub(template,"Signups.byTeam",parentId, 'shift') ]
       }
     task =  {
       id: "task"
@@ -35,7 +36,7 @@ Template.teamEdit.helpers
       tableFields: [ { name: 'title'}, {name: 'dueDate'} ]
       form: { collection: share.TeamTasks, filter: {parentId: parentId} }
       subscription : (template) ->
-        [ share.templateSub(template,"TaskSignups.byTeam",parentId) ]
+        [ share.templateSub(template,"Signups.byTeam",parentId, 'task') ]
       }
     lead =  {
       'id': "leads"
@@ -46,7 +47,7 @@ Template.teamEdit.helpers
       ]
       'form': { collection: share.Lead, filter: {parentId: parentId} }
       'subscription': (template) ->
-        [ share.templateSub(template,"LeadSignups.byTeam",parentId) ]
+        [ share.templateSub(template,"Signups.byTeam",parentId, 'lead') ]
       }
     return [shift,task,lead]
 
@@ -67,11 +68,11 @@ Template.addTeam.events
 Template.teamLeadField.bindI18nNamespace('goingnowhere:volunteers')
 Template.teamLeadField.onCreated () ->
   template = this
-  share.templateSub(template,"LeadSignups.byTeam",template.data.parentId)
-  share.templateSub(template,"LeadSignups.byDepartment",template.data.parentId)
+  share.templateSub(template,"Signups.byTeam",template.data.parentId, 'lead')
+  share.templateSub(template,"Signups.byDept",template.data.parentId, 'lead')
 
 Template.teamLeadField.helpers
   'signup': () ->
     parentId = Template.currentData().parentId
     shiftId = Template.currentData()._id
-    share.LeadSignups.findOne({parentId: parentId, shiftId: shiftId, status: 'confirmed'})
+    collections.signups.findOne({parentId: parentId, shiftId: shiftId, status: 'confirmed'})

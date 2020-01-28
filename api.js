@@ -6,6 +6,8 @@ import moment from 'moment-timezone'
 import { initMethods } from './both/methods/methods'
 import { getSkillsList, getQuirksList } from './both/collections/unit'
 import { collections } from './both/collections/initCollections'
+import { volunteerFormSchema } from './both/collections/volunteer'
+import { teamStats, deptStats } from './both/stats'
 
 export { BookedTable } from './client/components/volunteers/BookedTable.jsx'
 export { SignupApproval } from './client/components/teamLeads/SignupApproval.jsx'
@@ -51,10 +53,12 @@ export class VolunteersClass {
     this.isManagerOrLead = (...args) => share.isManagerOrLead(...args)
     this.isManager = (...args) => share.isManager(...args)
     this.isLead = (...args) => share.isLead(...args)
-    this.teamStats = (...args) => share.TeamStats(...args)
-    this.deptStats = (...args) => share.DepartmentStats(...args)
+    this.teamStats = (...args) => teamStats(...args)
+    this.deptStats = (...args) => deptStats(...args)
 
-    this.Schemas = share.Schemas
+    this.schemas = {
+      volunteerForm: volunteerFormSchema,
+    }
     this.Collections = {
       ...collections,
       VolunteerForm: share.VolunteerForm,
@@ -65,10 +69,6 @@ export class VolunteersClass {
       TeamTasks: share.TeamTasks,
       Projects: share.Projects,
       Lead: share.Lead,
-      ShiftSignups: share.ShiftSignups,
-      ProjectSignups: share.ProjectSignups,
-      TaskSignups: share.TaskSignups,
-      LeadSignups: share.LeadSignups,
       UnitAggregation: share.UnitAggregation,
     }
   }
