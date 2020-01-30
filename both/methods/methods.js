@@ -63,7 +63,7 @@ export const initMethods = (eventName) => {
 
   // Status can be either confirmed or refused
   const createSignupStatusMethod = status => (signupId) => {
-    console.log(`${prefix}.signups.set.${status}`, status)
+    console.log(`${prefix}.signups.set.${status}`, signupId)
     check(signupId, String)
     check(status, Match.OneOf(...signupStatuses))
     const oldSignup = collections.signups.findOne(signupId)

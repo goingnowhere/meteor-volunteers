@@ -35,13 +35,13 @@ share.initServerMethods = (eventName) => {
   })
 
   Meteor.methods({
-    'signups.list.manager'(type) { //eslint-disable-line
+    'signups.list'(query) { //eslint-disable-line
       if (!share.isManager()) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
       return collections.signups.aggregate([
         {
-          $match: { type, status: 'pending' },
+          $match: query,
         }, {
           $lookup: {
             from: share.Department._name,
@@ -71,10 +71,41 @@ share.initServerMethods = (eventName) => {
             from: share.Lead._name,
             localField: 'shiftId',
             foreignField: '_id',
-            as: 'duty',
+            as: 'lead',
           },
         }, {
-          $unwind: { path: '$duty' },
+          $lookup: {
+            from: share.TeamShifts._name,
+            localField: 'shiftId',
+            foreignField: '_id',
+            as: 'shift',
+          },
+        }, {
+          $lookup: {
+            from: share.Projects._name,
+            localField: 'shiftId',
+            foreignField: '_id',
+            as: 'project',
+          },
+        }, {
+          $addFields: {
+            duty: {
+              $switch: {
+                branches: [
+                  {
+                    case: { $gt: [{ $size: '$shift' }, 0] },
+                    then: { $arrayElemAt: ['$shift', 0] },
+                  }, {
+                    case: { $gt: [{ $size: '$lead' }, 0] },
+                    then: { $arrayElemAt: ['$lead', 0] },
+                  }, {
+                    case: { $gt: [{ $size: '$project' }, 0] },
+                    then: { $arrayElemAt: ['$project', 0] },
+                  },
+                ],
+              },
+            },
+          },
         }, {
           $lookup: {
             from: Meteor.users._name,

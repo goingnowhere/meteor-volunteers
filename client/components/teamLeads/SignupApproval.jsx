@@ -1,6 +1,9 @@
 /* globals __coffeescriptShare */
 import React from 'react'
+import moment from 'moment-timezone'
 
+import { ProjectDateInline } from '../common/ProjectDateInline.jsx'
+import { ShiftDateInline } from '../common/ShiftDateInline.jsx'
 import { T } from '../common/i18n'
 
 const share = __coffeescriptShare
@@ -15,7 +18,6 @@ const refuse = (signupId, reload) => {
   reload()
 }
 
-// TODO generalise this for any signup, not just leads
 export const SignupApproval = ({
   signup: {
     _id,
@@ -23,35 +25,35 @@ export const SignupApproval = ({
     user,
     team,
     dept,
+    type,
+    start,
+    end,
+    createdAt,
   },
-  isTeam,
   openUserModal,
   reloadSignups,
 }) => (
   <li className="list-group-item p-2">
     <div className="row no-gutters align-items-center">
       <div className="col">
-        {!isTeam && `${(dept && dept.name) || (team && team.name)}  > `}{ duty.title }
-        {/* {{#if $eq signup.type 'shift'}}
-          <div>
-            {{> React component=ShiftDateInline start=signup.duty.start end=signup.duty.end }}
-          </div>
-        {{/if}}
-        {{#if $eq signup.type 'project'}}
-          <div>
-            {{> React component=ProjectDateInline start=signup.start end=signup.end }}
-          </div>
-        {{/if}}
-        {{#if $eq signup.type 'task'}}
-          {{> taskDate signup.duty }}
-        {{/if}} */}
+        {type === 'lead'
+          ? `${(dept && dept.name) || (team && team.name)}  > ${duty.title}`
+          : duty.title}
+        {type === 'shift' && (
+          <ShiftDateInline start={duty.start} end={duty.end} />
+        )}
+        {type === 'project' && (
+          <ProjectDateInline key={_id} start={start} end={end} />
+        )}
+        {/* TODO {type === 'task' && (
+          <TaskDateInline due={duty.dueDate} />
+        )} */}
       </div>
       <div className="col" data-action="user-info" data-id="{{ signup.userId }}">
         <button type="button" className="btn btn-link" onClick={() => openUserModal(user._id)}>
           {user.profile.nickname || user.profile.firstName}
         </button>
-        {/* XXX to be fixed */}
-        {/* <small>{{__ ".created"}}: {{createdAgo signup.createdAt}}</small> */}
+        <small><T>created</T>: {createdAt && moment(createdAt).fromNow()}</small>
       </div>
       <div className="col">
         <button type="button" className="btn btn-light btn-sm" onClick={() => approve(_id, reloadSignups)}>
