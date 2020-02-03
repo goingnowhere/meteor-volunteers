@@ -96,16 +96,6 @@
       "resolved": "https://registry.npmjs.org/prop-types/-/prop-types-15.7.2.tgz",
       "integrity": "sha512-8QQikdH7//R2vurIJSutZ1smHYTcLpRWEOlHnzcWHmBYrOGUysKwSsrC89BCiFj3CbrfJ/nXFdJepOVrY1GCHQ=="
     },
-    "react": {
-      "version": "16.8.6",
-      "resolved": "https://registry.npmjs.org/react/-/react-16.8.6.tgz",
-      "integrity": "sha512-pC0uMkhLaHm11ZSJULfOBqV4tIZkx87ZLvbbQYunNixAAvjnC+snJCg0XQXn9VIsttVsbZP/H/ewzgsd5fxKXw=="
-    },
-    "react-dom": {
-      "version": "16.8.6",
-      "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-16.8.6.tgz",
-      "integrity": "sha512-1nL7PIq9LTL3fthPqwkvr2zY7phIPjYrT0jp4HjyEQrEROnw4dG41VVwi/wfoCneoleqrNX7iAD+pXebJZwrwA=="
-    },
     "react-fontawesome": {
       "version": "1.6.1",
       "resolved": "https://registry.npmjs.org/react-fontawesome/-/react-fontawesome-1.6.1.tgz",

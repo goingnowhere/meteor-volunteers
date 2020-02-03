@@ -12,8 +12,10 @@ Npm.depends({
   'chart.js': '2.8.0',
   'moment-range': '4.0.2',
   'moment-timezone': '0.5.23',
-  react: '16.8.6',
-  'react-dom': '16.8.6',
+  // Depends on React but if we specify that Meteor bundles a copy of React with the package
+  // which causes problems, so we just hope the client has it instead.
+  // react: '16.8.6',
+  // 'react-dom': '16.8.6',
   'react-fontawesome': '1.6.1',
   'react-modal': '3.8.1',
 })
