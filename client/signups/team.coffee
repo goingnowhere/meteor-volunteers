@@ -6,7 +6,6 @@ import { projectSignupsConfirmed } from '../../both/stats'
 import { collections } from '../../both/collections/initCollections'
 import { getShifts } from '../../both/stats'
 import { ProjectDateInline } from '../components/common/ProjectDateInline.jsx'
-import { ShiftDateInline } from '../components/common/ShiftDateInline.jsx'
 
 commonEvents =
   'click [data-action="un-enroll"]': (event,template) ->
@@ -111,45 +110,6 @@ Template.teamShiftsRota.helpers
           shifts: v
         ).value()
     ).value()
-
-Template.teamShiftsTable.bindI18nNamespace('goingnowhere:volunteers')
-Template.teamShiftsTable.onCreated () ->
-  template = this
-  teamId = template.data._id
-  template.shifts = new ReactiveVar([])
-  template.grouping = new ReactiveVar(new Set())
-  template.shiftUpdateDep = new Tracker.Dependency
-  template.autorun () ->
-    template.shiftUpdateDep.depend()
-    share.templateSub(template,"Signups.byTeam",teamId,'shift')
-    if template.subscriptionsReady()
-      sel = {parentId: teamId}
-      currentDate = Template.currentData().date
-      if currentDate
-        # this is already a moment object
-        startOfDay = currentDate.clone().startOf('day')
-        endOfDay = currentDate.clone().endOf('day')
-        sel =
-          $and: [
-            sel,
-            { start: { $gte: startOfDay.toDate() , $lte: endOfDay.toDate() } },
-          ]
-      template.shifts.set(getShifts(sel))
-
-Template.teamShiftsTable.helpers
-  ShiftDateInline: () -> ShiftDateInline
-  'groupedShifts': () ->
-    _.chain(Template.instance().shifts.get())
-    .groupBy('groupId')
-    .map((v,k) ->
-      title: v[0].title
-      groupId: k
-      shifts: v
-    ).value()
-  'getRandomShiftId': (groupId) ->
-    share.TeamShifts.findOne({groupId})?._id
-
-Template.teamShiftsTable.events commonEvents
 
 Template.teamProjectsTable.bindI18nNamespace('goingnowhere:volunteers')
 Template.teamProjectsTable.onCreated () ->

@@ -11,6 +11,7 @@ import { teamStats, deptStats } from './both/stats'
 
 export { BookedTable } from './client/components/volunteers/BookedTable.jsx'
 export { SignupApproval } from './client/components/teamLeads/SignupApproval.jsx'
+export { TeamShiftsTable } from './client/components/teamLeads/TeamShiftsTable.jsx'
 export { ShiftDateInline } from './client/components/common/ShiftDateInline.jsx'
 export { DutiesListItem } from './client/components/shifts/DutiesListItem.jsx'
 export { SignupButtons } from './client/components/shifts/SignupButtons.jsx'

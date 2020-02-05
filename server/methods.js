@@ -1,11 +1,13 @@
 /* globals __coffeescriptShare */
 import { Meteor } from 'meteor/meteor'
-import { check } from 'meteor/check'
+import { check, Match } from 'meteor/check'
 import { ValidatedMethod } from 'meteor/mdg:validated-method'
 import Moment from 'moment-timezone'
 import { extendMoment } from 'moment-range'
 
+import { dutyTypes } from '../both/collections/volunteer'
 import { collections } from '../both/collections/initCollections'
+import { getDuties } from '../both/stats'
 
 const share = __coffeescriptShare
 
@@ -35,7 +37,7 @@ share.initServerMethods = (eventName) => {
   })
 
   Meteor.methods({
-    'signups.list'(query) { //eslint-disable-line
+    'signups.list'(query) {
       if (!share.isManager()) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
@@ -127,6 +129,36 @@ share.initServerMethods = (eventName) => {
           $unwind: { path: '$user' },
         },
       ])
+    },
+  })
+
+  new ValidatedMethod({
+    name: `${prefix}.getTeamDutyStats`,
+    validate({ type, teamId, date }) {
+      check(teamId, String)
+      check(type, Match.OneOf(...dutyTypes))
+      check(date, Match.Maybe(Date))
+    },
+    run({ type, teamId, date }) {
+      if (!share.isManagerOrLead(this.userId, [teamId])) {
+        throw new Meteor.Error(403, 'Insufficient Permission')
+      }
+      let query = { parentId: teamId }
+      if (date) {
+        const startOfDay = moment(date).startOf('day')
+        const endOfDay = moment(date).endOf('day')
+        query = {
+          $and: [
+            query,
+            { start: { $gte: startOfDay.toDate() , $lte: endOfDay.toDate() } },
+          ],
+        }
+      }
+      const duties = getDuties(query, type)
+      // TODO get usernames in lead page so remove need for this?
+      const userIds = new Set(duties.flatMap((duty) => duty.signups.map((signup) => signup.userId)))
+      const users = Meteor.users.find({ _id: { $in: Array.from(userIds) } }, { fields: { profile: true } }).fetch()
+      return { users, duties }
     },
   })
 

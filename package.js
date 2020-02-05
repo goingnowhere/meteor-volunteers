@@ -75,8 +75,6 @@ Package.onUse((api) => {
   api.add_files([
     'client/global_helpers.coffee',
     'client/css/custom.css',
-    'client/widgets.html',
-    'client/widgets.js',
 
     'client/shifts/shifts.html',
     'client/shifts/shifts.coffee',

@@ -7,7 +7,7 @@ import { collections } from './collections/initCollections'
 
 const moment = extendMoment(Moment)
 
-const uniqueVolunteers = allSignups => (
+const uniqueVolunteers = (allSignups) => (
   !allSignups ? []
     : _.chain(allSignups)
       .pluck('userId')
@@ -15,7 +15,7 @@ const uniqueVolunteers = allSignups => (
       .value())
 
 // TODO use an aggregation?
-const getDuties = (sel, type) => {
+export const getDuties = (sel, type) => {
   const sort = { sort: { start: 1, priority: 1 } }
   return collections.dutiesCollections[type].find(sel, sort).map((duty) => {
     const confirmedSignups = collections.signups.find({ type, status: 'confirmed', shiftId: duty._id }, sort)
@@ -44,13 +44,14 @@ const getDuties = (sel, type) => {
  * @param {Object} query Mongo query
  * @returns {Object}
  */
-export const getShifts = query => getDuties(query, 'shift')
-export const getProjects = query => getDuties(query, 'project')
-export const getTasks = query => getDuties(query, 'task')
-export const getLeads = query => getDuties(query, 'lead')
+export const getShifts = (query) => getDuties(query, 'shift')
+export const getProjects = (query) => getDuties(query, 'project')
+export const getTasks = (query) => getDuties(query, 'task')
+export const getLeads = (query) => getDuties(query, 'lead')
 
-const getSignupCount = query => collections.signups.find(query).count()
-const getVolunteerCount = query => uniqueVolunteers(collections.signups.find(query).fetch()).length
+const getSignupCount = (query) => collections.signups.find(query).count()
+const getVolunteerCount = (query) =>
+  uniqueVolunteers(collections.signups.find(query).fetch()).length
 
 /**
  * duties => { needed: int, confirmed: int }
@@ -79,7 +80,7 @@ const share = __coffeescriptShare
 //   volunteerNumber: int,
 //   ...team details
 // }
-const getTeams = query => share.Team.find(query).map(team => ({
+const getTeams = (query) => share.Team.find(query).map((team) => ({
   shiftRate: signupRates(getShifts({ parentId: team._id })),
   leadRate: signupRates(getLeads({ parentId: team._id })),
   // volunteers: getVolunteers({parentId: team._id, status: 'confirmed'}),
@@ -87,15 +88,15 @@ const getTeams = query => share.Team.find(query).map(team => ({
   ...team,
 }))
 
-const getDepts = query => share.Department.find(query).map((dept) => {
+const getDepts = (query) => share.Department.find(query).map((dept) => {
   const teamsOfThisDept = getTeams({ parentId: dept._id })
 
   return {
     teamIds: _.pluck(teamsOfThisDept, '_id'),
     teamsNumber: teamsOfThisDept.length,
     volunteerNumber: teamsOfThisDept.reduce((sum, team) => sum + team.volunteerNumber, 0),
-    shiftRate: sumSignupRates(teamsOfThisDept.map(team => team.shiftRate)),
-    leadRate: sumSignupRates(teamsOfThisDept.map(team => team.leadRate)),
+    shiftRate: sumSignupRates(teamsOfThisDept.map((team) => team.shiftRate)),
+    leadRate: sumSignupRates(teamsOfThisDept.map((team) => team.leadRate)),
   }
 })
 
@@ -121,10 +122,10 @@ export const deptStats = (parentId) => {
 
 export const projectSignupsConfirmed = (p) => {
   const pdays = Array.from(moment.range(moment(p.start), moment(p.end)).by('day'))
-  const dayStrings = pdays.map(m => m.toISOString())
+  const dayStrings = pdays.map((m) => m.toISOString())
   const needed = new Map(dayStrings.map((day, i) => [day, p.staffing[i].min]))
   const wanted = new Map(dayStrings.map((day, i) => [day, p.staffing[i].max]))
-  const confirmed = new Map(dayStrings.map(day => [day, 0]))
+  const confirmed = new Map(dayStrings.map((day) => [day, 0]))
   const signups = collections.signups.find({ shiftId: p._id, status: 'confirmed' }).fetch()
   signups.forEach((signup) => {
     pdays.forEach((day) => {
