@@ -154,10 +154,10 @@ export const SignupSchema = new SimpleSchema({
     optional: true,
     custom() {
       if (this.field('type').value === 'project') {
-        if (!this.isSet) {
+        if (!this.field('start').value) {
           return 'noProjectDate'
         }
-      } else if (this.isSet) {
+      } else if (this.field('start').value) {
         return 'extraSignupDate'
       }
       return undefined
@@ -169,12 +169,12 @@ export const SignupSchema = new SimpleSchema({
     optional: true,
     custom() {
       if (this.field('type').value === 'project') {
-        if (!this.isSet) {
+        if (!this.field('end').value) {
           return 'noProjectDate'
         }
         const start = moment(this.field('start').value)
-        if (!moment(this.value).isSameOrAfter(start)) return 'minDateCustom'
-      } else if (this.isSet) {
+        if (!moment(this.field('end').value).isSameOrAfter(start)) return 'minDateCustom'
+      } else if (this.field('end').value) {
         return 'extraSignupDate'
       }
       return undefined
