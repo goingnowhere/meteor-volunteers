@@ -12,6 +12,7 @@ import { teamStats, deptStats } from './both/stats'
 export { BookedTable } from './client/components/volunteers/BookedTable.jsx'
 export { SignupApproval } from './client/components/teamLeads/SignupApproval.jsx'
 export { TeamShiftsTable } from './client/components/teamLeads/TeamShiftsTable.jsx'
+export { TeamProjectsTable } from './client/components/teamLeads/TeamProjectsTable.jsx'
 export { ShiftDateInline } from './client/components/common/ShiftDateInline.jsx'
 export { DutiesListItem } from './client/components/shifts/DutiesListItem.jsx'
 export { SignupButtons } from './client/components/shifts/SignupButtons.jsx'
@@ -31,7 +32,7 @@ const initAuthorization = (eventName) => {
   share.isLead = (userId = Meteor.userId(), unitIdList) => {
     if (!unitIdList) {
       // TODO Get rid of 'user' role?
-      return Roles.getRolesForUser(userId, eventName).filter(role => role !== 'user').length > 0
+      return Roles.getRolesForUser(userId, eventName).filter((role) => role !== 'user').length > 0
     }
     return Roles.userIsInRole(userId, unitIdList, eventName)
   }

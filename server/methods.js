@@ -156,7 +156,7 @@ share.initServerMethods = (eventName) => {
       }
       const duties = getDuties(query, type)
       // TODO get usernames in lead page so remove need for this?
-      const userIds = new Set(duties.flatMap((duty) => duty.signups.map((signup) => signup.userId)))
+      const userIds = new Set(duties.flatMap((duty) => duty.volunteers))
       const users = Meteor.users.find({ _id: { $in: Array.from(userIds) } }, { fields: { profile: true } }).fetch()
       return { users, duties }
     },

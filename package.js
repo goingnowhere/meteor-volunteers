@@ -10,6 +10,7 @@ Package.describe({
 Npm.depends({
   bootstrap: '4.3.1',
   'chart.js': '2.8.0',
+  'react-chartjs-2': '2.9.0',
   'moment-range': '4.0.2',
   'moment-timezone': '0.5.23',
   // Depends on React but if we specify that Meteor bundles a copy of React with the package

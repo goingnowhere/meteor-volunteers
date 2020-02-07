@@ -14,6 +14,38 @@ const uniqueVolunteers = (allSignups) => (
       .uniq()
       .value())
 
+const getSignupCount = (query) => collections.signups.find(query).count()
+const getVolunteerCount = (query) =>
+  uniqueVolunteers(collections.signups.find(query).fetch()).length
+
+const share = __coffeescriptShare
+
+export const projectSignupsConfirmed = (project, signupsPassed) => {
+  const pdays = Array.from(moment.range(moment(project.start), moment(project.end)).by('day'))
+  const dayStrings = pdays.map((m) => m.toISOString())
+  const needed = new Map(dayStrings.map((day, i) => [day, project.staffing[i].min]))
+  const wanted = new Map(dayStrings.map((day, i) => [day, project.staffing[i].max]))
+  const confirmed = new Map(dayStrings.map((day) => [day, 0]))
+  const signups = signupsPassed
+    || collections.signups.find({ shiftId: project._id, status: 'confirmed' }).fetch()
+  signups.forEach((signup) => {
+    pdays.forEach((day) => {
+      const dayString = day.toISOString()
+      if (day.isBetween(signup.start, signup.end, 'days', '[]')) {
+        confirmed.set(dayString, confirmed.get(dayString) + 1)
+        needed.set(dayString, Math.max(needed.get(dayString) - 1, 0))
+        wanted.set(dayString, Math.max(wanted.get(dayString) - 1, 0))
+      }
+    })
+  })
+  return {
+    needed: Array.from(needed.values()),
+    wanted: Array.from(wanted.values()),
+    confirmed: Array.from(confirmed.values()),
+    days: dayStrings,
+  }
+}
+
 // TODO use an aggregation?
 export const getDuties = (sel, type) => {
   const sort = { sort: { start: 1, priority: 1 } }
@@ -21,12 +53,19 @@ export const getDuties = (sel, type) => {
     const confirmedSignups = collections.signups.find({ type, status: 'confirmed', shiftId: duty._id }, sort)
     const signups = confirmedSignups.fetch()
     const signupCount = confirmedSignups.count()
+    let needed, staffing
+    if (type === 'project') {
+      staffing = projectSignupsConfirmed(duty, signups)
+    } else {
+      needed = Math.max(0, duty.min - signupCount)
+    }
     return {
       ...duty,
       type,
       duration: moment.duration(duty.end - duty.start).humanize(),
       confirmed: signupCount,
-      needed: Math.max(0, duty.min - signupCount),
+      needed,
+      staffingStats: staffing,
       volunteers: uniqueVolunteers(signups),
       signups,
     }
@@ -37,8 +76,9 @@ export const getDuties = (sel, type) => {
  * return a shift/task/lead document together with updated signup information
  * type: string,
  * duration: string,
- * confirmed: int,
- * needed: int,
+ * confirmed?: int,
+ * needed?: int,
+ * staffingStats?: { needed: [int], wanted: [int], confirmed: [int], days: [string] },
  * volunteers: [id],
  * signups: [signups]
  * @param {Object} query Mongo query
@@ -48,10 +88,6 @@ export const getShifts = (query) => getDuties(query, 'shift')
 export const getProjects = (query) => getDuties(query, 'project')
 export const getTasks = (query) => getDuties(query, 'task')
 export const getLeads = (query) => getDuties(query, 'lead')
-
-const getSignupCount = (query) => collections.signups.find(query).count()
-const getVolunteerCount = (query) =>
-  uniqueVolunteers(collections.signups.find(query).fetch()).length
 
 /**
  * duties => { needed: int, confirmed: int }
@@ -71,8 +107,6 @@ const sumSignupRates = (rates = []) => rates.reduce(
   }),
   { needed: 0, confirmed: 0 },
 )
-
-const share = __coffeescriptShare
 
 // query => {
 //   shiftRate: { needed: int , confirmed: int},
@@ -118,29 +152,4 @@ export const deptStats = (parentId) => {
   const stats = { dept, pendingLeadRequests }
   share.UnitAggregation.upsert(parentId, { $set: stats })
   return stats
-}
-
-export const projectSignupsConfirmed = (p) => {
-  const pdays = Array.from(moment.range(moment(p.start), moment(p.end)).by('day'))
-  const dayStrings = pdays.map((m) => m.toISOString())
-  const needed = new Map(dayStrings.map((day, i) => [day, p.staffing[i].min]))
-  const wanted = new Map(dayStrings.map((day, i) => [day, p.staffing[i].max]))
-  const confirmed = new Map(dayStrings.map((day) => [day, 0]))
-  const signups = collections.signups.find({ shiftId: p._id, status: 'confirmed' }).fetch()
-  signups.forEach((signup) => {
-    pdays.forEach((day) => {
-      const dayString = day.toISOString()
-      if (day.isBetween(signup.start, signup.end, 'days', '[]')) {
-        confirmed.set(dayString, confirmed.get(dayString) + 1)
-        needed.set(dayString, needed.get(dayString) - 1)
-        wanted.set(dayString, wanted.get(dayString) - 1)
-      }
-    })
-  })
-  return {
-    needed: Array.from(needed.values()),
-    wanted: Array.from(wanted.values()),
-    confirmed: Array.from(confirmed.values()),
-    days: dayStrings,
-  }
 }
