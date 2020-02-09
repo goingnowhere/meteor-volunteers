@@ -106,6 +106,7 @@ Template.addProject.helpers
 
 AutoForm.addHooks ['InsertTeamShiftsFormId','UpdateTeamShiftsFormId'],
   onSuccess: (formType, result) ->
+    AutoFormComponents.modalHide()
     if this.template.data.var
       this.template.data.var.set({add: false, teamId: result.teamId})
 

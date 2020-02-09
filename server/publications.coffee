@@ -1,6 +1,6 @@
 import { ReactiveAggregate } from 'meteor/jcbernack:reactive-aggregate'
 import { initPublications } from './publications'
-import { teamStats, deptStats } from '../both/stats'
+import { deptStats } from '../both/stats'
 
 share.initPublications = (eventName) ->
 
@@ -138,12 +138,6 @@ share.initPublications = (eventName) ->
       teamIds = stats.dept.teamIds
       teamIds.push(parentId)
       share.UnitAggregation.find({_id: {$in: teamIds}})
-    else null
-
-  Meteor.publish "#{eventName}.Volunteers.unitAggregation.byTeam", (teamId) ->
-    if this.userId && share.isManagerOrLead(this.userId,[teamId])
-      teamStats(teamId)
-      share.UnitAggregation.find({_id: teamId})
     else null
 
   # XXX leads of a non public division should be able to see it

@@ -7,7 +7,9 @@ import { initMethods } from './both/methods/methods'
 import { getSkillsList, getQuirksList } from './both/collections/unit'
 import { collections } from './both/collections/initCollections'
 import { volunteerFormSchema } from './both/collections/volunteer'
-import { teamStats, deptStats } from './both/stats'
+import { deptStats } from './both/stats'
+
+import { initServerMethods } from './server/methods'
 
 export { BookedTable } from './client/components/volunteers/BookedTable.jsx'
 export { SignupApproval } from './client/components/teamLeads/SignupApproval.jsx'
@@ -45,7 +47,7 @@ export class VolunteersClass {
     share.initCollections(this.eventName)
     initMethods(this.eventName)
     if (Meteor.isServer) {
-      share.initServerMethods(this.eventName)
+      initServerMethods(this.eventName)
     }
     initAuthorization(this.eventName)
     if (Meteor.isServer) {
@@ -55,7 +57,6 @@ export class VolunteersClass {
     this.isManagerOrLead = (...args) => share.isManagerOrLead(...args)
     this.isManager = (...args) => share.isManager(...args)
     this.isLead = (...args) => share.isLead(...args)
-    this.teamStats = (...args) => teamStats(...args)
     this.deptStats = (...args) => deptStats(...args)
 
     this.schemas = {

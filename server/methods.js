@@ -7,13 +7,13 @@ import { extendMoment } from 'moment-range'
 
 import { dutyTypes } from '../both/collections/volunteer'
 import { collections } from '../both/collections/initCollections'
-import { getDuties } from '../both/stats'
+import { getDuties, getTeamStats } from '../both/stats'
 
 const share = __coffeescriptShare
 
 const moment = extendMoment(Moment)
 
-share.initServerMethods = (eventName) => {
+export const initServerMethods = (eventName) => {
   const prefix = `${eventName}.Volunteers`
   const getProjectStaffing = new ValidatedMethod({
     name: `${prefix}.getProjectStaffing`,
@@ -162,5 +162,16 @@ share.initServerMethods = (eventName) => {
     },
   })
 
-  return getProjectStaffing
+  new ValidatedMethod({
+    name: `${prefix}.getTeamStats`,
+    validate({ teamId }) {
+      check(teamId, String)
+    },
+    run({ teamId }) {
+      if (!share.isManagerOrLead(this.userId, [teamId])) {
+        throw new Meteor.Error(403, 'Insufficient Permission')
+      }
+      return getTeamStats(teamId)
+    },
+  })
 }

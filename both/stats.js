@@ -134,16 +134,12 @@ const getDepts = (query) => share.Department.find(query).map((dept) => {
   }
 })
 
-export const teamStats = (parentId) => {
-  // All pending requests for tasks, shifts and leads
-  const stats = {
-    pendingRequests: getSignupCount({ parentId, status: 'pending' }),
-    team: getTeams({ _id: parentId })[0],
-    volunteerNumber: getVolunteerCount({ parentId, status: 'confirmed' }),
-  }
-  share.UnitAggregation.upsert(parentId, { $set: stats })
-  return stats
-}
+// All pending requests for tasks, shifts and leads
+export const getTeamStats = (parentId) => ({
+  pendingRequests: getSignupCount({ parentId, status: 'pending' }),
+  team: getTeams({ _id: parentId })[0],
+  volunteerNumber: getVolunteerCount({ parentId, status: 'confirmed' }),
+})
 
 export const deptStats = (parentId) => {
   const dept = getDepts({ _id: parentId })[0]
