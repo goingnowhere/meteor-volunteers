@@ -1,4 +1,5 @@
 import SimpleSchema from 'simpl-schema'
+import { shiftSchema, taskSchema, projectSchema, leadSchema } from './duties'
 import { initCollections } from './initCollections'
 
 share.initCollections = (eventName) ->
@@ -11,12 +12,12 @@ share.initCollections = (eventName) ->
   
   # duties
   share.TeamTasks = new Mongo.Collection "#{prefix}Volunteers.teamTasks"
-  share.TeamTasks.attachSchema(share.Schemas.TeamTasks)
+  share.TeamTasks.attachSchema(taskSchema)
   if Meteor.isServer
     share.TeamTasks._ensureIndex( { parentId: 1 } )
 
   share.TeamShifts = new Mongo.Collection "#{prefix}Volunteers.teamShifts"
-  share.TeamShifts.attachSchema(share.Schemas.TeamShifts)
+  share.TeamShifts.attachSchema(shiftSchema)
   if Meteor.isServer
     share.TeamShifts._ensureIndex( { parentId: 1 } )
 
@@ -26,12 +27,12 @@ share.initCollections = (eventName) ->
     share.shiftGroups = new Mongo.Collection "#{prefix}Volunteers.shiftGroups"
 
   share.Projects = new Mongo.Collection "#{prefix}Volunteers.projects"
-  share.Projects.attachSchema(share.Schemas.Projects)
+  share.Projects.attachSchema(projectSchema)
   if Meteor.isServer
     share.Projects._ensureIndex( { parentId: 1 } )
 
   share.Lead = new Mongo.Collection "#{prefix}Volunteers.lead"
-  share.Lead.attachSchema(share.Schemas.Lead)
+  share.Lead.attachSchema(leadSchema)
   if Meteor.isServer
     share.Lead._ensureIndex( { parentId: 1 } )
 

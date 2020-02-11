@@ -1,7 +1,12 @@
 /* globals __coffeescriptShare */
 import { Meteor } from 'meteor/meteor'
 import { Mongo } from 'meteor/mongo'
+import SimpleSchema from 'simpl-schema'
+import { checkNpmVersions } from 'meteor/tmeasday:check-npm-versions'
 import { SignupSchema } from './volunteer'
+
+checkNpmVersions({ 'simpl-schema': '1.x' }, 'goingnowhere:volunteers')
+SimpleSchema.extendOptions(['autoform'])
 
 const share = __coffeescriptShare
 

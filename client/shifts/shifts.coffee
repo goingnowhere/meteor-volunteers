@@ -3,16 +3,10 @@ import Moment from 'moment-timezone'
 import { extendMoment } from 'moment-range'
 
 import { collections } from '../../both/collections/initCollections'
-import { DutiesListItem } from '../components/shifts/DutiesListItem';
+import { dayDatesSubschema, boundsSubschema } from '../../both/collections/subSchemas'
 import { DutyBody } from '../components/shifts/DutyBody';
 
 moment = extendMoment(Moment)
-
-Template.dutyListItem.helpers({
-  DutiesListItem: () -> DutiesListItem,
-})
-
-Template.dutyListItem.bindI18nNamespace('goingnowhere:volunteers')
 
 sameDayHelper = {
   'sameDay': (start, end) -> moment(start).isSame(moment(end),"day")
@@ -29,50 +23,50 @@ Template.addShift.helpers
   }
   'data': () -> parentId: Template.currentData().team?._id
 
-ShiftGroups = new SimpleSchema(share.Schemas.Common)
-# ShiftGroups.extend(share.SubSchemas.AssociatedProject)
-ShiftGroups.extend(share.SubSchemas.DayDates)
-ShiftGroups.extend(
-  oldshifts:
-    type: Array
-    optional: true
-    minCount: 0
-    autoform:
-      panelClass: "d-none"
-      afArrayField:
-        initialCount: 0
-  'oldshifts.$':
-    type: share.SubSchemas.Bounds.extend({
-      startTime: String,
-      endTime: String,
-      rotaId: Number })
-  shifts:
-    type: Array
-    minCount: 1
-    autoform:
-      afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","shifts_help_rota")
-  'shifts.$':
-    label: ''
-    type: share.SubSchemas.Bounds.extend(
-      startTime:
-        type: String
-        autoform:
-          afFieldInput:
-            type: 'timepicker'
-            placeholder: () -> i18n.__("goingnowhere:volunteers","start")
-      endTime:
-        type: String
-        autoform:
-          afFieldInput:
-            type: 'timepicker'
-            placeholder: () -> i18n.__("goingnowhere:volunteers","end")
-      rotaId:
-        type: Number
-        optional: true
-        autoform:
-          type: "hidden"
-    )
-)
+# ShiftGroups = new SimpleSchema(share.Schemas.Common)
+# # ShiftGroups.extend(share.SubSchemas.AssociatedProject)
+# ShiftGroups.extend(dayDatesSubschema)
+# ShiftGroups.extend(
+#   oldshifts:
+#     type: Array
+#     optional: true
+#     minCount: 0
+#     autoform:
+#       panelClass: "d-none"
+#       afArrayField:
+#         initialCount: 0
+#   'oldshifts.$':
+#     type: boundsSubschema.extend({
+#       startTime: String,
+#       endTime: String,
+#       rotaId: Number })
+#   shifts:
+#     type: Array
+#     minCount: 1
+#     autoform:
+#       afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","shifts_help_rota")
+#   'shifts.$':
+#     label: ''
+#     type: boundsSubschema.extend(
+#       startTime:
+#         type: String
+#         autoform:
+#           afFieldInput:
+#             type: 'timepicker'
+#             placeholder: () -> i18n.__("goingnowhere:volunteers","start")
+#       endTime:
+#         type: String
+#         autoform:
+#           afFieldInput:
+#             type: 'timepicker'
+#             placeholder: () -> i18n.__("goingnowhere:volunteers","end")
+#       rotaId:
+#         type: Number
+#         optional: true
+#         autoform:
+#           type: "hidden"
+#     )
+# )
 
 Template.addShiftGroup.bindI18nNamespace('goingnowhere:volunteers')
 Template.addShiftGroup.helpers

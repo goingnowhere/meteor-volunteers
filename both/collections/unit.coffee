@@ -78,6 +78,7 @@ CommonUnit = new SimpleSchema(
       afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","policy_help_team")
 )
 
+share.Schemas = {}
 share.Schemas.Team = new SimpleSchema(CommonUnit)
 share.Schemas.Team.extend(
   location:

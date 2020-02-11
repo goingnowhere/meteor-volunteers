@@ -2,6 +2,7 @@ import SimpleSchema from 'simpl-schema'
 import Moment from 'moment-timezone'
 import { extendMoment } from 'moment-range'
 import { collections } from '../collections/initCollections'
+import { dayDatesSubschema, boundsSubschema } from '../collections/subSchemas'
 
 moment = extendMoment(Moment)
 
@@ -135,25 +136,25 @@ share.initMethods = (eventName) ->
     else
       return throwError(403, 'Insufficient Permission')
 
-  groupSchema = new SimpleSchema(share.Schemas.Common)
-  groupSchema.extend(share.SubSchemas.DayDates)
-  groupSchema.extend({
-    shifts: { type: Array , minCount: 1 }
-    'shifts.$': {
-      type: share.SubSchemas.Bounds.extend({
-        startTime: String,
-        endTime: String,
-        rotaId: { type: Number, optional: true } })
-      optional: true
-    }
-    oldshifts: {type: Array, optional: true}
-    'oldshifts.$': {
-      type: share.SubSchemas.Bounds.extend({
-        startTime: String,
-        endTime: String,
-        rotaId: Number })
-    }
-  })
+  # groupSchema = new SimpleSchema(share.Schemas.Common)
+  # groupSchema.extend(dayDatesSubschema)
+  # groupSchema.extend({
+  #   shifts: { type: Array , minCount: 1 }
+  #   'shifts.$': {
+  #     type: boundsSubschema.extend({
+  #       startTime: String,
+  #       endTime: String,
+  #       rotaId: { type: Number, optional: true } })
+  #     optional: true
+  #   }
+  #   oldshifts: {type: Array, optional: true}
+  #   'oldshifts.$': {
+  #     type: boundsSubschema.extend({
+  #       startTime: String,
+  #       endTime: String,
+  #       rotaId: Number })
+  #   }
+  # })
 
   Meteor.methods "#{prefix}.teamShifts.group.update": (doc) ->
     console.log ["#{prefix}.teamShifts.group.update", doc]

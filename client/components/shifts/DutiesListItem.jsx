@@ -7,8 +7,10 @@ import { DutyBody } from './DutyBody.jsx'
 const DutiesListItemTitle = ({
   type,
   team,
-  title,
-  priority,
+  duty: {
+    title,
+    priority,
+  },
 }) => {
   if (type === 'shift') {
     return <ShiftTitle team={team} title={title} priority={priority} />
@@ -22,20 +24,20 @@ const DutiesListItemTitle = ({
   return null
 }
 
-const DutiesListItemContent = ({ description, team }) => (
+const DutiesListItemContent = ({ duty, team }) => (
   <Fragment>
     <div className="row no-gutters">
-      <DutyBody description={description} />
+      <DutyBody description={duty.description} />
     </div>
     <div className="row no-gutters">
       {!(team.quirks && team.skills) ? null : (
         <ul className="list-inline my-1">
-          {team.skills.map(skill => (
+          {team.skills.map((skill) => (
             <li key={skill} className="list-inline-item">
               <span className="badge badge-secondary badge-pill">{skill}</span>
             </li>
           ))}
-          {team.quirks.map(quirk => (
+          {team.quirks.map((quirk) => (
             <li key={quirk} className="list-inline-item">
               <span className="badge badge-primary badge-pill">{quirk}</span>
             </li>
@@ -46,9 +48,14 @@ const DutiesListItemContent = ({ description, team }) => (
   </Fragment>
 )
 
-export const DutiesListItem = ({ duty }) => (
-  <Fragment>
-    <DutiesListItemTitle {...duty} />
-    <DutiesListItemContent {...duty} />
-  </Fragment>
-)
+export const DutiesListItem = ({ type, duty, team }) => {
+  // TODO remove weird calls that make this necessary
+  type = type || duty.type // eslint-disable-line no-param-reassign
+  team = team || duty.team // eslint-disable-line no-param-reassign
+  return (
+    <Fragment>
+      <DutiesListItemTitle team={team} type={type} duty={duty} />
+      <DutiesListItemContent duty={duty} team={team} />
+    </Fragment>
+  )
+}

@@ -6,6 +6,9 @@ import { t } from '../utils/i18n'
 export const dutyTypes = ['lead', 'shift', 'project', 'task']
 export const signupStatuses = ['confirmed', 'pending', 'refused', 'bailed', 'cancelled']
 
+// For some reason it doesn't work to just add this at a higher level
+SimpleSchema.extendOptions(['autoform'])
+
 // this is the base Volunteers form schema
 export const volunteerFormSchema = new SimpleSchema({
   userId: {
