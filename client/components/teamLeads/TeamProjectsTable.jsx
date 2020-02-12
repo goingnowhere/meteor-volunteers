@@ -3,6 +3,7 @@ import { Meteor } from 'meteor/meteor'
 import React, { useState, useEffect } from 'react'
 import Fa from 'react-fontawesome'
 import { AutoFormComponents } from 'meteor/abate:autoform-components'
+import { AutoForm } from 'meteor/aldeed:autoform'
 
 import { T, t } from '../common/i18n'
 import { Modal } from '../common/Modal.jsx'
@@ -68,6 +69,17 @@ export const TeamProjectsTable = ({ teamId, UserInfoComponent }) => {
     reloadShifts()
   }
 
+  AutoForm.addHooks([
+    'UpdateProjectsFormId',
+    'projectSignupsUpdate',
+    'projectSignupsInsert',
+  ], {
+    onSuccess() {
+      reloadShifts()
+      AutoFormComponents.modalHide()
+    },
+  })
+
   const [modalUserId, setModalUserId] = useState('')
 
   return (
@@ -79,6 +91,8 @@ export const TeamProjectsTable = ({ teamId, UserInfoComponent }) => {
       >
         <UserInfoComponent userId={modalUserId} />
       </Modal>
+      {/* i18n! */}
+      {allProjects.length === 0 && <tbody><tr><td>No projects here...</td></tr></tbody>}
       {allProjects.map((project) => (
         <tbody key={project._id}>
           <tr>

@@ -3,7 +3,7 @@ import Moment from 'moment-timezone'
 import { extendMoment } from 'moment-range'
 
 import { collections } from '../../both/collections/initCollections'
-import { dayDatesSubschema, boundsSubschema } from '../../both/collections/subSchemas'
+import { rotaSchema } from '../../both/collections/duties'
 import { DutyBody } from '../components/shifts/DutyBody';
 
 moment = extendMoment(Moment)
@@ -22,69 +22,6 @@ Template.addShift.helpers
     insert: {label: i18n.__("goingnowhere:volunteers","new_shift") }
   }
   'data': () -> parentId: Template.currentData().team?._id
-
-# ShiftGroups = new SimpleSchema(share.Schemas.Common)
-# # ShiftGroups.extend(share.SubSchemas.AssociatedProject)
-# ShiftGroups.extend(dayDatesSubschema)
-# ShiftGroups.extend(
-#   oldshifts:
-#     type: Array
-#     optional: true
-#     minCount: 0
-#     autoform:
-#       panelClass: "d-none"
-#       afArrayField:
-#         initialCount: 0
-#   'oldshifts.$':
-#     type: boundsSubschema.extend({
-#       startTime: String,
-#       endTime: String,
-#       rotaId: Number })
-#   shifts:
-#     type: Array
-#     minCount: 1
-#     autoform:
-#       afFieldHelpText: () -> i18n.__("goingnowhere:volunteers","shifts_help_rota")
-#   'shifts.$':
-#     label: ''
-#     type: boundsSubschema.extend(
-#       startTime:
-#         type: String
-#         autoform:
-#           afFieldInput:
-#             type: 'timepicker'
-#             placeholder: () -> i18n.__("goingnowhere:volunteers","start")
-#       endTime:
-#         type: String
-#         autoform:
-#           afFieldInput:
-#             type: 'timepicker'
-#             placeholder: () -> i18n.__("goingnowhere:volunteers","end")
-#       rotaId:
-#         type: Number
-#         optional: true
-#         autoform:
-#           type: "hidden"
-#     )
-# )
-
-Template.addShiftGroup.bindI18nNamespace('goingnowhere:volunteers')
-Template.addShiftGroup.helpers
-  'form': () ->
-    return {
-      schema: ShiftGroups,
-      insert: {
-        id: "InsertShiftGroupFormId",
-        method: "#{share.eventName}.Volunteers.teamShifts.group.insert",
-        label: i18n.__("goingnowhere:volunteers","new_shift_group"),
-      }
-      update: {
-        id: "UpdateShiftGroupFormId",
-        method: "#{share.eventName}.Volunteers.teamShifts.group.update",
-        label: i18n.__("goingnowhere:volunteers","update_group"),
-      },
-    }
-  'data': () -> Template.currentData()
 
 Template.addTask.bindI18nNamespace('goingnowhere:volunteers')
 Template.addTask.helpers

@@ -5,11 +5,13 @@ import Moment from 'moment-timezone'
 import { extendMoment } from 'moment-range'
 import SimpleSchema from 'simpl-schema'
 import { Roles } from 'meteor/piemonkey:roles'
+import { _ } from 'meteor/underscore'
 
 import { collections, schemas } from '../collections/initCollections'
 import { signupStatuses } from '../collections/volunteer'
 import { projectSignupsConfirmed } from '../stats'
 import { areShiftChangesOpen } from '../utils/event'
+import { rotaSchema } from '../collections/duties'
 
 const share = __coffeescriptShare
 const moment = extendMoment(Moment)
@@ -35,12 +37,12 @@ const findConflicts = ({
     userId,
     status: { $in: ['confirmed', 'pending'] },
   }).fetch()
-  const shiftSignups = signups.filter(signup => signup.type === 'shift').map(signup => signup.shiftId)
-  const projectSignups = signups.filter(signup => signup.type === 'project')
+  const shiftSignups = signups.filter((signup) => signup.type === 'shift').map((signup) => signup.shiftId)
+  const projectSignups = signups.filter((signup) => signup.type === 'project')
   return [
     ...share.TeamShifts.find({ _id: { $in: shiftSignups } }).fetch(),
     ...projectSignups,
-  ].filter(shift => shift && signupRange.overlaps(moment.range(shift.start, shift.end)))
+  ].filter((shift) => shift && signupRange.overlaps(moment.range(shift.start, shift.end)))
 }
 
 const isDutyFull = ({
@@ -57,16 +59,62 @@ const isDutyFull = ({
   return signupCount >= parentDuty.max
 }
 
+const createShifts = ({
+  start,
+  end,
+  startTime,
+  endTime,
+  min,
+  max,
+  rotaId,
+  rotaIndex,
+  details,
+  rangeOptions = {},
+}) => {
+  // Moment range goes into the future if start > end
+  if (moment(start).isAfter(end)) return null
+  return Array.from(moment.range(start, end).by('days', rangeOptions)).map((day) => {
+    const [startHour, startMin] = startTime.split(':')
+    const [endHour, endMin] = endTime.split(':')
+    // this is the global timezone known by moment that we use to offset
+    // the date given by the client to store it in the database as a js Date()
+    // js Date() is timezone agnostic and always stored in UTC.
+    // Using the method Date().toString() the local timezone (set on the server)
+    // is used to print the date.
+    const timezone = moment(day).format('ZZ')
+    day.utcOffset(timezone)
+    const shiftStart = moment(day).hour(startHour).minute(startMin).utcOffset(timezone, true)
+    const shiftEnd = moment(day).hour(endHour).minute(endMin).utcOffset(timezone, true)
+    // Deal with day wrap-around
+    if (shiftEnd.isBefore(shiftStart)) {
+      shiftEnd.add(1, 'day')
+    }
+    return share.TeamShifts.insert({
+      ...details,
+      min,
+      max,
+      start: shiftStart.toDate(),
+      end: shiftEnd.toDate(),
+      rotaId,
+      rotaIndex,
+    })
+  })
+}
+
 export const initMethods = (eventName) => {
   share.initMethods(eventName)
   const prefix = `${eventName}.Volunteers`
 
   // Status can be either confirmed or refused
-  const createSignupStatusMethod = status => (signupId) => {
+  const createSignupStatusMethod = (status) => (signupId) => {
     console.log(`${prefix}.signups.set.${status}`, signupId)
     check(signupId, String)
     check(status, Match.OneOf(...signupStatuses))
     const oldSignup = collections.signups.findOne(signupId)
+    if (!oldSignup && Meteor.isClient) {
+      // Calling as a server method so stub has nothing to do
+      return null
+    }
     if (!areShiftChangesOpen(oldSignup) && !share.isManager()) {
       throw new Meteor.Error(403, 'Too late to change this shift! Contact your lead')
     }
@@ -89,9 +137,9 @@ export const initMethods = (eventName) => {
           }
         }
       })
-    } else {
-      throw new Meteor.Error(403, 'Insufficient Permission')
+      return null
     }
+    throw new Meteor.Error(403, 'Insufficient Permission')
   }
 
   Meteor.methods({
@@ -99,6 +147,10 @@ export const initMethods = (eventName) => {
       console.log(`${prefix}.signups.remove`, signupId)
       check(signupId, String)
       const oldSignup = collections.signups.findOne(signupId)
+      if (!oldSignup && Meteor.isClient) {
+        // Calling as a server method so stub has nothing to do
+        return null
+      }
       if (!areShiftChangesOpen(oldSignup) && !share.isManager()) {
         throw new Meteor.Error(403, 'Too late to change this shift! Contact your lead')
       }
@@ -156,6 +208,10 @@ export const initMethods = (eventName) => {
       const signupIdentifiers = _.pick(wholeSignup, ['userId', 'shiftId', 'parentId'])
       const parentDuty = collections.dutiesCollections[wholeSignup.type]
         .findOne(signupIdentifiers.shiftId)
+      if (!parentDuty && Meteor.isClient) {
+        // Calling as a server method so stub has nothing to do
+        return null
+      }
       if (!areShiftChangesOpen(wholeSignup, parentDuty) && !share.isManager()) {
         throw new Meteor.Error(403, 'Too late to change this shift! Contact your lead')
       }
@@ -228,6 +284,163 @@ export const initMethods = (eventName) => {
         })
       }
       throw new Meteor.Error(403, 'Insufficient Permission')
+    },
+  })
+
+  Meteor.methods({
+    // eslint-disable-next-line meteor/audit-argument-checks
+    [`${prefix}.rotas.insert`](rota) {
+      console.log(`${prefix}.rotas.insert`, rota)
+      rotaSchema.validate(rota)
+      const {
+        shifts,
+        start,
+        end,
+        parentId,
+      } = rota
+      const details = _.omit(rota, 'shifts', 'start', 'end')
+      if (!share.isManagerOrLead(Meteor.userId(), [parentId])) {
+        throw new Meteor.Error(403, 'Insufficient Permission')
+      }
+      // store rota
+      const rotaId = collections.rotas.insert(rota)
+      // generate and store shifts
+      return shifts.map((shiftSpecifics, rotaIndex) =>
+        createShifts({
+          ...shiftSpecifics,
+          start,
+          end,
+          rotaId,
+          rotaIndex,
+          details,
+        }))
+    },
+    [`${prefix}.rotas.remove`](group) {
+      console.log(`${prefix}.rotas.remove`, group)
+      check(group, { groupId: String, parentId: String })
+      if (share.isManagerOrLead(Meteor.userId(), [group.parentId])) {
+        collections.rotas.remove(group)
+        return share.TeamShifts.remove(group)
+      }
+      throw new Meteor.Error(403, 'Insufficient Permission')
+    },
+    // eslint-disable-next-line meteor/audit-argument-checks
+    [`${prefix}.rotas.update`]({ modifier, ...query }) {
+      console.log(`${prefix}.rotas.update`, query, modifier)
+      // TODO Instead of using autoform, report changes and only make them if confirmed
+      if (modifier.$set && modifier.$set.shifts) {
+        // Do we really need to filter out nulls?
+        modifier.$set.shifts = modifier.$set.shifts.filter(Boolean)
+      }
+      rotaSchema.validate(modifier, { modifier: true })
+      const oldRota = collections.rotas.findOne(query)
+      // Should be a server method?
+      if (!oldRota && Meteor.isClient) return null
+      if (!share.isManagerOrLead(Meteor.userId(), [oldRota.parentId])
+        || modifier.$set.parentId !== oldRota.parentId) {
+        throw new Meteor.Error(403, 'Insufficient Permission')
+      }
+      console.log('Updating rota (debug):', query, modifier, modifier.$set.shifts, oldRota)
+
+      // Delete any shifts outside of the new rota days
+      const { start, end } = modifier.$set
+      // 'end' is /start/ of last day in event local timezone
+      const lastRotaDayEnd = moment(end).add(1, 'day')
+      share.TeamShifts.remove({
+        rotaId: oldRota._id,
+        $or: [
+          { start: { $lt: start } },
+          // shifts can overflow to tomorrow so 'last day' constrains the shift starts
+          { start: { $gte: lastRotaDayEnd.toDate() } },
+        ],
+      })
+      // TODO delete signups
+
+      // Go through oldRota.shifts to find which have changed
+      const changes = oldRota.shifts.map((oldShift, oldIndex) => {
+        const newIndex = modifier.$set.shifts.findIndex((shift) => _.isEqual(shift, oldShift))
+        // Assume index is the same if there isn't an exact match. Need to improve when re-writing
+        const newShift = modifier.$set.shifts[oldIndex]
+        const timeChange = newShift.startTime !== oldShift.startTime
+          || newShift.endTime !== oldShift.endTime
+        return {
+          indexChange: (newIndex !== -1 && newIndex !== oldIndex) ? newIndex : false,
+          numChange: newShift.min !== oldShift.min || newShift.max !== oldShift.max,
+          timeChange,
+          oldIndex,
+          oldShift,
+          newShift,
+        }
+      })
+      // Update any we can and remove those with time changes
+      const indexesAlreadySet = changes
+        .filter((change) => !change.indexChange && !change.numChange && !change.timeChange)
+        .map(({ oldIndex }) => oldIndex)
+      changes
+        .filter(({ indexChange, timeChange }) => (indexChange === false) && timeChange)
+        .forEach(({ oldIndex }) => {
+          share.TeamShifts.remove({ rotaId: oldRota._id, rotaIndex: oldIndex })
+        })
+      changes
+        .filter(({ indexChange, timeChange, numChange }) =>
+          !indexChange && !timeChange && numChange)
+        .forEach(({ oldIndex, newShift: { min, max } }) => {
+          share.TeamShifts.update({ rotaId: oldRota._id, rotaIndex: oldIndex },
+            { $set: { min, max } }, { multi: true })
+          indexesAlreadySet.push(oldIndex)
+        })
+      changes
+        .filter(({ indexChange }) => indexChange !== false)
+        .forEach(({ oldIndex, indexChange }) => {
+          share.TeamShifts.update({ rotaId: oldRota._id, rotaIndex: oldIndex },
+            { $set: { rotaIndex: indexChange } }, { multi: true })
+          indexesAlreadySet.push(indexChange)
+        })
+
+      // Create any new shifts that don't exist already in the old rota days
+      modifier.$set.shifts.forEach((shift, index) => {
+        if (indexesAlreadySet.includes(index)) return
+        createShifts({
+          ...shift,
+          start: oldRota.start,
+          end: oldRota.end,
+          rotaId: oldRota._id,
+          rotaIndex: index,
+          details: _.omit(modifier.$set, 'shifts', 'start', 'end'),
+        })
+      })
+
+      // Create any shifts for days outside the old rota days
+      if (moment(start).isBefore(oldRota.start)) {
+        modifier.$set.shifts.forEach((shift, index) => {
+          createShifts({
+            ...shift,
+            start,
+            end: oldRota.start,
+            rotaId: oldRota._id,
+            rotaIndex: index,
+            details: _.omit(modifier.$set, 'shifts', 'start', 'end'),
+            rangeOptions: { excludeEnd: true },
+          })
+        })
+      }
+      if (moment(oldRota.end).isBefore(end)) {
+        modifier.$set.shifts.forEach((shift, index) => {
+          createShifts({
+            ...shift,
+            // Workaround moment-range poor edge-case handling
+            start: moment(oldRota.end).add(1, 'day').toDate(),
+            end,
+            rotaId: oldRota._id,
+            rotaIndex: index,
+            details: _.omit(modifier.$set, 'shifts', 'start', 'end'),
+            rangeOptions: { excludeStart: true },
+          })
+        })
+      }
+
+      // ...and finally we can update the rota
+      return collections.rotas.update(query, modifier)
     },
   })
 }

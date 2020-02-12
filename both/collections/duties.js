@@ -66,20 +66,6 @@ const commonDutySchema = new SimpleSchema({
       defaultValue: 'public',
     },
   },
-  groupId: {
-    type: String,
-    optional: true,
-    autoform: {
-      type: 'hidden',
-    },
-  },
-  rotaId: {
-    type: Number,
-    optional: true,
-    autoform: {
-      type: 'hidden',
-    },
-  },
 })
 
 export const taskSchema = new SimpleSchema({
@@ -126,6 +112,62 @@ export const shiftSchema = new SimpleSchema()
 shiftSchema.extend(dayDatesTimesSubschema)
 shiftSchema.extend(commonDutySchema)
 shiftSchema.extend(boundsSubschema)
+shiftSchema.extend({
+  rotaId: {
+    type: String,
+    autoform: {
+      type: 'hidden',
+    },
+  },
+  rotaIndex: {
+    type: Number,
+    optional: true,
+    autoform: {
+      type: 'hidden',
+    },
+  },
+})
+
+export const rotaSchema = new SimpleSchema(commonDutySchema)
+rotaSchema.extend(dayDatesSubSchema)
+rotaSchema.extend({
+  shifts: {
+    type: Array,
+    minCount: 1,
+    autoform: {
+      afFieldHelpText: () => t('shifts_help_rota'),
+    },
+  },
+  'shifts.$': {
+    type: boundsSubschema.extend({
+      startTime: {
+        type: String,
+        autoform: {
+          afFieldInput: {
+            type: 'timepicker',
+            placeholder: () => t('start'),
+          },
+        },
+      },
+      endTime: {
+        type: String,
+        autoform: {
+          afFieldInput: {
+            type: 'timepicker',
+            placeholder: () => t('end'),
+          },
+        },
+      },
+      rotaIndex: {
+        type: Number,
+        optional: true,
+        autoform: { type: 'hidden' },
+      },
+    }),
+    optional: true,
+  },
+})
+
 
 export const leadSchema = new SimpleSchema(commonDutySchema)
 leadSchema.extend({

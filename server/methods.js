@@ -174,4 +174,20 @@ export const initServerMethods = (eventName) => {
       return getTeamStats(teamId)
     },
   })
+
+  new ValidatedMethod({
+    name: `${prefix}.rotas.findOne`,
+    validate({ rotaId }) {
+      check(rotaId, String)
+    },
+    run({ rotaId }) {
+      console.log('finding rota', rotaId)
+      const rota = collections.rotas.findOne(rotaId)
+      if (!rota) throw new Meteor.Error(404, 'Not Found')
+      if (rota.policy === 'adminOnly' && !share.isManagerOrLead(this.userId, [rota.parentId])) {
+        throw new Meteor.Error(403, 'Insufficient Permission')
+      }
+      return rota
+    },
+  })
 }

@@ -4,6 +4,7 @@ import { _ } from 'meteor/underscore'
 import React, { Fragment, useState, useEffect } from 'react'
 import Fa from 'react-fontawesome'
 import { AutoFormComponents } from 'meteor/abate:autoform-components'
+import { AutoForm } from 'meteor/aldeed:autoform'
 
 import { T, t } from '../common/i18n'
 import { Modal } from '../common/Modal.jsx'
@@ -26,14 +27,13 @@ export const TeamShiftsTable = ({ date, teamId, UserInfoComponent }) => {
       if (err) console.error(err)
       else {
         setUsers(usrs)
-        const groupedDuties = _.groupBy(duties, 'groupId')
+        const groupedDuties = _.groupBy(duties, 'rotaId')
         setShifts(groupedDuties)
       }
     })
   useEffect(reloadShifts, [teamId, date])
 
   const editShift = (shift) =>
-    // TODO Also need to reload shifts when no longer using autoform modal
     AutoFormComponents.ModalShowWithTemplate('insertUpdateTemplate',
       { form: { collection: collections.dutiesCollections.shift }, data: shift }, '', 'lg')
   const deleteShift = (shiftId) => {
@@ -43,6 +43,7 @@ export const TeamShiftsTable = ({ date, teamId, UserInfoComponent }) => {
     }
   }
   const enrollUser = ({ _id: shiftId, policy }) =>
+    // TODO Also need to reload shifts and can probably move from autoform modal
     AutoFormComponents.ModalShowWithTemplate('shiftEnrollUsersTable', {
       data: {
         teamId,
@@ -55,6 +56,27 @@ export const TeamShiftsTable = ({ date, teamId, UserInfoComponent }) => {
     share.meteorCall('signups.remove', signupId)
     reloadShifts()
   }
+  const editRota = (rotaId) => {
+    Meteor.call(`${share.eventName}.Volunteers.rotas.findOne`, { rotaId }, (err, rota) => {
+      if (err) console.error(err)
+      AutoFormComponents.ModalShowWithTemplate('insertUpdateTemplate', {
+        form: {
+          collection: collections.rotas,
+        },
+        data: rota,
+      }, '', 'lg')
+    })
+  }
+  AutoForm.addHooks([
+    'InsertRotasFormId',
+    'UpdateRotasFormId',
+    'UpdateTeamShiftsFormId',
+  ], {
+    onSuccess() {
+      reloadShifts()
+      AutoFormComponents.modalHide()
+    },
+  })
 
   const [modalUserId, setModalUserId] = useState('')
 
@@ -73,7 +95,7 @@ export const TeamShiftsTable = ({ date, teamId, UserInfoComponent }) => {
             <tr className="shiftFamily table-active">
               <td colSpan="4"><h5>{shifts[0].title}</h5></td>
               <td>
-                <button type="button" className="btn btn-light btn-sm">
+                <button type="button" className="btn btn-light btn-sm" onClick={() => editRota(groupId)}>
                   <Fa name="pencil-square-o" /> <T>edit_group</T>
                 </button>
               </td>
