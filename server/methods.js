@@ -7,7 +7,7 @@ import { extendMoment } from 'moment-range'
 
 import { dutyTypes } from '../both/collections/volunteer'
 import { collections } from '../both/collections/initCollections'
-import { getDuties, getTeamStats } from '../both/stats'
+import { getDuties, getTeamStats, getDeptStats } from '../both/stats'
 
 const share = __coffeescriptShare
 
@@ -15,7 +15,7 @@ const moment = extendMoment(Moment)
 
 export const initServerMethods = (eventName) => {
   const prefix = `${eventName}.Volunteers`
-  const getProjectStaffing = new ValidatedMethod({
+  new ValidatedMethod({
     name: `${prefix}.getProjectStaffing`,
     validate(projectId) { check(projectId, String) },
     run(projectId) {
@@ -27,7 +27,7 @@ export const initServerMethods = (eventName) => {
         const signups = collections.signups.find({ shiftId: projectId, status: 'confirmed' }).fetch()
 
         const confirmed = days.map((day) => {
-          const thisday = signups.filter(signup => (day.isBetween(signup.start, signup.end, 'days', '[]')))
+          const thisday = signups.filter((signup) => (day.isBetween(signup.start, signup.end, 'days', '[]')))
           return thisday.length
         })
         return confirmed
@@ -38,6 +38,7 @@ export const initServerMethods = (eventName) => {
 
   Meteor.methods({
     'signups.list'(query) {
+      check(query, Object)
       if (!share.isManager()) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
@@ -150,14 +151,15 @@ export const initServerMethods = (eventName) => {
         query = {
           $and: [
             query,
-            { start: { $gte: startOfDay.toDate() , $lte: endOfDay.toDate() } },
+            { start: { $gte: startOfDay.toDate(), $lte: endOfDay.toDate() } },
           ],
         }
       }
       const duties = getDuties(query, type)
       // TODO get usernames in lead page so remove need for this?
       const userIds = new Set(duties.flatMap((duty) => duty.volunteers))
-      const users = Meteor.users.find({ _id: { $in: Array.from(userIds) } }, { fields: { profile: true } }).fetch()
+      const users = Meteor.users
+        .find({ _id: { $in: Array.from(userIds) } }, { fields: { profile: true } }).fetch()
       return { users, duties }
     },
   })
@@ -172,6 +174,19 @@ export const initServerMethods = (eventName) => {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
       return getTeamStats(teamId)
+    },
+  })
+
+  new ValidatedMethod({
+    name: `${prefix}.getDeptStats`,
+    validate({ deptId }) {
+      check(deptId, String)
+    },
+    run({ deptId }) {
+      if (!share.isManagerOrLead(this.userId, [deptId])) {
+        throw new Meteor.Error(403, 'Insufficient Permission')
+      }
+      return getDeptStats(deptId)
     },
   })
 

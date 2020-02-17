@@ -7,9 +7,6 @@ share.initCollections = (eventName) ->
 
   prefix = "#{eventName}."
 
-  # Used to store stats but doesn't seem to cache so may not be needed
-  share.UnitAggregation = new Mongo.Collection "#{prefix}Volunteers.unitAggregation"
-  
   # duties
   share.TeamTasks = new Mongo.Collection "#{prefix}Volunteers.teamTasks"
   share.TeamTasks.attachSchema(taskSchema)

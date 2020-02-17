@@ -72,7 +72,6 @@ export class VolunteersClass {
       TeamTasks: share.TeamTasks,
       Projects: share.Projects,
       Lead: share.Lead,
-      UnitAggregation: share.UnitAggregation,
     }
   }
 

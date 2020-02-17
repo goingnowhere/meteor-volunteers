@@ -131,15 +131,6 @@ share.initPublications = (eventName) ->
     dv = share.Division.find(sel)
     return [dv,dp,t]
 
-  Meteor.publish "#{eventName}.Volunteers.unitAggregation.byDepartment", (deptId) ->
-    if this.userId && share.isManagerOrLead(this.userId,[deptId])
-      parentId = deptId
-      stats = deptStats(parentId)
-      teamIds = stats.dept.teamIds
-      teamIds.push(parentId)
-      share.UnitAggregation.find({_id: {$in: teamIds}})
-    else null
-
   # XXX leads of a non public division should be able to see it
   Meteor.publish "#{eventName}.Volunteers.division", (sel={}) ->
     if this.userId && share.isManager()

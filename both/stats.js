@@ -1,4 +1,5 @@
 /* globals __coffeescriptShare */
+import { Meteor } from 'meteor/meteor'
 import Moment from 'moment-timezone'
 import { extendMoment } from 'moment-range' // eslint-disable-line import/no-unresolved, import/extensions
 import { _ } from 'meteor/underscore'
@@ -56,6 +57,8 @@ export const getDuties = (sel, type) => {
     let needed, staffing
     if (type === 'project') {
       staffing = projectSignupsConfirmed(duty, signups)
+    } else if (type === 'lead') {
+      needed = 1
     } else {
       needed = Math.max(0, duty.min - signupCount)
     }
@@ -94,7 +97,7 @@ export const getLeads = (query) => getDuties(query, 'lead')
  */
 const signupRates = (duties = []) => duties.reduce(
   (acc, duty) => ({
-    needed: acc.needed + (duty.min || 0),
+    needed: acc.needed + (duty.min || (duty.type === 'lead' ? 1 : 0)),
     confirmed: acc.confirmed + (duty.confirmed || 0),
   }),
   { needed: 0, confirmed: 0 },
@@ -114,13 +117,25 @@ const sumSignupRates = (rates = []) => rates.reduce(
 //   volunteerNumber: int,
 //   ...team details
 // }
-const getTeams = (query) => share.Team.find(query).map((team) => ({
-  shiftRate: signupRates(getShifts({ parentId: team._id })),
-  leadRate: signupRates(getLeads({ parentId: team._id })),
-  // volunteers: getVolunteers({parentId: team._id, status: 'confirmed'}),
-  volunteerNumber: getVolunteerCount({ parentId: team._id, status: 'confirmed' }),
-  ...team,
-}))
+const getTeams = (query) => share.Team.find(query).map((team) => {
+  const leadSignups = getLeads({ parentId: team._id })
+  const leadIds = leadSignups.flatMap((lead) => lead.volunteers)
+  return {
+    shiftRate: signupRates(getShifts({ parentId: team._id })),
+    leadRate: signupRates(leadSignups),
+    leadRoles: leadSignups,
+    leads: Meteor.users.find({ _id: { $in: leadIds } }, {
+      fields: {
+        profile: true,
+        ticketId: true,
+        isBanned: true,
+      },
+    }).fetch(),
+    // volunteers: getVolunteers({parentId: team._id, status: 'confirmed'}),
+    volunteerNumber: getVolunteerCount({ parentId: team._id, status: 'confirmed' }),
+    ...team,
+  }
+})
 
 const getDepts = (query) => share.Department.find(query).map((dept) => {
   const teamsOfThisDept = getTeams({ parentId: dept._id })
@@ -128,24 +143,26 @@ const getDepts = (query) => share.Department.find(query).map((dept) => {
   return {
     teamIds: _.pluck(teamsOfThisDept, '_id'),
     teamsNumber: teamsOfThisDept.length,
+    teams: teamsOfThisDept,
     volunteerNumber: teamsOfThisDept.reduce((sum, team) => sum + team.volunteerNumber, 0),
     shiftRate: sumSignupRates(teamsOfThisDept.map((team) => team.shiftRate)),
     leadRate: sumSignupRates(teamsOfThisDept.map((team) => team.leadRate)),
+    ...dept,
   }
 })
 
 // All pending requests for tasks, shifts and leads
-export const getTeamStats = (parentId) => ({
-  pendingRequests: getSignupCount({ parentId, status: 'pending' }),
-  team: getTeams({ _id: parentId })[0],
-  volunteerNumber: getVolunteerCount({ parentId, status: 'confirmed' }),
+export const getTeamStats = (teamId) => ({
+  pendingRequests: getSignupCount({ parentId: teamId, status: 'pending' }),
+  team: getTeams({ _id: teamId })[0],
+  volunteerNumber: getVolunteerCount({ parentId: teamId, status: 'confirmed' }),
 })
 
-export const deptStats = (parentId) => {
-  const dept = getDepts({ _id: parentId })[0]
-  const signupQuery = { parentId: { $in: dept.teamIds }, status: 'pending' }
-  const pendingLeadRequests = collections.signups.find(signupQuery).count()
-  const stats = { dept, pendingLeadRequests }
-  share.UnitAggregation.upsert(parentId, { $set: stats })
-  return stats
+export const getDeptStats = (deptId) => {
+  const dept = getDepts({ _id: deptId })[0]
+  const signupQuery = { parentId: { $in: [deptId, ...dept.teamIds] }, type: 'lead', status: 'pending' }
+  return {
+    dept,
+    pendingLeadRequests: collections.signups.find(signupQuery).fetch(),
+  }
 }

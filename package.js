@@ -91,8 +91,6 @@ Package.onUse((api) => {
 
     'client/signups/team.html',
     'client/signups/team.coffee',
-    'client/signups/signups.html',
-    'client/signups/signups.js',
 
   ], 'client')
 
