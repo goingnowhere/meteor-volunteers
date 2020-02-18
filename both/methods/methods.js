@@ -339,7 +339,12 @@ export const initMethods = (eventName) => {
       console.log('Updating rota (debug):', query, modifier, modifier.$set.shifts, oldRota)
 
       // Delete any shifts outside of the new rota days
-      const { start, end } = modifier.$set
+      const {
+        start,
+        end,
+        shifts,
+        ...meta
+      } = modifier.$set
       // 'end' is /start/ of last day in event local timezone
       const lastRotaDayEnd = moment(end).add(1, 'day')
       share.TeamShifts.remove({
@@ -352,11 +357,16 @@ export const initMethods = (eventName) => {
       })
       // TODO delete signups
 
+      // Apply any changes to the meta information
+      if (Object.entries(meta).some(([key, value]) => oldRota[key] !== value)) {
+        share.TeamShifts.update({ rotaId: oldRota._id }, { $set: meta }, { multi: true })
+      }
+
       // Go through oldRota.shifts to find which have changed
       const changes = oldRota.shifts.map((oldShift, oldIndex) => {
-        const newIndex = modifier.$set.shifts.findIndex((shift) => _.isEqual(shift, oldShift))
+        const newIndex = shifts.findIndex((shift) => _.isEqual(shift, oldShift))
         // Assume index is the same if there isn't an exact match. Need to improve when re-writing
-        const newShift = modifier.$set.shifts[oldIndex]
+        const newShift = shifts[oldIndex]
         const timeChange = newShift.startTime !== oldShift.startTime
           || newShift.endTime !== oldShift.endTime
         return {
