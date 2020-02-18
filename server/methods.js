@@ -39,7 +39,7 @@ export const initServerMethods = (eventName) => {
   Meteor.methods({
     'signups.list'(query) {
       check(query, Object)
-      if (!share.isManager()) {
+      if (!share.isManagerOrLead(this.userId, [query.parentId])) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
       return collections.signups.aggregate([

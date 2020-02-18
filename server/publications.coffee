@@ -1,6 +1,5 @@
 import { ReactiveAggregate } from 'meteor/jcbernack:reactive-aggregate'
 import { initPublications } from './publications'
-import { deptStats } from '../both/stats'
 
 share.initPublications = (eventName) ->
 

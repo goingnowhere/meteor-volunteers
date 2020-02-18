@@ -7,7 +7,6 @@ import { initMethods } from './both/methods/methods'
 import { getSkillsList, getQuirksList } from './both/collections/unit'
 import { collections } from './both/collections/initCollections'
 import { volunteerFormSchema } from './both/collections/volunteer'
-import { deptStats } from './both/stats'
 
 import { initServerMethods } from './server/methods'
 
@@ -57,7 +56,6 @@ export class VolunteersClass {
     this.isManagerOrLead = (...args) => share.isManagerOrLead(...args)
     this.isManager = (...args) => share.isManager(...args)
     this.isLead = (...args) => share.isLead(...args)
-    this.deptStats = (...args) => deptStats(...args)
 
     this.schemas = {
       volunteerForm: volunteerFormSchema,

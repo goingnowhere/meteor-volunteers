@@ -117,7 +117,7 @@ const sumSignupRates = (rates = []) => rates.reduce(
 //   volunteerNumber: int,
 //   ...team details
 // }
-const getTeams = (query) => share.Team.find(query).map((team) => {
+const getTeams = (query, orgUnit = 'Team') => share[orgUnit].find(query).map((team) => {
   const leadSignups = getLeads({ parentId: team._id })
   const leadIds = leadSignups.flatMap((lead) => lead.volunteers)
   return {
@@ -138,7 +138,8 @@ const getTeams = (query) => share.Team.find(query).map((team) => {
 })
 
 const getDepts = (query) => share.Department.find(query).map((dept) => {
-  const teamsOfThisDept = getTeams({ parentId: dept._id })
+  const teamsOfThisDept = getTeams({ _id: dept._id }, 'Department')
+    .concat(getTeams({ parentId: dept._id }))
 
   return {
     teamIds: _.pluck(teamsOfThisDept, '_id'),

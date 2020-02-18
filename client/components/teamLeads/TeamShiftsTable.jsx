@@ -89,13 +89,13 @@ export const TeamShiftsTable = ({ date, teamId, UserInfoComponent }) => {
       >
         <UserInfoComponent userId={modalUserId} />
       </Modal>
-      {Object.entries(shiftGroups).map(([groupId, shifts]) => (
-        <Fragment key={groupId}>
+      {Object.entries(shiftGroups).map(([rotaId, shifts]) => (
+        <Fragment key={rotaId}>
           <thead className="thead-default">
             <tr className="shiftFamily table-active">
               <td colSpan="4"><h5>{shifts[0].title}</h5></td>
               <td>
-                <button type="button" className="btn btn-light btn-sm" onClick={() => editRota(groupId)}>
+                <button type="button" className="btn btn-light btn-sm" onClick={() => editRota(rotaId)}>
                   <Fa name="pencil-square-o" /> <T>edit_group</T>
                 </button>
               </td>
@@ -107,7 +107,7 @@ export const TeamShiftsTable = ({ date, teamId, UserInfoComponent }) => {
               </td> -->
       <!--        <td>
                 <button type="button" className="btn btn-light btn-sm"
-                  data-groupid="{{family.groupId}}" data-parentid="{{_id}}"
+                  data-groupid="{{family.rotaId}}" data-parentid="{{_id}}"
                   data-type="shift" data-action="delete_group">
                   <Fa name="trash-o" /> <T>delete_rota</T>
                 </button>

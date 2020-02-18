@@ -219,7 +219,7 @@ export const initPublications = (eventName) => {
       { $match: query },
       {
         $group: {
-          _id: '$groupId',
+          _id: '$rotaId',
           parentId: { $first: '$parentId' },
           title: { $first: '$title' },
           description: { $first: '$description' },

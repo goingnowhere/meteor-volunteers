@@ -25,10 +25,10 @@ Template.teamShiftsRota.helpers
     .map((v1,k1) ->
       day: k1
       shifts: _.chain(v1)
-        .groupBy('groupId')
+        .groupBy('rotaId')
         .map((v,k) ->
           title: v[0].title
-          groupId: k
+          rotaId: k
           shifts: v
         ).value()
     ).value()

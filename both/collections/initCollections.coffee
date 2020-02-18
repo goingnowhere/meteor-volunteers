@@ -19,6 +19,12 @@ share.initCollections = (eventName) ->
     share.TeamShifts._ensureIndex( { parentId: 1 } )
     share.TeamShifts._ensureIndex( { rotaId: 1 } )
 
+  # Temporarily re-add to get dashboard working
+  if Meteor.isClient
+    # Create client-side only collection to reactively aggregate into
+    # If preformance is a problem we could aggregate into a collection inside Mongo
+    share.shiftGroups = new Mongo.Collection "#{prefix}Volunteers.shiftGroups"
+
   share.Projects = new Mongo.Collection "#{prefix}Volunteers.projects"
   share.Projects.attachSchema(projectSchema)
   if Meteor.isServer

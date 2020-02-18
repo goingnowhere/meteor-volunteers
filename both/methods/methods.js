@@ -317,7 +317,7 @@ export const initMethods = (eventName) => {
     },
     [`${prefix}.rotas.remove`](group) {
       console.log(`${prefix}.rotas.remove`, group)
-      check(group, { groupId: String, parentId: String })
+      check(group, { rotaId: String, parentId: String })
       if (share.isManagerOrLead(Meteor.userId(), [group.parentId])) {
         collections.rotas.remove(group)
         return share.TeamShifts.remove(group)
