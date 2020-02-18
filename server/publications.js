@@ -5,6 +5,7 @@ import { Roles } from 'meteor/piemonkey:roles'
 import { check, Match } from 'meteor/check'
 
 import { collections } from '../both/collections/initCollections'
+import { auth } from '../both/utils/auth'
 
 const share = __coffeescriptShare
 
@@ -13,7 +14,7 @@ export const initPublications = (eventName) => {
   const dutiesPublicPolicy = { policy: { $in: ['public', 'requireApproval'] } }
 
   const filterForPublic = (userId, sel) => {
-    if (share.isManager()) {
+    if (auth.isManager()) {
       return sel
     }
     // getRolesForUser includes all roles, e.g. if user is lead of a department,
@@ -26,13 +27,13 @@ export const initPublications = (eventName) => {
     return query
   }
 
-  const findDutiesWithSignupsAndUsers = (type, isManagerOrLead, passedTeamId) => ({
+  const findDutiesWithSignupsAndUsers = (type, isLead, passedTeamId) => ({
     find(team) {
       // When chained after other publishComposite steps gets passed the results of the previous
       // query, so needs an id passed to the function or a org unit query step just before
       const teamId = passedTeamId || (team && team._id)
       let sel = { parentId: teamId }
-      if (!isManagerOrLead) {
+      if (!isLead) {
         sel = _.extend(sel, dutiesPublicPolicy)
       }
       return collections.dutiesCollections[type].find(sel)
@@ -40,7 +41,7 @@ export const initPublications = (eventName) => {
     children: [
       {
         find(duty) {
-          if (isManagerOrLead) {
+          if (isLead) {
             return collections.signups.find({ shiftId: duty._id })
           }
           return null
@@ -48,7 +49,7 @@ export const initPublications = (eventName) => {
         children: [
           {
             find(signup) {
-              if (signup && isManagerOrLead) {
+              if (signup && isLead) {
                 return Meteor.users.find(signup.userId)
               }
               return null
@@ -63,20 +64,20 @@ export const initPublications = (eventName) => {
   // Restricted to team lead
   Meteor.publishComposite(`${prefix}.Signups.byTeam`,
     function publishSignupsByTeam(teamId, type) {
-      const isManagerOrLead = share.isManagerOrLead(this.userId, [teamId])
-      return findDutiesWithSignupsAndUsers(type, isManagerOrLead, teamId)
+      const isLead = auth.isLead(this.userId, [teamId])
+      return findDutiesWithSignupsAndUsers(type, isLead, teamId)
     })
 
   // all given a department id, return all teams and all signups related
   // to this department. Restricted to department lead
   Meteor.publishComposite(`${prefix}.Signups.byDept`,
     function publishSignupsByDept(departmentId, type) {
-      const isManagerOrLead = share.isManagerOrLead(this.userId, [departmentId])
+      const isLead = auth.isLead(this.userId, [departmentId])
       return {
         find() { return share.Team.find({ parentId: departmentId }) },
         children: [
-          findDutiesWithSignupsAndUsers(type, isManagerOrLead, departmentId),
-          findDutiesWithSignupsAndUsers(type, isManagerOrLead),
+          findDutiesWithSignupsAndUsers(type, isLead, departmentId),
+          findDutiesWithSignupsAndUsers(type, isLead),
         ],
       }
     })
@@ -85,18 +86,18 @@ export const initPublications = (eventName) => {
   // to this division. Restricted to division lead
   Meteor.publishComposite(`${prefix}.Signups.byDivision`,
     function publishSignupsByDiv(divisionId, type) {
-      const isManagerOrLead = share.isManagerOrLead(this.userId, [divisionId])
+      const isLead = auth.isLead(this.userId, [divisionId])
       return {
         find() { return share.Department.find({ parentId: divisionId }) },
         children: [
           {
             find(dept) { return share.Team.find({ parentId: dept._id }) },
             children: [
-              findDutiesWithSignupsAndUsers(type, isManagerOrLead),
+              findDutiesWithSignupsAndUsers(type, isLead),
             ],
           },
-          findDutiesWithSignupsAndUsers(type, isManagerOrLead),
-          findDutiesWithSignupsAndUsers(type, isManagerOrLead, divisionId),
+          findDutiesWithSignupsAndUsers(type, isLead),
+          findDutiesWithSignupsAndUsers(type, isLead, divisionId),
         ],
       }
     })
@@ -110,7 +111,7 @@ export const initPublications = (eventName) => {
       if (types.length > 0) query.type = { $in: types }
       return {
         find() {
-          if ((userId === this.userId) || share.isManager()) {
+          if ((userId === this.userId) || auth.isManager()) {
             return collections.signups.find(query)
           }
           return null
@@ -129,7 +130,7 @@ export const initPublications = (eventName) => {
           },
           {
             find({ userId: signupUserId, parentId }) {
-              if (parentId && share.isManagerOrLead(userId, [parentId])) {
+              if (parentId && auth.isLead(userId, [parentId])) {
                 return Meteor.users.find(signupUserId)
               }
               return null
@@ -150,7 +151,7 @@ export const initPublications = (eventName) => {
           {
             find(duty) {
               if (duty && (userId === currentUserId
-                || share.isManagerOrLead(currentUserId, [duty.parentId]))) {
+                || auth.isLead(currentUserId, [duty.parentId]))) {
                 return collections.signups.find({ shiftId: duty._id, userId })
               }
               return null
@@ -158,7 +159,7 @@ export const initPublications = (eventName) => {
             children: [
               {
                 find(signup, duty) {
-                  if (signup && share.isManagerOrLead(currentUserId, [duty.parentId])) {
+                  if (signup && auth.isLead(currentUserId, [duty.parentId])) {
                     return Meteor.users.find(signup.userId)
                   }
                   return null

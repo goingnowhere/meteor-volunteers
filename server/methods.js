@@ -8,6 +8,7 @@ import { extendMoment } from 'moment-range'
 import { dutyTypes } from '../both/collections/volunteer'
 import { collections } from '../both/collections/initCollections'
 import { getDuties, getTeamStats, getDeptStats } from '../both/stats'
+import { auth } from '../both/utils/auth'
 
 const share = __coffeescriptShare
 
@@ -39,7 +40,7 @@ export const initServerMethods = (eventName) => {
   Meteor.methods({
     'signups.list'(query) {
       check(query, Object)
-      if (!share.isManagerOrLead(this.userId, [query.parentId])) {
+      if (!auth.isLead(this.userId, [query.parentId])) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
       return collections.signups.aggregate([
@@ -141,7 +142,7 @@ export const initServerMethods = (eventName) => {
       check(date, Match.Maybe(Date))
     },
     run({ type, teamId, date }) {
-      if (!share.isManagerOrLead(this.userId, [teamId])) {
+      if (!auth.isLead(this.userId, [teamId])) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
       let query = { parentId: teamId }
@@ -170,7 +171,7 @@ export const initServerMethods = (eventName) => {
       check(teamId, String)
     },
     run({ teamId }) {
-      if (!share.isManagerOrLead(this.userId, [teamId])) {
+      if (!auth.isLead(this.userId, [teamId])) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
       return getTeamStats(teamId)
@@ -183,7 +184,7 @@ export const initServerMethods = (eventName) => {
       check(deptId, String)
     },
     run({ deptId }) {
-      if (!share.isManagerOrLead(this.userId, [deptId])) {
+      if (!auth.isLead(this.userId, [deptId])) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
       return getDeptStats(deptId)
@@ -199,7 +200,7 @@ export const initServerMethods = (eventName) => {
       console.log('finding rota', rotaId)
       const rota = collections.rotas.findOne(rotaId)
       if (!rota) throw new Meteor.Error(404, 'Not Found')
-      if (rota.policy === 'adminOnly' && !share.isManagerOrLead(this.userId, [rota.parentId])) {
+      if (rota.policy === 'adminOnly' && !auth.isLead(this.userId, [rota.parentId])) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
       return rota

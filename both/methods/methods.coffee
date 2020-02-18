@@ -1,6 +1,6 @@
 import SimpleSchema from 'simpl-schema'
 import { collections } from '../collections/initCollections'
-
+import { auth } from '../utils/auth'
 
 throwError = (error, reason, details) ->
   error = new (Meteor.Error)(error, reason, details)
@@ -21,7 +21,7 @@ share.initMethods = (eventName) ->
         Meteor.methods "#{collectionName}.remove": (Id) ->
           console.log ["#{collectionName}.remove", Id]
           check(Id,String)
-          if share.isManagerOrLead(Meteor.userId(),[Id])
+          if auth.isLead(Meteor.userId(),[Id])
             if Meteor.isServer then Roles.deleteRole(Id)
             collection.remove(Id)
             # delete all shifts and signups associated to this team
@@ -42,7 +42,7 @@ share.initMethods = (eventName) ->
           if doc.parentId != 'TopEntity'
             parentRole = doc.parentId
             allowedRoles.push(parentRole)
-          if share.isManagerOrLead(Meteor.userId(),allowedRoles)
+          if auth.isLead(Meteor.userId(),allowedRoles)
             collection.insert(doc, (err,newDocId) ->
               unless err
                 if Meteor.isServer
@@ -57,7 +57,7 @@ share.initMethods = (eventName) ->
         Meteor.methods "#{collectionName}.update": (doc) ->
           console.log ["#{collectionName}.update",doc._id,doc.modifier]
           collection.simpleSchema().validate(doc.modifier,{modifier:true})
-          if share.isManagerOrLead(Meteor.userId(),[doc._id])
+          if auth.isLead(Meteor.userId(),[doc._id])
             oldDoc = collection.findOne(doc._id)
             collection.update(doc._id,doc.modifier, (err,res) ->
               unless err
@@ -83,7 +83,7 @@ share.initMethods = (eventName) ->
           console.log ["#{collectionName}.remove", Id]
           check(Id,String)
           doc = collection.findOne(Id)
-          if share.isManagerOrLead(Meteor.userId(),[doc.parentId])
+          if auth.isLead(Meteor.userId(),[doc.parentId])
             collection.remove(Id)
             for k,scollection of collections.signupCollections
               do ->
@@ -94,7 +94,7 @@ share.initMethods = (eventName) ->
         Meteor.methods "#{collectionName}.insert": (doc) ->
           console.log ["#{collectionName}.insert",doc]
           collection.simpleSchema().validate(doc)
-          if share.isManagerOrLead(Meteor.userId(),[doc.parentId])
+          if auth.isLead(Meteor.userId(),[doc.parentId])
             collection.insert(doc)
           else
             throwError(403, 'Insufficient Permission')
@@ -103,7 +103,7 @@ share.initMethods = (eventName) ->
           console.log ["#{collectionName}.update",doc._id,doc.modifier]
           collection.simpleSchema().validate(doc.modifier,{modifier:true})
           olddoc = collection.findOne(doc._id)
-          if share.isManagerOrLead(Meteor.userId(),[olddoc.parentId])
+          if auth.isLead(Meteor.userId(),[olddoc.parentId])
             collection.update(doc._id,doc.modifier)
           else
             throwError(403, 'Insufficient Permission')
@@ -127,7 +127,7 @@ share.initMethods = (eventName) ->
   Meteor.methods "#{prefix}.volunteerForm.remove": (formId) ->
     console.log ["#{prefix}.volunteerForm.remove",formId]
     check(formId,String)
-    if share.isManager()
+    if auth.isManager()
       share.VolunteerForm.remove(formId)
     else
       return throwError(403, 'Insufficient Permission')
@@ -137,7 +137,7 @@ share.initMethods = (eventName) ->
     schema = share.VolunteerForm.simpleSchema()
     SimpleSchema.validate(doc.modifier,schema,{ modifier: true })
     oldDoc = share.VolunteerForm.findOne(doc._id)
-    if (Meteor.userId() == oldDoc.userId) || share.isManager()
+    if (Meteor.userId() == oldDoc.userId) || auth.isManager()
       share.VolunteerForm.update(doc._id,doc.modifier)
     else
       return throwError(403, 'Insufficient Permission')

@@ -12,6 +12,7 @@ import { signupStatuses } from '../collections/volunteer'
 import { projectSignupsConfirmed } from '../stats'
 import { areShiftChangesOpen } from '../utils/event'
 import { rotaSchema } from '../collections/duties'
+import { auth } from '../utils/auth'
 
 const share = __coffeescriptShare
 const moment = extendMoment(Moment)
@@ -115,10 +116,7 @@ export const initMethods = (eventName) => {
       // Calling as a server method so stub has nothing to do
       return null
     }
-    if (!areShiftChangesOpen(oldSignup) && !share.isManager()) {
-      throw new Meteor.Error(403, 'Too late to change this shift! Contact your lead')
-    }
-    if (share.isManagerOrLead(Meteor.userId(), [oldSignup.parentId])) {
+    if (auth.isLead(Meteor.userId(), [oldSignup.parentId])) {
       collections.signups.update(signupId, {
         $set: {
           status,
@@ -151,10 +149,7 @@ export const initMethods = (eventName) => {
         // Calling as a server method so stub has nothing to do
         return null
       }
-      if (!areShiftChangesOpen(oldSignup) && !share.isManager()) {
-        throw new Meteor.Error(403, 'Too late to change this shift! Contact your lead')
-      }
-      if (share.isManagerOrLead(Meteor.userId(), [oldSignup.parentId])) {
+      if (auth.isLead(Meteor.userId(), [oldSignup.parentId])) {
         return collections.signups.remove(signupId, (err) => {
           if (err) {
             console.error('Error when removing signup', err)
@@ -178,10 +173,11 @@ export const initMethods = (eventName) => {
       if (oldSignup.type !== 'project') {
         throw new Meteor.Error(405, 'Only possible for Project signups')
       }
-      if (!areShiftChangesOpen(oldSignup) && !share.isManager()) {
+      const isLead = auth.isLead(Meteor.userId(), [oldSignup.parentId])
+      if (!areShiftChangesOpen(oldSignup) && !isLead) {
         throw new Meteor.Error(403, 'Too late to change this shift! Contact your lead')
       }
-      if (share.isManagerOrLead(Meteor.userId(), [oldSignup.parentId])) {
+      if (isLead) {
         doc.modifier.$set.enrolled = true
         // This logic probably needs review but currently this isn't used to approve
         doc.modifier.$set.reviewed = (oldSignup.status === 'pending' && doc.status !== 'pending')
@@ -212,14 +208,14 @@ export const initMethods = (eventName) => {
         // Calling as a server method so stub has nothing to do
         return null
       }
-      if (!areShiftChangesOpen(wholeSignup, parentDuty) && !share.isManager()) {
+      const isLead = auth.isLead(this.userId, [parentDuty.parentId])
+      if (!areShiftChangesOpen(wholeSignup, parentDuty) && !isLead) {
         throw new Meteor.Error(403, 'Too late to change this shift! Contact your lead')
       }
-      const isManager = share.isManagerOrLead(this.userId, [parentDuty.parentId])
-      if (parentDuty.policy === 'adminOnly' && !isManager) {
+      if (parentDuty.policy === 'adminOnly' && !isLead) {
         throw new Meteor.Error(403, 'Admin only')
       }
-      if ((signupIdentifiers.userId === this.userId) || isManager) {
+      if ((signupIdentifiers.userId === this.userId) || isLead) {
         // Leads cannot be public so no special handling of roles needed in this method
         const status = parentDuty.policy === 'public' ? 'confirmed' : 'pending'
         const conflicts = findConflicts(wholeSignup, parentDuty)
@@ -262,11 +258,11 @@ export const initMethods = (eventName) => {
         userId: String,
       })
       const signup = collections.signups.findOne(signupIds)
-      if (!areShiftChangesOpen(signup) && !share.isManager()) {
+      const isLead = auth.isLead(this.userId, [signupIds.parentId])
+      if (!areShiftChangesOpen(signup) && !isLead) {
         throw new Meteor.Error(403, 'Too late to change this shift! Contact your lead')
       }
-      if ((signupIds.userId === this.userId)
-        || share.isManagerOrLead(this.userId, [signupIds.parentId])) {
+      if ((signupIds.userId === this.userId) || isLead) {
         // multi : true just in case it is possible to singup for the same shift twice
         // this should not be possible. Failsafe !
         return collections.signups.update(signupIds, {
@@ -299,7 +295,7 @@ export const initMethods = (eventName) => {
         parentId,
       } = rota
       const details = _.omit(rota, 'shifts', 'start', 'end')
-      if (!share.isManagerOrLead(Meteor.userId(), [parentId])) {
+      if (!auth.isLead(Meteor.userId(), [parentId])) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
       // store rota
@@ -318,7 +314,7 @@ export const initMethods = (eventName) => {
     [`${prefix}.rotas.remove`](group) {
       console.log(`${prefix}.rotas.remove`, group)
       check(group, { rotaId: String, parentId: String })
-      if (share.isManagerOrLead(Meteor.userId(), [group.parentId])) {
+      if (auth.isLead(Meteor.userId(), [group.parentId])) {
         collections.rotas.remove(group)
         return share.TeamShifts.remove(group)
       }
@@ -336,7 +332,7 @@ export const initMethods = (eventName) => {
       const oldRota = collections.rotas.findOne(query)
       // Should be a server method?
       if (!oldRota && Meteor.isClient) return null
-      if (!share.isManagerOrLead(Meteor.userId(), [oldRota.parentId])
+      if (!auth.isLead(Meteor.userId(), [oldRota.parentId])
         || modifier.$set.parentId !== oldRota.parentId) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
