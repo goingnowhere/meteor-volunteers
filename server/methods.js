@@ -206,4 +206,17 @@ export const initServerMethods = (eventName) => {
       return rota
     },
   })
+
+  new ValidatedMethod({
+    name: `${prefix}.depts.find`,
+    validate({ query } = {}) {
+      check(query, Match.Maybe(String))
+    },
+    run({ query = {} } = {}) {
+      if (!auth.isLead()) {
+        query.policy = 'public'
+      }
+      return share.Department.find(query).fetch()
+    },
+  })
 }

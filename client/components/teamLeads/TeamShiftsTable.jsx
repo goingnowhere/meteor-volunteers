@@ -123,11 +123,11 @@ export const TeamShiftsTable = ({ date, teamId, UserInfoComponent }) => {
                     {/* <!-- #{{shift.rotaId}} --> */}
                     <span>
                       {shift.priority === 'essential' && (
-                        <span className="text-danger"><Fa name="exclamation-circle" /></span>
+                        <span className="text-danger" title={t('essential')}><Fa name="exclamation-circle" /></span>
                       )}
-                      {shift.policy === 'private' && <Fa name="user-secret" />}
-                      {shift.policy === 'requireApproval' && <Fa name="lock" />}
-                      {shift.policy === 'adminOnly' && <Fa name="user-secret" />}
+                      {shift.policy === 'private' && <Fa name="user-secret" title={t('private')} />}
+                      {shift.policy === 'requireApproval' && <Fa name="lock" title={t('require_approval')} />}
+                      {shift.policy === 'adminOnly' && <Fa name="user-secret" title={t('admin_only')} />}
                     </span>
                   </th>
                   <td><ShiftDateInline start={shift.start} end={shift.end} /></td>
