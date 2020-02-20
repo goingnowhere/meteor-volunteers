@@ -70,6 +70,7 @@ export const TeamProjectsTable = ({ teamId, UserInfoComponent }) => {
   }
 
   AutoForm.addHooks([
+    'InsertProjectsFormId',
     'UpdateProjectsFormId',
     'projectSignupsUpdate',
     'projectSignupsInsert',

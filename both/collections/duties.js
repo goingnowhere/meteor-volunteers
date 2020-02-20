@@ -139,7 +139,7 @@ rotaSchema.extend({
     },
   },
   'shifts.$': {
-    type: boundsSubschema.extend({
+    type: new SimpleSchema(boundsSubschema).extend({
       startTime: {
         type: String,
         autoform: {

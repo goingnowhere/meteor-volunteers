@@ -29,12 +29,6 @@ Template.addTask.helpers
   'data': () ->
     parentId: Template.currentData().team?._id
 
-Template.addProject.bindI18nNamespace('goingnowhere:volunteers')
-Template.addProject.helpers
-  'form': () -> { collection: share.Projects }
-  'data': () ->
-    parentId: Template.currentData().team?._id
-
 AutoForm.addHooks ['InsertTeamShiftsFormId','UpdateTeamShiftsFormId'],
   onSuccess: (formType, result) ->
     AutoFormComponents.modalHide()

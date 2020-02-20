@@ -59,6 +59,8 @@ share.initMethods = (eventName) ->
           collection.simpleSchema().validate(doc.modifier,{modifier:true})
           if auth.isLead(Meteor.userId(),[doc._id])
             oldDoc = collection.findOne(doc._id)
+            unless oldDoc
+              return throwError(404)
             collection.update(doc._id,doc.modifier, (err,res) ->
               unless err
                 if Meteor.isServer
