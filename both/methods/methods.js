@@ -37,13 +37,27 @@ const findConflicts = ({
     shiftId: { $ne: shiftId },
     userId,
     status: { $in: ['confirmed', 'pending'] },
-  }).fetch()
+  }, { sort: { start: 1 } }).fetch()
   const shiftSignups = signups.filter((signup) => signup.type === 'shift').map((signup) => signup.shiftId)
   const projectSignups = signups.filter((signup) => signup.type === 'project')
-  return [
+
+  // TODO fix this hack
+  // Don't allow people to hop between projects during build without a lead doing it for them
+  if (type === 'project' && projectSignups.length > 0) {
+    const firstStart = moment(projectSignups[0].start)
+    if (firstStart.isBefore(start)) {
+      return ['You can\'t switch projects part-way through build!']
+    }
+  }
+
+  const conflicts = [
     ...share.TeamShifts.find({ _id: { $in: shiftSignups } }).fetch(),
     ...projectSignups,
   ].filter((shift) => shift && signupRange.overlaps(moment.range(shift.start, shift.end)))
+  if (conflicts.length > 0) {
+    return ['Double Booking', conflicts]
+  }
+  return []
 }
 
 const isDutyFull = ({
@@ -218,9 +232,9 @@ export const initMethods = (eventName) => {
       if ((signupIdentifiers.userId === this.userId) || isLead) {
         // Leads cannot be public so no special handling of roles needed in this method
         const status = parentDuty.policy === 'public' ? 'confirmed' : 'pending'
-        const conflicts = findConflicts(wholeSignup, parentDuty)
-        if (conflicts.length !== 0) {
-          throw new Meteor.Error(409, 'Double Booking', conflicts)
+        const [failReason, conflicts] = findConflicts(wholeSignup, parentDuty)
+        if (failReason) {
+          throw new Meteor.Error(409, failReason, conflicts)
         }
         if (isDutyFull(wholeSignup, parentDuty)) {
           throw new Meteor.Error(409, 'Too many signups')

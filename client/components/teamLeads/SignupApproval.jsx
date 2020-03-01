@@ -1,6 +1,7 @@
 /* globals __coffeescriptShare */
 import React from 'react'
 import moment from 'moment-timezone'
+import Fa from 'react-fontawesome'
 
 import { ProjectDateInline } from '../common/ProjectDateInline.jsx'
 import { ShiftDateInline } from '../common/ShiftDateInline.jsx'
@@ -50,7 +51,8 @@ export const SignupApproval = ({
         )} */}
       </div>
       <div className="col" data-action="user-info" data-id="{{ signup.userId }}">
-        <button type="button" className="btn btn-link" onClick={() => openUserModal(user._id)}>
+        <button type="button" className={`btn btn-link${user.ticketId ? '' : ' text-danger'}`} onClick={() => openUserModal(user._id)}>
+          {!user.ticketId && (<Fa name="warning" title="No Ticket!" />)}
           {user.profile.nickname || user.profile.firstName}
         </button>
         <small><T>created</T>: {createdAt && moment(createdAt).fromNow()}</small>

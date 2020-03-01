@@ -122,6 +122,7 @@ export const initServerMethods = (eventName) => {
                 $project: {
                   emails: true,
                   profile: true,
+                  ticketId: true,
                 },
               },
             ],
