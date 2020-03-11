@@ -30,7 +30,7 @@ export const SignupUserRowViewComponent = ({
           <div className="col">
             {signup.type === 'lead' && team.name}
             {signup.type === 'project' && <ProjectDateInline start={signup.start} end={signup.end} />}
-            {signup.type === 'shift' && <ShiftDateInline start={signup.start} end={signup.end} />}
+            {signup.type === 'shift' && <ShiftDateInline start={duty.start} end={duty.end} />}
           </div>
           <div className="col">
             <h6>{team.name} &gt; {duty.title}</h6>
