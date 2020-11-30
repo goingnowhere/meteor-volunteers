@@ -8,7 +8,7 @@ import { ProjectDateInline } from '../common/ProjectDateInline.jsx'
 import { ShiftDateInline } from '../common/ShiftDateInline.jsx'
 import { bailCall } from '../../utils/signups'
 import { collections } from '../../../both/collections/initCollections'
-import { findOrgUnit } from '../../../both/collections/unit'
+import { findOrgUnit } from '../../../both/utils/unit'
 import { Modal } from '../common/Modal.jsx'
 import { DutiesListItem } from '../shifts/DutiesListItem.jsx'
 

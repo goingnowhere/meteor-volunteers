@@ -1,4 +1,3 @@
-/* globals __coffeescriptShare */
 import { Meteor } from 'meteor/meteor'
 import { ReactiveAggregate } from 'meteor/jcbernack:reactive-aggregate'
 import { Roles } from 'meteor/piemonkey:roles'
@@ -6,8 +5,6 @@ import { check, Match } from 'meteor/check'
 
 import { collections } from '../both/collections/initCollections'
 import { auth } from '../both/utils/auth'
-
-const share = __coffeescriptShare
 
 export const initPublications = (eventName) => {
   const prefix = `${eventName}.Volunteers`
@@ -74,7 +71,7 @@ export const initPublications = (eventName) => {
     function publishSignupsByDept(departmentId, type) {
       const isLead = auth.isLead(this.userId, [departmentId])
       return {
-        find() { return share.Team.find({ parentId: departmentId }) },
+        find() { return collections.team.find({ parentId: departmentId }) },
         children: [
           findDutiesWithSignupsAndUsers(type, isLead, departmentId),
           findDutiesWithSignupsAndUsers(type, isLead),
@@ -88,10 +85,10 @@ export const initPublications = (eventName) => {
     function publishSignupsByDiv(divisionId, type) {
       const isLead = auth.isLead(this.userId, [divisionId])
       return {
-        find() { return share.Department.find({ parentId: divisionId }) },
+        find() { return collections.department.find({ parentId: divisionId }) },
         children: [
           {
-            find(dept) { return share.Team.find({ parentId: dept._id }) },
+            find(dept) { return collections.team.find({ parentId: dept._id }) },
             children: [
               findDutiesWithSignupsAndUsers(type, isLead),
             ],
@@ -120,11 +117,11 @@ export const initPublications = (eventName) => {
           { find: ({ type, shiftId }) => collections.dutiesCollections[type].find(shiftId) },
           {
             find({ parentId }) {
-              let unit = share.Team.find(parentId)
+              let unit = collections.team.find(parentId)
               if (unit.count() > 0) {
                 return unit
               }
-              unit = share.Department.find(parentId)
+              unit = collections.department.find(parentId)
               return unit
             },
           },
@@ -216,7 +213,7 @@ export const initPublications = (eventName) => {
     if (this.userId) {
       query = filterForPublic(this.userId, query)
     }
-    return ReactiveAggregate(this, share.TeamShifts, [
+    return ReactiveAggregate(this, collections.shift, [
       { $match: query },
       {
         $group: {

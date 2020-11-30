@@ -1,6 +1,7 @@
 import SimpleSchema from 'simpl-schema'
 import { LeadListItemGrouped } from '../components/shifts/LeadListItemGrouped.jsx'
 import { DutiesListItemGrouped } from '../components/shifts/DutiesListItemGrouped.jsx'
+import { collections } from '../../both/collections/initCollections'
 
 ShiftTitles = new Mongo.Collection(null)
 
@@ -45,18 +46,18 @@ Template.signupsListTeam.onCreated () ->
       when "task"
         share.templateSub(template,"duties",dutyType,sel,limit)
         if template.subscriptionsReady()
-          addLocalDutiesCollection(team,share.TeamTasks,dutyType,sel,limit)
+          addLocalDutiesCollection(team,collections.task,dutyType,sel,limit)
       when "project"
         share.templateSub(template,"duties",dutyType,sel,limit)
         if template.subscriptionsReady()
-          addLocalDutiesCollection(team,share.Projects,dutyType,sel,limit)
+          addLocalDutiesCollection(team,collections.project,dutyType,sel,limit)
       else
         share.templateSub(template,"shiftGroups",sel)
         share.templateSub(template,"duties","task",sel,limit)
         share.templateSub(template,"duties","project",sel,limit)
         if template.subscriptionsReady()
-          addLocalDutiesCollection(team,share.TeamTasks,'task',sel,limit)
-          addLocalDutiesCollection(team,share.Projects,'project',sel,limit)
+          addLocalDutiesCollection(team,collections.task,'task',sel,limit)
+          addLocalDutiesCollection(team,collections.project,'project',sel,limit)
 
 Template.signupsListTeam.helpers
   DutiesListItemGrouped: () -> DutiesListItemGrouped
@@ -69,7 +70,7 @@ Template.signupsListTeam.helpers
       if dutyType in ['lead', 'project']
         sel.type = dutyType
       else
-        shiftGroups = share.shiftGroups.find(sel).map(
+        shiftGroups = collections.shiftGroups.find(sel).map(
           (group) -> _.extend(group, {type: 'shift', team})
         )
       otherDuties = ShiftTitles.find(sel).fetch()
@@ -107,11 +108,11 @@ Template.signupsList.helpers
     query.quirks = {$in: filters.quirks} if filters?.quirks?
     # teams are ordered using the score that is calculated by considering
     # the priority of the shifts associated with each team
-    return share.Team
+    return collections.team
       .find(query,{sort: {userpref: -1, score: -1}, limit:limit})
   'loadMore' : () ->
     template = Template.instance()
-    share.Team.find().count() >= template.limit.get()
+    collections.team.find().count() >= template.limit.get()
 
 Template.signupsList.events
   'click [data-action="loadMoreTeams"]': ( event, template ) ->

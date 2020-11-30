@@ -1,4 +1,3 @@
-/* globals __coffeescriptShare */
 import { Meteor } from 'meteor/meteor'
 import { check, Match } from 'meteor/check'
 import { ValidatedMethod } from 'meteor/mdg:validated-method'
@@ -10,8 +9,6 @@ import { collections } from '../both/collections/initCollections'
 import { getDuties, getTeamStats, getDeptStats } from '../both/stats'
 import { auth } from '../both/utils/auth'
 
-const share = __coffeescriptShare
-
 const moment = extendMoment(Moment)
 
 export const initServerMethods = (eventName) => {
@@ -20,7 +17,7 @@ export const initServerMethods = (eventName) => {
     name: `${prefix}.getProjectStaffing`,
     validate(projectId) { check(projectId, String) },
     run(projectId) {
-      const project = share.Projects.findOne(projectId)
+      const project = collections.project.findOne(projectId)
       if (project) {
         let days = []
         const range = moment.range(project.start, project.end).by('days')
@@ -48,7 +45,7 @@ export const initServerMethods = (eventName) => {
           $match: query,
         }, {
           $lookup: {
-            from: share.Department._name,
+            from: collections.department._name,
             localField: 'parentId',
             foreignField: '_id',
             as: 'dept',
@@ -60,7 +57,7 @@ export const initServerMethods = (eventName) => {
           },
         }, {
           $lookup: {
-            from: share.Team._name,
+            from: collections.team._name,
             localField: 'parentId',
             foreignField: '_id',
             as: 'team',
@@ -72,21 +69,21 @@ export const initServerMethods = (eventName) => {
           },
         }, {
           $lookup: {
-            from: share.Lead._name,
+            from: collections.lead._name,
             localField: 'shiftId',
             foreignField: '_id',
             as: 'lead',
           },
         }, {
           $lookup: {
-            from: share.TeamShifts._name,
+            from: collections.shift._name,
             localField: 'shiftId',
             foreignField: '_id',
             as: 'shift',
           },
         }, {
           $lookup: {
-            from: share.Projects._name,
+            from: collections.project._name,
             localField: 'shiftId',
             foreignField: '_id',
             as: 'project',
@@ -217,7 +214,7 @@ export const initServerMethods = (eventName) => {
       if (!auth.isLead()) {
         query.policy = 'public'
       }
-      return share.Department.find(query).fetch()
+      return collections.department.find(query).fetch()
     },
   })
 }

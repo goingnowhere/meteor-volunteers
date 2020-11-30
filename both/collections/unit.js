@@ -1,44 +1,130 @@
-/* globals __coffeescriptShare */
-import { _ } from 'meteor/underscore'
+import { checkNpmVersions } from 'meteor/tmeasday:check-npm-versions'
+import SimpleSchema from 'simpl-schema'
+import { getSkillsList, getQuirksList, getLocationList } from '../utils/unit'
+import { t } from '../utils/i18n'
 
-const share = __coffeescriptShare
+checkNpmVersions({ 'simpl-schema': '1.x' }, 'goingnowhere:volunteers')
 
-export const getSkillsList = (sel = {}) =>
-  _.union(...share.Team.find(sel, { fields: { skills: true } }).map(team => team.skills))
-    .filter(item => item)
-    .map(tag => ({ value: tag, label: tag }))
+SimpleSchema.extendOptions(['autoform'])
 
-export const getQuirksList = (sel = {}) =>
-  _.union(...share.Team.find(sel, { fields: { quirks: true } }).map(team => team.quirks))
-    .filter(item => item)
-    .map(tag => ({ value: tag, label: tag }))
+const unitPolicy = ['public', 'private']
 
-export const getLocationList = (sel = {}) =>
-  _.union(...share.Team.find(sel, { fields: { location: true } }).map(team => team.location))
-    .filter(item => item)
-    .map(loc => ({ value: loc, label: loc }))
+const CommonUnit = new SimpleSchema({
+  parentId: {
+    type: String,
+    autoform: {
+      type: 'hidden',
+    },
+  },
+  name: {
+    type: String,
+    label: () => t('name'),
+    autoform: {
+      afFieldHelpText: () => t('name_help_team'),
+    },
+  },
+  skills: {
+    type: Array,
+    label: () => t('skills'),
+    optional: true,
+    autoform: {
+      type: 'select2',
+      options: getSkillsList,
+      afFieldHelpText: () => t('skills_help_team'),
+      afFieldInput: {
+        multiple: true,
+        select2Options() {
+          return {
+            tags: true,
+            width: '100%',
+          }
+        },
+      },
+    },
+  },
+  'skills.$': String,
+  quirks: {
+    type: Array,
+    label: () => t('quirks'),
+    optional: true,
+    autoform: {
+      type: 'select2',
+      options: getQuirksList,
+      afFieldHelpText: () => t('quirks_help_team'),
+      afFieldInput: {
+        multiple: true,
+        select2Options() {
+          return {
+            tags: true,
+            width: '100%',
+          }
+        },
+      },
+    },
+  },
+  'quirks.$': String,
+  description: {
+    type: String,
+    label: () => t('description'),
+    optional: true,
+    autoform: {
+      rows: 5,
+      afFieldHelpText: () => t('description_help_team'),
+    },
+  },
+  // TODO: the unit policy should lock the policy of all entities below
+  email: {
+    type: String,
+    optional: true,
+    autoform: {
+      label: () => t('public_email'),
+      afFieldHelpText: () => t('public_email_help'),
+    },
+  },
+  policy: {
+    type: String,
+    label: () => t('policy'),
+    allowedValues: unitPolicy,
+    defaultValue: 'public',
+    autoform: {
+      afFieldHelpText: () => t('policy_help_team'),
+    },
+  },
+})
 
-export const findOrgUnit = (unitId) => {
-  const team = share.Team.findOne({ _id: unitId })
-  if (team) {
-    return {
-      unit: team,
-      type: 'team',
-    }
-  }
-  const dept = share.Department.findOne({ _id: unitId })
-  if (dept) {
-    return {
-      unit: dept,
-      type: 'department',
-    }
-  }
-  const div = share.Division.findOne({ _id: unitId })
-  if (div) {
-    return {
-      unit: div,
-      type: 'division',
-    }
-  }
-  return {}
-}
+export const teamSchema = new SimpleSchema(CommonUnit)
+teamSchema.extend({
+  location: {
+    type: String,
+    label: () => t('location'),
+    optional: true,
+    autoform: {
+      type: 'select2',
+      options: getLocationList,
+      afFieldHelpText: () => t('location_help_team'),
+      afFieldInput: {
+        select2Options: () => ({
+          tags: true,
+          width: '100%',
+          placeholder: t('select_location'),
+          allowClear: true,
+        })
+        ,
+      },
+    },
+  },
+})
+
+export const departmentSchema = CommonUnit
+
+export const divisionSchema = new SimpleSchema(CommonUnit)
+// a division (a top level unit) has 'top' as parentId
+divisionSchema.extend({
+  parentId: {
+    type: String,
+    defaultValue: 'TopEntity',
+    autoform: {
+      type: 'hidden',
+    },
+  },
+})

@@ -3,6 +3,7 @@ import { Meteor } from 'meteor/meteor'
 import { AutoFormComponents } from 'meteor/abate:autoform-components'
 import { Bert } from 'meteor/themeteorchef:bert'
 import { t } from '../components/common/i18n'
+import { collections } from '../../both/collections/initCollections'
 
 const share = __coffeescriptShare
 
@@ -65,7 +66,7 @@ export const applyCall = ({
     type,
   }
   if (type === 'project') {
-    const project = share.Projects.findOne(shiftId)
+    const project = collections.project.findOne(shiftId)
     AutoFormComponents.ModalShowWithTemplate('projectSignupForm', { signup, project }, project.title)
   } else {
     share.meteorCall('signups.insert', signup, applyErrorCallback)

@@ -7,6 +7,7 @@ import React from 'react'
 import { T } from '../common/i18n'
 import { LeadListItem } from './LeadListItem.jsx'
 import { applyCall } from '../../utils/signups'
+import { collections } from '../../../both/collections/initCollections'
 
 export const LeadListItemGroupedComponent = ({
   allLeads,
@@ -40,13 +41,13 @@ const share = __coffeescriptShare
 
 const getTeam = (type, parentId) => {
   // if (['shift', 'task'].includes(type)) {
-  //   return share.Team.findOne(parentId)
+  //   return collections.team.findOne(parentId)
   // }
-  const team = share.Team.findOne(parentId)
+  const team = collections.team.findOne(parentId)
   if (team) return { ...team, type: 'team' }
-  const department = share.Department.findOne(parentId)
+  const department = collections.department.findOne(parentId)
   if (department) return { ...department, type: 'department' }
-  const division = share.Division.findOne(parentId)
+  const division = collections.division.findOne(parentId)
   return { ...division, type: 'division' }
 }
 
@@ -58,11 +59,11 @@ const mapProps = ({ teamId, reactiveLimit }) => {
   const leadSignupSub = Meteor.subscribe(`${share.eventName}.Volunteers.Signups.byUser`, userId, ['lead'])
   const loaded = leadSub.ready() && leadSignupSub.ready()
 
-  const showLoadMore = loaded && share.Lead.find({ parentId: teamId }).count() >= limit
-  const allLeads = !loaded ? [] : share.Lead.find({ parentId: teamId }).map(lead => ({
+  const showLoadMore = loaded && collections.lead.find({ parentId: teamId }).count() >= limit
+  const allLeads = !loaded ? [] : collections.lead.find({ parentId: teamId }).map(lead => ({
     ...lead,
     team: getTeam('lead', lead.parentId),
-    signup: share.LeadSignups.findOne({ userId, shiftId: lead._id }),
+    signup: collections.leadSignups.findOne({ userId, shiftId: lead._id }),
     type: 'lead',
   }))
   // _.filter(leads,(lead) -> ! lead.signup.status? )

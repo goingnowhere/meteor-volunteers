@@ -65,9 +65,6 @@ Package.onUse((api) => {
   api.add_files([
     'both/global.coffee',
 
-    'both/collections/unit.coffee',
-    'both/collections/initCollections.coffee',
-
     'both/methods/methods.coffee',
   ], ['server', 'client'])
 

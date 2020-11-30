@@ -1,6 +1,7 @@
 import { ReactiveAggregate } from 'meteor/jcbernack:reactive-aggregate'
 import { initPublications } from './publications'
 import { auth } from '../both/utils/auth'
+import { collections } from '../both/collections/initCollections'
 
 share.initPublications = (eventName) ->
 
@@ -8,20 +9,20 @@ share.initPublications = (eventName) ->
 
   Meteor.publish "#{eventName}.Volunteers.volunteerForm.list", (userIds = []) ->
     if auth.isManager() # publish manager only information
-      share.VolunteerForm.find({userId: {$in: userIds}})
+      collections.volunteerForm.find({userId: {$in: userIds}})
     else if auth.isLead()
       # TODO: the fields of the should have a field 'confidential that allow
       # here to filter which information to publish to all leads
-      share.VolunteerForm.find({userId: {$in: userIds}})
+      collections.volunteerForm.find({userId: {$in: userIds}})
     else
       return null
 
   Meteor.publish "#{eventName}.Volunteers.volunteerForm", (userId = this.userId) ->
     if auth.isLead()
-      share.VolunteerForm.find({userId: userId})
+      collections.volunteerForm.find({userId: userId})
     else
       if !userId? or this?.userId == userId
-        share.VolunteerForm.find({userId: this.userId},{fields: {private_notes: 0}})
+        collections.volunteerForm.find({userId: this.userId},{fields: {private_notes: 0}})
       else
         return null
 
@@ -29,7 +30,7 @@ share.initPublications = (eventName) ->
   teamPipeline = [
     # get all the shifts associated to this team
     { $lookup: {
-      from: share.TeamShifts._name,
+      from: collections.shift._name,
       localField: "_id",
       foreignField: "parentId",
       as: "duties"
@@ -69,7 +70,7 @@ share.initPublications = (eventName) ->
   # I use the pipeline above + adding one more field for the userPref
   Meteor.publish "#{eventName}.Volunteers.team.ByUserPref", (quirks,skills) ->
     if this.userId
-      ReactiveAggregate(this, share.Team, teamPipeline.concat([
+      ReactiveAggregate(this, collections.team, teamPipeline.concat([
         { $project: {
           name: 1,
           description: 1,
@@ -108,7 +109,7 @@ share.initPublications = (eventName) ->
   Meteor.publish "#{eventName}.Volunteers.team", (sel={}) ->
     unless auth.isManager()
       sel = _.extend(sel,unitPublicPolicy)
-    ReactiveAggregate(this, share.Team,
+    ReactiveAggregate(this, collections.team,
       [ { $match: sel } ].concat(
         teamPipeline.concat( [
           { $match: { totalscore: { $gt: 0 } }},
@@ -126,35 +127,35 @@ share.initPublications = (eventName) ->
     sel = {}
     unless (not this.userId) || auth.isManager()
       sel = unitPublicPolicy
-    dp = share.Department.find(sel)
-    t = share.Team.find(sel)
-    dv = share.Division.find(sel)
+    dp = collections.department.find(sel)
+    t = collections.team.find(sel)
+    dv = collections.division.find(sel)
     return [dv,dp,t]
 
   Meteor.publish "#{eventName}.Volunteers.division", (sel={}) ->
     if this.userId && auth.isLead()
-      share.Division.find(sel)
+      collections.division.find(sel)
     else
-      share.Division.find(_.extend(sel,unitPublicPolicy))
+      collections.division.find(_.extend(sel,unitPublicPolicy))
 
   Meteor.publish "#{eventName}.Volunteers.department", (sel={}) ->
     if this.userId && auth.isLead()
-      share.Department.find(sel)
+      collections.department.find(sel)
     else
-      share.Department.find(_.extend(sel,unitPublicPolicy))
+      collections.department.find(_.extend(sel,unitPublicPolicy))
 
   # these two publications are used in the teamEdit and departmentEdit forms
   Meteor.publish "#{eventName}.Volunteers.team.backend", (parentId = '') ->
     if this.userId && auth.isLead(this.userId,[parentId])
-      share.Team.find({parentId})
+      collections.team.find({parentId})
     else
-      share.Team.find(_.extend({parentId},unitPublicPolicy))
+      collections.team.find(_.extend({parentId},unitPublicPolicy))
 
   Meteor.publish "#{eventName}.Volunteers.department.backend", (parentId = '') ->
     if this.userId && auth.isLead(this.userId,[parentId])
-      share.Department.find({parentId})
+      collections.department.find({parentId})
     else
-      share.Department.find(_.extend({parentId},unitPublicPolicy))
+      collections.department.find(_.extend({parentId},unitPublicPolicy))
 
   # migrate to JS:
   initPublications(eventName)

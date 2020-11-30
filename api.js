@@ -3,8 +3,8 @@ import { Meteor } from 'meteor/meteor'
 import moment from 'moment-timezone'
 
 import { initMethods } from './both/methods/methods'
-import { getSkillsList, getQuirksList } from './both/collections/unit'
-import { collections } from './both/collections/initCollections'
+import { getSkillsList, getQuirksList } from './both/utils/unit'
+import { collections, initCollections } from './both/collections/initCollections'
 import { volunteerFormSchema } from './both/collections/volunteer'
 import { initAuth, auth } from './both/utils/auth'
 
@@ -24,7 +24,8 @@ const share = __coffeescriptShare
 export class VolunteersClass {
   constructor(eventName) {
     this.eventName = eventName
-    share.initCollections(this.eventName)
+    share.eventName = this.eventName
+    initCollections(this.eventName)
     initMethods(this.eventName)
     if (Meteor.isServer) {
       initServerMethods(this.eventName)
@@ -38,17 +39,7 @@ export class VolunteersClass {
     this.schemas = {
       volunteerForm: volunteerFormSchema,
     }
-    this.Collections = {
-      ...collections,
-      VolunteerForm: share.VolunteerForm,
-      Team: share.Team,
-      Division: share.Division,
-      Department: share.Department,
-      TeamShifts: share.TeamShifts,
-      TeamTasks: share.TeamTasks,
-      Projects: share.Projects,
-      Lead: share.Lead,
-    }
+    this.Collections = collections
   }
 
   getSkillsList = getSkillsList

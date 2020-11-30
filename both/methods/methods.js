@@ -51,7 +51,7 @@ const findConflicts = ({
   }
 
   const conflicts = [
-    ...share.TeamShifts.find({ _id: { $in: shiftSignups } }).fetch(),
+    ...collections.shift.find({ _id: { $in: shiftSignups } }).fetch(),
     ...projectSignups,
   ].filter((shift) => shift && signupRange.overlaps(moment.range(shift.start, shift.end)))
   if (conflicts.length > 0) {
@@ -104,7 +104,7 @@ const createShifts = ({
     if (shiftEnd.isBefore(shiftStart)) {
       shiftEnd.add(1, 'day')
     }
-    return share.TeamShifts.insert({
+    return collections.shift.insert({
       ...details,
       min,
       max,
@@ -330,7 +330,7 @@ export const initMethods = (eventName) => {
       check(group, { rotaId: String, parentId: String })
       if (auth.isLead(Meteor.userId(), [group.parentId])) {
         collections.rotas.remove(group)
-        return share.TeamShifts.remove(group)
+        return collections.shift.remove(group)
       }
       throw new Meteor.Error(403, 'Insufficient Permission')
     },
@@ -361,7 +361,7 @@ export const initMethods = (eventName) => {
       } = modifier.$set
       // 'end' is /start/ of last day in event local timezone
       const lastRotaDayEnd = moment(end).add(1, 'day')
-      share.TeamShifts.remove({
+      collections.shift.remove({
         rotaId: oldRota._id,
         $or: [
           { start: { $lt: start } },
@@ -373,7 +373,7 @@ export const initMethods = (eventName) => {
 
       // Apply any changes to the meta information
       if (Object.entries(meta).some(([key, value]) => oldRota[key] !== value)) {
-        share.TeamShifts.update({ rotaId: oldRota._id }, { $set: meta }, { multi: true })
+        collections.shift.update({ rotaId: oldRota._id }, { $set: meta }, { multi: true })
       }
 
       // Go through oldRota.shifts to find which have changed
@@ -399,20 +399,20 @@ export const initMethods = (eventName) => {
       changes
         .filter(({ indexChange, timeChange }) => (indexChange === false) && timeChange)
         .forEach(({ oldIndex }) => {
-          share.TeamShifts.remove({ rotaId: oldRota._id, rotaIndex: oldIndex })
+          collections.shift.remove({ rotaId: oldRota._id, rotaIndex: oldIndex })
         })
       changes
         .filter(({ indexChange, timeChange, numChange }) =>
           !indexChange && !timeChange && numChange)
         .forEach(({ oldIndex, newShift: { min, max } }) => {
-          share.TeamShifts.update({ rotaId: oldRota._id, rotaIndex: oldIndex },
+          collections.shift.update({ rotaId: oldRota._id, rotaIndex: oldIndex },
             { $set: { min, max } }, { multi: true })
           indexesAlreadySet.push(oldIndex)
         })
       changes
         .filter(({ indexChange }) => indexChange !== false)
         .forEach(({ oldIndex, indexChange }) => {
-          share.TeamShifts.update({ rotaId: oldRota._id, rotaIndex: oldIndex },
+          collections.shift.update({ rotaId: oldRota._id, rotaIndex: oldIndex },
             { $set: { rotaIndex: indexChange } }, { multi: true })
           indexesAlreadySet.push(indexChange)
         })

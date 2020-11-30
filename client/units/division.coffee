@@ -1,3 +1,5 @@
+import { collections } from '../../both/collections/initCollections'
+
 Template.addDivision.onCreated () ->
   template = this
   share.templateSub(template,"users")
@@ -12,7 +14,7 @@ Template.divisionEdit.helpers
   'main': () ->
     id: "details"
     label: i18n.__("goingnowhere:volunteers","details")
-    form: { collection: share.Division }
+    form: { collection: collections.division }
     data: Template.currentData()
   'tabs': () ->
     parentId = if Template.currentData() then Template.currentData()._id
@@ -20,7 +22,7 @@ Template.divisionEdit.helpers
       id: "dept"
       label: i18n.__("goingnowhere:volunteers","departments")
       tableFields: [ { name: 'name'} ]
-      form: { collection: share.Department }
+      form: { collection: collections.department }
       subscription : (template) ->
         [ share.templateSub(template,"department.backend",parentId) ]
       }
@@ -31,7 +33,7 @@ Template.divisionEdit.helpers
         { name: 'userId', template:"leadField"},
         { name: 'role' }
       ]
-      form: { collection: share.Lead }
+      form: { collection: collections.lead }
       subscription : (template) ->
         [ share.templateSub(template,"users"),
           share.templateSub(template,"lead.backend",parentId)

@@ -1,6 +1,6 @@
 import SimpleSchema from 'simpl-schema'
 import moment from 'moment-timezone'
-import { getSkillsList, getQuirksList } from './unit'
+import { getSkillsList, getQuirksList } from '../utils/unit'
 import { t } from '../utils/i18n'
 
 export const dutyTypes = ['lead', 'shift', 'project', 'task']

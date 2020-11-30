@@ -17,7 +17,7 @@ Template.shiftDateInline.helpers sameDayHelper
 Template.addShift.bindI18nNamespace('goingnowhere:volunteers')
 Template.addShift.helpers
   'form': () -> {
-    collection: share.TeamShifts,
+    collection: collections.shift,
     update: {label: i18n.__("goingnowhere:volunteers","update_shift") },
     insert: {label: i18n.__("goingnowhere:volunteers","new_shift") }
   }
@@ -25,7 +25,7 @@ Template.addShift.helpers
 
 Template.addTask.bindI18nNamespace('goingnowhere:volunteers')
 Template.addTask.helpers
-  'form': () -> { collection: share.TeamTasks }
+  'form': () -> { collection: collections.task }
   'data': () ->
     parentId: Template.currentData().team?._id
 

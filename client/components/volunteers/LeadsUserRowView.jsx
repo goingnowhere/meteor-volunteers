@@ -17,7 +17,7 @@ export const LeadsUserRowView = ({ unit, lead }) => (
 //   sub = share.templateSub(template,"LeadsSignups.byUser", template.leadSignup.userId)
 
 // Template.leadsUserRowView.helpers
-//   'lead': () -> share.Lead.findOne(Template.instance().leadSignup.shiftId)
+//   'lead': () -> collections.lead.findOne(Template.instance().leadSignup.shiftId)
 //   'unit': () ->
 //     parentId = Template.instance().leasSignup.parentId
 //     t = share.Team.findOne(parentId)

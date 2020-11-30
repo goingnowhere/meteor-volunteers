@@ -24,4 +24,4 @@ export const TaskUserRowView = ({ team, task }) => (
 
 // Template.tasksUserRowView.helpers
 //   'team': () -> share.Team.findOne(Template.instance().taskSignup.parentId)
-//   'task': () -> share.TeamTasks.findOne(Template.instance().taskSignup.shiftId)
+//   'task': () -> collections.task.findOne(Template.instance().taskSignup.shiftId)

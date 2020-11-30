@@ -1,14 +1,16 @@
+import { collections } from '../../both/collections/initCollections'
+
 Template.departmentEdit.bindI18nNamespace('goingnowhere:volunteers')
 Template.departmentEditDetails.bindI18nNamespace('goingnowhere:volunteers')
 Template.departmentEditDetails.helpers
-  'form': () -> { collection: share.Department }
+  'form': () -> { collection: collections.department }
   'data': () -> Template.currentData()
 
 Template.departmentEdit.helpers
   'main': () ->
     id: "details"
     label: i18n.__("goingnowhere:volunteers","details")
-    form: { collection: share.Department }
+    form: { collection: collections.department }
     data: Template.currentData()
   'tabs': () ->
     parentId = if Template.currentData() then Template.currentData()._id
@@ -16,7 +18,7 @@ Template.departmentEdit.helpers
       id: "team"
       label: i18n.__("goingnowhere:volunteers","team")
       tableFields: [ { name: 'name'} ]
-      form: { collection: share.Team, filter: {parentId} }
+      form: { collection: collections.team, filter: {parentId} }
       subscription : (template) ->
         [ share.templateSub(template,"team.backend",parentId) ]
       }
@@ -27,7 +29,7 @@ Template.departmentEdit.helpers
        { name: 'title' },
        { name: 'userId', template:"teamLeadField"},
       ]
-      form: { collection: share.Lead, filter: {parentId} }
+      form: { collection: collections.lead, filter: {parentId} }
       subscription : (template) ->
         [ share.templateSub(template,"Signups.byDept",parentId,"lead") ]
       }
@@ -44,7 +46,7 @@ Template.addDepartment.onCreated () ->
   template.divisionId = template.data.divisionId
 
 Template.addDepartment.helpers
-  'form': () -> { collection: share.Department }
+  'form': () -> { collection: collections.department }
   'data': () -> { parentId : Template.instance().divisionId }
 
 Template.addDepartment.events

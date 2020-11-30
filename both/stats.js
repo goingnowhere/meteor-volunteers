@@ -1,4 +1,3 @@
-/* globals __coffeescriptShare */
 import { Meteor } from 'meteor/meteor'
 import Moment from 'moment-timezone'
 import { extendMoment } from 'moment-range' // eslint-disable-line import/no-unresolved, import/extensions
@@ -18,8 +17,6 @@ const uniqueVolunteers = (allSignups) => (
 const getSignupCount = (query) => collections.signups.find(query).count()
 const getVolunteerCount = (query) =>
   uniqueVolunteers(collections.signups.find(query).fetch()).length
-
-const share = __coffeescriptShare
 
 export const projectSignupsConfirmed = (project, signupsPassed) => {
   const pdays = Array.from(moment.range(moment(project.start), moment(project.end)).by('day'))
@@ -117,7 +114,7 @@ const sumSignupRates = (rates = []) => rates.reduce(
 //   volunteerNumber: int,
 //   ...team details
 // }
-const getTeams = (query, orgUnit = 'Team') => share[orgUnit].find(query).map((team) => {
+const getTeams = (query, orgUnit = 'team') => collections[orgUnit].find(query).map((team) => {
   const leadSignups = getLeads({ parentId: team._id })
   const leadIds = leadSignups.flatMap((lead) => lead.volunteers)
   return {
@@ -137,8 +134,8 @@ const getTeams = (query, orgUnit = 'Team') => share[orgUnit].find(query).map((te
   }
 })
 
-const getDepts = (query) => share.Department.find(query).map((dept) => {
-  const teamsOfThisDept = getTeams({ _id: dept._id }, 'Department')
+const getDepts = (query) => collections.department.find(query).map((dept) => {
+  const teamsOfThisDept = getTeams({ _id: dept._id }, 'department')
     .concat(getTeams({ parentId: dept._id }))
 
   return {
