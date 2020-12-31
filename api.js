@@ -7,6 +7,7 @@ import { getSkillsList, getQuirksList } from './both/utils/unit'
 import { collections, initCollections } from './both/collections/initCollections'
 import { volunteerFormSchema } from './both/collections/volunteer'
 import { initAuth, auth } from './both/utils/auth'
+import { methodBodies } from './both/methods/methods'
 
 import { initServerMethods } from './server/methods'
 
@@ -40,6 +41,7 @@ export class VolunteersClass {
       volunteerForm: volunteerFormSchema,
     }
     this.Collections = collections
+    this.methodBodies = methodBodies
   }
 
   getSkillsList = getSkillsList

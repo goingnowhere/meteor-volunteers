@@ -116,6 +116,8 @@ const createShifts = ({
   })
 }
 
+export const methodBodies = {}
+
 export const initMethods = (eventName) => {
   share.initMethods(eventName)
   const prefix = `${eventName}.Volunteers`
@@ -297,21 +299,14 @@ export const initMethods = (eventName) => {
     },
   })
 
-  Meteor.methods({
-    // eslint-disable-next-line meteor/audit-argument-checks
-    [`${prefix}.rotas.insert`](rota) {
-      console.log(`${prefix}.rotas.insert`, rota)
-      rotaSchema.validate(rota)
+  methodBodies.rota = {
+    insert(rota) {
       const {
         shifts,
         start,
         end,
-        parentId,
+        ...details
       } = rota
-      const details = _.omit(rota, 'shifts', 'start', 'end')
-      if (!auth.isLead(Meteor.userId(), [parentId])) {
-        throw new Meteor.Error(403, 'Insufficient Permission')
-      }
       // store rota
       const rotaId = collections.rotas.insert(rota)
       // generate and store shifts
@@ -324,6 +319,17 @@ export const initMethods = (eventName) => {
           rotaIndex,
           details,
         }))
+    },
+  }
+  Meteor.methods({
+    // eslint-disable-next-line meteor/audit-argument-checks
+    [`${prefix}.rotas.insert`](rota) {
+      console.log(`${prefix}.rotas.insert`, rota)
+      rotaSchema.validate(rota)
+      if (!auth.isLead(Meteor.userId(), [rota.parentId])) {
+        throw new Meteor.Error(403, 'Insufficient Permission')
+      }
+      return methodBodies.rota.insert(rota)
     },
     [`${prefix}.rotas.remove`](group) {
       console.log(`${prefix}.rotas.remove`, group)
