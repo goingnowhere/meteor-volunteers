@@ -2,12 +2,11 @@
 import { Meteor } from 'meteor/meteor'
 import moment from 'moment-timezone'
 
-import { initMethods } from './both/methods/methods'
+import { initMethods, methodBodies } from './both/methods/methods'
 import { getSkillsList, getQuirksList } from './both/utils/unit'
 import { collections, initCollections } from './both/collections/initCollections'
 import { volunteerFormSchema } from './both/collections/volunteer'
 import { initAuth, auth } from './both/utils/auth'
-import { methodBodies } from './both/methods/methods'
 
 import { initServerMethods } from './server/methods'
 
@@ -23,18 +22,21 @@ const share = __coffeescriptShare
 
 // TODO migrated from coffeescript, can most likely simplify
 export class VolunteersClass {
-  constructor(eventName) {
+  /** dontShare is used to start an instance without weird coffeescript global effects */
+  constructor(eventName, dontShare) {
     this.eventName = eventName
     share.eventName = this.eventName
     initCollections(this.eventName)
-    initMethods(this.eventName)
-    if (Meteor.isServer) {
-      initServerMethods(this.eventName)
-    }
-    initAuth(this.eventName)
-    this.auth = auth
-    if (Meteor.isServer) {
-      share.initPublications(this.eventName)
+    if (!dontShare) {
+      initMethods(this.eventName)
+      if (Meteor.isServer) {
+        initServerMethods(this.eventName)
+      }
+      initAuth(this.eventName)
+      this.auth = auth
+      if (Meteor.isServer) {
+        share.initPublications(this.eventName)
+      }
     }
 
     this.schemas = {
