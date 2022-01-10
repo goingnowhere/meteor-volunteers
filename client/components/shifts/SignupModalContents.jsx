@@ -5,7 +5,7 @@ import { withTracker } from 'meteor/react-meteor-data'
 import React, { Fragment } from 'react'
 
 import { collections } from '../../../both/collections/initCollections'
-import { findOrgUnit } from '../../../both/collections/unit'
+import { findOrgUnit } from '../../../both/utils/unit'
 import { DutiesListItemDate } from './DutiesListItemDate.jsx'
 
 const SignupModalContentsComponent = ({
