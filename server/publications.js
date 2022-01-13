@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor'
 import { ReactiveAggregate } from 'meteor/jcbernack:reactive-aggregate'
-import { Roles } from 'meteor/piemonkey:roles'
+import { Roles } from 'meteor/alanning:roles'
 import { check, Match } from 'meteor/check'
 
 import { collections } from '../both/collections/initCollections'

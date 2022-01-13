@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor'
-import { Roles } from 'meteor/piemonkey:roles'
+import { Roles } from 'meteor/alanning:roles'
 
 export const auth = {}
 

@@ -35,7 +35,7 @@ Package.onUse((api) => {
     'check',
     'underscore',
     'reywood:publish-composite@1.7.0',
-    'piemonkey:roles',
+    'alanning:roles',
     'reactive-dict',
     'reactive-var',
     'random',

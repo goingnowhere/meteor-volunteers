@@ -4,7 +4,7 @@ import { check, Match } from 'meteor/check'
 import Moment from 'moment-timezone'
 import { extendMoment } from 'moment-range'
 import SimpleSchema from 'simpl-schema'
-import { Roles } from 'meteor/piemonkey:roles'
+import { Roles } from 'meteor/alanning:roles'
 import { _ } from 'meteor/underscore'
 
 import { collections, schemas } from '../collections/initCollections'
