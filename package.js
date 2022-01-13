@@ -62,13 +62,13 @@ Package.onUse((api) => {
   ], 'server')
 
   // Order Matters !
-  api.add_files([
+  api.addFiles([
     'both/global.coffee',
 
     'both/methods/methods.coffee',
   ], ['server', 'client'])
 
-  api.add_files([
+  api.addFiles([
     'client/global_helpers.coffee',
     'client/css/custom.css',
 
@@ -91,12 +91,12 @@ Package.onUse((api) => {
 
   ], 'client')
 
-  api.add_files([
+  api.addFiles([
     'server/methods.js',
     'server/publications.coffee',
   ], 'server')
 
-  api.add_files(['i18n/en.i18n.json'], ['client', 'server'])
+  api.addFiles(['i18n/en.i18n.json'], ['client', 'server'])
 
   api.mainModule('api.js')
 })
