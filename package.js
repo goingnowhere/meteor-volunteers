@@ -22,7 +22,7 @@ Npm.depends({
 })
 
 Package.onUse((api) => {
-  api.versionsFrom('1.8')
+  api.versionsFrom('2.4')
 
   api.use([
     'mongo',

@@ -35,14 +35,14 @@ export const initCollections = (eventName) => {
   collections.task = new Mongo.Collection(`${prefix}.teamTasks`)
   collections.task.attachSchema(taskSchema)
   if (Meteor.isServer) {
-    collections.task._ensureIndex({ parentId: 1 })
+    collections.task.createIndex({ parentId: 1 })
   }
 
   collections.shift = new Mongo.Collection(`${prefix}.teamShifts`)
   collections.shift.attachSchema(shiftSchema)
   if (Meteor.isServer) {
-    collections.shift._ensureIndex({ parentId: 1 })
-    collections.shift._ensureIndex({ rotaId: 1 })
+    collections.shift.createIndex({ parentId: 1 })
+    collections.shift.createIndex({ rotaId: 1 })
   }
 
   // Temporarily re-add to get dashboard working
@@ -55,19 +55,19 @@ export const initCollections = (eventName) => {
   collections.project = new Mongo.Collection(`${prefix}.projects`)
   collections.project.attachSchema(projectSchema)
   if (Meteor.isServer) {
-    collections.project._ensureIndex({ parentId: 1 })
+    collections.project.createIndex({ parentId: 1 })
   }
 
   collections.lead = new Mongo.Collection(`${prefix}.lead`)
   collections.lead.attachSchema(leadSchema)
   if (Meteor.isServer) {
-    collections.lead._ensureIndex({ parentId: 1 })
+    collections.lead.createIndex({ parentId: 1 })
   }
 
   // Data for the volunteer Form
   collections.volunteerForm = new Mongo.Collection(`${prefix}.volunteerForm`)
   if (Meteor.isServer) {
-    collections.volunteerForm._ensureIndex({ userId: 1 })
+    collections.volunteerForm.createIndex({ userId: 1 })
   }
 
   // User duties
@@ -76,13 +76,13 @@ export const initCollections = (eventName) => {
   schemas.signups = SignupSchema
   if (Meteor.isServer) {
     // we enforce using a unique index that a person cannot sign up twice for the same duty
-    collections.signups._ensureIndex({ userId: 1, shiftId: 1 })
+    collections.signups.createIndex({ userId: 1, shiftId: 1 })
   }
 
   collections.rotas = new Mongo.Collection(`${prefix}.rotas`)
   collections.rotas.attachSchema(rotaSchema)
   if (Meteor.isServer) {
-    collections.rotas._ensureIndex({ parentId: 1 })
+    collections.rotas.createIndex({ parentId: 1 })
   }
 
   // shortcut to recover all related collections more easily
