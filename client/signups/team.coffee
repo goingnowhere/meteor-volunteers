@@ -4,35 +4,6 @@ import moment from 'moment-timezone'
 import { projectSignupsConfirmed } from '../../both/stats'
 import { getShifts } from '../../both/stats'
 
-Template.teamShiftsRota.bindI18nNamespace('goingnowhere:volunteers')
-Template.teamShiftsRota.onCreated () ->
-  template = this
-  teamId = template.data._id
-  template.shifts = new ReactiveVar([])
-  template.grouping = new ReactiveVar(new Set())
-  template.shiftUpdateDep = new Tracker.Dependency
-  share.templateSub(template,"Signups.byTeam",teamId,'shift')
-  template.autorun () ->
-    if template.subscriptionsReady()
-      sel = {parentId: teamId}
-      template.shifts.set(getShifts(sel))
-
-Template.teamShiftsRota.helpers
-  'groupedShifts': () ->
-    _.chain(Template.instance().shifts.get())
-    .map((s) -> _.extend(s,{ startday: moment(s.start).format("MM-DD-YY")}) )
-    .groupBy('startday')
-    .map((v1,k1) ->
-      day: k1
-      shifts: _.chain(v1)
-        .groupBy('rotaId')
-        .map((v,k) ->
-          title: v[0].title
-          rotaId: k
-          shifts: v
-        ).value()
-    ).value()
-
 Template.projectStaffingChart.bindI18nNamespace('goingnowhere:volunteers')
 Template.projectStaffingChart.helpers
   stackedBarData: (project) ->

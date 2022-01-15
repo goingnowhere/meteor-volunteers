@@ -12,23 +12,6 @@ sameDayHelper = {
   'sameDay': (start, end) -> moment(start).isSame(moment(end),"day")
 }
 
-Template.shiftDateInline.helpers sameDayHelper
-
-Template.addShift.bindI18nNamespace('goingnowhere:volunteers')
-Template.addShift.helpers
-  'form': () -> {
-    collection: collections.shift,
-    update: {label: i18n.__("goingnowhere:volunteers","update_shift") },
-    insert: {label: i18n.__("goingnowhere:volunteers","new_shift") }
-  }
-  'data': () -> parentId: Template.currentData().team?._id
-
-Template.addTask.bindI18nNamespace('goingnowhere:volunteers')
-Template.addTask.helpers
-  'form': () -> { collection: collections.task }
-  'data': () ->
-    parentId: Template.currentData().team?._id
-
 AutoForm.addHooks ['InsertTeamShiftsFormId','UpdateTeamShiftsFormId'],
   onSuccess: (formType, result) ->
     AutoFormComponents.modalHide()

@@ -115,12 +115,12 @@ const sumSignupRates = (rates = []) => rates.reduce(
 //   ...team details
 // }
 const getTeams = (query, orgUnit = 'team') => collections[orgUnit].find(query).map((team) => {
-  const leadSignups = getLeads({ parentId: team._id })
-  const leadIds = leadSignups.flatMap((lead) => lead.volunteers)
+  const leadRoles = getLeads({ parentId: team._id })
+  const leadIds = leadRoles.flatMap((lead) => lead.volunteers)
   return {
     shiftRate: signupRates(getShifts({ parentId: team._id })),
-    leadRate: signupRates(leadSignups),
-    leadRoles: leadSignups,
+    leadRate: signupRates(leadRoles),
+    leadRoles,
     leads: Meteor.users.find({ _id: { $in: leadIds } }, {
       fields: {
         profile: true,

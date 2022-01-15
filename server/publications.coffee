@@ -144,18 +144,5 @@ share.initPublications = (eventName) ->
     else
       collections.department.find(_.extend(sel,unitPublicPolicy))
 
-  # these two publications are used in the teamEdit and departmentEdit forms
-  Meteor.publish "#{eventName}.Volunteers.team.backend", (parentId = '') ->
-    if this.userId && auth.isLead(this.userId,[parentId])
-      collections.team.find({parentId})
-    else
-      collections.team.find(_.extend({parentId},unitPublicPolicy))
-
-  Meteor.publish "#{eventName}.Volunteers.department.backend", (parentId = '') ->
-    if this.userId && auth.isLead(this.userId,[parentId])
-      collections.department.find({parentId})
-    else
-      collections.department.find(_.extend({parentId},unitPublicPolicy))
-
   # migrate to JS:
   initPublications(eventName)

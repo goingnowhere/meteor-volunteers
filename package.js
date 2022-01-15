@@ -82,13 +82,6 @@ Package.onUse((api) => {
 
     'client/components/volunteers/BookedTable.jsx',
 
-    'client/units/team.html',
-    'client/units/team.coffee',
-    'client/units/department.html',
-    'client/units/department.coffee',
-    'client/units/division.html',
-    'client/units/division.coffee',
-
     'client/signups/team.html',
     'client/signups/team.coffee',
 

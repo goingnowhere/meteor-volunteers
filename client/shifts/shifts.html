@@ -1,17 +1,3 @@
-<!-- Create a new shift give for a given team
-   args: Team
--->
-<template name="addShift">
-  {{> insertUpdateTemplate form=form data=data }}
-</template>
-
-<!-- Create a new task give for a given team
-   args: Team
--->
-<template name="addTask">
-  {{> insertUpdateTemplate form=form data=data }}
-</template>
-
 <Template name="projectStaffingInput">
   {{! Wrapper div with this.atts needed to wire it into autoform}}
   <div {{this.atts}}>
@@ -40,41 +26,6 @@
     {{/if}}
   </div>
 </Template>
-
-<!-- Isn't used anywhere? -->
-<template name="shiftsTasksTableRowView">
-  <div>
-    <a href="{pathFor teamViewEventName _id=teamId}}">{{teamName}}</a>:
-    {{title}}
-    {{#if $and ($eq type "lead") ($eq status "pending")}} {{fa "exclamation-triangle"}}{{/if}}
-  </div>
-  <div>
-    {{#if $eq type "shift"}}{{fa "calendar"}}
-    {{else $eq type "task"}}{{fa "tasks"}}
-    {{else $eq type "lead"}}{{fa "user-circle"}}
-    {{/if}}
-    <div class="row align-items-center">
-      {{#if $eq type "task"}}
-        {{> taskDate shift}}
-      {{else $eq type "shift"}}
-        {{> shiftDate shift}}
-      {{/if}}
-    </div>
-  </div>
-</template>
-
-<template name="shiftDateInline">
-  {{#if sameDay start end}}
-    <h6>{{formatDateTime start}} - {{formatTime end}}</h6>
-  {{else}}
-    <h6>{{formatDateTime start}} - {{formatTime end}} {{differenceTime start end}}</h6>
-  {{/if}}
-</template>
-
-<template name="taskDate">
-  <!-- <div class="row">{{> taskDate duty}}</div> -->
-  <div class="row">{{__ ".estimated_time"}} {{estimatedTime}}</div>
-</template>
 
 <template name="projectSignupForm">
   <div>{{> React component=DutyBody description=project.description }}</div>
