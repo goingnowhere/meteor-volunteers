@@ -17,7 +17,10 @@ Npm.depends({
   // which causes problems, so we just hope the client has it instead.
   // react: '16.8.6',
   // 'react-dom': '16.8.6',
-  'react-fontawesome': '1.6.1',
+  '@fortawesome/fontawesome-svg-core': '1.2.36',
+  '@fortawesome/free-regular-svg-icons': '5.15.4',
+  '@fortawesome/free-solid-svg-icons': '5.15.4',
+  '@fortawesome/react-fontawesome': '0.1.16',
   'react-modal': '3.8.1',
 })
 

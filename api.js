@@ -9,6 +9,7 @@ import { volunteerFormSchema } from './both/collections/volunteer'
 import { initAuth, auth } from './both/utils/auth'
 
 import { initServerMethods } from './server/methods'
+import { initClient } from './client/clientInit'
 
 export { BookedTable } from './client/components/volunteers/BookedTable.jsx'
 export { SignupApproval } from './client/components/teamLeads/SignupApproval.jsx'
@@ -44,6 +45,10 @@ export class VolunteersClass {
     }
     this.Collections = collections
     this.methodBodies = methodBodies
+
+    if (Meteor.isClient) {
+      initClient()
+    }
   }
 
   getSkillsList = getSkillsList

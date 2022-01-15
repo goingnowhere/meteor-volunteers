@@ -5,6 +5,7 @@ import React, { Fragment, useState, useEffect } from 'react'
 import Fa from 'react-fontawesome'
 import { AutoFormComponents } from 'meteor/abate:autoform-components'
 import { AutoForm } from 'meteor/aldeed:autoform'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { T, t } from '../common/i18n'
 import { Modal } from '../common/Modal.jsx'
@@ -157,7 +158,7 @@ export const TeamShiftsTable = ({ date, teamId, UserInfoComponent }) => {
                         className="btn btn-sm btn-circle"
                         onClick={() => deleteShift(shift._id)}
                       >
-                        <Fa name="trash-o" />
+                        <FontAwesomeIcon icon="trash-alt" />
                       </button>
                       <button
                         type="button"
@@ -199,7 +200,7 @@ export const TeamShiftsTable = ({ date, teamId, UserInfoComponent }) => {
                                   className="btn btn-sm btn-circle"
                                   onClick={() => unEnrollUser(signup._id)}
                                 >
-                                  <Fa name="trash-o" />
+                                  <FontAwesomeIcon icon="trash-alt" />
                                 </button>
                               </td>
                             </tr>
