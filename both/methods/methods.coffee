@@ -105,7 +105,7 @@ share.initMethods = (eventName) ->
           console.log ["#{collectionName}.update",doc._id,doc.modifier]
           collection.simpleSchema().validate(doc.modifier,{modifier:true})
           olddoc = collection.findOne(doc._id)
-          if auth.isLead(Meteor.userId(),[olddoc.parentId])
+          if this.isSimulation || auth.isLead(Meteor.userId(),[olddoc.parentId])
             collection.update(doc._id,doc.modifier)
           else
             throwError(403, 'Insufficient Permission')

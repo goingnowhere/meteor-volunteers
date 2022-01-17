@@ -77,6 +77,7 @@ Package.onUse((api) => {
 
     'client/shifts/shifts.html',
     'client/shifts/shifts.coffee',
+    'client/shifts/shifts.js',
     'client/shifts/signupList.html',
     'client/shifts/signupList.coffee',
 

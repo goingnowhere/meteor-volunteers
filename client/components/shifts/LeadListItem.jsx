@@ -1,4 +1,3 @@
-/* eslint-disable no-nested-ternary */
 import React, { Fragment } from 'react'
 
 import { T } from '../common/i18n'
