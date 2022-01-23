@@ -2,7 +2,7 @@
 import { Meteor } from 'meteor/meteor'
 import moment from 'moment-timezone'
 
-import { initMethods, methodBodies } from './both/methods/methods'
+import { initMethods } from './both/methods/methods'
 import { getSkillsList, getQuirksList } from './both/utils/unit'
 import { collections, initCollections } from './both/collections/initCollections'
 import { volunteerFormSchema } from './both/collections/volunteer'
@@ -28,15 +28,18 @@ export class VolunteersClass {
     this.eventName = eventName
     share.eventName = this.eventName
     initCollections(this.eventName)
+    let methodBodies = {}
     if (!dontShare) {
-      initMethods(this.eventName)
+      ({ methodBodies } = initMethods(this.eventName))
       if (Meteor.isServer) {
         initServerMethods(this.eventName)
       }
       initAuth(this.eventName)
       this.auth = auth
       if (Meteor.isServer) {
-        share.initPublications(this.eventName)
+        import('./server/publications')
+          .then(({ initPublications }) => initPublications(this.eventName))
+          .catch(err => console.error('Error importing server publications', err))
       }
     }
 

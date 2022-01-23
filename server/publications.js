@@ -9,6 +9,170 @@ import { auth } from '../both/utils/auth'
 export const initPublications = (eventName) => {
   const prefix = `${eventName}.Volunteers`
   const dutiesPublicPolicy = { policy: { $in: ['public', 'requireApproval'] } }
+  const unitPublicPolicy = { policy: { $in: ['public'] } }
+
+  Meteor.publish(`${prefix}.volunteerForm.list`, (userIds = []) => {
+    if (auth.isManager()) { // publish manager only information
+      return collections.volunteerForm.find({ userId: { $in: userIds } })
+    }
+    if (auth.isLead()) {
+      // TODO: the fields of the should have a field 'confidential that allow
+      // here to filter which information to publish to all leads
+      return collections.volunteerForm.find({ userId: { $in: userIds } })
+    }
+    return null
+  })
+
+  Meteor.publish(`${prefix}.volunteerForm`, function publishVolunteerForm(userId = this.userId) {
+    if (auth.isLead()) {
+      return collections.volunteerForm.find({ userId })
+    }
+    if (!userId || (this?.userId === userId)) {
+      return collections.volunteerForm
+        .find({ userId: this.userId }, { fields: { private_notes: 0 } })
+    }
+    return null
+  })
+
+  // this pipeline sort add the totalscore field to a team
+  const teamPipeline = [
+    // get all the shifts associated to this team
+    {
+      $lookup: {
+        from: collections.shift._name,
+        localField: '_id',
+        foreignField: 'parentId',
+        as: 'duties',
+      },
+    },
+    { $unwind: '$duties' },
+    // project the results in mongo 3.4 use addfields instead
+    {
+      $project: {
+        name: 1,
+        description: 1,
+        parentId: 1,
+        quirks: 1,
+        skills: 1,
+        duties: 1,
+        p: {
+          $cond: [{ $eq: ['$duties.priority', 'normal'] }, 1,
+            {
+              $cond: [{ $eq: ['$duties.priority', 'important'] }, 3,
+                {
+                  $cond: [{ $eq: ['$duties.priority', 'essential'] }, 5, 0],
+                },
+              ],
+            },
+          ],
+        },
+      },
+    },
+    {
+      $group: {
+        _id: '$_id',
+        // types: { $addToSet: "$duties.priority" },
+        totalscore: { $sum: '$p' }, // assign a score to each team based on its shifts' priority
+        name: { $first: '$name' },
+        description: { $first: '$description' },
+        parentId: { $first: '$parentId' },
+        quirks: { $first: '$quirks' },
+        skills: { $first: '$skills' },
+      },
+    },
+  ]
+
+  // Reactive publication sorted by user preferences
+  // I use the pipeline above + adding one more field for the userPref
+  Meteor.publish(`${prefix}.team.ByUserPref`, function publishTeamsByUserPrefs(quirks = [], skills = []) {
+    if (!this.userId) {
+      throw new Meteor.Error('401', 'You need to be logged in for this')
+    }
+    return ReactiveAggregate(this, collections.team, teamPipeline.concat([
+      {
+        $project: {
+          name: 1,
+          description: 1,
+          parentId: 1,
+          totalscore: 1,
+          quirks: { $ifNull: ['$quirks', []] },
+          skills: { $ifNull: ['$skills', []] },
+          intq: { $setIntersection: [quirks, '$quirks'] },
+          ints: { $setIntersection: [skills, '$skills'] },
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          description: 1,
+          parentId: 1,
+          quirks: 1,
+          skills: 1,
+          totalscore: 1,
+          subq: { $size: { $ifNull: ['$intq', []] } },
+          subs: { $size: { $ifNull: ['$ints', []] } },
+        },
+      },
+      {
+        $project: {
+          name: 1,
+          description: 1,
+          parentId: 1,
+          quirks: 1,
+          skills: 1,
+          totalscore: 1,
+          // assign a score to the team w.r.t. the user preferences
+          userpref: { $sum: ['$subq', '$subs'] },
+        },
+      },
+      // remove all teams without duties
+      { $match: { totalscore: { $gt: 0 } } },
+      { $sort: { totalscore: -1 } },
+    ]))
+  })
+
+  Meteor.publish(`${prefix}.team`, function publishTeam(sel = {}) {
+    let selector = sel
+    if (!auth.isManager()) {
+      selector = { ...sel, ...unitPublicPolicy }
+    }
+    return ReactiveAggregate(this, collections.team,
+      [{ $match: selector }].concat(
+        teamPipeline.concat([
+          { $match: { totalscore: { $gt: 0 } } },
+          { $sort: { totalscore: -1 } },
+        ]),
+      ))
+  })
+  // #####################################
+  // Below here, all public information #
+  // #####################################
+
+  // not reactive
+  Meteor.publish(`${prefix}.organization`, function publishOrg() {
+    let sel = {}
+    if (this.userId && !auth.isManager()) {
+      sel = unitPublicPolicy
+    }
+    const dp = collections.department.find(sel)
+    const t = collections.team.find(sel)
+    const dv = collections.division.find(sel)
+    return [dv, dp, t]
+  })
+
+  Meteor.publish(`${prefix}.division`, function publishDiv(sel = {}) {
+    if (this.userId && auth.isLead()) {
+      return collections.division.find(sel)
+    }
+    return collections.division.find(_.extend(sel, unitPublicPolicy))
+  })
+
+  Meteor.publish(`${prefix}.department`, function publishDept(sel = {}) {
+    if (this.userId && auth.isLead()) {
+      return collections.department.find(sel)
+    }
+    return collections.department.find(_.extend(sel, unitPublicPolicy))
+  })
 
   const filterForPublic = (userId, sel) => {
     if (auth.isManager()) {

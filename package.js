@@ -64,15 +64,12 @@ Package.onUse((api) => {
     'jcbernack:reactive-aggregate',
   ], 'server')
 
-  // Order Matters !
   api.addFiles([
     'both/global.coffee',
-
-    'both/methods/methods.coffee',
   ], ['server', 'client'])
 
   api.addFiles([
-    'client/global_helpers.coffee',
+    'client/globalHelpers.js',
     'client/css/custom.css',
 
     'client/shifts/shifts.html',
@@ -81,17 +78,10 @@ Package.onUse((api) => {
     'client/shifts/signupList.html',
     'client/shifts/signupList.coffee',
 
-    'client/components/volunteers/BookedTable.jsx',
-
     'client/signups/team.html',
     'client/signups/team.coffee',
 
   ], 'client')
-
-  api.addFiles([
-    'server/methods.js',
-    'server/publications.coffee',
-  ], 'server')
 
   api.addFiles(['i18n/en.i18n.json'], ['client', 'server'])
 

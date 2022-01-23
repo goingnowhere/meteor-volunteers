@@ -1,6 +1,6 @@
 import { Template } from 'meteor/templating'
 import { AutoForm } from 'meteor/aldeed:autoform'
-import { ProjectStaffingInput } from '../components/shifts/ProjectStaffingInput'
+import { ProjectStaffingInput } from '../components/shifts/ProjectStaffingInput.jsx'
 
 // This is a weird hack and means we can't have more than one, but we want to get rid of
 // the autoform Blaze magic anyway
@@ -13,9 +13,9 @@ Template.projectStaffingInput.helpers({
   start: () => AutoForm.getFieldValue('start'),
   end: () => AutoForm.getFieldValue('end'),
   staffing: () => AutoForm.getFieldValue('staffing'),
-  callback: () => (arg) => dangerousVar = arg,
+  callback: () => (arg) => { dangerousVar = arg },
 })
-AutoForm.addInputType("projectStaffing", {
+AutoForm.addInputType('projectStaffing', {
   template: 'projectStaffingInput',
   valueIn: (valIn) => {
     if (!dangerousVar) {
