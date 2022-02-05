@@ -1,30 +1,13 @@
 /* global __coffeescriptShare */
 import { Meteor } from 'meteor/meteor'
 import { Mongo } from 'meteor/mongo'
-import { withTracker } from 'meteor/react-meteor-data'
+import { useTracker } from 'meteor/react-meteor-data'
 import React, { Fragment } from 'react'
 
 import { collections } from '../../../both/collections/initCollections'
 import { findOrgUnit } from '../../../both/utils/unit'
 import { DutiesListItemDate } from './DutiesListItemDate.jsx'
 
-const SignupModalContentsComponent = ({
-  allDates,
-}) => (
-  <Fragment>
-    {allDates.map(date => (
-      <div key={date._id} className="list-item row align-items-center px-2">
-        <DutiesListItemDate {...date} />
-      </div>
-    ))}
-  </Fragment>
-)
-
-// TODO We should replace all of this with a method
-
-const share = __coffeescriptShare
-
-// client side collection
 const DatesLocal = new Mongo.Collection(null)
 
 // DatesLocal contains all shifts (dates) related to a particular title and parentId
@@ -43,19 +26,31 @@ const addLocalDatesCollection = (duties, type, filter) => {
   })
 }
 
-export const SignupModalContents = withTracker(({ duty, ...props }) => {
-  const { type, title, parentId } = duty
-  const userId = Meteor.userId()
-  const subs = [
-    Meteor.subscribe(`${share.eventName}.Volunteers.duties`, type, { title, parentId }),
-    Meteor.subscribe(`${share.eventName}.Volunteers.Signups.byUser`, userId),
-  ]
-  if (subs.every(sub => sub.ready())) {
-    addLocalDatesCollection(collections.dutiesCollections[type], type, { title, parentId })
-  }
-  return {
-    duty,
-    ...props,
-    allDates: DatesLocal.find({ title }, { sort: { start: 1 } }).fetch(),
-  }
-})(SignupModalContentsComponent)
+export function SignupModalContents({
+  duty,
+}) {
+  const eventName = 'nowhere2022'
+  const { allDates } = useTracker(() => {
+    const { type, title, parentId } = duty
+    const userId = Meteor.userId()
+    const subs = [
+      Meteor.subscribe(`${eventName}.Volunteers.duties`, type, { title, parentId }),
+      Meteor.subscribe(`${eventName}.Volunteers.Signups.byUser`, userId),
+    ]
+    if (subs.every(sub => sub.ready())) {
+      addLocalDatesCollection(collections.dutiesCollections[type], type, { title, parentId })
+    }
+    return {
+      allDates: DatesLocal.find({ title }, { sort: { start: 1 } }).fetch(),
+    }
+  }, [duty])
+  return (
+    <>
+      {allDates.map(date => (
+        <div key={date._id} className="list-item row align-items-center px-2">
+          <DutiesListItemDate {...date} />
+        </div>
+      ))}
+    </>
+  )
+}

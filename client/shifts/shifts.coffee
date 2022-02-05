@@ -12,11 +12,31 @@ sameDayHelper = {
   'sameDay': (start, end) -> moment(start).isSame(moment(end),"day")
 }
 
+meteorCall = (name,args...,lastArg) ->
+  if typeof lastArg == 'function'
+    callback = lastArg
+  else
+    args.push(lastArg)
+  Meteor.call("#{share.eventName}.Volunteers.#{name}", args... , (err,res) ->
+    if !callback && err
+      Bert.alert({
+        title: i18n.__("goingnowhere:volunteers","method_error"),
+        message: err.reason,
+        type: 'danger',
+        style: 'growl-top-right',
+      })
+    if callback
+      callback(err,res)
+    )
+
 AutoForm.addHooks ['InsertTeamShiftsFormId','UpdateTeamShiftsFormId'],
   onSuccess: (formType, result) ->
     AutoFormComponents.modalHide()
     if this.template.data.var
       this.template.data.var.set({add: false, teamId: result.teamId})
+
+templateSub = (template,name,args...) ->
+  template.subscribe("#{share.eventName}.Volunteers.#{name}",args...)
 
 Template.projectSignupForm.bindI18nNamespace('goingnowhere:volunteers')
 Template.projectSignupForm.onCreated () ->
@@ -24,10 +44,10 @@ Template.projectSignupForm.onCreated () ->
   if template.data?.signup
     template.signup = template.data.signup
   project = template.data.project
-  share.templateSub(template,"Signups.byDuty",project._id,"project")
+  templateSub(template,"Signups.byDuty",project._id,"project")
   template.allDays = new ReactiveVar([])
   template.confirmed = new ReactiveVar([])
-  share.meteorCall("getProjectStaffing", project._id,
+  meteorCall("getProjectStaffing", project._id,
     (err, confirmed) ->
       unless err
         template.confirmed.set(confirmed)

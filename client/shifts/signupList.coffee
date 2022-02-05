@@ -1,87 +1,10 @@
 import SimpleSchema from 'simpl-schema'
 import { LeadListItemGrouped } from '../components/shifts/LeadListItemGrouped.jsx'
-import { DutiesListItemGrouped } from '../components/shifts/DutiesListItemGrouped.jsx'
+import { SignupsListTeam } from '../components/volunteers/SignupsListTeam.jsx'
 import { collections } from '../../both/collections/initCollections'
 
-ShiftTitles = new Mongo.Collection(null)
-
-# coll contains shifts unique shifts title
-addLocalDutiesCollection = (team,duties,type,filter,limit) ->
-  ShiftTitles.remove({type, parentId: filter.parentId})
-  shifts = duties.find(filter,{limit: limit}).fetch()
-  _.chain(shifts).groupBy('title').map((shifts,title) ->
-    shift = shifts[0]
-    duty = {
-      type,
-      title,
-      description: shift.description,
-      priority: shift.priority,
-      parentId: filter.parentId,
-      policy: filter.policy,
-      team,
-    }
-    if type == 'project'
-      duty._id = shift._id
-      duty.start = shift.start
-      duty.end = shift.end
-    ShiftTitles.insert(duty)
-  ).value()
-
-Template.signupsListTeam.bindI18nNamespace('goingnowhere:volunteers')
-Template.signupsListTeam.onCreated () ->
-  template = this
-  {team, dutyType = ''} = template.data
-
-  template.autorun () ->
-    sel = {parentId : team._id}
-    # TODO Only need one to get details of the shift but this limits to only one project per team.
-    # We should add a 'projectGroups' aggregation in the same way as 'shiftGroups'
-    limit = 10
-    {filters} = Template.currentData()
-    if filters?.priorities?
-      sel.priority = {$in: filters.priorities}
-    switch dutyType
-      when "shift"
-        share.templateSub(template,"shiftGroups",sel)
-      when "task"
-        share.templateSub(template,"duties",dutyType,sel,limit)
-        if template.subscriptionsReady()
-          addLocalDutiesCollection(team,collections.task,dutyType,sel,limit)
-      when "project"
-        share.templateSub(template,"duties",dutyType,sel,limit)
-        if template.subscriptionsReady()
-          addLocalDutiesCollection(team,collections.project,dutyType,sel,limit)
-      else
-        share.templateSub(template,"shiftGroups",sel)
-        share.templateSub(template,"duties","task",sel,limit)
-        share.templateSub(template,"duties","project",sel,limit)
-        if template.subscriptionsReady()
-          addLocalDutiesCollection(team,collections.task,'task',sel,limit)
-          addLocalDutiesCollection(team,collections.project,'project',sel,limit)
-
-Template.signupsListTeam.helpers
-  DutiesListItemGrouped: () -> DutiesListItemGrouped
-  'allShifts': () ->
-    template = Template.instance()
-    {team, dutyType = ''} = template.data
-    sel = {parentId : team._id}
-    if template.subscriptionsReady()
-      shiftGroups = []
-      if dutyType in ['lead', 'project']
-        sel.type = dutyType
-      else
-        shiftGroups = collections.shiftGroups.find(sel).map(
-          (group) -> _.extend(group, {type: 'shift', team})
-        )
-      otherDuties = ShiftTitles.find(sel).fetch()
-      return shiftGroups.concat(otherDuties)
-    else []
-
-Template.signupsListTeam.events
-  'click [data-action="loadMoreShifts"]': ( event, template ) ->
-    event.preventDefault()
-    limit = template.limit.get()
-    template.limit.set(limit+2)
+templateSub = (template,name,args...) ->
+  template.subscribe("#{share.eventName}.Volunteers.#{name}",args...)
 
 Template.signupsList.bindI18nNamespace('goingnowhere:volunteers')
 Template.signupsList.onCreated () ->
@@ -93,12 +16,13 @@ Template.signupsList.onCreated () ->
   template.autorun () ->
     limit = template.limit.get()
     if quirks and skills
-      share.templateSub(template,"team.ByUserPref",quirks,skills,limit)
+      templateSub(template,"team.ByUserPref",quirks,skills,limit)
     else
-      share.templateSub(template,"team")
+      templateSub(template,"team")
 
 Template.signupsList.helpers
   LeadListItemGrouped: () -> LeadListItemGrouped,
+  SignupsListTeam: () -> SignupsListTeam,
   'allTeams': () ->
     template = Template.instance()
     limit = template.limit.get()

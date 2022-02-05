@@ -1,7 +1,10 @@
-/* globals __coffeescriptShare */
-import { Meteor } from 'meteor/meteor'
 import { _ } from 'meteor/underscore'
-import React, { Fragment, useState, useEffect } from 'react'
+import React, {
+  Fragment,
+  useState,
+  useEffect,
+  useContext,
+} from 'react'
 import Fa from 'react-fontawesome'
 import { AutoFormComponents } from 'meteor/abate:autoform-components'
 import { AutoForm } from 'meteor/aldeed:autoform'
@@ -11,19 +14,20 @@ import { T, t } from '../common/i18n'
 import { Modal } from '../common/Modal.jsx'
 import { ShiftDateInline } from '../common/ShiftDateInline.jsx'
 import { collections } from '../../../both/collections/initCollections'
+import { reactContext } from '../../clientInit'
+import { meteorCall } from '../../../both/utils/methodUtils'
 
 const getUsername = (users, userId) => {
   const user = users.find((usr) => usr._id === userId)
   return user && (user.profile.nickname || user.profile.firstName)
 }
 
-const share = __coffeescriptShare
-
 // used to display all shifts for a given team
 export const TeamShiftsTable = ({ date, teamId, UserInfoComponent }) => {
+  const Volunteers = useContext(reactContext)
   const [users, setUsers] = useState([])
   const [shiftGroups, setShifts] = useState([])
-  const reloadShifts = () => Meteor.call(`${share.eventName}.Volunteers.getTeamDutyStats`,
+  const reloadShifts = () => meteorCall(Volunteers, 'getTeamDutyStats',
     { type: 'shift', teamId, date: date && date.toDate() }, (err, { users: usrs, duties }) => {
       if (err) console.error(err)
       else {
@@ -39,7 +43,7 @@ export const TeamShiftsTable = ({ date, teamId, UserInfoComponent }) => {
       { form: { collection: collections.dutiesCollections.shift }, data: shift }, '', 'lg')
   const deleteShift = (shiftId) => {
     if (window.confirm('Are you sure you want to delete this shift?')) {
-      share.meteorCall('teamShifts.remove', shiftId)
+      meteorCall(Volunteers, 'teamShifts.remove', shiftId)
       reloadShifts()
     }
   }
@@ -54,11 +58,11 @@ export const TeamShiftsTable = ({ date, teamId, UserInfoComponent }) => {
       },
     })
   const unEnrollUser = (signupId) => {
-    share.meteorCall('signups.remove', signupId)
+    meteorCall(Volunteers, 'signups.remove', signupId)
     reloadShifts()
   }
   const editRota = (rotaId) => {
-    Meteor.call(`${share.eventName}.Volunteers.rotas.findOne`, { rotaId }, (err, rota) => {
+    meteorCall(Volunteers, 'rotas.findOne', { rotaId }, (err, rota) => {
       if (err) console.error(err)
       AutoFormComponents.ModalShowWithTemplate('insertUpdateTemplate', {
         form: {

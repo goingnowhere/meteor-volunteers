@@ -1,43 +1,12 @@
-/* global __coffeescriptShare */
 import { Meteor } from 'meteor/meteor'
-import { ReactiveVar } from 'meteor/reactive-var'
-import { withTracker } from 'meteor/react-meteor-data'
-import React from 'react'
+import { useTracker } from 'meteor/react-meteor-data'
+import React, { useContext, useState } from 'react'
 
 import { T } from '../common/i18n'
 import { LeadListItem } from './LeadListItem.jsx'
 import { applyCall } from '../../utils/signups'
 import { collections } from '../../../both/collections/initCollections'
-
-export const LeadListItemGroupedComponent = ({
-  allLeads,
-  loaded,
-  showLoadMore,
-  loadMoreLeads,
-}) => (
-  <div className="row justify-content-between align-content-center no-gutters">
-    {loaded && allLeads.length > 0 && (
-      <div className="container-fluid signupsListItem">
-        {allLeads.map(lead => <LeadListItem key={lead._id} lead={lead} apply={applyCall(lead)} />)}
-        {showLoadMore && (
-          <div className="row align-content-right no-gutters">
-            <div className="col-md-2 offset-md-8">
-              <button
-                className="btn btn-light btn-primary"
-                type="button"
-                onClick={loadMoreLeads}
-              >
-                <T>load_more_leads</T>
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-    )}
-  </div>
-)
-
-const share = __coffeescriptShare
+import { reactContext } from '../../clientInit'
 
 const getTeam = (type, parentId) => {
   // if (['shift', 'task'].includes(type)) {
@@ -51,40 +20,50 @@ const getTeam = (type, parentId) => {
   return { ...division, type: 'division' }
 }
 
-const mapProps = ({ teamId, reactiveLimit }) => {
-  const userId = Meteor.userId()
-  const limit = reactiveLimit.get()
+export function LeadListItemGrouped({ teamId }) {
+  const _Volunteers = useContext(reactContext)
+  console.log(_Volunteers)
+  const Volunteers = { eventName: 'nowhere2022' }
+  const [limit, setLimit] = useState(2)
+  const loadMoreLeads = () => setLimit(limit + 2)
+  const { allLeads, loaded, showLoadMore } = useTracker(() => {
+    const userId = Meteor.userId()
 
-  const leadSub = Meteor.subscribe(`${share.eventName}.Volunteers.Lead`, { parentId: teamId }, limit)
-  const leadSignupSub = Meteor.subscribe(`${share.eventName}.Volunteers.Signups.byUser`, userId, ['lead'])
-  const loaded = leadSub.ready() && leadSignupSub.ready()
-
-  const showLoadMore = loaded && collections.lead.find({ parentId: teamId }).count() >= limit
-  const allLeads = !loaded ? [] : collections.lead.find({ parentId: teamId }).map(lead => ({
-    ...lead,
-    team: getTeam('lead', lead.parentId),
-    signup: collections.leadSignups.findOne({ userId, shiftId: lead._id }),
-    type: 'lead',
-  }))
-  // _.filter(leads,(lead) -> ! lead.signup.status? )
-
-  const loadMoreLeads = () => {
-    reactiveLimit.set(limit + 2)
-  }
-
-  return {
-    allLeads,
-    loaded,
-    showLoadMore,
-    loadMoreLeads,
-  }
-}
-
-// TODO probably need to store WithTracker on the instance
-export const LeadListItemGrouped = (props) => {
-  const reactiveLimit = new ReactiveVar(2)
-  const WithTracker = withTracker(mapProps)(LeadListItemGroupedComponent)
+    const leadSub = Meteor.subscribe(`${Volunteers.eventName}.Volunteers.duties`, 'lead', { parentId: teamId }, limit)
+    const leadSignupSub = Meteor.subscribe(`${Volunteers.eventName}.Volunteers.Signups.byUser`, userId, ['lead'])
+    const isLoaded = leadSub.ready() && leadSignupSub.ready()
+    return {
+      loaded: isLoaded,
+      showLoadMore: isLoaded && collections.lead.find({ parentId: teamId }).count() >= limit,
+      allLeads: !isLoaded ? [] : collections.lead.find({ parentId: teamId }).map(lead => ({
+        ...lead,
+        team: getTeam('lead', lead.parentId),
+        signup: collections.leadSignups?.findOne({ userId, shiftId: lead._id }),
+        type: 'lead',
+      })),
+    }
+  }, [limit, _Volunteers])
   return (
-    <WithTracker reactiveLimit={reactiveLimit} {...props} />
+    <div className="row justify-content-between align-content-center no-gutters">
+      {loaded && allLeads.length > 0 && (
+        <div className="container-fluid signupsListItem">
+          {allLeads.map(lead =>
+            <LeadListItem key={lead._id} lead={lead} apply={applyCall(Volunteers, lead)} />)}
+          {showLoadMore && (
+            <div className="row align-content-right no-gutters">
+              <div className="col-md-2 offset-md-8">
+                <button
+                  className="btn btn-light btn-primary"
+                  type="button"
+                  onClick={loadMoreLeads}
+                >
+                  <T>load_more_leads</T>
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
   )
 }

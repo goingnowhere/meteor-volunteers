@@ -1,6 +1,4 @@
-/* globals __coffeescriptShare */
-import { Meteor } from 'meteor/meteor'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useContext } from 'react'
 import Fa from 'react-fontawesome'
 import { AutoFormComponents } from 'meteor/abate:autoform-components'
 import { AutoForm } from 'meteor/aldeed:autoform'
@@ -12,19 +10,20 @@ import { formatDate } from '../common/dates'
 import { ProjectDateInline } from '../common/ProjectDateInline.jsx'
 import { collections } from '../../../both/collections/initCollections'
 import { ProjectStaffingDisplay } from '../common/ProjectStaffingDisplay.jsx'
+import { reactContext } from '../../clientInit'
+import { meteorCall } from '../../../both/utils/methodUtils'
 
 const getUsername = (users, userId) => {
   const user = users.find((usr) => usr._id === userId)
   return user && (user.profile.nickname || user.profile.firstName)
 }
 
-const share = __coffeescriptShare
-
 // used to display all shifts for a given team
 export const TeamProjectsTable = ({ teamId, UserInfoComponent }) => {
+  const Volunteers = useContext(reactContext)
   const [users, setUsers] = useState([])
   const [allProjects, setProjects] = useState([])
-  const reloadShifts = () => Meteor.call(`${share.eventName}.Volunteers.getTeamDutyStats`,
+  const reloadShifts = () => meteorCall(Volunteers, 'getTeamDutyStats',
     { type: 'project', teamId }, (err, { users: usrs, duties }) => {
       if (err) console.error(err)
       else {
@@ -40,7 +39,7 @@ export const TeamProjectsTable = ({ teamId, UserInfoComponent }) => {
       { form: { collection: collections.dutiesCollections.project }, data: project }, '', 'lg')
   const deleteProject = (projectId) => {
     if (window.confirm('Are you sure you want to delete this project?')) {
-      share.meteorCall('projects.remove', projectId)
+      meteorCall(Volunteers, 'projects.remove', projectId)
       reloadShifts()
     }
   }
@@ -66,7 +65,7 @@ export const TeamProjectsTable = ({ teamId, UserInfoComponent }) => {
       signup,
     }, project.title)
   const unEnrollUser = (signupId) => {
-    share.meteorCall('signups.remove', signupId)
+    meteorCall(Volunteers, 'signups.remove', signupId)
     reloadShifts()
   }
 

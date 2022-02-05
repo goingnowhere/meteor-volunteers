@@ -9,7 +9,7 @@ import { volunteerFormSchema } from './both/collections/volunteer'
 import { initAuth, auth } from './both/utils/auth'
 
 import { initServerMethods } from './server/methods'
-import { initClient } from './client/clientInit'
+import { initClient, reactContext } from './client/clientInit'
 
 export { BookedTable } from './client/components/volunteers/BookedTable.jsx'
 export { SignupApproval } from './client/components/teamLeads/SignupApproval.jsx'
@@ -18,6 +18,7 @@ export { TeamProjectsTable } from './client/components/teamLeads/TeamProjectsTab
 export { ShiftDateInline } from './client/components/common/ShiftDateInline.jsx'
 export { DutiesListItem } from './client/components/shifts/DutiesListItem.jsx'
 export { SignupButtons } from './client/components/shifts/SignupButtons.jsx'
+export { SignupsListTeam } from './client/components/volunteers/SignupsListTeam.jsx'
 
 const share = __coffeescriptShare
 
@@ -51,6 +52,7 @@ export class VolunteersClass {
 
     if (Meteor.isClient) {
       initClient()
+      this.reactContext = reactContext
     }
   }
 

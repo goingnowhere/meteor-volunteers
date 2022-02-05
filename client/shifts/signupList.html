@@ -4,7 +4,7 @@
       {{#if $eq dutyType 'lead' }}
         <div>{{> React component=LeadListItemGrouped teamId=team._id }}</div>
       {{else }}
-        {{> signupsListTeam team=team filters=filters dutyType=dutyType }}
+        <div>{{> React component=SignupsListTeam team=team filters=filters dutyType=dutyType }}</div>
       {{/if}}
     {{/each}}
     {{#if loadMore}}
@@ -18,12 +18,3 @@
   </div>
 </template>
 
-<template name="signupsListTeam">
-  {{#if $and Template.subscriptionsReady ($gt ($len allShifts) 0) }}
-    {{#each duty in allShifts }}
-      <div class="px-2 pb-0 signupsListItem">
-        {{> React component=DutiesListItemGrouped duty=duty }}
-      </div>
-    {{/each}}
-  {{/if}}
-</template>

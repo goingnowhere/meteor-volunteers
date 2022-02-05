@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import Fa from 'react-fontawesome'
 import { withTracker } from 'meteor/react-meteor-data'
 import { AutoFormComponents } from 'meteor/abate:autoform-components'
@@ -11,15 +11,17 @@ import { collections } from '../../../both/collections/initCollections'
 import { findOrgUnit } from '../../../both/utils/unit'
 import { Modal } from '../common/Modal.jsx'
 import { DutiesListItem } from '../shifts/DutiesListItem.jsx'
+import { reactContext } from '../../clientInit'
 
 export const SignupUserRowViewComponent = ({
   signup = {},
   team = {},
   duty = {},
   editProject,
-  bail,
 }) => {
+  const Volunteers = useContext(reactContext)
   const [modalOpen, showModal] = useState(false)
+  const bail = () => bailCall(Volunteers, signup)
   return (
     <div className={`row no-gutters ${signup.status !== 'confirmed' ? 'text-muted' : ''}`} title={t(signup.status)}>
       <Modal isOpen={modalOpen} closeModal={() => showModal(false)} title={duty.title}>
@@ -81,6 +83,5 @@ export const SignupUserRowView = withTracker(({ signup }) => {
     team,
     duty,
     editProject: editProject({ duty, signup }),
-    bail: bailCall(signup),
   }
 })(SignupUserRowViewComponent)

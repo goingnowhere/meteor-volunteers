@@ -1,13 +1,11 @@
-/* global __coffeescriptShare */
 import { Meteor } from 'meteor/meteor'
 import { AutoFormComponents } from 'meteor/abate:autoform-components'
 import { Bert } from 'meteor/themeteorchef:bert'
 import { t } from '../components/common/i18n'
 import { collections } from '../../both/collections/initCollections'
+import { meteorCall } from '../../both/utils/methodUtils'
 
-const share = __coffeescriptShare
-
-export const bailCall = ({
+export const bailCall = (Volunteers, {
   parentId,
   _id,
   shiftId = _id,
@@ -15,7 +13,7 @@ export const bailCall = ({
 }) => () => {
   // I18N
   if (window.confirm('Are you sure you want to cancel this shift?')) {
-    share.meteorCall('signups.bail', {
+    meteorCall(Volunteers, 'signups.bail', {
       parentId,
       shiftId,
       userId,
@@ -52,7 +50,7 @@ const applyErrorCallback = (err) => {
   }
 }
 
-export const applyCall = ({
+export const applyCall = (Volunteers, {
   _id,
   shiftId = _id,
   type,
@@ -69,6 +67,6 @@ export const applyCall = ({
     const project = collections.project.findOne(shiftId)
     AutoFormComponents.ModalShowWithTemplate('projectSignupForm', { signup, project }, project.title)
   } else {
-    share.meteorCall('signups.insert', signup, applyErrorCallback)
+    meteorCall(Volunteers, 'signups.insert', signup, applyErrorCallback)
   }
 }

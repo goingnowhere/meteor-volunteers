@@ -1,7 +1,8 @@
-import React from 'react'
+import React, { useContext } from 'react'
 
 import { T, t } from '../common/i18n'
 import { applyCall } from '../../utils/signups'
+import { reactContext } from '../../clientInit'
 
 const signupMessages = {
   public: 'join',
@@ -19,6 +20,7 @@ export const SignupButtons = ({
   signedUp = 0,
   ...duty
 }) => {
+  const Volunteers = useContext(reactContext)
   const gaps = Math.max(0, min - signedUp)
   const spotsLeft = type === 'project' ? 1 : Math.max(0, max - signedUp)
   return policy === 'adminOnly'
@@ -27,7 +29,7 @@ export const SignupButtons = ({
       <button
         className="btn btn-primary btn-action"
         type="button"
-        onClick={applyCall({ type, ...duty })}
+        onClick={applyCall(Volunteers, { type, ...duty })}
         disabled={!spotsLeft}
       >
         {type === 'project'
@@ -36,4 +38,3 @@ export const SignupButtons = ({
       </button>
     )
 }
-

@@ -13,10 +13,6 @@ function deleteUnitAndRoles(collection, id) {
   Object.values(collections.dutiesCollections).forEach(dutyColl => {
     dutyColl.remove({ parentId: id })
   })
-  // WHY?
-  // Object.values(collections.signupCollections).forEach(signupColl => {
-  //   signupColl.update({ shiftId: id }, { $set: { status: 'cancelled' } })
-  // })
   collections.signups.update({ shiftId: id }, { $set: { status: 'cancelled' } })
 }
 
