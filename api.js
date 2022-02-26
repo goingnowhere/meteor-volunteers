@@ -19,6 +19,7 @@ export { ShiftDateInline } from './client/components/common/ShiftDateInline.jsx'
 export { DutiesListItem } from './client/components/shifts/DutiesListItem.jsx'
 export { SignupButtons } from './client/components/shifts/SignupButtons.jsx'
 export { SignupsListTeam } from './client/components/volunteers/SignupsListTeam.jsx'
+export { SignupsList } from './client/components/shifts/SignupsList.jsx'
 
 const share = __coffeescriptShare
 

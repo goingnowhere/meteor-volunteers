@@ -22,7 +22,6 @@ const getTeam = (type, parentId) => {
 
 export function LeadListItemGrouped({ teamId }) {
   const _Volunteers = useContext(reactContext)
-  console.log(_Volunteers)
   const Volunteers = { eventName: 'nowhere2022' }
   const [limit, setLimit] = useState(2)
   const loadMoreLeads = () => setLimit(limit + 2)
