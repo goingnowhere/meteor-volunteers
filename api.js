@@ -11,6 +11,7 @@ import { initAuth, auth } from './both/utils/auth'
 import { initServerMethods } from './server/methods'
 import { initClient, reactContext } from './client/clientInit'
 
+export { wrapAsync } from './both/utils/helpers'
 export { BookedTable } from './client/components/volunteers/BookedTable.jsx'
 export { SignupApproval } from './client/components/teamLeads/SignupApproval.jsx'
 export { TeamShiftsTable } from './client/components/teamLeads/TeamShiftsTable.jsx'
