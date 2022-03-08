@@ -21,7 +21,6 @@ export const SignupUserRowViewComponent = ({
 }) => {
   const Volunteers = useContext(reactContext)
   const [modalOpen, showModal] = useState(false)
-  const bail = () => bailCall(Volunteers, signup)
   return (
     <div className={`row no-gutters ${signup.status !== 'confirmed' ? 'text-muted' : ''}`} title={t(signup.status)}>
       <Modal isOpen={modalOpen} closeModal={() => showModal(false)} title={duty.title}>
@@ -60,7 +59,11 @@ export const SignupUserRowViewComponent = ({
           )}
 
           <div className="col px-0">
-            <button type="button" onClick={bail} className="btn btn-primary btn-action">
+            <button
+              type="button"
+              onClick={bailCall(Volunteers, signup)}
+              className="btn btn-primary btn-action"
+            >
               <T>bail</T>
             </button>
           </div>
