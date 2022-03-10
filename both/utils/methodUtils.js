@@ -3,7 +3,7 @@ import { Bert } from 'meteor/themeteorchef:bert'
 
 import { t } from './i18n'
 
-export function meteorCall(Volunteers, methodName, ...args) {
+export function meteorCall(VolClass, methodName, ...args) {
   let nonCallbackArgs = args
   const lastArg = args[args.length - 1]
   let callback
@@ -11,6 +11,8 @@ export function meteorCall(Volunteers, methodName, ...args) {
     callback = lastArg
     nonCallbackArgs = args.slice(0, -1)
   }
+  // TODO remove when blaze has been eradicated...
+  const Volunteers = VolClass || { eventName: 'nowhere2022' }
   Meteor.call(
     `${Volunteers.eventName}.Volunteers.${methodName}`,
     ...nonCallbackArgs,
