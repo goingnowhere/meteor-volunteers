@@ -37,7 +37,7 @@ export const SignupApproval = ({
       <div className="row no-gutters align-items-center">
         <div className="col">
           {type === 'lead'
-            ? `${(dept && dept.name) || (team && team.name)}  > ${duty.title}`
+            ? `${(dept && dept.name) || (team && team.name)}${duty?.title ? `  > ${duty.title}` : ''}`
             : duty.title}
           {type === 'shift' && (
             <ShiftDateInline start={duty.start} end={duty.end} />
@@ -50,10 +50,14 @@ export const SignupApproval = ({
           )} */}
         </div>
         <div className="col" data-action="user-info" data-id="{{ signup.userId }}">
-          <button type="button" className={`btn btn-link${user.ticketId ? '' : ' text-danger'}`} onClick={() => openUserModal(user._id)}>
-            {!user.ticketId && (<Fa name="warning" title="No Ticket!" />)}
-            {user.profile.nickname || user.profile.firstName}
-          </button>
+          {!user ? (
+            <p>Bug detected... hiding this for now</p>
+          ) : (
+            <button type="button" className={`btn btn-link${user.ticketId ? '' : ' text-danger'}`} onClick={() => openUserModal(user._id)}>
+              {!user.ticketId && (<Fa name="warning" title="No Ticket!" />)}
+              {user.profile.nickname || user.profile.firstName}
+            </button>
+          )}
           <small><T>created</T>: {createdAt && moment(createdAt).fromNow()}</small>
         </div>
         <div className="col">
