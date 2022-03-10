@@ -153,6 +153,10 @@ export const createSignupMethods = (eventName) => {
       } else if (oldSignup.userId === Meteor.userId()) {
         const parentDuty = collections.dutiesCollections[oldSignup.type]
           .findOne({ _id: oldSignup.shiftId })
+        if (!parentDuty && Meteor.isClient) {
+        // Calling as a server method so stub has nothing to do
+          return null
+        }
         doc.modifier.$set = {
           ...doc.modifier.$set,
           status: parentDuty.policy === 'public' ? 'confirmed' : 'pending',
@@ -163,6 +167,7 @@ export const createSignupMethods = (eventName) => {
       } else {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
+      return true
     },
     // this is actually an upsert
     [`${prefix}.signups.insert`](wholeSignup) {
@@ -201,6 +206,7 @@ export const createSignupMethods = (eventName) => {
         } = wholeSignup
         const res = collections.signups.upsert(signupIdentifiers, {
           $set: {
+            ...signupIdentifiers,
             type,
             status,
             start,

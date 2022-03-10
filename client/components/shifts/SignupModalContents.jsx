@@ -1,8 +1,7 @@
-/* global __coffeescriptShare */
 import { Meteor } from 'meteor/meteor'
 import { Mongo } from 'meteor/mongo'
 import { useTracker } from 'meteor/react-meteor-data'
-import React, { Fragment } from 'react'
+import React from 'react'
 
 import { collections } from '../../../both/collections/initCollections'
 import { findOrgUnit } from '../../../both/utils/unit'
