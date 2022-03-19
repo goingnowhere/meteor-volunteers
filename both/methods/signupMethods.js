@@ -84,7 +84,7 @@ export const createSignupMethods = (eventName) => {
       // Calling as a server method so stub has nothing to do
       return null
     }
-    if (auth.isLead(Meteor.userId(), [oldSignup.parentId])) {
+    if (auth.isLead(Meteor.userId(), oldSignup.parentId)) {
       collections.signups.update(signupId, {
         $set: {
           status,
@@ -117,7 +117,7 @@ export const createSignupMethods = (eventName) => {
         // Calling as a server method so stub has nothing to do
         return null
       }
-      if (auth.isLead(Meteor.userId(), [oldSignup.parentId])) {
+      if (auth.isLead(Meteor.userId(), oldSignup.parentId)) {
         return collections.signups.remove(signupId, (err) => {
           if (err) {
             console.error('Error when removing signup', err)
@@ -141,7 +141,7 @@ export const createSignupMethods = (eventName) => {
       if (oldSignup.type !== 'project') {
         throw new Meteor.Error(405, 'Only possible for Project signups')
       }
-      const isLead = auth.isLead(Meteor.userId(), [oldSignup.parentId])
+      const isLead = auth.isLead(Meteor.userId(), oldSignup.parentId)
       if (!areShiftChangesOpen(oldSignup) && !isLead) {
         throw new Meteor.Error(403, 'Too late to change this shift! Contact your lead')
       }
@@ -181,7 +181,7 @@ export const createSignupMethods = (eventName) => {
         // Calling as a server method so stub has nothing to do
         return null
       }
-      const isLead = auth.isLead(this.userId, [parentDuty.parentId])
+      const isLead = auth.isLead(this.userId, parentDuty.parentId)
       if (!areShiftChangesOpen(wholeSignup, parentDuty) && !isLead) {
         throw new Meteor.Error(403, 'Too late to change this shift! Contact your lead')
       }
@@ -232,7 +232,7 @@ export const createSignupMethods = (eventName) => {
         userId: String,
       })
       const signup = collections.signups.findOne(signupIds)
-      const isLead = auth.isLead(this.userId, [signupIds.parentId])
+      const isLead = auth.isLead(this.userId, signupIds.parentId)
       if (!areShiftChangesOpen(signup) && !isLead) {
         throw new Meteor.Error(403, 'Too late to change this shift! Contact your lead')
       }

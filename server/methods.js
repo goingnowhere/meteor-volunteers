@@ -37,12 +37,18 @@ export const initServerMethods = (eventName) => {
   Meteor.methods({
     'signups.list'(query) {
       check(query, Object)
-      if (!auth.isLead(this.userId, [query.parentId])) {
+      const teamIds = (query.parentId.$in ?? [query.parentId])
+        .filter(unitId => auth.isLead(this.userId, unitId))
+      if (teamIds.length < 1) {
         throw new Meteor.Error(403, 'Insufficient Permission')
+      }
+      const restrictedQuery = {
+        ...query,
+        parentId: { $in: teamIds },
       }
       return collections.signups.aggregate([
         {
-          $match: query,
+          $match: restrictedQuery,
         }, {
           $lookup: {
             from: collections.department._name,
@@ -140,7 +146,7 @@ export const initServerMethods = (eventName) => {
       check(date, Match.Maybe(Date))
     },
     run({ type, teamId, date }) {
-      if (!auth.isLead(this.userId, [teamId])) {
+      if (!auth.isLead(this.userId, teamId)) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
       let query = { parentId: teamId }
@@ -169,7 +175,7 @@ export const initServerMethods = (eventName) => {
       check(teamId, String)
     },
     run({ teamId }) {
-      if (!auth.isLead(this.userId, [teamId])) {
+      if (!auth.isLead(this.userId, teamId)) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
       return getTeamStats(teamId)
@@ -182,7 +188,7 @@ export const initServerMethods = (eventName) => {
       check(deptId, String)
     },
     run({ deptId }) {
-      if (!auth.isLead(this.userId, [deptId])) {
+      if (!auth.isLead(this.userId, deptId)) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
       return getDeptStats(deptId)
@@ -198,7 +204,7 @@ export const initServerMethods = (eventName) => {
       console.log('finding rota', rotaId)
       const rota = collections.rotas.findOne(rotaId)
       if (!rota) throw new Meteor.Error(404, 'Not Found')
-      if (rota.policy === 'adminOnly' && !auth.isLead(this.userId, [rota.parentId])) {
+      if (rota.policy === 'adminOnly' && !auth.isLead(this.userId, rota.parentId)) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
       return rota
@@ -211,7 +217,7 @@ export const initServerMethods = (eventName) => {
       check(query, Match.Maybe(String))
     },
     run({ query = {} } = {}) {
-      if (!auth.isLead()) {
+      if (!auth.isALead()) {
         query.policy = 'public'
       }
       return collections.department.find(query).fetch()

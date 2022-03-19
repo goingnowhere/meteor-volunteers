@@ -22,7 +22,7 @@ export function createOrgUnitMethods(collection) {
     [`${collectionName}.remove`](id) {
       console.log(`${collectionName}.remove`, id)
       check(id, String)
-      if (!auth.isLead(Meteor.userId(), [id])) {
+      if (!auth.isLead(Meteor.userId(), id)) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
       if (collectionName === collections.department._name) {
@@ -36,7 +36,7 @@ export function createOrgUnitMethods(collection) {
       console.log(`${collectionName}.insert`, doc)
       check(doc, Object)
       collection.simpleSchema().validate(doc)
-      if (!auth.isLead(Meteor.userId(), ['manager', doc.parentId])) {
+      if (!auth.isLead(Meteor.userId(), doc.parentId)) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
       return collection.insert(doc, (err, newDocId) => {
@@ -54,7 +54,7 @@ export function createOrgUnitMethods(collection) {
       console.log(`${collectionName}.update`, doc._id, doc.modifier)
       check(doc, Object)
       collection.simpleSchema().validate(doc.modifier, { modifier: true })
-      if (!auth.isLead(Meteor.userId(), [doc._id])) {
+      if (!auth.isLead(Meteor.userId(), doc._id)) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
       const oldDoc = collection.findOne(doc._id)

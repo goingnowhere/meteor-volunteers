@@ -15,7 +15,7 @@ export const initPublications = (eventName) => {
     if (auth.isManager()) { // publish manager only information
       return collections.volunteerForm.find({ userId: { $in: userIds } })
     }
-    if (auth.isLead()) {
+    if (auth.isALead()) {
       // TODO: the fields of the should have a field 'confidential that allow
       // here to filter which information to publish to all leads
       return collections.volunteerForm.find({ userId: { $in: userIds } })
@@ -24,7 +24,7 @@ export const initPublications = (eventName) => {
   })
 
   Meteor.publish(`${prefix}.volunteerForm`, function publishVolunteerForm(userId = this.userId) {
-    if (auth.isLead()) {
+    if (auth.isALead()) {
       return collections.volunteerForm.find({ userId })
     }
     if (!userId || (this?.userId === userId)) {
@@ -161,14 +161,14 @@ export const initPublications = (eventName) => {
   })
 
   Meteor.publish(`${prefix}.division`, function publishDiv(sel = {}) {
-    if (this.userId && auth.isLead()) {
+    if (this.userId && auth.isALead()) {
       return collections.division.find(sel)
     }
     return collections.division.find(_.extend(sel, unitPublicPolicy))
   })
 
   Meteor.publish(`${prefix}.department`, function publishDept(sel = {}) {
-    if (this.userId && auth.isLead()) {
+    if (this.userId && auth.isALead()) {
       return collections.department.find(sel)
     }
     return collections.department.find(_.extend(sel, unitPublicPolicy))
@@ -225,7 +225,7 @@ export const initPublications = (eventName) => {
   // Restricted to team lead
   Meteor.publishComposite(`${prefix}.Signups.byTeam`,
     function publishSignupsByTeam(teamId, type) {
-      const isLead = auth.isLead(this.userId, [teamId])
+      const isLead = auth.isLead(this.userId, teamId)
       return findDutiesWithSignupsAndUsers(type, isLead, teamId)
     })
 
@@ -233,7 +233,7 @@ export const initPublications = (eventName) => {
   // to this department. Restricted to department lead
   Meteor.publishComposite(`${prefix}.Signups.byDept`,
     function publishSignupsByDept(departmentId, type) {
-      const isLead = auth.isLead(this.userId, [departmentId])
+      const isLead = auth.isLead(this.userId, departmentId)
       return {
         find() { return collections.team.find({ parentId: departmentId }) },
         children: [
@@ -247,7 +247,7 @@ export const initPublications = (eventName) => {
   // to this division. Restricted to division lead
   Meteor.publishComposite(`${prefix}.Signups.byDivision`,
     function publishSignupsByDiv(divisionId, type) {
-      const isLead = auth.isLead(this.userId, [divisionId])
+      const isLead = auth.isLead(this.userId, divisionId)
       return {
         find() { return collections.department.find({ parentId: divisionId }) },
         children: [
@@ -291,7 +291,7 @@ export const initPublications = (eventName) => {
           },
           {
             find({ userId: signupUserId, parentId }) {
-              if (parentId && auth.isLead(userId, [parentId])) {
+              if (parentId && auth.isLead(userId, parentId)) {
                 return Meteor.users.find(signupUserId)
               }
               return null
@@ -312,7 +312,7 @@ export const initPublications = (eventName) => {
           {
             find(duty) {
               if (duty && (userId === currentUserId
-                || auth.isLead(currentUserId, [duty.parentId]))) {
+                || auth.isLead(currentUserId, duty.parentId))) {
                 return collections.signups.find({ shiftId: duty._id, userId })
               }
               return null
@@ -320,7 +320,7 @@ export const initPublications = (eventName) => {
             children: [
               {
                 find(signup, duty) {
-                  if (signup && auth.isLead(currentUserId, [duty.parentId])) {
+                  if (signup && auth.isLead(currentUserId, duty.parentId)) {
                     return Meteor.users.find(signup.userId)
                   }
                   return null

@@ -84,7 +84,7 @@ export function createRotaMethods(eventName) {
     [`${prefix}.rotas.insert`](rota) {
       console.log(`${prefix}.rotas.insert`, rota)
       rotaSchema.validate(rota)
-      if (!auth.isLead(Meteor.userId(), [rota.parentId])) {
+      if (!auth.isLead(Meteor.userId(), rota.parentId)) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
       return methodBodies.rota.insert(rota)
@@ -92,7 +92,7 @@ export function createRotaMethods(eventName) {
     [`${prefix}.rotas.remove`](group) {
       console.log(`${prefix}.rotas.remove`, group)
       check(group, { rotaId: String, parentId: String })
-      if (auth.isLead(Meteor.userId(), [group.parentId])) {
+      if (auth.isLead(Meteor.userId(), group.parentId)) {
         collections.rotas.remove(group)
         return collections.shift.remove(group)
       }
@@ -110,7 +110,7 @@ export function createRotaMethods(eventName) {
       const oldRota = collections.rotas.findOne(query)
       // Should be a server method?
       if (!oldRota && Meteor.isClient) return null
-      if (!auth.isLead(Meteor.userId(), [oldRota.parentId])
+      if (!auth.isLead(Meteor.userId(), oldRota.parentId)
         || modifier.$set.parentId !== oldRota.parentId) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
