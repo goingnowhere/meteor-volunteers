@@ -10,10 +10,10 @@ export function SignupsList({
   dutyType, filters = {}, quirks, skills,
 }) {
   const Volunteers = useContext(reactContext)
-  const [limit, setLimit] = useState(4)
+  const [limit, setLimit] = useState(8)
   const { allTeams, showLoadMore } = useTracker(() => {
     if (quirks && skills) {
-      Meteor.subscribe(`${Volunteers.eventName}.Volunteers.team.ByUserPref`, quirks, skills, limit)
+      Meteor.subscribe(`${Volunteers.eventName}.Volunteers.team.ByUserPref`, quirks, skills)
     } else {
       Meteor.subscribe(`${Volunteers.eventName}.Volunteers.team`)
     }

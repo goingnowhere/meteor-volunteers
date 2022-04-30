@@ -38,15 +38,6 @@ const findConflicts = ({
   const shiftSignups = signups.filter((signup) => signup.type === 'shift').map((signup) => signup.shiftId)
   const projectSignups = signups.filter((signup) => signup.type === 'project')
 
-  // TODO fix this hack
-  // Don't allow people to hop between projects during build without a lead doing it for them
-  if (type === 'project' && projectSignups.length > 0) {
-    const firstStart = moment(projectSignups[0].start)
-    if (firstStart.isBefore(start)) {
-      return ['You can\'t switch projects part-way through build!']
-    }
-  }
-
   const conflicts = [
     ...collections.shift.find({ _id: { $in: shiftSignups } }).fetch(),
     ...projectSignups,
@@ -204,6 +195,12 @@ export const createSignupMethods = (eventName) => {
           end,
           enrolled,
         } = wholeSignup
+        if (type === 'project' && (
+          moment(start).isBefore(parentDuty.start)
+          || moment(end).isAfter(parentDuty.end)
+        )) {
+          throw new Meteor.Error(400, 'Start and end need to be within the project dates')
+        }
         const res = collections.signups.upsert(signupIdentifiers, {
           $set: {
             ...signupIdentifiers,
