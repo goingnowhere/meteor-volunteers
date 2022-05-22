@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react'
+import React from 'react'
 import { ShiftTitle } from './ShiftTitle.jsx'
 import { TaskTitle } from './TaskTitle.jsx'
 import { ProjectTitle } from './ProjectTitle.jsx'
@@ -25,7 +25,7 @@ const DutiesListItemTitle = ({
 }
 
 const DutiesListItemContent = ({ duty, team }) => (
-  <Fragment>
+  <>
     <div className="row no-gutters">
       <DutyBody description={duty.description} />
     </div>
@@ -45,7 +45,7 @@ const DutiesListItemContent = ({ duty, team }) => (
         </ul>
       )}
     </div>
-  </Fragment>
+  </>
 )
 
 export const DutiesListItem = ({ type, duty, team }) => {
@@ -53,9 +53,9 @@ export const DutiesListItem = ({ type, duty, team }) => {
   type = type || duty.type // eslint-disable-line no-param-reassign
   team = team || duty.team // eslint-disable-line no-param-reassign
   return (
-    <Fragment>
+    <>
       <DutiesListItemTitle team={team} type={type} duty={duty} />
       <DutiesListItemContent duty={duty} team={team} />
-    </Fragment>
+    </>
   )
 }
