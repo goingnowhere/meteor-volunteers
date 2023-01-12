@@ -1,25 +1,21 @@
-import React, { Fragment, useContext } from 'react'
+import React, { useContext } from 'react'
 
 import { T } from '../common/i18n'
-import { ProjectDate } from '../common/ProjectDate.jsx'
 import { ShiftDate } from '../common/ShiftDate.jsx'
 import { bailCall } from '../../utils/signups'
-import { SignupButtons } from './SignupButtons.jsx'
+import { SignupShiftButtons } from './SignupShiftButtons.jsx'
 import { reactContext } from '../../clientInit'
 
-export const DutiesListItemDate = ({
+export const SignupShiftRow = ({
   start,
   end,
-  type,
   signup,
   ...duty
 }) => {
   const Volunteers = useContext(reactContext)
   return (
     <>
-      {type === 'project'
-        ? <ProjectDate start={start} end={end} />
-        : <ShiftDate start={start} end={end} />}
+      <ShiftDate start={start} end={end} />
       <div className="col p-0">
         {signup && signup.status !== 'bailed' ? (
           <div className="d-flex">
@@ -33,12 +29,12 @@ export const DutiesListItemDate = ({
             <button
               className="btn btn-primary btn-action"
               type="button"
-              onClick={bailCall(Volunteers, { type, ...duty })}
+              onClick={bailCall(Volunteers, { ...duty })}
             >
               <T>cancel</T>
             </button>
           </div>
-        ) : <SignupButtons type={type} {...duty} />}
+        ) : <SignupShiftButtons {...duty} />}
       </div>
     </>
   )

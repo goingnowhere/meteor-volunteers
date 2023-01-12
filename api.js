@@ -1,4 +1,3 @@
-/* globals __coffeescriptShare */
 import { Meteor } from 'meteor/meteor'
 import moment from 'moment-timezone'
 
@@ -18,18 +17,15 @@ export { TeamShiftsTable } from './client/components/teamLeads/TeamShiftsTable.j
 export { TeamProjectsTable } from './client/components/teamLeads/TeamProjectsTable.jsx'
 export { ShiftDateInline } from './client/components/common/ShiftDateInline.jsx'
 export { DutiesListItem } from './client/components/shifts/DutiesListItem.jsx'
-export { SignupButtons } from './client/components/shifts/SignupButtons.jsx'
+export { SignupShiftButtons } from './client/components/shifts/SignupShiftButtons.jsx'
 export { SignupsListTeam } from './client/components/volunteers/SignupsListTeam.jsx'
 export { SignupsList } from './client/components/shifts/SignupsList.jsx'
-
-const share = __coffeescriptShare
 
 // TODO migrated from coffeescript, can most likely simplify
 export class VolunteersClass {
   /** dontShare is used to start an instance without weird coffeescript global effects */
   constructor(eventName, dontShare) {
     this.eventName = eventName
-    share.eventName = this.eventName
     initCollections(this.eventName)
     let methodBodies = {}
     if (!dontShare) {

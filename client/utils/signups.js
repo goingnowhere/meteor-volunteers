@@ -1,8 +1,6 @@
 import { Meteor } from 'meteor/meteor'
-import { AutoFormComponents } from 'meteor/abate:autoform-components'
 import { Bert } from 'meteor/themeteorchef:bert'
 import { t } from '../components/common/i18n'
-import { collections } from '../../both/collections/initCollections'
 import { meteorCall } from '../../both/utils/methodUtils'
 
 export const bailCall = (Volunteers, {
@@ -64,8 +62,8 @@ export const applyCall = (Volunteers, {
     type,
   }
   if (type === 'project') {
-    const project = collections.project.findOne(shiftId)
-    AutoFormComponents.ModalShowWithTemplate('projectSignupForm', { signup, project }, project.title)
+    console.error('Project signups not supported')
+    applyErrorCallback({ reason: 'Please report this error to fist@goingnowhere.org' })
   } else {
     meteorCall(Volunteers, 'signups.insert', signup, applyErrorCallback)
   }

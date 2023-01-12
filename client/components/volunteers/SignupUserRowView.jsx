@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react'
 import Fa from 'react-fontawesome'
 import { withTracker } from 'meteor/react-meteor-data'
-import { AutoFormComponents } from 'meteor/abate:autoform-components'
 
 import { t, T } from '../common/i18n'
 import { ProjectDateInline } from '../common/ProjectDateInline.jsx'
@@ -73,11 +72,7 @@ export const SignupUserRowViewComponent = ({
   )
 }
 
-const editProject = ({ duty, signup }) => () => {
-  AutoFormComponents.ModalShowWithTemplate('projectSignupForm', { project: duty, signup })
-}
-
-export const SignupUserRowView = withTracker(({ signup }) => {
+export const SignupUserRowView = withTracker(({ signup, editProject }) => {
   const orgUnit = findOrgUnit(signup.parentId)
   const team = orgUnit ? orgUnit.unit : {}
   const duty = collections.dutiesCollections[signup.type].findOne(signup.shiftId)
@@ -85,6 +80,6 @@ export const SignupUserRowView = withTracker(({ signup }) => {
     signup,
     team,
     duty,
-    editProject: editProject({ duty, signup }),
+    editProject: () => editProject({ project: duty, signup }),
   }
 })(SignupUserRowViewComponent)

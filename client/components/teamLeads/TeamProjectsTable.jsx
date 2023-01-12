@@ -12,6 +12,7 @@ import { collections } from '../../../both/collections/initCollections'
 import { ProjectStaffingDisplay } from '../common/ProjectStaffingDisplay.jsx'
 import { reactContext } from '../../clientInit'
 import { meteorCall } from '../../../both/utils/methodUtils'
+import { ProjectSignupForm } from '../shifts/ProjectSignupForm.jsx'
 
 const getUsername = (users, userId) => {
   const user = users.find((usr) => usr._id === userId)
@@ -59,11 +60,6 @@ export const TeamProjectsTable = ({ teamId, UserInfoComponent }) => {
         end,
       },
     })
-  const editEnrollment = (project, signup) =>
-    AutoFormComponents.ModalShowWithTemplate('projectSignupForm', {
-      project,
-      signup,
-    }, project.title)
   const unEnrollUser = (signupId) => {
     meteorCall(Volunteers, 'signups.remove', signupId)
     reloadShifts()
@@ -72,8 +68,6 @@ export const TeamProjectsTable = ({ teamId, UserInfoComponent }) => {
   AutoForm.addHooks([
     'InsertProjectsFormId',
     'UpdateProjectsFormId',
-    'projectSignupsUpdate',
-    'projectSignupsInsert',
   ], {
     onSuccess() {
       reloadShifts()
@@ -82,6 +76,7 @@ export const TeamProjectsTable = ({ teamId, UserInfoComponent }) => {
   })
 
   const [modalUserId, setModalUserId] = useState('')
+  const [editModal, openEditModal] = useState({})
 
   return (
     <table className="table">
@@ -92,7 +87,21 @@ export const TeamProjectsTable = ({ teamId, UserInfoComponent }) => {
       >
         <UserInfoComponent userId={modalUserId} />
       </Modal>
-      {/* i18n! */}
+      <Modal
+        isOpen={!!editModal.projectEnrollment}
+        closeModal={() => openEditModal({})}
+        title={`${editModal?.projectEnrollment?.project?.title}: ${getUsername(users, editModal?.projectEnrollment?.signup.userId)}`}
+      >
+        <ProjectSignupForm
+          project={editModal?.projectEnrollment?.project}
+          signup={editModal?.projectEnrollment?.signup}
+          onSubmit={() => {
+            openEditModal({})
+            reloadShifts()
+          }}
+        />
+      </Modal>
+      {/* FIXME i18n! */}
       {allProjects.length === 0 && <tbody><tr><td>No projects here...</td></tr></tbody>}
       {allProjects.map((project) => (
         <tbody key={project._id}>
@@ -180,7 +189,9 @@ export const TeamProjectsTable = ({ teamId, UserInfoComponent }) => {
                               type="button"
                               title="edit"
                               className="btn btn-sm btn-circle"
-                              onClick={() => editEnrollment(project, signup)}
+                              onClick={() => openEditModal({
+                                projectEnrollment: { project, signup },
+                              })}
                             >
                               <Fa name="pencil-square-o" />
                             </button>

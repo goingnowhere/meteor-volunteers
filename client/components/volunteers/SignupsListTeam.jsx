@@ -1,11 +1,14 @@
 import { Meteor } from 'meteor/meteor'
 import { Mongo } from 'meteor/mongo'
 import { useTracker } from 'meteor/react-meteor-data'
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 
 import { collections } from '../../../both/collections/initCollections'
 import { reactContext } from '../../clientInit'
-import { DutiesListItemGrouped } from '../shifts/DutiesListItemGrouped.jsx'
+import { SignupsListItem } from '../shifts/SignupsListItem.jsx'
+import { Modal } from '../common/Modal.jsx'
+import { ShiftSignupModalContents } from '../shifts/ShiftSignupModalContents.jsx'
+import { ProjectSignupForm } from '../shifts/ProjectSignupForm.jsx'
 
 const ShiftTitles = new Mongo.Collection(null)
 
@@ -27,6 +30,7 @@ const addLocalDutiesCollection = (team, duties, type, filter, limit) => {
     if (type === 'project') {
       duty.start = shift.start
       duty.end = shift.end
+      duty.staffing = shift.staffing
     }
     ShiftTitles.insert(duty)
   }).value()
@@ -37,6 +41,9 @@ export function SignupsListTeam({ team, dutyType = '', filters }) {
   // TODO remove defaults when removing blaze embeded react
   const eventName = Volunteers?.eventName || 'nowhere2022'
   const Collections = Volunteers?.Collections || collections
+
+  const [signupDuty, setSignupDuty] = useState(null)
+
   const { allShifts } = useTracker(() => {
     const sel = { parentId: team._id }
     // TODO Only need one to get details of the shift but this limits to only one project
@@ -87,9 +94,18 @@ export function SignupsListTeam({ team, dutyType = '', filters }) {
     return { allShifts: allTheShifts }
   }, [team, dutyType, filters])
 
-  return allShifts.map(duty => (
-    <div key={duty._id} className="px-2 pb-0 signupsListItem">
-      <DutiesListItemGrouped duty={duty} />
-    </div>
-  ))
+  return (
+    <>
+      <Modal isOpen={!!signupDuty} closeModal={() => setSignupDuty(null)} title={signupDuty?.title}>
+        {signupDuty?.type === 'project'
+          ? <ProjectSignupForm project={signupDuty} onSubmit={setSignupDuty} />
+          : <ShiftSignupModalContents duty={signupDuty} />}
+      </Modal>
+      {allShifts.map(duty => (
+        <div key={duty._id} className="px-2 pb-0 signupsListItem">
+          <SignupsListItem duty={duty} showSignupModal={setSignupDuty} />
+        </div>
+      ))}
+    </>
+  )
 }

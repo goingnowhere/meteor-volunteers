@@ -12,7 +12,7 @@ const signupMessages = {
 const numLeft = (gaps, spotsLeft) =>
   `${gaps || spotsLeft} ${t(gaps ? 'people_needed' : 'spots_left')}`
 
-export const SignupButtons = ({
+export const SignupShiftButtons = ({
   policy,
   type,
   min,
@@ -22,7 +22,7 @@ export const SignupButtons = ({
 }) => {
   const Volunteers = useContext(reactContext)
   const gaps = Math.max(0, min - signedUp)
-  const spotsLeft = type === 'project' ? 1 : Math.max(0, max - signedUp)
+  const spotsLeft = Math.max(0, max - signedUp)
   return policy === 'adminOnly'
     ? <T>admin_only</T>
     : (
@@ -32,9 +32,7 @@ export const SignupButtons = ({
         onClick={applyCall(Volunteers, { type, ...duty })}
         disabled={!spotsLeft}
       >
-        {type === 'project'
-          ? t('choose_date')
-          : `${t(signupMessages[policy])} (${numLeft(gaps, spotsLeft)})`}
+        {`${t(signupMessages[policy])} (${numLeft(gaps, spotsLeft)})`}
       </button>
     )
 }

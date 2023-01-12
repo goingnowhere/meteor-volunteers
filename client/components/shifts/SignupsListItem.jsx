@@ -1,23 +1,16 @@
-import React, { Fragment, useState } from 'react'
+import React from 'react'
 
 import { T } from '../common/i18n'
 import { DutiesListItem } from './DutiesListItem.jsx'
-import { DutiesListItemDate } from './DutiesListItemDate.jsx'
-import { SignupModalContents } from './SignupModalContents.jsx'
-import { Modal } from '../common/Modal.jsx'
+import { SignupProjectRow } from './SignupProjectRow.jsx'
 
-export const DutiesListItemGrouped = ({ duty }) => {
-  // TODO move higher when React has spread enough and make general e.g. specify duty in callback
-  const [modalOpen, showModal] = useState(false)
+export const SignupsListItem = ({ duty, showSignupModal }) => {
   return (
     <>
-      <Modal isOpen={modalOpen} closeModal={() => showModal(false)} title={duty.title}>
-        <SignupModalContents duty={duty} />
-      </Modal>
       <DutiesListItem duty={duty} />
       <div className="row no-gutters pt-2 align-items-center">
         {duty.type === 'project'
-          ? <DutiesListItemDate {...duty} />
+          ? <SignupProjectRow duty={duty} showSignupModal={showSignupModal} />
           : (
             <>
               <div className="col">
@@ -29,7 +22,7 @@ export const DutiesListItemGrouped = ({ duty }) => {
                 <button
                   className="btn btn-action btn-primary"
                   type="button"
-                  onClick={() => showModal(true)}
+                  onClick={() => showSignupModal(duty)}
                 >
                   <T>choose_shifts</T>
                 </button>

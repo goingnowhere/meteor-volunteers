@@ -47,6 +47,7 @@ Package.onUse((api) => {
     'abate:autoform-components',
     'mdg:validated-method',
     'react-meteor-data',
+    'gadicc:blaze-react-component',
   ], ['client', 'server'])
 
   api.use([
@@ -65,15 +66,10 @@ Package.onUse((api) => {
   ], 'server')
 
   api.addFiles([
-    'both/global.coffee',
-  ], ['server', 'client'])
-
-  api.addFiles([
     'client/globalHelpers.js',
     'client/css/custom.css',
 
     'client/shifts/shifts.html',
-    'client/shifts/shifts.coffee',
     'client/shifts/shifts.js',
 
     'client/signups/team.html',

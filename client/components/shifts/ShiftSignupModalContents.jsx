@@ -1,12 +1,14 @@
 import { Meteor } from 'meteor/meteor'
 import { Mongo } from 'meteor/mongo'
 import { useTracker } from 'meteor/react-meteor-data'
-import React from 'react'
+import React, { useContext } from 'react'
 
 import { collections } from '../../../both/collections/initCollections'
 import { findOrgUnit } from '../../../both/utils/unit'
-import { DutiesListItemDate } from './DutiesListItemDate.jsx'
+import { SignupShiftRow } from './SignupShiftRow.jsx'
+import { reactContext } from '../../clientInit'
 
+// TODO Replace all this weird local collection stuff with just a method call
 const DatesLocal = new Mongo.Collection(null)
 
 // DatesLocal contains all shifts (dates) related to a particular title and parentId
@@ -25,10 +27,11 @@ const addLocalDatesCollection = (duties, type, filter) => {
   })
 }
 
-export function SignupModalContents({
+export function ShiftSignupModalContents({
   duty,
 }) {
-  const eventName = 'nowhere2022'
+  const Volunteers = useContext(reactContext)
+  const eventName = Volunteers?.eventName || 'nowhere2022'
   const { allDates } = useTracker(() => {
     const { type, title, parentId } = duty
     const userId = Meteor.userId()
@@ -47,7 +50,7 @@ export function SignupModalContents({
     <>
       {allDates.map(date => (
         <div key={date._id} className="list-item row align-items-center px-2">
-          <DutiesListItemDate {...date} />
+          <SignupShiftRow {...date} />
         </div>
       ))}
     </>

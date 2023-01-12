@@ -10,25 +10,3 @@
     }}
   </div>
 </Template>
-
-<template name="projectSignupForm">
-  <div>{{> React component=DutyBody description=project.description }}</div>
-  {{#if Template.subscriptionsReady }}
-    {{> projectStaffingChart project=project confirmedSignups=confirmed }}
-    {{#if signup._id}}
-      {{> quickForm
-        schema=formSchema
-        id="projectSignupsUpdate"
-        type="method-update"
-        meteormethod=methodNameUpdate
-        doc=signup }}
-    {{else}}
-      {{> quickForm
-        schema=formSchema
-        id="projectSignupsInsert"
-        type="method"
-        meteormethod=methodNameInsert
-        doc=signup}}
-    {{/if}}
-  {{/if}}
-</template>
