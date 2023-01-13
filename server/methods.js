@@ -1,38 +1,15 @@
 import { Meteor } from 'meteor/meteor'
 import { check, Match } from 'meteor/check'
 import { ValidatedMethod } from 'meteor/mdg:validated-method'
-import Moment from 'moment-timezone'
-import { extendMoment } from 'moment-range'
+import moment from 'moment-timezone'
 
 import { dutyTypes } from '../both/collections/volunteer'
 import { collections } from '../both/collections/initCollections'
 import { getDuties, getTeamStats, getDeptStats } from '../both/stats'
 import { auth } from '../both/utils/auth'
 
-const moment = extendMoment(Moment)
-
 export const initServerMethods = (eventName) => {
   const prefix = `${eventName}.Volunteers`
-  new ValidatedMethod({
-    name: `${prefix}.getProjectStaffing`,
-    validate(projectId) { check(projectId, String) },
-    run(projectId) {
-      const project = collections.project.findOne(projectId)
-      if (project) {
-        let days = []
-        const range = moment.range(project.start, project.end).by('days')
-        days = Array.from(range)
-        const signups = collections.signups.find({ shiftId: projectId, status: 'confirmed' }).fetch()
-
-        const confirmed = days.map((day) => {
-          const thisday = signups.filter((signup) => (day.isBetween(signup.start, signup.end, 'days', '[]')))
-          return thisday.length
-        })
-        return confirmed
-      }
-      throw new Meteor.Error('InternalError', 'Project not found')
-    },
-  })
 
   Meteor.methods({
     'signups.list'(query) {
@@ -139,6 +116,18 @@ export const initServerMethods = (eventName) => {
   })
 
   new ValidatedMethod({
+    name: `${prefix}.getProjectStaffing`,
+    validate(projectId) { check(projectId, String) },
+    run(projectId) {
+      const staffing = getDuties({ _id: projectId }, 'project', false)
+      if (staffing.length === 0) {
+        throw new Meteor.Error(404, 'Project not found')
+      }
+      return staffing[0]
+    },
+  })
+
+  new ValidatedMethod({
     name: `${prefix}.getTeamDutyStats`,
     validate({ type, teamId, date }) {
       check(teamId, String)
@@ -160,7 +149,7 @@ export const initServerMethods = (eventName) => {
           ],
         }
       }
-      const duties = getDuties(query, type)
+      const duties = getDuties(query, type, true)
       // TODO get usernames in lead page so remove need for this?
       const userIds = new Set(duties.flatMap((duty) => duty.volunteers))
       const users = Meteor.users
@@ -178,7 +167,7 @@ export const initServerMethods = (eventName) => {
       if (!auth.isLead(this.userId, teamId)) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
-      return getTeamStats(teamId)
+      return getTeamStats(teamId, true)
     },
   })
 
@@ -191,7 +180,7 @@ export const initServerMethods = (eventName) => {
       if (!auth.isLead(this.userId, deptId)) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
-      return getDeptStats(deptId)
+      return getDeptStats(deptId, true)
     },
   })
 

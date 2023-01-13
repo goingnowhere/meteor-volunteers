@@ -12,6 +12,7 @@ import { collections } from '../../../both/collections/initCollections'
 import { meteorCall } from '../../../both/utils/methodUtils'
 import { reactContext } from '../../clientInit'
 import { DutyBody } from './DutyBody.jsx'
+import { ProjectStaffingDisplay } from '../common/ProjectStaffingDisplay.jsx'
 
 const moment = extendMoment(Moment)
 
@@ -139,11 +140,7 @@ export const ProjectSignupForm = ({ project, signup, onSubmit }) => {
   return (
     <>
       <DutyBody description={project.description} />
-      <Blaze
-        template="projectStaffingChart"
-        project={project}
-        confirmedSignups={confirmed}
-      />
+      {confirmed && <ProjectStaffingDisplay staffing={confirmed.staffingStats} />}
       {signup?._id ? (
         <Blaze
           template="quickForm"

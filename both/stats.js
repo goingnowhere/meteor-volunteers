@@ -1,18 +1,13 @@
 import { Meteor } from 'meteor/meteor'
 import Moment from 'moment-timezone'
 import { extendMoment } from 'moment-range' // eslint-disable-line import/no-unresolved, import/extensions
-import { _ } from 'meteor/underscore'
 
 import { collections } from './collections/initCollections'
 
 const moment = extendMoment(Moment)
 
-const uniqueVolunteers = (allSignups) => (
-  !allSignups ? []
-    : _.chain(allSignups)
-      .pluck('userId')
-      .uniq()
-      .value())
+const uniqueVolunteers = (allSignups) =>
+  new Set(allSignups?.map(signup => signup.userId)).values()
 
 const getSignupCount = (query) => collections.signups.find(query).count()
 const getVolunteerCount = (query) =>
@@ -45,7 +40,7 @@ export const projectSignupsConfirmed = (project, signupsPassed) => {
 }
 
 // TODO use an aggregation?
-export const getDuties = (sel, type) => {
+export const getDuties = (sel, type, isLead) => {
   const sort = { sort: { start: 1, priority: 1 } }
   return collections.dutiesCollections[type].find(sel, sort).map((duty) => {
     const confirmedSignups = collections.signups.find({ type, status: 'confirmed', shiftId: duty._id }, sort)
@@ -59,6 +54,10 @@ export const getDuties = (sel, type) => {
     } else {
       needed = Math.max(0, duty.min - signupCount)
     }
+    const leadOnly = {
+      volunteers: uniqueVolunteers(signups),
+      signups,
+    }
     return {
       ...duty,
       type,
@@ -66,8 +65,7 @@ export const getDuties = (sel, type) => {
       confirmed: signupCount,
       needed,
       staffingStats: staffing,
-      volunteers: uniqueVolunteers(signups),
-      signups,
+      ...isLead && leadOnly,
     }
   })
 }
@@ -84,10 +82,10 @@ export const getDuties = (sel, type) => {
  * @param {Object} query Mongo query
  * @returns {Object}
  */
-export const getShifts = (query) => getDuties(query, 'shift')
-export const getProjects = (query) => getDuties(query, 'project')
-export const getTasks = (query) => getDuties(query, 'task')
-export const getLeads = (query) => getDuties(query, 'lead')
+export const getShifts = (query, isLead) => getDuties(query, 'shift', isLead)
+export const getProjects = (query, isLead) => getDuties(query, 'project', isLead)
+export const getTasks = (query, isLead) => getDuties(query, 'task', isLead)
+export const getLeads = (query, isLead) => getDuties(query, 'lead', isLead)
 
 /**
  * duties => { needed: int, confirmed: int }
@@ -115,10 +113,10 @@ const sumSignupRates = (rates = []) => rates.reduce(
 //   ...team details
 // }
 const getTeams = (query, orgUnit = 'team') => collections[orgUnit].find(query).map((team) => {
-  const leadRoles = getLeads({ parentId: team._id })
+  const leadRoles = getLeads({ parentId: team._id }, true)
   const leadIds = leadRoles.flatMap((lead) => lead.volunteers)
   return {
-    shiftRate: signupRates(getShifts({ parentId: team._id })),
+    shiftRate: signupRates(getShifts({ parentId: team._id }, true)),
     leadRate: signupRates(leadRoles),
     leadRoles,
     leads: Meteor.users.find({ _id: { $in: leadIds } }, {
@@ -139,7 +137,7 @@ const getDepts = (query) => collections.department.find(query).map((dept) => {
     .concat(getTeams({ parentId: dept._id }))
 
   return {
-    teamIds: _.pluck(teamsOfThisDept, '_id'),
+    teamIds: teamsOfThisDept.map(team => team._id),
     teamsNumber: teamsOfThisDept.length,
     teams: teamsOfThisDept,
     volunteerNumber: teamsOfThisDept.reduce((sum, team) => sum + team.volunteerNumber, 0),
@@ -150,13 +148,18 @@ const getDepts = (query) => collections.department.find(query).map((dept) => {
 })
 
 // All pending requests for tasks, shifts and leads
-export const getTeamStats = (teamId) => ({
+// isLead = false isn't used, so may not make much sense, it at least doesn't
+// leak any sensitive info
+export const getTeamStats = (teamId, isLead) => ({
   pendingRequests: getSignupCount({ parentId: teamId, status: 'pending' }),
-  team: getTeams({ _id: teamId })[0],
+  team: isLead && getTeams({ _id: teamId })[0],
   volunteerNumber: getVolunteerCount({ parentId: teamId, status: 'confirmed' }),
 })
 
-export const getDeptStats = (deptId) => {
+export const getDeptStats = (deptId, isLead) => {
+  if (!isLead) {
+    throw new Meteor.Error(403, 'Only able to get dept signup stats as a lead')
+  }
   const dept = getDepts({ _id: deptId })[0]
   const signupQuery = { parentId: { $in: [deptId, ...dept.teamIds] }, type: 'lead', status: 'pending' }
   return {

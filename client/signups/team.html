@@ -1,9 +1,0 @@
-<template name="projectStaffingChart">
-  {{> stackedBar barData=(stackedBarData project) hideConfirmed=hideConfirmed }}
-</template>
-
-<template name="stackedBar">
-  <div class="chart-container">
-    <canvas id="StackedBar-{{barData._id}}" class="chart"></canvas>
-  </div>
-</template>

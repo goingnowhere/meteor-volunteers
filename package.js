@@ -29,7 +29,6 @@ Package.onUse((api) => {
 
   api.use([
     'mongo',
-    'coffeescript',
     'ecmascript',
     'tmeasday:check-npm-versions',
     'aldeed:collection2@3.0.2',
@@ -71,10 +70,6 @@ Package.onUse((api) => {
 
     'client/shifts/shifts.html',
     'client/shifts/shifts.js',
-
-    'client/signups/team.html',
-    'client/signups/team.coffee',
-
   ], 'client')
 
   api.addFiles(['i18n/en.i18n.json'], ['client', 'server'])
