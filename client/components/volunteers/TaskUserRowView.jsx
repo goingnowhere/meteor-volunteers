@@ -1,5 +1,5 @@
 import React from 'react'
-import Fa from 'react-fontawesome'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { T } from '../common/i18n'
 import { formatDate } from '../common/dates'
@@ -8,7 +8,7 @@ export const TaskUserRowView = ({ team, task }) => (
   <tr>
     <td>{team.name} {task.title}</td>
     <td>
-      <Fa name="task" />
+      <FontAwesomeIcon icon="list-check" />
       {formatDate(task.dueDate)} - <T>estimated_time</T> {task.estimatedTime}
     </td>
   </tr>

@@ -64,6 +64,7 @@
   "update_shift": "Mettre à jour un shift",
   "new_project": "Nouveau Projet",
   "update_project": "Mettre à jour le Projet",
+  "no_projects": "Aucune projet ici",
   "new_shift_group": "Créer un horaire de shift",
   "project_signup_form": "Sélectionne les dates",
   "project_signup_start": "Sélectionne le jour de début",

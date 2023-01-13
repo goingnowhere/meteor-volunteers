@@ -5,7 +5,6 @@ import React, {
   useEffect,
   useContext,
 } from 'react'
-import Fa from 'react-fontawesome'
 import { AutoFormComponents } from 'meteor/abate:autoform-components'
 import { AutoForm } from 'meteor/aldeed:autoform'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -101,7 +100,7 @@ export const TeamShiftsTable = ({ date, teamId, UserInfoComponent }) => {
               <td colSpan="4"><h5>{shifts[0].title}</h5></td>
               <td>
                 <button type="button" className="btn btn-light btn-sm" onClick={() => editRota(rotaId)}>
-                  <Fa name="pencil-square-o" /> <T>edit_group</T>
+                  <FontAwesomeIcon icon="pen-to-square" /> <T>edit_group</T>
                 </button>
               </td>
               {/* <!-- <td>
@@ -128,11 +127,11 @@ export const TeamShiftsTable = ({ date, teamId, UserInfoComponent }) => {
                     {/* <!-- #{{shift.rotaId}} --> */}
                     <span>
                       {shift.priority === 'essential' && (
-                        <span className="text-danger" title={t('essential')}><Fa name="exclamation-circle" /></span>
+                        <span className="text-danger" title={t('essential')}><FontAwesomeIcon icon="exclamation-circle" /></span>
                       )}
-                      {shift.policy === 'private' && <Fa name="user-secret" title={t('private')} />}
-                      {shift.policy === 'requireApproval' && <Fa name="lock" title={t('require_approval')} />}
-                      {shift.policy === 'adminOnly' && <Fa name="user-secret" title={t('admin_only')} />}
+                      {shift.policy === 'private' && <FontAwesomeIcon icon="user-secret" title={t('private')} />}
+                      {shift.policy === 'requireApproval' && <FontAwesomeIcon icon="lock" title={t('require_approval')} />}
+                      {shift.policy === 'adminOnly' && <FontAwesomeIcon icon="user-secret" title={t('admin_only')} />}
                     </span>
                   </th>
                   <td><ShiftDateInline start={shift.start} end={shift.end} /></td>
@@ -155,7 +154,7 @@ export const TeamShiftsTable = ({ date, teamId, UserInfoComponent }) => {
                         className="btn btn-sm btn-circle"
                         onClick={() => editShift(shift)}
                       >
-                        <Fa name="pencil-square-o" />
+                        <FontAwesomeIcon icon="pen-to-square" />
                       </button>
                       <button
                         type="button"
@@ -169,7 +168,7 @@ export const TeamShiftsTable = ({ date, teamId, UserInfoComponent }) => {
                         className="btn btn-sm btn-circle"
                         onClick={() => enrollUser(shift)}
                       >
-                        <Fa name="user-plus" />
+                        <FontAwesomeIcon icon="user-plus" />
                       </button>
                     </div>
                   </td>
@@ -182,10 +181,10 @@ export const TeamShiftsTable = ({ date, teamId, UserInfoComponent }) => {
                           {shift.signups.map((signup, index) => (
                             <tr key={signup._id}>
                               <td>
-                                {index}
+                                {index + 1}
                                 {signup.enrolled && (
                                   <small title={t('voluntold')}>
-                                    <Fa name="hand-spock-o" />
+                                    <FontAwesomeIcon icon="people-pulling" />
                                   </small>
                                 )}
                               </td>

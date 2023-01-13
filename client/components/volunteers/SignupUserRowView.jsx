@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import Fa from 'react-fontawesome'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { withTracker } from 'meteor/react-meteor-data'
 
 import { t, T } from '../common/i18n'
@@ -38,8 +38,8 @@ export const SignupUserRowViewComponent = ({
         </div>
         <div className="row px-1 py-0">
           <div className="col">
-            {signup.status === 'confirmed' && <div className="text-success"><Fa name="check" /> <T>confirmed</T></div>}
-            {signup.status === 'pending' && <div className="text-warning"><Fa name="clock-o" /> <T>pending</T></div>}
+            {signup.status === 'confirmed' && <div className="text-success"><FontAwesomeIcon icon="check" /> <T>confirmed</T></div>}
+            {signup.status === 'pending' && <div className="text-warning"><FontAwesomeIcon icon="clock" /> <T>pending</T></div>}
           </div>
           <div className="col px-1 py-0" />
 

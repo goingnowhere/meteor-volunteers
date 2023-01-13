@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from 'react'
-import Fa from 'react-fontawesome'
 import { AutoFormComponents } from 'meteor/abate:autoform-components'
 import { AutoForm } from 'meteor/aldeed:autoform'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -101,18 +100,17 @@ export const TeamProjectsTable = ({ teamId, UserInfoComponent }) => {
           }}
         />
       </Modal>
-      {/* FIXME i18n! */}
-      {allProjects.length === 0 && <tbody><tr><td>No projects here...</td></tr></tbody>}
+      {allProjects.length === 0 && <tbody><tr><td><T>no_projects</T></td></tr></tbody>}
       {allProjects.map((project) => (
         <tbody key={project._id}>
           <tr>
             <td>
               {project.priority === 'essential' && (
-                <span className="text-danger"><Fa name="exclamation-circle" /></span>
+                <span className="text-danger"><FontAwesomeIcon icon="exclamation-circle" /></span>
               )}
-              {project.policy === 'private' && <Fa name="user-secret" />}
-              {project.policy === 'requireApproval' && <Fa name="lock" />}
-              {project.policy === 'adminOnly' && <Fa name="user-secret" />}
+              {project.policy === 'private' && <FontAwesomeIcon icon="user-secret" />}
+              {project.policy === 'requireApproval' && <FontAwesomeIcon icon="lock" />}
+              {project.policy === 'adminOnly' && <FontAwesomeIcon icon="user-secret" />}
             </td>
             <td><ProjectDateInline start={project.start} end={project.end} /></td>
             <td>{project.title}</td>
@@ -123,7 +121,7 @@ export const TeamProjectsTable = ({ teamId, UserInfoComponent }) => {
                   className="btn btn-sm btn-circle"
                   onClick={() => editProject(project)}
                 >
-                  <Fa name="pencil-square-o" />
+                  <FontAwesomeIcon icon="pen-to-square" />
                 </button>
                 <button
                   type="button"
@@ -137,7 +135,7 @@ export const TeamProjectsTable = ({ teamId, UserInfoComponent }) => {
                   className="btn btn-sm btn-circle"
                   onClick={() => enrollUser(project)}
                 >
-                  <Fa name="user-plus" />
+                  <FontAwesomeIcon icon="user-plus" />
                 </button>
               </div>
             </td>
@@ -165,10 +163,10 @@ export const TeamProjectsTable = ({ teamId, UserInfoComponent }) => {
                     {project.signups.map((signup, index) => (
                       <tr key={signup._id}>
                         <td>
-                          {index}
+                          {index + 1}
                           {signup.enrolled && (
                             <small title={t('voluntold')}>
-                              <Fa name="hand-spock-o" />
+                              <FontAwesomeIcon icon="people-pulling" />
                             </small>
                           )}
                         </td>
@@ -193,7 +191,7 @@ export const TeamProjectsTable = ({ teamId, UserInfoComponent }) => {
                                 projectEnrollment: { project, signup },
                               })}
                             >
-                              <Fa name="pencil-square-o" />
+                              <FontAwesomeIcon icon="pen-to-square" />
                             </button>
                             <button
                               type="button"

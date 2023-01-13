@@ -1,10 +1,10 @@
 import React from 'react'
-import Fa from 'react-fontawesome'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 export const LeadsUserRowView = ({ unit, lead }) => (
   <div className="row">
     <div className="col">{unit.name}</div>
-    <div className="col"><Fa name="user-circle" /> {lead.title}</div>
+    <div className="col"><FontAwesomeIcon icon="user-circle" /> {lead.title}</div>
   </div>
 )
 

@@ -1,6 +1,6 @@
 import React, { useContext } from 'react'
 import moment from 'moment-timezone'
-import Fa from 'react-fontawesome'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { reactContext } from '../../clientInit'
 import { meteorCall } from '../../../both/utils/methodUtils'
@@ -54,7 +54,7 @@ export const SignupApproval = ({
             <p>Bug detected... hiding this for now</p>
           ) : (
             <button type="button" className={`btn btn-link${user.ticketId ? '' : ' text-danger'}`} onClick={() => openUserModal(user._id)}>
-              {!user.ticketId && (<Fa name="warning" title="No Ticket!" />)}
+              {!user.ticketId && (<FontAwesomeIcon icon="warning" title="No Ticket!" />)}
               {user.profile.nickname || user.profile.firstName}
             </button>
           )}
