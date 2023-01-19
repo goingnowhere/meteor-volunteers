@@ -12,9 +12,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { T, t } from '../common/i18n'
 import { Modal } from '../common/Modal.jsx'
 import { ShiftDateInline } from '../common/ShiftDateInline.jsx'
-import { collections } from '../../../both/collections/initCollections'
 import { reactContext } from '../../clientInit'
-import { meteorCall } from '../../../both/utils/methodUtils'
+import { meteorCall } from '../../utils/methodUtils'
 
 const getUsername = (users, userId) => {
   const user = users.find((usr) => usr._id === userId)
@@ -24,6 +23,8 @@ const getUsername = (users, userId) => {
 // used to display all shifts for a given team
 export const TeamShiftsTable = ({ date, teamId, UserInfoComponent }) => {
   const Volunteers = useContext(reactContext)
+  const { collections } = Volunteers
+
   const [users, setUsers] = useState([])
   const [shiftGroups, setShifts] = useState([])
   const reloadShifts = () => meteorCall(Volunteers, 'getTeamDutyStats',

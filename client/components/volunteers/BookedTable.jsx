@@ -2,7 +2,6 @@ import React, { useContext, useState } from 'react'
 import { Meteor } from 'meteor/meteor'
 import { useTracker } from 'meteor/react-meteor-data'
 
-import { collections } from '../../../both/collections/initCollections'
 import { reactContext } from '../../clientInit'
 import { Modal } from '../common/Modal.jsx'
 import { ProjectSignupForm } from '../shifts/ProjectSignupForm.jsx'
@@ -12,7 +11,8 @@ export const BookedTable = ({
   userId,
 }) => {
   const Volunteers = useContext(reactContext)
-  const eventName = Volunteers?.eventName || 'nowhere2022'
+  const { collections, eventName } = Volunteers
+
   const allShifts = useTracker(() => {
     const bookedUserId = userId || Meteor.userId()
     Meteor.subscribe(`${eventName}.Volunteers.Signups.byUser`, bookedUserId).ready()
@@ -31,11 +31,13 @@ export const BookedTable = ({
         closeModal={() => setProjectEdit()}
         title={projectEdit?.project?.title}
       >
-        <ProjectSignupForm
-          project={projectEdit?.project}
-          signup={projectEdit?.signup}
-          onSubmit={setProjectEdit}
-        />
+        {projectEdit && (
+          <ProjectSignupForm
+            project={projectEdit.project}
+            signup={projectEdit.signup}
+            onSubmit={setProjectEdit}
+          />
+        )}
       </Modal>
       <div className="container-fluid p-0 bookedTable">
         <div className="row">

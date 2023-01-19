@@ -26,7 +26,7 @@ export function SignupsList({
     // the priority of the shifts associated with each team
     // We used to limit here but it meant we didn't know if we had more results, so istead get
     // everything
-    const allTeamsCursor = Volunteers.Collections.team
+    const allTeamsCursor = Volunteers.collections.team
       .find(query, { sort: { userpref: -1, score: -1 } })
     return {
       allTeams: allTeamsCursor.fetch().slice(0, limit),

@@ -1,24 +1,28 @@
 import React, { useContext, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { withTracker } from 'meteor/react-meteor-data'
+import { useTracker } from 'meteor/react-meteor-data'
 
 import { t, T } from '../common/i18n'
 import { ProjectDateInline } from '../common/ProjectDateInline.jsx'
 import { ShiftDateInline } from '../common/ShiftDateInline.jsx'
 import { bailCall } from '../../utils/signups'
-import { collections } from '../../../both/collections/initCollections'
-import { findOrgUnit } from '../../../both/utils/unit'
 import { Modal } from '../common/Modal.jsx'
 import { DutiesListItem } from '../shifts/DutiesListItem.jsx'
 import { reactContext } from '../../clientInit'
 
-export const SignupUserRowViewComponent = ({
+export const SignupUserRowView = ({
   signup = {},
-  team = {},
-  duty = {},
   editProject,
 }) => {
   const Volunteers = useContext(reactContext)
+  const { team, duty, editProjectClick } = useTracker(() => {
+    const orgUnit = Volunteers.collections.utils.findOrgUnit(signup.parentId)
+    return {
+      team: orgUnit ? orgUnit.unit : {},
+      duty: Volunteers.collections.dutiesCollections[signup.type].findOne(signup.shiftId),
+      editProjectClick: () => editProject({ project: duty, signup }),
+    }
+  }, [signup, editProject])
   const [modalOpen, showModal] = useState(false)
   return (
     <div className={`row no-gutters ${signup.status !== 'confirmed' ? 'text-muted' : ''}`} title={t(signup.status)}>
@@ -51,7 +55,7 @@ export const SignupUserRowViewComponent = ({
 
           {signup.type === 'project' && (
             <div className="col px-1 py-0">
-              <button type="button" onClick={editProject} className="btn btn-primary btn-action">
+              <button type="button" onClick={editProjectClick} className="btn btn-primary btn-action">
                 <T>change_dates</T>
               </button>
             </div>
@@ -71,15 +75,3 @@ export const SignupUserRowViewComponent = ({
     </div>
   )
 }
-
-export const SignupUserRowView = withTracker(({ signup, editProject }) => {
-  const orgUnit = findOrgUnit(signup.parentId)
-  const team = orgUnit ? orgUnit.unit : {}
-  const duty = collections.dutiesCollections[signup.type].findOne(signup.shiftId)
-  return {
-    signup,
-    team,
-    duty,
-    editProject: () => editProject({ project: duty, signup }),
-  }
-})(SignupUserRowViewComponent)

@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor'
 import { Bert } from 'meteor/themeteorchef:bert'
 
-import { t } from './i18n'
+import { t } from '../../both/utils/i18n'
 
 export function meteorCall(VolClass, methodName, ...args) {
   let nonCallbackArgs = args

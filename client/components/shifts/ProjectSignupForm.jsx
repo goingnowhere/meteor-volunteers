@@ -8,8 +8,7 @@ import { extendMoment } from 'moment-range'
 import { AutoForm } from 'meteor/aldeed:autoform'
 
 import { t } from '../common/i18n'
-import { collections } from '../../../both/collections/initCollections'
-import { meteorCall } from '../../../both/utils/methodUtils'
+import { meteorCall } from '../../utils/methodUtils'
 import { reactContext } from '../../clientInit'
 import { DutyBody } from './DutyBody.jsx'
 import { ProjectStaffingDisplay } from '../common/ProjectStaffingDisplay.jsx'
@@ -105,6 +104,8 @@ const makeFormSchema = (project, signup) => {
 export const ProjectSignupForm = ({ project, signup, onSubmit }) => {
   const userId = useTracker(() => Meteor.userId())
   const Volunteers = useContext(reactContext)
+  const { collections } = Volunteers
+
   const [confirmed, setConfirmed] = useState()
 
   useEffect(() => {
@@ -122,7 +123,7 @@ export const ProjectSignupForm = ({ project, signup, onSubmit }) => {
 
   useEffect(() => {
     setFormSchema(makeFormSchema(project, signup))
-  }, [project, signup])
+  }, [project, signup, confirmed])
 
   useEffect(() => {
     AutoForm.addHooks([
@@ -140,7 +141,7 @@ export const ProjectSignupForm = ({ project, signup, onSubmit }) => {
   return (
     <>
       <DutyBody description={project.description} />
-      {confirmed && <ProjectStaffingDisplay staffing={confirmed.staffingStats} />}
+      {confirmed && <ProjectStaffingDisplay staffing={confirmed.staffingStats} signup={signup} />}
       {signup?._id ? (
         <Blaze
           template="quickForm"

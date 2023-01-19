@@ -3,7 +3,6 @@ import { Mongo } from 'meteor/mongo'
 import { useTracker } from 'meteor/react-meteor-data'
 import React, { useContext, useState } from 'react'
 
-import { collections } from '../../../both/collections/initCollections'
 import { reactContext } from '../../clientInit'
 import { SignupsListItem } from '../shifts/SignupsListItem.jsx'
 import { Modal } from '../common/Modal.jsx'
@@ -38,9 +37,7 @@ const addLocalDutiesCollection = (team, duties, type, filter, limit) => {
 
 export function SignupsListTeam({ team, dutyType = '', filters }) {
   const Volunteers = useContext(reactContext)
-  // TODO remove defaults when removing blaze embeded react
-  const eventName = Volunteers?.eventName || 'nowhere2022'
-  const Collections = Volunteers?.Collections || collections
+  const { collections, eventName } = Volunteers
 
   const [signupDuty, setSignupDuty] = useState(null)
 
@@ -60,13 +57,13 @@ export function SignupsListTeam({ team, dutyType = '', filters }) {
     case 'task':
       subs.push(Meteor.subscribe(`${eventName}.Volunteers.duties`, dutyType, sel, limit))
       if (subs.every(sub => sub.ready())) {
-        addLocalDutiesCollection(team, Collections.task, dutyType, sel, limit)
+        addLocalDutiesCollection(team, collections.task, dutyType, sel, limit)
       }
       break
     case 'project':
       subs.push(Meteor.subscribe(`${eventName}.Volunteers.duties`, dutyType, sel, limit))
       if (subs.every(sub => sub.ready())) {
-        addLocalDutiesCollection(team, Collections.project, dutyType, sel, limit)
+        addLocalDutiesCollection(team, collections.project, dutyType, sel, limit)
       }
       break
     default:
@@ -74,8 +71,8 @@ export function SignupsListTeam({ team, dutyType = '', filters }) {
       subs.push(Meteor.subscribe(`${eventName}.Volunteers.duties`, 'task', sel, limit))
       subs.push(Meteor.subscribe(`${eventName}.Volunteers.duties`, 'project', sel, limit))
       if (subs.every(sub => sub.ready())) {
-        addLocalDutiesCollection(team, Collections.task, 'task', sel, limit)
-        addLocalDutiesCollection(team, Collections.project, 'project', sel, limit)
+        addLocalDutiesCollection(team, collections.task, 'task', sel, limit)
+        addLocalDutiesCollection(team, collections.project, 'project', sel, limit)
       }
     }
     let allTheShifts = []
@@ -84,7 +81,7 @@ export function SignupsListTeam({ team, dutyType = '', filters }) {
       if (['lead', 'project'].includes(dutyType)) {
         sel.type = dutyType
       } else {
-        shiftGroups = Collections.shiftGroups.find(sel).map(
+        shiftGroups = collections.shiftGroups.find(sel).map(
           (group) => _.extend(group, { type: 'shift', team }),
         )
       }

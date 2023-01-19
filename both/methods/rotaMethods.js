@@ -4,13 +4,10 @@ import Moment from 'moment-timezone'
 import { extendMoment } from 'moment-range'
 import { _ } from 'meteor/underscore'
 
-import { collections } from '../collections/initCollections'
-import { rotaSchema } from '../collections/duties'
-import { auth } from '../utils/auth'
-
 const moment = extendMoment(Moment)
 
 const createShifts = ({
+  collections,
   start,
   end,
   startTime,
@@ -52,8 +49,9 @@ const createShifts = ({
   })
 }
 
-export function createRotaMethods(eventName) {
-  const prefix = `${eventName}.Volunteers`
+export function initRotaMethods(volunteersClass) {
+  const prefix = `${volunteersClass.eventName}.Volunteers`
+  const { collections, schemas, services: { auth } } = volunteersClass
 
   const methodBodies = {
     rota: {
@@ -75,6 +73,7 @@ export function createRotaMethods(eventName) {
             rotaId,
             rotaIndex,
             details,
+            collections,
           }))
       },
     },
@@ -83,7 +82,7 @@ export function createRotaMethods(eventName) {
     // eslint-disable-next-line meteor/audit-argument-checks
     [`${prefix}.rotas.insert`](rota) {
       console.log(`${prefix}.rotas.insert`, rota)
-      rotaSchema.validate(rota)
+      schemas.rota.validate(rota)
       if (!auth.isLead(Meteor.userId(), rota.parentId)) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
@@ -106,7 +105,7 @@ export function createRotaMethods(eventName) {
         // Do we really need to filter out nulls?
         modifier.$set.shifts = modifier.$set.shifts.filter(Boolean)
       }
-      rotaSchema.validate(modifier, { modifier: true })
+      schemas.rota.validate(modifier, { modifier: true })
       const oldRota = collections.rotas.findOne(query)
       // Should be a server method?
       if (!oldRota && Meteor.isClient) return null
@@ -191,6 +190,7 @@ export function createRotaMethods(eventName) {
           rotaId: oldRota._id,
           rotaIndex: index,
           details: _.omit(modifier.$set, 'shifts', 'start', 'end'),
+          collections,
         })
       })
 
@@ -205,6 +205,7 @@ export function createRotaMethods(eventName) {
             rotaIndex: index,
             details: _.omit(modifier.$set, 'shifts', 'start', 'end'),
             rangeOptions: { excludeEnd: true },
+            collections,
           })
         })
       }
@@ -219,6 +220,7 @@ export function createRotaMethods(eventName) {
             rotaIndex: index,
             details: _.omit(modifier.$set, 'shifts', 'start', 'end'),
             rangeOptions: { excludeStart: true },
+            collections,
           })
         })
       }

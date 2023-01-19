@@ -3,7 +3,7 @@ import moment from 'moment-timezone'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { reactContext } from '../../clientInit'
-import { meteorCall } from '../../../both/utils/methodUtils'
+import { meteorCall } from '../../utils/methodUtils'
 import { ProjectDateInline } from '../common/ProjectDateInline.jsx'
 import { ShiftDateInline } from '../common/ShiftDateInline.jsx'
 import { T } from '../common/i18n'

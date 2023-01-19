@@ -3,8 +3,6 @@ import { Mongo } from 'meteor/mongo'
 import { useTracker } from 'meteor/react-meteor-data'
 import React, { useContext } from 'react'
 
-import { collections } from '../../../both/collections/initCollections'
-import { findOrgUnit } from '../../../both/utils/unit'
 import { SignupShiftRow } from './SignupShiftRow.jsx'
 import { reactContext } from '../../clientInit'
 
@@ -12,13 +10,13 @@ import { reactContext } from '../../clientInit'
 const DatesLocal = new Mongo.Collection(null)
 
 // DatesLocal contains all shifts (dates) related to a particular title and parentId
-const addLocalDatesCollection = (duties, type, filter) => {
-  duties.find(filter).forEach((duty) => {
-    const orgUnit = findOrgUnit(duty.parentId)
+const addLocalDatesCollection = (Volunteers, type, filter) => {
+  Volunteers.collections.dutiesCollections[type].find(filter).forEach((duty) => {
+    const orgUnit = Volunteers.collections.utils.findOrgUnit(duty.parentId)
     DatesLocal.upsert(duty._id, {
       type,
       team: orgUnit && orgUnit.unit,
-      signup: collections.signups.findOne({
+      signup: Volunteers.collections.signups.findOne({
         userId: Meteor.userId(),
         shiftId: duty._id,
       }),
@@ -40,7 +38,7 @@ export function ShiftSignupModalContents({
       Meteor.subscribe(`${eventName}.Volunteers.Signups.byUser`, userId),
     ]
     if (subs.every(sub => sub.ready())) {
-      addLocalDatesCollection(collections.dutiesCollections[type], type, { title, parentId })
+      addLocalDatesCollection(Volunteers, type, { title, parentId })
     }
     return {
       allDates: DatesLocal.find({ title }, { sort: { start: 1 } }).fetch(),

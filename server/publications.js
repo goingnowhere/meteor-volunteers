@@ -3,11 +3,10 @@ import { ReactiveAggregate } from 'meteor/jcbernack:reactive-aggregate'
 import { Roles } from 'meteor/alanning:roles'
 import { check, Match } from 'meteor/check'
 
-import { collections } from '../both/collections/initCollections'
-import { auth } from '../both/utils/auth'
-
-export const initPublications = (eventName) => {
+export const initPublications = (volunteersClass) => {
+  const { collections, eventName, services: { auth } } = volunteersClass
   const prefix = `${eventName}.Volunteers`
+
   const dutiesPublicPolicy = { policy: { $in: ['public', 'requireApproval'] } }
   const unitPublicPolicy = { policy: { $in: ['public'] } }
 

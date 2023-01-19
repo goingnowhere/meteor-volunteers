@@ -6,64 +6,65 @@ import SimpleSchema from 'simpl-schema'
 import { Roles } from 'meteor/alanning:roles'
 import { _ } from 'meteor/underscore'
 
-import { collections, schemas } from '../collections/initCollections'
-import { signupStatuses } from '../collections/volunteer'
-import { projectSignupsConfirmed } from '../stats'
-import { areShiftChangesOpen } from '../utils/event'
-import { auth } from '../utils/auth'
+import { signupStatuses } from '../collections/schemas/volunteer'
 
 const moment = extendMoment(Moment)
 
-const findConflicts = ({
-  userId,
-  shiftId,
-  type,
-  start,
-  end,
-}, parentDuty) => {
-  let signupRange
-  if (start && end) {
-    signupRange = moment.range(start, end)
-  } else if (type === 'shift') {
-    signupRange = moment.range(parentDuty.start, parentDuty.end)
-  } else {
+export const initSignupMethods = (volunteersClass) => {
+  const {
+    collections, eventName, schemas, services,
+  } = volunteersClass
+  const prefix = `${eventName}.Volunteers`
+
+  const findConflicts = ({
+    userId,
+    shiftId,
+    type,
+    start,
+    end,
+  }, parentDuty) => {
+    let signupRange
+    if (start && end) {
+      signupRange = moment.range(start, end)
+    } else if (type === 'shift') {
+      signupRange = moment.range(parentDuty.start, parentDuty.end)
+    } else {
+      return []
+    }
+    const signups = collections.signups.find({
+    // it's a double booking only if it is a different shift
+      shiftId: { $ne: shiftId },
+      userId,
+      status: { $in: ['confirmed', 'pending'] },
+    }, { sort: { start: 1 } }).fetch()
+    const shiftSignups = signups.filter((signup) => signup.type === 'shift').map((signup) => signup.shiftId)
+    const projectSignups = signups.filter((signup) => signup.type === 'project')
+
+    const conflicts = [
+      ...collections.shift.find({ _id: { $in: shiftSignups } }).fetch(),
+      ...projectSignups,
+    ].filter((shift) => shift && signupRange.overlaps(moment.range(shift.start, shift.end)))
+    if (conflicts.length > 0) {
+      return ['Double Booking', conflicts]
+    }
     return []
   }
-  const signups = collections.signups.find({
-    // it's a double booking only if it is a different shift
-    shiftId: { $ne: shiftId },
-    userId,
-    status: { $in: ['confirmed', 'pending'] },
-  }, { sort: { start: 1 } }).fetch()
-  const shiftSignups = signups.filter((signup) => signup.type === 'shift').map((signup) => signup.shiftId)
-  const projectSignups = signups.filter((signup) => signup.type === 'project')
 
-  const conflicts = [
-    ...collections.shift.find({ _id: { $in: shiftSignups } }).fetch(),
-    ...projectSignups,
-  ].filter((shift) => shift && signupRange.overlaps(moment.range(shift.start, shift.end)))
-  if (conflicts.length > 0) {
-    return ['Double Booking', conflicts]
+  const isDutyFull = ({
+    shiftId,
+    type,
+    start,
+    end,
+  }, parentDuty) => {
+    if (type === 'project') {
+      const { needed, wanted, days } = services.stats.projectSignupsConfirmed(parentDuty)
+      return wanted.some((wantedNum, i) =>
+        wantedNum < 1 && needed[i] < 1
+        && moment(days[i]).isBetween(start, end, 'days', '[]'))
+    }
+    const signupCount = collections.signups.find({ shiftId, status: { $in: ['confirmed', 'pending'] } }).count()
+    return signupCount >= parentDuty.max
   }
-  return []
-}
-
-const isDutyFull = ({
-  shiftId,
-  type,
-  start,
-  end,
-}, parentDuty) => {
-  if (type === 'project') {
-    const { wanted, days } = projectSignupsConfirmed(parentDuty)
-    return wanted.some((wantedNum, i) => wantedNum < 1 && moment(days[i]).isBetween(start, end, 'days', '[]'))
-  }
-  const signupCount = collections.signups.find({ shiftId, status: { $in: ['confirmed', 'pending'] } }).count()
-  return signupCount >= parentDuty.max
-}
-
-export const createSignupMethods = (eventName) => {
-  const prefix = `${eventName}.Volunteers`
 
   // Status can be either confirmed or refused
   const createSignupStatusMethod = (status) => (signupId) => {
@@ -75,7 +76,7 @@ export const createSignupMethods = (eventName) => {
       // Calling as a server method so stub has nothing to do
       return null
     }
-    if (auth.isLead(Meteor.userId(), oldSignup.parentId)) {
+    if (services.auth.isLead(Meteor.userId(), oldSignup.parentId)) {
       collections.signups.update(signupId, {
         $set: {
           status,
@@ -108,7 +109,7 @@ export const createSignupMethods = (eventName) => {
         // Calling as a server method so stub has nothing to do
         return null
       }
-      if (auth.isLead(Meteor.userId(), oldSignup.parentId)) {
+      if (services.auth.isLead(Meteor.userId(), oldSignup.parentId)) {
         return collections.signups.remove(signupId, (err) => {
           if (err) {
             console.error('Error when removing signup', err)
@@ -127,13 +128,13 @@ export const createSignupMethods = (eventName) => {
       // Only used for project timing updates, can get rid of if we dump autoform for projects
       console.log(`${prefix}.signups.update`, doc)
       check(doc, { modifier: Object, _id: String })
-      SimpleSchema.validate(doc.modifier, schemas.signups, { modifier: true })
+      SimpleSchema.validate(doc.modifier, schemas.signup, { modifier: true })
       const oldSignup = collections.signups.findOne(doc._id)
       if (oldSignup.type !== 'project') {
         throw new Meteor.Error(405, 'Only possible for Project signups')
       }
-      const isLead = auth.isLead(Meteor.userId(), oldSignup.parentId)
-      if (!areShiftChangesOpen(oldSignup) && !isLead) {
+      const isLead = services.auth.isLead(Meteor.userId(), oldSignup.parentId)
+      if (!services.event.areShiftChangesOpen(oldSignup) && !isLead) {
         throw new Meteor.Error(403, 'Too late to change this shift! Contact your lead')
       }
       if (isLead) {
@@ -164,7 +165,7 @@ export const createSignupMethods = (eventName) => {
     [`${prefix}.signups.insert`](wholeSignup) {
       console.log(`${prefix}.signups.insert`, wholeSignup)
       check(wholeSignup, Object)
-      SimpleSchema.validate(wholeSignup, schemas.signups.omit('status'))
+      SimpleSchema.validate(wholeSignup, schemas.signup.omit('status'))
       const signupIdentifiers = _.pick(wholeSignup, ['userId', 'shiftId', 'parentId'])
       const parentDuty = collections.dutiesCollections[wholeSignup.type]
         .findOne(signupIdentifiers.shiftId)
@@ -172,8 +173,8 @@ export const createSignupMethods = (eventName) => {
         // Calling as a server method so stub has nothing to do
         return null
       }
-      const isLead = auth.isLead(this.userId, parentDuty.parentId)
-      if (!areShiftChangesOpen(wholeSignup, parentDuty) && !isLead) {
+      const isLead = services.auth.isLead(this.userId, parentDuty.parentId)
+      if (!services.event.areShiftChangesOpen(wholeSignup, parentDuty) && !isLead) {
         throw new Meteor.Error(403, 'Too late to change this shift! Contact your lead')
       }
       if (parentDuty.policy === 'adminOnly' && !isLead) {
@@ -182,11 +183,11 @@ export const createSignupMethods = (eventName) => {
       if ((signupIdentifiers.userId === this.userId) || isLead) {
         // Leads cannot be public so no special handling of roles needed in this method
         const status = parentDuty.policy === 'public' ? 'confirmed' : 'pending'
-        const [failReason, conflicts] = findConflicts(wholeSignup, parentDuty)
+        const [failReason, conflicts] = findConflicts(collections, wholeSignup, parentDuty)
         if (failReason) {
           throw new Meteor.Error(409, failReason, conflicts)
         }
-        if (isDutyFull(wholeSignup, parentDuty)) {
+        if (isDutyFull(collections, wholeSignup, parentDuty)) {
           throw new Meteor.Error(409, 'Too many signups')
         }
         const {
@@ -229,8 +230,8 @@ export const createSignupMethods = (eventName) => {
         userId: String,
       })
       const signup = collections.signups.findOne(signupIds)
-      const isLead = auth.isLead(this.userId, signupIds.parentId)
-      if (!areShiftChangesOpen(signup) && !isLead) {
+      const isLead = services.auth.isLead(this.userId, signupIds.parentId)
+      if (!services.event.areShiftChangesOpen(signup) && !isLead) {
         throw new Meteor.Error(403, 'Too late to change this shift! Contact your lead')
       }
       if ((signupIds.userId === this.userId) || isLead) {

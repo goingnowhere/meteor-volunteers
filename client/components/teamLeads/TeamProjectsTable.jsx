@@ -7,10 +7,9 @@ import { T, t } from '../common/i18n'
 import { Modal } from '../common/Modal.jsx'
 import { formatDate } from '../common/dates'
 import { ProjectDateInline } from '../common/ProjectDateInline.jsx'
-import { collections } from '../../../both/collections/initCollections'
 import { ProjectStaffingDisplay } from '../common/ProjectStaffingDisplay.jsx'
 import { reactContext } from '../../clientInit'
-import { meteorCall } from '../../../both/utils/methodUtils'
+import { meteorCall } from '../../utils/methodUtils'
 import { ProjectSignupForm } from '../shifts/ProjectSignupForm.jsx'
 
 const getUsername = (users, userId) => {
@@ -21,6 +20,8 @@ const getUsername = (users, userId) => {
 // used to display all shifts for a given team
 export const TeamProjectsTable = ({ teamId, UserInfoComponent }) => {
   const Volunteers = useContext(reactContext)
+  const { collections } = Volunteers
+
   const [users, setUsers] = useState([])
   const [allProjects, setProjects] = useState([])
   const reloadShifts = () => meteorCall(Volunteers, 'getTeamDutyStats',

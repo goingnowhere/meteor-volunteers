@@ -1,7 +1,7 @@
 import SimpleSchema from 'simpl-schema'
 import moment from 'moment-timezone'
 import { AutoForm } from 'meteor/aldeed:autoform'
-import { t } from '../utils/i18n'
+import { t } from '../../utils/i18n'
 
 export const boundsSubschema = new SimpleSchema({
   min: {

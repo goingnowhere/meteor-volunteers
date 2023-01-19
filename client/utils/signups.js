@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor'
 import { Bert } from 'meteor/themeteorchef:bert'
 import { t } from '../components/common/i18n'
-import { meteorCall } from '../../both/utils/methodUtils'
+import { meteorCall } from './methodUtils'
 
 export const bailCall = (Volunteers, {
   parentId,

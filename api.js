@@ -2,10 +2,8 @@ import { Meteor } from 'meteor/meteor'
 import moment from 'moment-timezone'
 
 import { initMethods } from './both/methods/methods'
-import { getSkillsList, getQuirksList } from './both/utils/unit'
-import { collections, initCollections } from './both/collections/initCollections'
-import { volunteerFormSchema } from './both/collections/volunteer'
-import { initAuth, auth } from './both/utils/auth'
+import { initCollections } from './both/collections/initCollections'
+import { initServices } from './both/services'
 
 import { initServerMethods } from './server/methods'
 import { initClient, reactContext } from './client/clientInit'
@@ -21,31 +19,31 @@ export { SignupShiftButtons } from './client/components/shifts/SignupShiftButton
 export { SignupsListTeam } from './client/components/volunteers/SignupsListTeam.jsx'
 export { SignupsList } from './client/components/shifts/SignupsList.jsx'
 
-// TODO migrated from coffeescript, can most likely simplify
 export class VolunteersClass {
   /** dontShare is used to start an instance without weird coffeescript global effects */
   constructor(eventName, dontShare) {
     this.eventName = eventName
-    initCollections(this.eventName)
+    const { collections, schemas } = initCollections(this.eventName)
+    this.schemas = schemas
+    this.collections = collections
+
+    this.services = initServices(this)
+    // TODO deprecated
+    this.auth = this.services.auth
+
     let methodBodies = {}
+    // TODO this can most likely be removed but annual rota migration needs to be tested
     if (!dontShare) {
-      ({ methodBodies } = initMethods(this.eventName))
+      ({ methodBodies } = initMethods(this))
       if (Meteor.isServer) {
-        initServerMethods(this.eventName)
+        initServerMethods(this)
       }
-      initAuth(this.eventName)
-      this.auth = auth
       if (Meteor.isServer) {
         import('./server/publications')
-          .then(({ initPublications }) => initPublications(this.eventName))
+          .then(({ initPublications }) => initPublications(this))
           .catch(err => console.error('Error importing server publications', err))
       }
     }
-
-    this.schemas = {
-      volunteerForm: volunteerFormSchema,
-    }
-    this.Collections = collections
     this.methodBodies = methodBodies
 
     if (Meteor.isClient) {
@@ -53,10 +51,6 @@ export class VolunteersClass {
       this.reactContext = reactContext
     }
   }
-
-  getSkillsList = getSkillsList
-
-  getQuirksList = getQuirksList
 
   setTimeZone = (timezone) => {
     moment.tz.setDefault(timezone)

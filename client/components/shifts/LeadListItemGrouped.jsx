@@ -5,10 +5,9 @@ import React, { useContext, useState } from 'react'
 import { T } from '../common/i18n'
 import { LeadListItem } from './LeadListItem.jsx'
 import { applyCall } from '../../utils/signups'
-import { collections } from '../../../both/collections/initCollections'
 import { reactContext } from '../../clientInit'
 
-const getTeam = (type, parentId) => {
+const getTeam = (collections, parentId) => {
   // if (['shift', 'task'].includes(type)) {
   //   return collections.team.findOne(parentId)
   // }
@@ -21,22 +20,22 @@ const getTeam = (type, parentId) => {
 }
 
 export function LeadListItemGrouped({ teamId }) {
-  const _Volunteers = useContext(reactContext)
-  const Volunteers = { eventName: 'nowhere2022' }
+  const Volunteers = useContext(reactContext)
+  const { collections, eventName } = Volunteers
   const [limit, setLimit] = useState(2)
   const loadMoreLeads = () => setLimit(limit + 2)
   const { allLeads, loaded, showLoadMore } = useTracker(() => {
     const userId = Meteor.userId()
 
-    const leadSub = Meteor.subscribe(`${Volunteers.eventName}.Volunteers.duties`, 'lead', { parentId: teamId }, limit)
-    const leadSignupSub = Meteor.subscribe(`${Volunteers.eventName}.Volunteers.Signups.byUser`, userId, ['lead'])
+    const leadSub = Meteor.subscribe(`${eventName}.Volunteers.duties`, 'lead', { parentId: teamId }, limit)
+    const leadSignupSub = Meteor.subscribe(`${eventName}.Volunteers.Signups.byUser`, userId, ['lead'])
     const isLoaded = leadSub.ready() && leadSignupSub.ready()
     return {
       loaded: isLoaded,
       showLoadMore: isLoaded && collections.lead.find({ parentId: teamId }).count() >= limit,
       allLeads: !isLoaded ? [] : collections.lead.find({ parentId: teamId }).map(lead => ({
         ...lead,
-        team: getTeam('lead', lead.parentId),
+        team: getTeam(collections, lead.parentId),
         signup: collections.leadSignups?.findOne({ userId, shiftId: lead._id }),
         type: 'lead',
       })),

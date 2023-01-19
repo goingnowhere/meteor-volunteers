@@ -3,19 +3,17 @@ import { check, Match } from 'meteor/check'
 import { ValidatedMethod } from 'meteor/mdg:validated-method'
 import moment from 'moment-timezone'
 
-import { dutyTypes } from '../both/collections/volunteer'
-import { collections } from '../both/collections/initCollections'
-import { getDuties, getTeamStats, getDeptStats } from '../both/stats'
-import { auth } from '../both/utils/auth'
+import { dutyTypes } from '../both/collections/schemas/volunteer'
 
-export const initServerMethods = (eventName) => {
+export const initServerMethods = (volunteersClass) => {
+  const { collections, eventName, services } = volunteersClass
   const prefix = `${eventName}.Volunteers`
 
   Meteor.methods({
     'signups.list'(query) {
       check(query, Object)
-      const teamIds = (query.parentId.$in ?? [query.parentId])
-        .filter(unitId => auth.isLead(this.userId, unitId))
+      const teamIds = (query.parentId?.$in ?? [query.parentId])
+        .filter(unitId => services.auth.isLead(this.userId, unitId))
       if (teamIds.length < 1) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
@@ -119,7 +117,7 @@ export const initServerMethods = (eventName) => {
     name: `${prefix}.getProjectStaffing`,
     validate(projectId) { check(projectId, String) },
     run(projectId) {
-      const staffing = getDuties({ _id: projectId }, 'project', false)
+      const staffing = services.stats.getDuties({ _id: projectId }, 'project', false)
       if (staffing.length === 0) {
         throw new Meteor.Error(404, 'Project not found')
       }
@@ -135,7 +133,7 @@ export const initServerMethods = (eventName) => {
       check(date, Match.Maybe(Date))
     },
     run({ type, teamId, date }) {
-      if (!auth.isLead(this.userId, teamId)) {
+      if (!services.auth.isLead(this.userId, teamId)) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
       let query = { parentId: teamId }
@@ -149,7 +147,7 @@ export const initServerMethods = (eventName) => {
           ],
         }
       }
-      const duties = getDuties(query, type, true)
+      const duties = services.stats.getDuties(query, type, true)
       // TODO get usernames in lead page so remove need for this?
       const userIds = new Set(duties.flatMap((duty) => duty.volunteers))
       const users = Meteor.users
@@ -164,10 +162,10 @@ export const initServerMethods = (eventName) => {
       check(teamId, String)
     },
     run({ teamId }) {
-      if (!auth.isLead(this.userId, teamId)) {
+      if (!services.auth.isLead(this.userId, teamId)) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
-      return getTeamStats(teamId, true)
+      return services.stats.getTeamStats(teamId, true)
     },
   })
 
@@ -177,10 +175,10 @@ export const initServerMethods = (eventName) => {
       check(deptId, String)
     },
     run({ deptId }) {
-      if (!auth.isLead(this.userId, deptId)) {
+      if (!services.auth.isLead(this.userId, deptId)) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
-      return getDeptStats(deptId, true)
+      return services.stats.getDeptStats(deptId, true)
     },
   })
 
@@ -193,7 +191,7 @@ export const initServerMethods = (eventName) => {
       console.log('finding rota', rotaId)
       const rota = collections.rotas.findOne(rotaId)
       if (!rota) throw new Meteor.Error(404, 'Not Found')
-      if (rota.policy === 'adminOnly' && !auth.isLead(this.userId, rota.parentId)) {
+      if (rota.policy === 'adminOnly' && !services.auth.isLead(this.userId, rota.parentId)) {
         throw new Meteor.Error(403, 'Insufficient Permission')
       }
       return rota
@@ -206,7 +204,7 @@ export const initServerMethods = (eventName) => {
       check(query, Match.Maybe(String))
     },
     run({ query = {} } = {}) {
-      if (!auth.isALead()) {
+      if (!services.auth.isALead()) {
         query.policy = 'public'
       }
       return collections.department.find(query).fetch()

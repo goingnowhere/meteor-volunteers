@@ -2,10 +2,8 @@ import { Meteor } from 'meteor/meteor'
 import { check } from 'meteor/check'
 import SimpleSchema from 'simpl-schema'
 
-import { collections } from '../collections/initCollections'
-import { auth } from '../utils/auth'
-
-export function createVolunteerformMethods(eventName) {
+export function initVolunteerformMethods(volunteersClass) {
+  const { collections, eventName, services: { auth } } = volunteersClass
   const prefix = `${eventName}.Volunteers`
 
   Meteor.methods({
