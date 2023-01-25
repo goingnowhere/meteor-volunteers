@@ -119,6 +119,9 @@ export const initStatsService = (volunteersClass) => {
   //   volunteerNumber: int,
   //   ...team details
   // }
+  /**
+   * Lead only
+   */
   const getTeams = (query, orgUnit = 'team') => collections[orgUnit].find(query).map((team) => {
     const leadRoles = service.getLeads({ parentId: team._id }, true)
     const leadIds = leadRoles.flatMap((lead) => lead.volunteers)
@@ -128,6 +131,7 @@ export const initStatsService = (volunteersClass) => {
       leadRoles,
       leads: Meteor.users.find({ _id: { $in: leadIds } }, {
         fields: {
+          emails: true,
           profile: true,
           ticketId: true,
           isBanned: true,
@@ -139,6 +143,9 @@ export const initStatsService = (volunteersClass) => {
     }
   })
 
+  /**
+   * Lead only
+   */
   const getDepts = (query) => collections.department.find(query).map((dept) => {
     const teamsOfThisDept = getTeams({ _id: dept._id }, 'department')
       .concat(getTeams({ parentId: dept._id }))
