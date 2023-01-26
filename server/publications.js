@@ -147,7 +147,6 @@ export const initPublications = (volunteersClass) => {
   // Below here, all public information #
   // #####################################
 
-  // not reactive
   Meteor.publish(`${prefix}.organization`, function publishOrg() {
     let sel = {}
     if (this.userId && !auth.isManager()) {

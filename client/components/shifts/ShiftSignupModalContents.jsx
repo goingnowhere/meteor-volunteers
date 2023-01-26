@@ -29,7 +29,7 @@ export function ShiftSignupModalContents({
   duty,
 }) {
   const Volunteers = useContext(reactContext)
-  const eventName = Volunteers?.eventName || 'nowhere2022'
+  const eventName = Volunteers?.eventName || 'nowhere2023'
   const { allDates } = useTracker(() => {
     const { type, title, parentId } = duty
     const userId = Meteor.userId()
