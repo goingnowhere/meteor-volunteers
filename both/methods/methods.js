@@ -5,12 +5,15 @@ import { initVolunteerformMethods } from './volunteerFormMethods'
 import { initRotaMethods } from './rotaMethods'
 
 export const initMethods = (volunteersClass) => {
-  initOrgUnitMethods(volunteersClass)
+  const orgUnitMethods = initOrgUnitMethods(volunteersClass)
   initDutiesMethods(volunteersClass)
   initSignupMethods(volunteersClass)
   initVolunteerformMethods(volunteersClass)
 
   const { methodBodies } = initRotaMethods(volunteersClass)
 
-  return { methodBodies }
+  return {
+    methodBodies,
+    ...orgUnitMethods,
+  }
 }

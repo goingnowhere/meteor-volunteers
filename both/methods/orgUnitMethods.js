@@ -1,9 +1,10 @@
 import { Meteor } from 'meteor/meteor'
 import { check } from 'meteor/check'
 import { Roles } from 'meteor/alanning:roles'
+import { ValidatedMethod } from 'meteor/mdg:validated-method'
 
 export function initOrgUnitMethods(volunteersClass) {
-  const { collections, services: { auth } } = volunteersClass
+  const { collections, eventName, services: { auth } } = volunteersClass
 
   function deleteUnitAndRoles(collection, id) {
     if (Meteor.isServer) {
@@ -82,4 +83,39 @@ export function initOrgUnitMethods(volunteersClass) {
   Object.values(collections.orgUnitCollections).forEach(orgUnitColl => {
     createOrgUnitMethods(orgUnitColl)
   })
+
+  return {
+    addRoleToUser: new ValidatedMethod({
+      name: 'user.role.add',
+      validate: ({ userId, role }) => check(role, String) && check(userId, String),
+      mixins: [auth.mixins.isManager],
+      run({ userId, role }) {
+        if (Meteor.isServer) {
+          const allowedRoles = Roles.userIsInRole(Meteor.userId(), 'admin', eventName)
+            ? ['admin', 'manager'] : ['manager']
+          if (!allowedRoles.includes(role)) {
+            throw new Meteor.Error(403,
+              `You don't have adequate permissions to make a user a ${role}`)
+          }
+          Roles.addUsersToRoles(userId, role, eventName)
+        }
+      },
+    }),
+    removeRoleFromUser: new ValidatedMethod({
+      name: 'user.role.remove',
+      validate: ({ userId, role }) => check(role, String) && check(userId, String),
+      mixins: [auth.mixins.isManager],
+      run({ userId, role }) {
+        if (Meteor.isServer) {
+          const allowedRoles = Roles.userIsInRole(Meteor.userId(), 'admin', eventName)
+            ? ['admin', 'manager'] : ['manager']
+          if (!allowedRoles.includes(role)) {
+            throw new Meteor.Error(403,
+            `You don't have adequate permissions to remove ${role} from a user`)
+          }
+          Roles.removeUsersFromRoles(userId, role, eventName)
+        }
+      },
+    }),
+  }
 }

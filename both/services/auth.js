@@ -1,15 +1,16 @@
 import { Meteor } from 'meteor/meteor'
 import { Roles } from 'meteor/alanning:roles'
 
+import { initAuthMixins } from './authMixins'
+
 export const initAuthService = ({ eventName }) => {
   const isManager = (userId = Meteor.userId()) =>
     Roles.userIsInRole(userId, ['manager', 'admin'], eventName)
 
-  return {
+  const authService = {
     isManager,
     isALead: (userId = Meteor.userId()) =>
-    // TODO Get rid of 'user' role?
-      Roles.getRolesForUser(userId, eventName).filter((role) => role !== 'user').length > 0,
+      Roles.getRolesForUser(userId, eventName).length > 0,
 
     isLead: (userId = Meteor.userId(), unitId) => {
       if (!unitId || unitId instanceof Array) {
@@ -19,5 +20,12 @@ export const initAuthService = ({ eventName }) => {
       }
       return Roles.userIsInRole(userId, unitId, eventName) || isManager()
     },
+  }
+
+  const mixins = initAuthMixins(authService)
+
+  return {
+    ...authService,
+    mixins,
   }
 }

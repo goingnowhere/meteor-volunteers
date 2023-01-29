@@ -1,4 +1,5 @@
 import { Meteor } from 'meteor/meteor'
+import { Roles } from 'meteor/alanning:roles'
 import moment from 'moment-timezone'
 
 import { initMethods } from './both/methods/methods'
@@ -23,6 +24,14 @@ export class VolunteersClass {
   /** dontShare is used to start an instance without weird coffeescript global effects */
   constructor(eventName, dontShare) {
     this.eventName = eventName
+
+    const roles = ['admin', 'manager']
+    roles.forEach((role) => Roles.createRole(role, { unlessExists: true }))
+    // establish a hierarchy among roles
+    if (Meteor.isServer) {
+      Roles.addRolesToParent('manager', 'admin')
+    }
+
     const { collections, schemas } = initCollections(this.eventName)
     this.schemas = schemas
     this.collections = collections
@@ -31,10 +40,11 @@ export class VolunteersClass {
     // TODO deprecated
     this.auth = this.services.auth
 
+    let methods = {}
     let methodBodies = {}
     // TODO this can most likely be removed but annual rota migration needs to be tested
     if (!dontShare) {
-      ({ methodBodies } = initMethods(this))
+      ({ methodBodies, ...methods } = initMethods(this))
       if (Meteor.isServer) {
         initServerMethods(this)
       }
@@ -44,6 +54,7 @@ export class VolunteersClass {
           .catch(err => console.error('Error importing server publications', err))
       }
     }
+    this.methods = methods
     this.methodBodies = methodBodies
 
     if (Meteor.isClient) {
