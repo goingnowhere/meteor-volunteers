@@ -27,10 +27,10 @@ export class VolunteersClass {
     this.eventName = settings.eventName
     this.previousEventName = settings.previousEventName
 
-    const roles = ['admin', 'manager']
-    roles.forEach((role) => Roles.createRole(role, { unlessExists: true }))
     // establish a hierarchy among roles
     if (Meteor.isServer) {
+      const roles = ['admin', 'manager']
+      roles.forEach((role) => Roles.createRole(role, { unlessExists: true }))
       Roles.addRolesToParent('manager', 'admin')
     }
 
