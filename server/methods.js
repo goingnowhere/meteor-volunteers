@@ -4,6 +4,7 @@ import { ValidatedMethod } from 'meteor/mdg:validated-method'
 import moment from 'moment-timezone'
 
 import { dutyTypes } from '../both/collections/schemas/volunteer'
+import { signupDetailPipeline } from '../both/methods/aggregations'
 
 export const initServerMethods = (volunteersClass) => {
   const { collections, eventName, services } = volunteersClass
@@ -24,91 +25,8 @@ export const initServerMethods = (volunteersClass) => {
       return collections.signups.aggregate([
         {
           $match: restrictedQuery,
-        }, {
-          $lookup: {
-            from: collections.department._name,
-            localField: 'parentId',
-            foreignField: '_id',
-            as: 'dept',
-          },
-        }, {
-          $unwind: {
-            path: '$dept',
-            preserveNullAndEmptyArrays: true,
-          },
-        }, {
-          $lookup: {
-            from: collections.team._name,
-            localField: 'parentId',
-            foreignField: '_id',
-            as: 'team',
-          },
-        }, {
-          $unwind: {
-            path: '$team',
-            preserveNullAndEmptyArrays: true,
-          },
-        }, {
-          $lookup: {
-            from: collections.lead._name,
-            localField: 'shiftId',
-            foreignField: '_id',
-            as: 'lead',
-          },
-        }, {
-          $lookup: {
-            from: collections.shift._name,
-            localField: 'shiftId',
-            foreignField: '_id',
-            as: 'shift',
-          },
-        }, {
-          $lookup: {
-            from: collections.project._name,
-            localField: 'shiftId',
-            foreignField: '_id',
-            as: 'project',
-          },
-        }, {
-          $addFields: {
-            duty: {
-              $switch: {
-                branches: [
-                  {
-                    case: { $gt: [{ $size: '$shift' }, 0] },
-                    then: { $arrayElemAt: ['$shift', 0] },
-                  }, {
-                    case: { $gt: [{ $size: '$lead' }, 0] },
-                    then: { $arrayElemAt: ['$lead', 0] },
-                  }, {
-                    case: { $gt: [{ $size: '$project' }, 0] },
-                    then: { $arrayElemAt: ['$project', 0] },
-                  },
-                ],
-              },
-            },
-          },
-        }, {
-          $lookup: {
-            from: Meteor.users._name,
-            let: { userId: '$userId' },
-            pipeline: [
-              {
-                $match: { $expr: { $eq: ['$_id', '$$userId'] } },
-              }, {
-                // Only return public user fields
-                $project: {
-                  emails: true,
-                  profile: true,
-                  ticketId: true,
-                },
-              },
-            ],
-            as: 'user',
-          },
-        }, {
-          $unwind: { path: '$user' },
         },
+        ...signupDetailPipeline(collections, ['dept', 'team', 'user', 'duty']),
       ])
     },
   })

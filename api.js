@@ -23,8 +23,9 @@ export { SignupsList } from './client/components/shifts/SignupsList.jsx'
 
 export class VolunteersClass {
   /** dontShare is used to start an instance without weird coffeescript global effects */
-  constructor(eventName, dontShare) {
-    this.eventName = eventName
+  constructor(settings, dontShare) {
+    this.eventName = settings.eventName
+    this.previousEventName = settings.previousEventName
 
     const roles = ['admin', 'manager']
     roles.forEach((role) => Roles.createRole(role, { unlessExists: true }))
@@ -36,6 +37,9 @@ export class VolunteersClass {
     const { collections, schemas } = initCollections(this.eventName)
     this.schemas = schemas
     this.collections = collections
+
+    const { collections: prevEventCollections } = initCollections(this.previousEventName)
+    this.prevEventCollections = prevEventCollections
 
     this.services = initServices(this)
     // TODO deprecated
