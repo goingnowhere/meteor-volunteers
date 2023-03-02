@@ -7,3 +7,9 @@ export const wrapAsync = (func) => Meteor.wrapAsync((...args) => {
     .then(ticket => cb(null, ticket))
     .catch(err => cb(err))
 })
+
+export const displayName = ({ profile }) =>
+  profile?.nickname
+    || profile?.firstName
+    || (profile?.lastName && `Mx ${profile.lastName}`)
+    || 'anonymous nobody'

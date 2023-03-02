@@ -2,7 +2,7 @@ import { _ } from 'meteor/underscore'
 import React, {
   Fragment,
   useState,
-  useEffect,
+  useMemo,
   useContext,
 } from 'react'
 import { AutoFormComponents } from 'meteor/abate:autoform-components'
@@ -14,6 +14,7 @@ import { Modal } from '../common/Modal.jsx'
 import { ShiftDateInline } from '../common/ShiftDateInline.jsx'
 import { reactContext } from '../../clientInit'
 import { meteorCall } from '../../utils/methodUtils'
+import { useMethodCallData } from '../../utils/useMethodCallData'
 
 const getUsername = (users, userId) => {
   const user = users.find((usr) => usr._id === userId)
@@ -25,18 +26,11 @@ export const TeamShiftsTable = ({ date, teamId, UserInfoComponent }) => {
   const Volunteers = useContext(reactContext)
   const { collections } = Volunteers
 
-  const [users, setUsers] = useState([])
-  const [shiftGroups, setShifts] = useState([])
-  const reloadShifts = () => meteorCall(Volunteers, 'getTeamDutyStats',
-    { type: 'shift', teamId, date: date && date.toDate() }, (err, { users: usrs, duties }) => {
-      if (err) console.error(err)
-      else {
-        setUsers(usrs)
-        const groupedDuties = _.groupBy(duties, 'rotaId')
-        setShifts(groupedDuties)
-      }
-    })
-  useEffect(reloadShifts, [teamId, date])
+  const [{ users, duties }, isLoaded, reloadShifts] = useMethodCallData(
+    `${Volunteers.eventName}.Volunteers.getTeamDutyStats`,
+    { type: 'shift', teamId, date: date && date.toDate() },
+  )
+  const shiftGroups = useMemo(() => duties && _.groupBy(duties, 'rotaId'), [duties])
 
   const editShift = (shift) =>
     AutoFormComponents.ModalShowWithTemplate('insertUpdateTemplate',
@@ -94,7 +88,7 @@ export const TeamShiftsTable = ({ date, teamId, UserInfoComponent }) => {
       >
         <UserInfoComponent userId={modalUserId} />
       </Modal>
-      {Object.entries(shiftGroups).map(([rotaId, shifts]) => (
+      {isLoaded && Object.entries(shiftGroups).map(([rotaId, shifts]) => (
         <Fragment key={rotaId}>
           <thead className="thead-default">
             <tr className="shiftFamily table-active">

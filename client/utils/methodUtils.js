@@ -3,6 +3,20 @@ import { Bert } from 'meteor/themeteorchef:bert'
 
 import { t } from '../../both/utils/i18n'
 
+export const methodCallback = (cb) => (err, res) => {
+  if (err) {
+    if (Meteor.isDevelopment) console.error('Error calling method', err)
+    Bert.alert({
+      title: t('method_error'),
+      message: err.reason,
+      type: 'danger',
+      style: 'growl-top-right',
+    })
+  } else {
+    cb(res)
+  }
+}
+
 export function meteorCall(VolClass, methodName, ...args) {
   let nonCallbackArgs = args
   const lastArg = args[args.length - 1]
@@ -16,17 +30,6 @@ export function meteorCall(VolClass, methodName, ...args) {
   Meteor.call(
     `${Volunteers.eventName}.Volunteers.${methodName}`,
     ...nonCallbackArgs,
-    (err, res) => {
-      if (!callback && err) {
-        Bert.alert({
-          title: t('method_error'),
-          message: err.reason,
-          type: 'danger',
-          style: 'growl-top-right',
-        })
-      } else if (callback) {
-        callback(err, res)
-      }
-    },
+    methodCallback((res) => callback?.(null, res)),
   )
 }
