@@ -103,5 +103,12 @@
   "project_end_help": "Quand pars-tu ? (Pour Build: laisse 'par défaut' si tu restes pour l'évènement)",
   "method_error": "Un problème est survenu lors de l'échange avec le serveur.",
   "public_email": "Email public",
-  "public_email_help": "Ceci est l'email public pour cette unité"
+  "public_email_help": "Ceci est l'email public pour cette unité",
+  "email_not_verified": "Email address not verified",
+  "no_ticket": "No Ticket!",
+  "real_name": "Real Name",
+  "ticket_number": "Ticket #",
+  "email": "Email",
+  "last_login": "Last logged in",
+  "site_roles": "FIST roles"
 }

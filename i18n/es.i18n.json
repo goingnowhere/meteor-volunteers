@@ -103,5 +103,12 @@
   "project_end_help": "¿Cuándo te marchas? (para el montaje: deja 'por defecto' si te quedas para el evento)",
   "method_error": "Ha surgido un problema con el servidor.",
   "public_email": "Email público",
-  "public_email_help": "Este es el email público para esta unidad"
+  "public_email_help": "Este es el email público para esta unidad",
+  "email_not_verified": "Email address not verified",
+  "no_ticket": "No Ticket!",
+  "real_name": "Real Name",
+  "ticket_number": "Ticket #",
+  "email": "Email",
+  "last_login": "Last logged in",
+  "site_roles": "FIST roles"
 }

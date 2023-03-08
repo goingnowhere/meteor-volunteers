@@ -115,5 +115,12 @@
   "more_needed": "More needed",
   "full": "Full",
   "practical_information": "Practical Information",
-  "practical_information_help_duty": "Write here all practical information specific to this shift (where to meet, what to wear, what to bring, etc.). This is going to be sent to each volunteer before the shift"
+  "practical_information_help_duty": "Write here all practical information specific to this shift (where to meet, what to wear, what to bring, etc.). This is going to be sent to each volunteer before the shift",
+  "email_not_verified": "Email address not verified",
+  "no_ticket": "No Ticket!",
+  "real_name": "Real Name",
+  "ticket_number": "Ticket #",
+  "email": "Email",
+  "last_login": "Last logged in",
+  "site_roles": "FIST roles"
 }

@@ -20,6 +20,7 @@ export { DutiesListItem } from './client/components/shifts/DutiesListItem.jsx'
 export { SignupShiftButtons } from './client/components/shifts/SignupShiftButtons.jsx'
 export { SignupsListTeam } from './client/components/volunteers/SignupsListTeam.jsx'
 export { SignupsList } from './client/components/shifts/SignupsList.jsx'
+export { UserInfoList } from './client/components/common/UserInfoList.jsx'
 
 export class VolunteersClass {
   /** dontShare is used to start an instance without weird coffeescript global effects */
