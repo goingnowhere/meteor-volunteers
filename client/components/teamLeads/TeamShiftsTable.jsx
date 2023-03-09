@@ -1,9 +1,10 @@
 import { _ } from 'meteor/underscore'
 import React, {
   Fragment,
-  useState,
-  useMemo,
   useContext,
+  useEffect,
+  useMemo,
+  useState,
 } from 'react'
 import { AutoFormComponents } from 'meteor/abate:autoform-components'
 import { AutoForm } from 'meteor/aldeed:autoform'
@@ -15,22 +16,34 @@ import { ShiftDateInline } from '../common/ShiftDateInline.jsx'
 import { reactContext } from '../../clientInit'
 import { meteorCall } from '../../utils/methodUtils'
 import { useMethodCallData } from '../../utils/useMethodCallData'
+import { displayName } from '../../../both/utils/helpers'
 
 const getUsername = (users, userId) => {
-  const user = users.find((usr) => usr._id === userId)
-  return user && (user.profile.nickname || user.profile.firstName)
+  const user = users?.find((usr) => usr._id === userId)
+  return user && displayName(user)
 }
 
 // used to display all shifts for a given team
-export const TeamShiftsTable = ({ date, teamId, UserInfoComponent }) => {
+export const TeamShiftsTable = ({
+  reloadRef = {},
+  date,
+  teamId,
+  UserInfoComponent,
+}) => {
   const Volunteers = useContext(reactContext)
-  const { collections } = Volunteers
+  const { collections, eventName } = Volunteers
 
   const [{ users, duties }, isLoaded, reloadShifts] = useMethodCallData(
-    `${Volunteers.eventName}.Volunteers.getTeamDutyStats`,
+    `${eventName}.Volunteers.getTeamDutyStats`,
     { type: 'shift', teamId, date: date && date.toDate() },
   )
   const shiftGroups = useMemo(() => duties && _.groupBy(duties, 'rotaId'), [duties])
+
+  // Hack to allow reloading from above, remove when adding state management
+  useEffect(() => {
+    reloadRef.current = reloadShifts
+    return () => { reloadRef.current = null }
+  }, [reloadShifts, reloadRef])
 
   const editShift = (shift) =>
     AutoFormComponents.ModalShowWithTemplate('insertUpdateTemplate',

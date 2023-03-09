@@ -11,28 +11,33 @@ import { ProjectStaffingDisplay } from '../common/ProjectStaffingDisplay.jsx'
 import { reactContext } from '../../clientInit'
 import { meteorCall } from '../../utils/methodUtils'
 import { ProjectSignupForm } from '../shifts/ProjectSignupForm.jsx'
+import { useMethodCallData } from '../../utils/useMethodCallData'
+import { displayName } from '../../../both/utils/helpers'
 
 const getUsername = (users, userId) => {
-  const user = users.find((usr) => usr._id === userId)
-  return user && (user.profile.nickname || user.profile.firstName)
+  const user = users?.find((usr) => usr._id === userId)
+  return user && displayName(user)
 }
 
 // used to display all shifts for a given team
-export const TeamProjectsTable = ({ teamId, UserInfoComponent }) => {
+export const TeamProjectsTable = ({
+  reloadRef = {},
+  teamId,
+  UserInfoComponent,
+}) => {
   const Volunteers = useContext(reactContext)
-  const { collections } = Volunteers
+  const { collections, eventName } = Volunteers
 
-  const [users, setUsers] = useState([])
-  const [allProjects, setProjects] = useState([])
-  const reloadShifts = () => meteorCall(Volunteers, 'getTeamDutyStats',
-    { type: 'project', teamId }, (err, { users: usrs, duties }) => {
-      if (err) console.error(err)
-      else {
-        setUsers(usrs)
-        setProjects(duties)
-      }
-    })
-  useEffect(reloadShifts, [teamId])
+  const [{ users, duties: allProjects }, isLoaded, reloadShifts] = useMethodCallData(
+    `${eventName}.Volunteers.getTeamDutyStats`,
+    { type: 'project', teamId },
+  )
+
+  // Hack to allow reloading from above, remove when adding state management
+  useEffect(() => {
+    reloadRef.current = reloadShifts
+    return () => { reloadRef.current = null }
+  }, [reloadShifts, reloadRef])
 
   const editProject = (project) =>
     // TODO Also need to reload projects when no longer using autoform modal
@@ -101,8 +106,8 @@ export const TeamProjectsTable = ({ teamId, UserInfoComponent }) => {
           }}
         />
       </Modal>
-      {allProjects.length === 0 && <tbody><tr><td><T>no_projects</T></td></tr></tbody>}
-      {allProjects.map((project) => (
+      {isLoaded && allProjects.length === 0 && <tbody><tr><td><T>no_projects</T></td></tr></tbody>}
+      {isLoaded && allProjects.map((project) => (
         <tbody key={project._id}>
           <tr>
             <td>

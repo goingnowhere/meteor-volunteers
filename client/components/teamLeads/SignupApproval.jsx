@@ -21,7 +21,7 @@ export const SignupApproval = ({
     createdAt,
   },
   openUserModal,
-  reloadSignups,
+  reload,
 }) => {
   const Volunteers = useContext(reactContext)
   const approve = (signupId, reload) => {
@@ -61,10 +61,10 @@ export const SignupApproval = ({
           <small><T>created</T>: {createdAt && moment(createdAt).fromNow()}</small>
         </div>
         <div className="col">
-          <button type="button" className="btn btn-light btn-sm" onClick={() => approve(_id, reloadSignups)}>
+          <button type="button" className="btn btn-light btn-sm" onClick={() => approve(_id, reload)}>
             <T>approve</T>
           </button>
-          <button type="button" className="btn btn-light btn-sm" onClick={() => refuse(_id, reloadSignups)}>
+          <button type="button" className="btn btn-light btn-sm" onClick={() => refuse(_id, reload)}>
             <T>refuse</T>
           </button>
         </div>

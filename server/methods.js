@@ -11,7 +11,7 @@ export const initServerMethods = (volunteersClass) => {
   const prefix = `${eventName}.Volunteers`
 
   Meteor.methods({
-    'signups.list'(query) {
+    [`${prefix}.signups.list`](query) {
       check(query, Object)
       const teamIds = (query.parentId?.$in ?? [query.parentId])
         .filter(unitId => services.auth.isLead(this.userId, unitId))
