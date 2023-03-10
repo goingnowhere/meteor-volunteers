@@ -12,11 +12,13 @@ import {
   faPenToSquare,
   faPeoplePulling,
   faPlusSquare,
+  faTicket,
   faTrashAlt,
   faTriangleExclamation,
   faUserCircle,
   faUserPlus,
   faUserSecret,
+  faXmark,
 } from '@fortawesome/free-solid-svg-icons'
 // We don't actually use this for now
 // import { faCalendar } from '@fortawesome/free-regular-svg-icons'
@@ -38,10 +40,12 @@ export function initClient() {
     faPenToSquare,
     faPeoplePulling,
     faPlusSquare,
+    faTicket,
     faTrashAlt,
     faTriangleExclamation,
     faUserCircle,
     faUserPlus,
     faUserSecret,
+    faXmark,
   )
 }

@@ -8,6 +8,7 @@ import { Modal } from '../common/Modal.jsx'
 import { formatDate } from '../common/dates'
 import { ProjectDateInline } from '../common/ProjectDateInline.jsx'
 import { ProjectStaffingDisplay } from '../common/ProjectStaffingDisplay.jsx'
+import { getDisplayNameFromList } from '../common/DisplayName.jsx'
 import { reactContext } from '../../clientInit'
 import { meteorCall } from '../../utils/methodUtils'
 import { ProjectSignupForm } from '../shifts/ProjectSignupForm.jsx'
@@ -84,7 +85,7 @@ export const TeamProjectsTable = ({
   const [editModal, openEditModal] = useState({})
 
   return (
-    <table className="table">
+    <>
       <Modal
         title={t('user_details')}
         isOpen={!!modalUserId}
@@ -108,19 +109,19 @@ export const TeamProjectsTable = ({
       </Modal>
       {isLoaded && allProjects.length === 0 && <tbody><tr><td><T>no_projects</T></td></tr></tbody>}
       {isLoaded && allProjects.map((project) => (
-        <tbody key={project._id}>
-          <tr>
-            <td>
+        <div key={project._id} className="container-fluid">
+          <div className="row align-items-center ml-0 mr-0 pt-2">
+            <div className="col-sm-1">
               {project.priority === 'essential' && (
                 <span className="text-danger"><FontAwesomeIcon icon="exclamation-circle" /></span>
               )}
               {project.policy === 'private' && <FontAwesomeIcon icon="user-secret" />}
               {project.policy === 'requireApproval' && <FontAwesomeIcon icon="lock" />}
               {project.policy === 'adminOnly' && <FontAwesomeIcon icon="user-secret" />}
-            </td>
-            <td><ProjectDateInline start={project.start} end={project.end} /></td>
-            <td>{project.title}</td>
-            <td>
+            </div>
+            <div className="col-sm-4"><ProjectDateInline start={project.start} end={project.end} /></div>
+            <div className="col-sm-4">{project.title}</div>
+            <div className="col-sm-3">
               <div className="btn-group inline pull-left">
                 <button
                   type="button"
@@ -144,80 +145,76 @@ export const TeamProjectsTable = ({
                   <FontAwesomeIcon icon="user-plus" />
                 </button>
               </div>
-            </td>
-          </tr>
-          <tr>
-            <td colSpan="4">
+            </div>
+          </div>
+          <div className="row">
+            <div className="col">
               <ProjectStaffingDisplay staffing={project.staffingStats} />
-            </td>
-          </tr>
+            </div>
+          </div>
           { project.confirmed > 0 && (
-            <tr>
-              <td colSpan="4">
-                <table className="table">
-                  <thead>
-                    <tr>
-                      <th scope="col">#</th>
-                      <th scope="col"><T>name</T></th>
-                      <th scope="col"><T>arrival</T></th>
-                      <th scope="col"><T>departure</T></th>
-                      {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-                      <th scope="col" />
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {project.signups.map((signup, index) => (
-                      <tr key={signup._id}>
-                        <td>
-                          {index + 1}
-                          {signup.enrolled && (
-                            <small title={t('voluntold')}>
-                              <FontAwesomeIcon icon="people-pulling" />
-                            </small>
-                          )}
-                        </td>
-                        <td>
+            <div className="row">
+              <table className="table">
+                <thead>
+                  <tr>
+                    <th scope="col">#</th>
+                    <th scope="col"><T>name</T></th>
+                    <th scope="col"><T>arrival</T></th>
+                    <th scope="col"><T>departure</T></th>
+                    {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+                    <th scope="col" />
+                  </tr>
+                </thead>
+                <tbody>
+                  {project.signups.map((signup, index) => (
+                    <tr key={signup._id}>
+                      <th scope="row" className="align-middle">
+                        {index + 1}
+                        {signup.enrolled && (
+                          <small title={t('voluntold')}>
+                            <FontAwesomeIcon icon="people-pulling" />
+                          </small>
+                        )}
+                      </th>
+                      <td className="align-middle">
+                        {getDisplayNameFromList(
+                          users,
+                          signup.userId,
+                          () => setModalUserId(signup.userId),
+                        )}
+                      </td>
+                      <td className="align-middle">{formatDate(signup.start)}</td>
+                      <td className="align-middle">{formatDate(signup.end)}</td>
+                      <td className="align-middle">
+                        <div className="btn-group inline pull-left">
                           <button
                             type="button"
-                            className="btn btn-link"
-                            onClick={() => setModalUserId(signup.userId)}
+                            title="edit"
+                            className="btn btn-sm btn-circle"
+                            onClick={() => openEditModal({
+                              projectEnrollment: { project, signup },
+                            })}
                           >
-                            {getUsername(users, signup.userId)}
+                            <FontAwesomeIcon icon="pen-to-square" />
                           </button>
-                        </td>
-                        <td>{formatDate(signup.start)}</td>
-                        <td>{formatDate(signup.end)}</td>
-                        <td>
-                          <div className="btn-group inline pull-left">
-                            <button
-                              type="button"
-                              title="edit"
-                              className="btn btn-sm btn-circle"
-                              onClick={() => openEditModal({
-                                projectEnrollment: { project, signup },
-                              })}
-                            >
-                              <FontAwesomeIcon icon="pen-to-square" />
-                            </button>
-                            <button
-                              type="button"
-                              title="remove"
-                              className="btn btn-sm btn-circle"
-                              onClick={() => unEnrollUser(signup._id)}
-                            >
-                              <FontAwesomeIcon icon="trash-alt" />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </td>
-            </tr>
+                          <button
+                            type="button"
+                            title="remove"
+                            className="btn btn-sm btn-circle"
+                            onClick={() => unEnrollUser(signup._id)}
+                          >
+                            <FontAwesomeIcon icon="trash-alt" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
-        </tbody>
+        </div>
       ))}
-    </table>
+    </>
   )
 }

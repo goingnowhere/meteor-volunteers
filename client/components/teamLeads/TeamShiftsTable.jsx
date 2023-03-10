@@ -12,16 +12,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { T, t } from '../common/i18n'
 import { Modal } from '../common/Modal.jsx'
-import { ShiftDateInline } from '../common/ShiftDateInline.jsx'
 import { reactContext } from '../../clientInit'
 import { meteorCall } from '../../utils/methodUtils'
 import { useMethodCallData } from '../../utils/useMethodCallData'
-import { displayName } from '../../../both/utils/helpers'
-
-const getUsername = (users, userId) => {
-  const user = users?.find((usr) => usr._id === userId)
-  return user && displayName(user)
-}
+import { LeadShiftView } from './LeadShiftView.jsx'
 
 // used to display all shifts for a given team
 export const TeamShiftsTable = ({
@@ -45,32 +39,8 @@ export const TeamShiftsTable = ({
     return () => { reloadRef.current = null }
   }, [reloadShifts, reloadRef])
 
-  const editShift = (shift) =>
-    AutoFormComponents.ModalShowWithTemplate('insertUpdateTemplate',
-      { form: { collection: collections.dutiesCollections.shift }, data: shift }, '', 'lg')
-  const deleteShift = (shiftId) => {
-    if (window.confirm('Are you sure you want to delete this shift?')) {
-      meteorCall(Volunteers, 'teamShifts.remove', shiftId)
-      reloadShifts()
-    }
-  }
-  const enrollUser = ({ _id: shiftId, policy }) =>
-    // TODO Also need to reload shifts and can probably move from autoform modal
-    AutoFormComponents.ModalShowWithTemplate('shiftEnrollUsersTable', {
-      data: {
-        teamId,
-        shiftId,
-        duty: 'shift',
-        policy,
-      },
-    })
-  const unEnrollUser = (signupId) => {
-    meteorCall(Volunteers, 'signups.remove', signupId)
-    reloadShifts()
-  }
   const editRota = (rotaId) => {
-    meteorCall(Volunteers, 'rotas.findOne', { rotaId }, (err, rota) => {
-      if (err) console.error(err)
+    meteorCall(Volunteers, 'rotas.findOne', { rotaId }, (_err, rota) => {
       AutoFormComponents.ModalShowWithTemplate('insertUpdateTemplate', {
         form: {
           collection: collections.rotas,
@@ -82,7 +52,6 @@ export const TeamShiftsTable = ({
   AutoForm.addHooks([
     'InsertRotasFormId',
     'UpdateRotasFormId',
-    'UpdateTeamShiftsFormId',
   ], {
     onSuccess() {
       reloadShifts()
@@ -111,13 +80,7 @@ export const TeamShiftsTable = ({
                   <FontAwesomeIcon icon="pen-to-square" /> <T>edit_group</T>
                 </button>
               </td>
-              {/* <!-- <td>
-                <button type="button" className="btn btn-light btn-sm"
-                  data-id="" data-type="shift" data-action="add_date">
-                  <Fa name="calendar" /> <T>add_date</T>
-                </button>
-              </td> -->
-      <!--        <td>
+              {/* <!--        <td>
                 <button type="button" className="btn btn-light btn-sm"
                   data-groupid="{{family.rotaId}}" data-parentid="{{_id}}"
                   data-type="shift" data-action="delete_group">
@@ -129,99 +92,13 @@ export const TeamShiftsTable = ({
           </thead>
           <tbody>
             {shifts.map((shift) => (
-              <Fragment key={shift._id}>
-                <tr>
-                  <th scope="row">
-                    {/* <!-- #{{shift.rotaId}} --> */}
-                    <span>
-                      {shift.priority === 'essential' && (
-                        <span className="text-danger" title={t('essential')}><FontAwesomeIcon icon="exclamation-circle" /></span>
-                      )}
-                      {shift.policy === 'private' && <FontAwesomeIcon icon="user-secret" title={t('private')} />}
-                      {shift.policy === 'requireApproval' && <FontAwesomeIcon icon="lock" title={t('require_approval')} />}
-                      {shift.policy === 'adminOnly' && <FontAwesomeIcon icon="user-secret" title={t('admin_only')} />}
-                    </span>
-                  </th>
-                  <td><ShiftDateInline start={shift.start} end={shift.end} /></td>
-                  <td colSpan="2">
-                    {/* <!-- {{> progressBarShifts shift}} --> */}
-                    <div title={`Min: ${shift.min} - Max: ${shift.max} - Confirmed: ${shift.confirmed}`}>
-                      {shift.needed !== 0 ? (
-                        <span className="inline">{shift.needed} <T>more_needed</T></span>
-                      ) : (
-                        // <!-- <span className="bg-success"> -->
-                        <T>full</T>
-                        // <!-- </span> -->
-                      )}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="btn-group inline pull-left">
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-circle"
-                        onClick={() => editShift(shift)}
-                      >
-                        <FontAwesomeIcon icon="pen-to-square" />
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-circle"
-                        onClick={() => deleteShift(shift._id)}
-                      >
-                        <FontAwesomeIcon icon="trash-alt" />
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-circle"
-                        onClick={() => enrollUser(shift)}
-                      >
-                        <FontAwesomeIcon icon="user-plus" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                {shift.confirmed > 0 && (
-                  <tr>
-                    <td colSpan="4">
-                      <table className="table table-borderless">
-                        <tbody>
-                          {shift.signups.map((signup, index) => (
-                            <tr key={signup._id}>
-                              <td>
-                                {index + 1}
-                                {signup.enrolled && (
-                                  <small title={t('voluntold')}>
-                                    <FontAwesomeIcon icon="people-pulling" />
-                                  </small>
-                                )}
-                              </td>
-                              <td>
-                                <button
-                                  type="button"
-                                  className="btn btn-link"
-                                  onClick={() => setModalUserId(signup.userId)}
-                                >
-                                  {getUsername(users, signup.userId)}
-                                </button>
-                              </td>
-                              <td>
-                                <button
-                                  type="button"
-                                  className="btn btn-sm btn-circle"
-                                  onClick={() => unEnrollUser(signup._id)}
-                                >
-                                  <FontAwesomeIcon icon="trash-alt" />
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </td>
-                  </tr>
-                )}
-              </Fragment>
+              <LeadShiftView
+                key={shift._id}
+                shift={shift}
+                users={users}
+                showUserInfo={setModalUserId}
+                reload={reloadShifts}
+              />
             ))}
           </tbody>
         </Fragment>
