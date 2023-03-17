@@ -9,13 +9,13 @@ import { T } from '../common/i18n'
 export function SignupsList({
   dutyType, filters = {}, quirks, skills,
 }) {
-  const Volunteers = useContext(reactContext)
+  const { collections, eventName } = useContext(reactContext)
   const [limit, setLimit] = useState(8)
   const { allTeams, showLoadMore } = useTracker(() => {
-    if (quirks && skills) {
-      Meteor.subscribe(`${Volunteers.eventName}.Volunteers.team.ByUserPref`, quirks, skills)
+    if (quirks || skills) {
+      Meteor.subscribe(`${eventName}.Volunteers.team.ByUserPref`, quirks, skills)
     } else {
-      Meteor.subscribe(`${Volunteers.eventName}.Volunteers.team`)
+      Meteor.subscribe(`${eventName}.Volunteers.team`)
     }
 
     const query = {
@@ -26,13 +26,17 @@ export function SignupsList({
     // the priority of the shifts associated with each team
     // We used to limit here but it meant we didn't know if we had more results, so istead get
     // everything
-    const allTeamsCursor = Volunteers.collections.team
-      .find(query, { sort: { userpref: -1, score: -1 } })
-    return {
+    const allTeamsCursor = collections.team
+      .find(query, { sort: { userpref: -1, totalscore: -1 } })
+    // Doesn't work well for build/strike. Temp fix until we can add a better sort/search
+    return dutyType === 'project' ? {
+      allTeams: allTeamsCursor.fetch(),
+      showLoadMore: false,
+    } : {
       allTeams: allTeamsCursor.fetch().slice(0, limit),
       showLoadMore: allTeamsCursor.count() >= limit,
     }
-  }, [limit, filters, quirks, skills])
+  }, [limit, filters, quirks, skills, dutyType])
 
   return (
     <div className="container-fluid p-0">

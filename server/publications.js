@@ -45,15 +45,8 @@ export const initPublications = (volunteersClass) => {
       },
     },
     { $unwind: '$duties' },
-    // project the results in mongo 3.4 use addfields instead
     {
-      $project: {
-        name: 1,
-        description: 1,
-        parentId: 1,
-        quirks: 1,
-        skills: 1,
-        duties: 1,
+      $addFields: {
         p: {
           $cond: [{ $eq: ['$duties.priority', 'normal'] }, 1,
             {
@@ -89,37 +82,19 @@ export const initPublications = (volunteersClass) => {
     }
     return ReactiveAggregate(this, collections.team, teamPipeline.concat([
       {
-        $project: {
-          name: 1,
-          description: 1,
-          parentId: 1,
-          totalscore: 1,
-          quirks: { $ifNull: ['$quirks', []] },
-          skills: { $ifNull: ['$skills', []] },
+        $addFields: {
           intq: { $setIntersection: [quirks, '$quirks'] },
           ints: { $setIntersection: [skills, '$skills'] },
         },
       },
       {
-        $project: {
-          name: 1,
-          description: 1,
-          parentId: 1,
-          quirks: 1,
-          skills: 1,
-          totalscore: 1,
+        $addFields: {
           subq: { $size: { $ifNull: ['$intq', []] } },
           subs: { $size: { $ifNull: ['$ints', []] } },
         },
       },
       {
-        $project: {
-          name: 1,
-          description: 1,
-          parentId: 1,
-          quirks: 1,
-          skills: 1,
-          totalscore: 1,
+        $addFields: {
           // assign a score to the team w.r.t. the user preferences
           userpref: { $sum: ['$subq', '$subs'] },
         },
