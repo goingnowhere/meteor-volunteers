@@ -3,14 +3,19 @@ import { Roles } from 'meteor/alanning:roles'
 
 import { initAuthMixins } from './authMixins'
 
+const MANAGER_ROLES = ['manager', 'admin']
+
 export const initAuthService = ({ eventName }) => {
   const isManager = (userId = Meteor.userId()) =>
-    Roles.userIsInRole(userId, ['manager', 'admin'], eventName)
+    Roles.userIsInRole(userId, MANAGER_ROLES, eventName)
 
   const authService = {
     isManager,
     isALead: (userId = Meteor.userId()) =>
       Roles.getRolesForUser(userId, eventName).length > 0,
+    getLeadUnitIds: (userId = Meteor.userId()) =>
+      Roles.getRolesForUser(userId, eventName)
+        .filter((role) => !MANAGER_ROLES.includes(role)),
 
     isLead: (userId = Meteor.userId(), unitId) => {
       if (!unitId || unitId instanceof Array) {
