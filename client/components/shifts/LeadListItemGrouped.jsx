@@ -40,7 +40,7 @@ export function LeadListItemGrouped({ teamId }) {
         type: 'lead',
       })),
     }
-  }, [limit, _Volunteers])
+  }, [limit, eventName, collections])
   return (
     <div className="row justify-content-between align-content-center no-gutters">
       {loaded && allLeads.length > 0 && (

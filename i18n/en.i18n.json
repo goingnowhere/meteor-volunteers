@@ -99,7 +99,7 @@
   "project_period_help": "Specify your date of arrival on site. Your choice is constrained by number of volunteer already on site.",
   "project_start_help": "When do you plan to arrive ? Be on time ! (for strike : leave default if already on site)",
   "project_end_help": "When do leave ? (for build : leave default if you stay for the event)",
-  "method_error": "We hit a problem while executing talking to the server",
+  "method_error": "We hit a problem while talking to the server",
   "public_email": "Public Email",
   "public_email_help": "This is the public email for this unit",
   "arrival": "Arrival",
@@ -122,5 +122,8 @@
   "ticket_number": "Ticket #",
   "email": "Email",
   "last_login": "Last logged in",
-  "site_roles": "FIST roles"
+  "site_roles": "FIST roles",
+  "essential": "This role is essential!",
+  "important": "This role is important!",
+  "require_approval": "A lead must approve each volunteer"
 }

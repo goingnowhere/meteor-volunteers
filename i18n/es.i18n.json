@@ -110,5 +110,8 @@
   "ticket_number": "Ticket #",
   "email": "Email",
   "last_login": "Last logged in",
-  "site_roles": "FIST roles"
+  "site_roles": "FIST roles",
+  "essential": "This role is essential!",
+  "important": "This role is important!",
+  "require_approval": "A lead must approve each volunteer"
 }
