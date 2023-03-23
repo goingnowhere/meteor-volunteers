@@ -68,8 +68,8 @@ export const initServerMethods = (volunteersClass) => {
       const duties = services.stats.getDuties(query, type, true)
       // TODO get usernames in lead page so remove need for this?
       const userIds = new Set(duties.flatMap((duty) => duty.volunteers))
-      const users = Meteor.users
-        .find({ _id: { $in: Array.from(userIds) } }, { fields: { profile: true } }).fetch()
+      const users = Meteor.users.find({ _id: { $in: Array.from(userIds) } },
+        { fields: { profile: true, ticketId: true } }).fetch()
       return { users, duties }
     },
   })

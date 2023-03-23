@@ -12,9 +12,9 @@ import { ProjectSignupForm } from '../shifts/ProjectSignupForm.jsx'
 const ShiftTitles = new Mongo.Collection(null)
 
 // coll contains shifts unique shifts title
-const addLocalDutiesCollection = (team, duties, type, filter, limit) => {
+const addLocalDutiesCollection = (team, duties, type, filter) => {
   ShiftTitles.remove({ type, parentId: filter.parentId })
-  const shifts = duties.find(filter, { limit }).fetch()
+  const shifts = duties.find(filter).fetch()
   _.chain(shifts).groupBy('title').forEach(([shift], title) => {
     const duty = {
       _id: shift._id,
@@ -45,7 +45,6 @@ export function SignupsListTeam({ team, dutyType = '', filters }) {
     const sel = { parentId: team._id }
     // TODO Only need one to get details of the shift but this limits to only one project
     // per team. We should add a 'projectGroups' aggregation in the same way as 'shiftGroups'
-    const limit = 10
     if (filters?.priorities) {
       sel.priority = { $in: filters.priorities }
     }
@@ -55,24 +54,24 @@ export function SignupsListTeam({ team, dutyType = '', filters }) {
       subs.push(Meteor.subscribe(`${eventName}.Volunteers.shiftGroups`, sel))
       break
     case 'task':
-      subs.push(Meteor.subscribe(`${eventName}.Volunteers.duties`, dutyType, sel, limit))
+      subs.push(Meteor.subscribe(`${eventName}.Volunteers.duties`, dutyType, sel))
       if (subs.every(sub => sub.ready())) {
-        addLocalDutiesCollection(team, collections.task, dutyType, sel, limit)
+        addLocalDutiesCollection(team, collections.task, dutyType, sel)
       }
       break
     case 'project':
-      subs.push(Meteor.subscribe(`${eventName}.Volunteers.duties`, dutyType, sel, limit))
+      subs.push(Meteor.subscribe(`${eventName}.Volunteers.duties`, dutyType, sel))
       if (subs.every(sub => sub.ready())) {
-        addLocalDutiesCollection(team, collections.project, dutyType, sel, limit)
+        addLocalDutiesCollection(team, collections.project, dutyType, sel)
       }
       break
     default:
       subs.push(Meteor.subscribe(`${eventName}.Volunteers.shiftGroups`, sel))
-      subs.push(Meteor.subscribe(`${eventName}.Volunteers.duties`, 'task', sel, limit))
-      subs.push(Meteor.subscribe(`${eventName}.Volunteers.duties`, 'project', sel, limit))
+      subs.push(Meteor.subscribe(`${eventName}.Volunteers.duties`, 'task', sel))
+      subs.push(Meteor.subscribe(`${eventName}.Volunteers.duties`, 'project', sel))
       if (subs.every(sub => sub.ready())) {
-        addLocalDutiesCollection(team, collections.task, 'task', sel, limit)
-        addLocalDutiesCollection(team, collections.project, 'project', sel, limit)
+        addLocalDutiesCollection(team, collections.task, 'task', sel)
+        addLocalDutiesCollection(team, collections.project, 'project', sel)
       }
     }
     let allTheShifts = []
