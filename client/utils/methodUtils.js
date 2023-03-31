@@ -13,7 +13,7 @@ export const methodCallback = (cb) => (err, res) => {
       style: 'growl-top-right',
     })
   } else {
-    cb(res)
+    cb(err, res)
   }
 }
 
@@ -30,7 +30,6 @@ export function meteorCall(VolClass, methodName, ...args) {
   Meteor.call(
     `${Volunteers.eventName}.Volunteers.${methodName}`,
     ...nonCallbackArgs,
-    // TODO remove the error from the passed callback as it's not used
-    methodCallback((res) => callback?.(null, res)),
+    methodCallback((err, res) => callback?.(err, res)),
   )
 }

@@ -65,6 +65,9 @@ export const applyCall = (Volunteers, {
     console.error('Project signups not supported')
     applyErrorCallback({ reason: 'Please report this error to fist@goingnowhere.org' })
   } else {
-    meteorCall(Volunteers, 'signups.insert', signup, applyErrorCallback)
+    // FIXME This was actually being called with null. If called with an error will lead to multiple
+    // messages. We need to combine this with methodUtils handling.
+    // meteorCall(Volunteers, 'signups.insert', signup, applyErrorCallback)
+    meteorCall(Volunteers, 'signups.insert', signup)
   }
 }

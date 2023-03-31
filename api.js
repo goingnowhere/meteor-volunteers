@@ -11,6 +11,7 @@ import { initClient, reactContext } from './client/clientInit'
 
 export * from './both/utils/helpers'
 export { useMethodCallData } from './client/utils/useMethodCallData'
+export { meteorCall, methodCallback } from './client/utils/methodUtils'
 export { BookedTable } from './client/components/volunteers/BookedTable.jsx'
 export { SignupApproval } from './client/components/teamLeads/SignupApproval.jsx'
 export { TeamShiftsTable } from './client/components/teamLeads/TeamShiftsTable.jsx'
