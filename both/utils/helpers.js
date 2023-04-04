@@ -13,3 +13,6 @@ export const displayName = ({ profile }) =>
     || profile?.firstName
     || (profile?.lastName && `Mx ${profile.lastName}`)
     || 'anonymous nobody'
+
+export const rawCollectionOp = wrapAsync((collection, operation, ...args) =>
+  collection.rawCollection()[operation](...args))
