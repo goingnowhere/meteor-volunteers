@@ -9,6 +9,7 @@ import { initServices } from './both/services'
 import { initServerMethods } from './server/methods'
 import { initClient, reactContext } from './client/clientInit'
 
+export { MongoBackedQueue } from './server/queue'
 export * from './both/utils/helpers'
 export { useMethodCallData } from './client/utils/useMethodCallData'
 export { meteorCall, methodCallback } from './client/utils/methodUtils'
