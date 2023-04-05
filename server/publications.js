@@ -175,10 +175,7 @@ export const initPublications = (volunteersClass) => {
     children: [
       {
         find(duty) {
-          if (isLead) {
-            return collections.signups.find({ shiftId: duty._id })
-          }
-          return null
+          return collections.signups.find({ shiftId: duty._id })
         },
         children: [
           {

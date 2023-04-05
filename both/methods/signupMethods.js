@@ -63,6 +63,9 @@ export const initSignupMethods = (volunteersClass) => {
         && moment(days[i]).isBetween(start, end, 'days', '[]'))
     }
     const signupCount = collections.signups.find({ shiftId, status: { $in: ['confirmed', 'pending'] } }).count()
+    if (type === 'lead') {
+      return signupCount >= 1
+    }
     return signupCount >= parentDuty.max
   }
 
@@ -187,7 +190,7 @@ export const initSignupMethods = (volunteersClass) => {
         if (failReason) {
           throw new Meteor.Error(409, failReason, conflicts)
         }
-        if (isDutyFull(collections, wholeSignup, parentDuty)) {
+        if (isDutyFull(wholeSignup, parentDuty)) {
           throw new Meteor.Error(409, 'Too many signups')
         }
         const {
