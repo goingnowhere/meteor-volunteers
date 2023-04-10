@@ -25,6 +25,7 @@ export { SignupsList } from './client/components/shifts/SignupsList.jsx'
 export { UserInfoList } from './client/components/common/UserInfoList.jsx'
 export { Loading } from './client/components/common/Loading.jsx'
 export { DisplayName } from './client/components/common/DisplayName.jsx'
+export { TextField } from './client/components/forms/TextField.jsx'
 
 export class VolunteersClass {
   /** dontShare is used to start an instance without weird coffeescript global effects */

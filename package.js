@@ -22,6 +22,7 @@ Npm.depends({
   '@fortawesome/free-solid-svg-icons': '6.2.1',
   '@fortawesome/react-fontawesome': '0.2.0',
   'react-modal': '3.8.1',
+  'react-hook-form': '7.43.8',
 })
 
 Package.onUse((api) => {
