@@ -16,3 +16,5 @@ export const displayName = ({ profile }) =>
 
 export const rawCollectionOp = wrapAsync((collection, operation, ...args) =>
   collection.rawCollection()[operation](...args))
+
+export const emailRegex = /[^@]+@[^@]+\.[^@.]{2,}$/
