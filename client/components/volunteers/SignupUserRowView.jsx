@@ -24,7 +24,9 @@ export const SignupUserRowView = ({
     }
   }, [signup, editProject])
   const [modalOpen, showModal] = useState(false)
-  return (
+  return !duty ? (
+    <p>Unable to find shift</p>
+  ) : (
     <div className={`row no-gutters ${signup.status !== 'confirmed' ? 'text-muted' : ''}`} title={t(signup.status)}>
       <Modal isOpen={modalOpen} closeModal={() => showModal(false)} title={duty.title}>
         <DutiesListItem type={signup.type} duty={duty} team={team} />
