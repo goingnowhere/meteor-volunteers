@@ -28,8 +28,8 @@ export function SignupsList({
     // everything
     const allTeamsCursor = collections.team
       .find(query, { sort: { userpref: -1, totalscore: -1 } })
-    // Doesn't work well for build/strike. Temp fix until we can add a better sort/search
-    return dutyType === 'project' ? {
+    // TODO Doesn't work well for build/strike. Temp fix until we can add a better sort/search
+    return dutyType === 'build-strike' ? {
       allTeams: allTeamsCursor.fetch(),
       showLoadMore: false,
     } : {
@@ -44,7 +44,7 @@ export function SignupsList({
         (dutyType === 'lead' ? (
           <LeadListItemGrouped key={team._id} teamId={team._id} />
         ) : (
-          <SignupsListTeam key={team._id} team={team} filters={filters} dutyType={dutyType} />
+          <SignupsListTeam key={team._id} team={team} filters={filters} dutyType={dutyType === 'build-strike' ? 'project' : dutyType} />
         )))}
       {showLoadMore && (
         <div className="row align-content-right no-gutters">
