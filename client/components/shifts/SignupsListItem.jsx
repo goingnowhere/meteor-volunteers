@@ -4,12 +4,13 @@ import { T } from '../common/i18n'
 import { DutiesListItem } from './DutiesListItem.jsx'
 import { SignupProjectRow } from './SignupProjectRow.jsx'
 
-export const SignupsListItem = ({ duty, showSignupModal }) => {
+export const SignupsListItem = ({ duty, type, showSignupModal }) => {
+  const dutyType = type || duty.type
   return (
     <>
-      <DutiesListItem duty={duty} />
+      <DutiesListItem type={type} duty={duty} />
       <div className="row no-gutters pt-2 align-items-center">
-        {duty.type === 'project'
+        {dutyType === 'project'
           ? <SignupProjectRow duty={duty} showSignupModal={showSignupModal} />
           : (
             <>

@@ -1,5 +1,24 @@
 import { _ } from 'meteor/underscore'
 
+export const userPrefsMatch = (skills, quirks) => ({
+  $sum: [
+    { $size: { $ifNull: [{ $setIntersection: [quirks, '$quirks'] }, []] } },
+    { $size: { $ifNull: [{ $setIntersection: [skills, '$skills'] }, []] } },
+  ],
+})
+
+export const dutyPriorityScore = {
+  $cond: [{ $eq: ['$priority', 'normal'] }, 1,
+    {
+      $cond: [{ $eq: ['$priority', 'important'] }, 2,
+        {
+          $cond: [{ $eq: ['$priority', 'essential'] }, 3, 1],
+        },
+      ],
+    },
+  ],
+}
+
 export const initCollectionUtils = (collections) => ({
   getSkillsList: (sel = {}) =>
     _.union(...collections.team.find(sel, { fields: { skills: true } })

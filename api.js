@@ -22,6 +22,7 @@ export { DutiesListItem } from './client/components/shifts/DutiesListItem.jsx'
 export { SignupShiftButtons } from './client/components/shifts/SignupShiftButtons.jsx'
 export { SignupsListTeam } from './client/components/volunteers/SignupsListTeam.jsx'
 export { SignupsList } from './client/components/shifts/SignupsList.jsx'
+export { SignupsList as SignupsListNew } from './client/components/shifts/SignupsListNew.jsx'
 export { UserInfoList } from './client/components/common/UserInfoList.jsx'
 export { Loading } from './client/components/common/Loading.jsx'
 export { DisplayName } from './client/components/common/DisplayName.jsx'
@@ -32,6 +33,13 @@ export class VolunteersClass {
   constructor(settings, dontShare) {
     this.eventName = settings.eventName
     this.previousEventName = settings.previousEventName
+    // This allows us to use the settings but without having to refactor everything not to auto
+    // import
+    this.settings = {}
+    settings.SettingsCollection.find().observe({
+      added: (setting) => { this.settings = setting },
+      changed: (setting) => { this.settings = setting },
+    })
 
     // establish a hierarchy among roles
     if (Meteor.isServer) {

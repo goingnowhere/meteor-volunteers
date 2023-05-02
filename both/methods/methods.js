@@ -7,7 +7,7 @@ import { initPrevEventMethods } from './prevEventMethods'
 
 export const initMethods = (volunteersClass) => {
   const orgUnitMethods = initOrgUnitMethods(volunteersClass)
-  initDutiesMethods(volunteersClass)
+  const dutiesMethods = initDutiesMethods(volunteersClass)
   initSignupMethods(volunteersClass)
   initVolunteerformMethods(volunteersClass)
   const prevEvent = initPrevEventMethods(volunteersClass)
@@ -17,6 +17,7 @@ export const initMethods = (volunteersClass) => {
   return {
     methodBodies,
     prevEvent,
+    ...dutiesMethods,
     ...orgUnitMethods,
   }
 }
