@@ -1,7 +1,10 @@
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import { SignupsListItem } from './SignupsListItem.jsx'
 import { reactContext } from '../../clientInit'
 import { useMethodCallData } from '../../utils/useMethodCallData'
+import { Modal } from '../common/Modal.jsx'
+import { ShiftSignupModalContents } from './ShiftSignupModalContents.jsx'
+import { ProjectSignupForm } from './ProjectSignupForm.jsx'
 
 export function SignupsList({
   dutyType, filters = {},
@@ -9,6 +12,8 @@ export function SignupsList({
   const { methods } = useContext(reactContext)
 
   const [projects, isLoaded] = useMethodCallData(methods.listOpenShifts, { type: dutyType })
+
+  const [signupDuty, setSignupDuty] = useState()
 
   if (!['build-strike', 'build', 'strike'].includes(dutyType)) {
     // TODO implement shift version for event-time and include shifts in build/strike
@@ -29,9 +34,14 @@ export function SignupsList({
 
   return (
     <div className="container-fluid p-0">
+      <Modal isOpen={!!signupDuty} closeModal={() => setSignupDuty(null)} title={signupDuty?.title}>
+        {signupDuty?.type === 'project'
+          ? <ProjectSignupForm project={signupDuty} onSubmit={setSignupDuty} />
+          : <ShiftSignupModalContents duty={signupDuty} />}
+      </Modal>
       {isLoaded && filteredList.map((project) => (
         <div key={project._id} className="px-2 pb-0 signupsListItem">
-          <SignupsListItem key={project._id} type="project" duty={project} />
+          <SignupsListItem duty={project} showSignupModal={setSignupDuty} />
         </div>
       ))}
     </div>

@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor'
-import { check } from 'meteor/check'
+import { check, Match } from 'meteor/check'
 import { ValidatedMethod } from 'meteor/mdg:validated-method'
 
 import { dutyPriorityScore, userPrefsMatch } from '../collections/utils'
@@ -50,7 +50,7 @@ export function initDutiesMethods(volunteersClass) {
   return {
     listOpenShifts: new ValidatedMethod({
       name: 'shifts.open.list',
-      validate: ({ type }) => check(type, String), // Also check content
+      validate: ({ type }) => check(type, Match.OneOf('build', 'strike', 'build-strike')),
       run({
         type,
       }) {
@@ -76,6 +76,9 @@ export function initDutiesMethods(volunteersClass) {
               pipeline: [
                 {
                   $match: { $expr: { $eq: ['$userId', '$$userId'] } },
+                },
+                {
+                  $project: { skills: true, quirks: true },
                 },
               ],
               as: 'prefs',
@@ -117,6 +120,8 @@ export function initDutiesMethods(volunteersClass) {
           },
           {
             $addFields: {
+              // A literal to indicate what type of 'duty'
+              type: 'project',
               volDays: { $sum: '$signups.days' },
               minStaffing: { $sum: '$staffing.min' },
               maxStaffing: { $sum: '$staffing.max' },

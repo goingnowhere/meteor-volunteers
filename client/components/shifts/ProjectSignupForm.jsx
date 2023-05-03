@@ -109,6 +109,8 @@ export const ProjectSignupForm = ({ project, signup, onSubmit }) => {
   const [confirmed, setConfirmed] = useState()
 
   useEffect(() => {
+    // Could potentially get this from props by tweaking the query for open roles to include the raw
+    // signup info
     meteorCall(Volunteers, 'getProjectStaffing', project._id,
       (err, confirmedStaffing) => {
         if (!err) {
@@ -129,8 +131,6 @@ export const ProjectSignupForm = ({ project, signup, onSubmit }) => {
     AutoForm.addHooks([
       'projectSignupsInsert',
       'projectSignupsUpdate',
-      'InsertShiftGroupFormId',
-      'UpdateShiftGroupFormId',
     ], {
       onSuccess() {
         if (onSubmit) onSubmit()
