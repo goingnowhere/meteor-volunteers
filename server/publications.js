@@ -242,7 +242,7 @@ export const initPublications = (volunteersClass) => {
       if (types.length > 0) query.type = { $in: types }
       return {
         find() {
-          if ((userId === this.userId) || auth.isManager()) {
+          if ((userId === this.userId) || auth.isManager() || auth.isNoInfo()) {
             return collections.signups.find(query)
           }
           return null

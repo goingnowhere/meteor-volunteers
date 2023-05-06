@@ -5,7 +5,7 @@ import { initAuthMixins } from './authMixins'
 
 const MANAGER_ROLES = ['manager', 'admin']
 
-export const initAuthService = ({ eventName }) => {
+export const initAuthService = ({ eventName, collections }) => {
   const isManager = (userId = Meteor.userId()) =>
     Roles.userIsInRole(userId, MANAGER_ROLES, eventName)
 
@@ -24,6 +24,13 @@ export const initAuthService = ({ eventName }) => {
         return false
       }
       return Roles.userIsInRole(userId, unitId, eventName) || isManager()
+    },
+    // FIXME Should make a role for this to avoid this mess
+    isNoInfo: () => {
+      const noInfo = collections.team.findOne({ name: 'NoInfo' })
+      const wh = collections.team.findOne({ name: 'Werkhaüs' })
+      return ((noInfo) && authService.isLead(Meteor.userId(), noInfo._id))
+        || ((wh) && authService.isLead(Meteor.userId(), wh._id))
     },
   }
 
