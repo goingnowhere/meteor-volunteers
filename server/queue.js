@@ -15,6 +15,10 @@ const queueSchema = new SimpleSchema({
     type: Date,
     optional: true,
   },
+  failures: {
+    type: Number,
+    optional: true,
+  },
   // TODO could pass this in to enforce correct structure
   data: {
     type: Object,
@@ -45,7 +49,13 @@ export class MongoBackedQueue {
       const findResult = rawCollectionOp(
         this.queue,
         'findOneAndUpdate',
-        { $or: [{ lock: { $lt: lockExpiry } }, { lock: { $exists: false } }] },
+        {
+          $and: [
+            { $or: [{ lock: { $lt: lockExpiry } }, { lock: { $exists: false } }] },
+            // Don't get stuck on our failures
+            { $or: [{ failures: { $lt: 5 } }, { failures: { $exists: false } }] },
+          ],
+        },
         { $set: { lock: new Date() } },
         { sort: { createdAt: 1 } },
       )
@@ -66,7 +76,7 @@ export class MongoBackedQueue {
       console.error(`Error when processing ${this.name} queue`, err)
       // TODO retry failures
       try {
-        this.queue.update({ _id: itemId }, { $unset: { lock: '' } })
+        this.queue.update({ _id: itemId }, { $unset: { lock: '' }, $inc: { failures: 1 } })
       } catch (updateErr) {
         console.error(`Fatal error processing ${this.name} queue, unable to update queue collection`, updateErr)
       }
