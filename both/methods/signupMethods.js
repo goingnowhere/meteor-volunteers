@@ -186,7 +186,7 @@ export const initSignupMethods = (volunteersClass) => {
       if ((signupIdentifiers.userId === this.userId) || isLead) {
         // Leads cannot be public so no special handling of roles needed in this method
         const status = parentDuty.policy === 'public' ? 'confirmed' : 'pending'
-        const [failReason, conflicts] = findConflicts(collections, wholeSignup, parentDuty)
+        const [failReason, conflicts] = findConflicts(wholeSignup, parentDuty)
         if (failReason) {
           throw new Meteor.Error(409, failReason, conflicts)
         }
