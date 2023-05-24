@@ -15,18 +15,21 @@ export const initStatsService = (volunteersClass) => {
   const getVolunteerCount = (query) =>
     uniqueVolunteers(collections.signups.find(query).fetch()).length
 
-  service.projectSignupsConfirmed = (project, signupsPassed) => {
+  service.projectSignupsConfirmed = (project, signupsPassed, days) => {
     const pdays = Array.from(moment.range(moment(project.start), moment(project.end))
       .by('day'))
-    const dayStrings = pdays.map((m) => m.toISOString())
-    const needed = new Map(dayStrings.map((day, i) => [day, project.staffing[i].min]))
-    const wanted = new Map(dayStrings.map((day, i) =>
-      [day, project.staffing[i].max - project.staffing[i].min]))
+    const displayDays = days ?? pdays
+    const dayStrings = displayDays.map((m) => m.toISOString())
+
+    const staffing = new Map(pdays.map((day, i) => [day.toISOString(), project.staffing[i]]))
+    const needed = new Map(dayStrings.map((day) => [day, staffing.get(day)?.min ?? 0]))
+    const wanted = new Map(dayStrings.map((day) =>
+      [day, (staffing.get(day)?.max ?? 0) - (staffing.get(day)?.min ?? 0)]))
     const confirmed = new Map(dayStrings.map((day) => [day, 0]))
     const signups = signupsPassed
-    || collections.signups.find({ shiftId: project._id, status: 'confirmed' }).fetch()
+      || collections.signups.find({ shiftId: project._id, status: 'confirmed' }).fetch()
     signups.forEach((signup) => {
-      pdays.forEach((day) => {
+      displayDays.forEach((day) => {
         const dayString = day.toISOString()
         if (day.isBetween(signup.start, signup.end, 'days', '[]')) {
           confirmed.set(dayString, confirmed.get(dayString) + 1)

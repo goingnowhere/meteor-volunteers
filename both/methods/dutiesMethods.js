@@ -1,11 +1,16 @@
 import { Meteor } from 'meteor/meteor'
 import { check, Match } from 'meteor/check'
 import { ValidatedMethod } from 'meteor/mdg:validated-method'
+import Moment from 'moment-timezone'
+import { extendMoment } from 'moment-range'
 
 import { dutyPriorityScore, userPrefsMatch } from '../collections/utils'
+import { projectsAndStaffingAggregation } from './aggregations'
+
+const moment = extendMoment(Moment)
 
 export function initDutiesMethods(volunteersClass) {
-  const { collections, services: { auth }, settings } = volunteersClass
+  const { collections, services: { auth, stats }, settings } = volunteersClass
 
   function createMethod(collection) {
     const collectionName = collection._name
@@ -152,6 +157,57 @@ export function initDutiesMethods(volunteersClass) {
             $sort: { score: -1 },
           },
         ])
+      },
+    }),
+
+    getProjectSignupStats: new ValidatedMethod({
+      name: 'project.staffing.report',
+      validate: ({ type }) => check(type, Match.OneOf('build', 'strike', 'build-strike')),
+      run({
+        type,
+      }) {
+        // Aggregate is only available on the server
+        if (!Meteor.isServer) {
+          return []
+        }
+        if (!settings.buildPeriod || !settings.eventPeriod || !settings.strikePeriod) {
+          throw new Meteor.Error(500, 'Invalid event settings')
+        }
+        const buildStart = moment(settings.buildPeriod.start)
+        const eventStart = moment(settings.eventPeriod.start)
+        const eventEnd = moment(settings.eventPeriod.end)
+        const strikeEnd = moment(settings.strikePeriod.end)
+        const days = [
+          ...type.includes('build') ? moment.range(buildStart, eventStart).by('days') : [],
+          ...type.includes('strike') ? moment.range(eventEnd, strikeEnd).by('days') : [],
+        ]
+
+        const projectData = collections.team.aggregate([
+          ...projectsAndStaffingAggregation(
+            collections, type, eventStart.toDate(), eventEnd.toDate(),
+          ),
+        ])
+
+        const projStats = projectData.map((team) => {
+          const allProjectStats = team.projects.map((proj) =>
+            stats.projectSignupsConfirmed(proj, proj.signups, days))
+          const staffingStats = allProjectStats.length < 1
+            ? {}
+            : allProjectStats.reduce((combined, curr) => ({
+              confirmed: combined.confirmed.map((count, i) => count + curr.confirmed[i]),
+              needed: combined.needed.map((count, i) => count + curr.needed[i]),
+              wanted: combined.wanted.map((count, i) => count + curr.wanted[i]),
+            }))
+          return {
+            team: team.name,
+            stats: staffingStats,
+          }
+        })
+
+        return {
+          days: days.map(day => day.toDate()),
+          allTeams: projStats,
+        }
       },
     }),
   }

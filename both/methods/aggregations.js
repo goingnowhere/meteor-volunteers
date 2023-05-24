@@ -97,3 +97,41 @@ export const signupDetailPipeline = (collections, included) => [
   },
   ],
 ]
+
+export const projectsAndStaffingAggregation = (collections, type, eventStart, eventEnd) => [
+  {
+    $lookup: {
+      from: collections.project._name,
+      let: { teamId: '$_id' },
+      pipeline: [
+        {
+          $match: { $expr: { $eq: ['$parentId', '$$teamId'] } },
+        }, {
+          $match: {
+            // policy: { $in: ['public', 'requireApproval'] },
+            ...type === 'build' && eventStart && { start: { $lt: eventStart } },
+            ...type === 'strike' && eventEnd && { end: { $gt: eventEnd } },
+          },
+        },
+        {
+          $lookup: {
+            from: collections.signups._name,
+            let: { shiftId: '$_id' },
+            pipeline: [
+              { $match: { $expr: { $eq: ['$$shiftId', '$shiftId'] }, status: 'confirmed' } },
+              {
+                $addFields: { test: '$$shiftId' },
+              },
+              {
+                // Remove anything about user so this can be public
+                $unset: ['userId'],
+              },
+            ],
+            as: 'signups',
+          },
+        },
+      ],
+      as: 'projects',
+    },
+  },
+]
