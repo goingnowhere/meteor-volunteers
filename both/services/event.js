@@ -4,7 +4,7 @@ export const initEventService = (volunteersClass) => {
   const { collections } = volunteersClass
 
   const isEarlyEntryOpen = () => {
-    // TODO get from settings when we no longer have a separate meteor-volunteers module
+    // TODO Add settings date for when EE changes cannot be made
     const earlyEntryClose = moment('2020-06-10')
     return moment().isBefore(earlyEntryClose)
   }

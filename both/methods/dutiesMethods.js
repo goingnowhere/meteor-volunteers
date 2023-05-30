@@ -162,9 +162,18 @@ export function initDutiesMethods(volunteersClass) {
 
     getProjectSignupStats: new ValidatedMethod({
       name: 'project.staffing.report',
-      validate: ({ type }) => check(type, Match.OneOf('build', 'strike', 'build-strike')),
+      validate: ({ type, deptId, teamId }) => {
+        check(type, Match.OneOf('build', 'strike', 'build-strike'))
+        check(deptId, Match.Maybe(String))
+        check(teamId, Match.Maybe(String))
+        if (deptId && teamId) {
+          throw new Match.Error(400, 'Can\'t specify both team and dept')
+        }
+      },
       run({
         type,
+        deptId,
+        teamId,
       }) {
         // Aggregate is only available on the server
         if (!Meteor.isServer) {
@@ -183,6 +192,14 @@ export function initDutiesMethods(volunteersClass) {
         ]
 
         const projectData = collections.team.aggregate([
+          {
+            $match: {
+              policy: 'public',
+              ...((!teamId && !deptId)
+                && teamId ? { _id: teamId } : { parentId: deptId }
+              ),
+            },
+          },
           ...projectsAndStaffingAggregation(
             collections, type, eventStart.toDate(), eventEnd.toDate(),
           ),

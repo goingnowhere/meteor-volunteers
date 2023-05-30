@@ -18,9 +18,16 @@ const chartOptions = {
   },
 }
 
-export function BuildAndStrikeVolunteerReport({ type }) {
+export function BuildAndStrikeVolunteerReport({
+  className,
+  type,
+  deptId,
+  teamId,
+}) {
   const { methods } = useContext(reactContext)
-  const [{ days, allTeams }, isLoaded] = useMethodCallData(methods.getProjectSignupStats, { type })
+  const [{ days, allTeams }, isLoaded] = useMethodCallData(
+    methods.getProjectSignupStats, { type, deptId, teamId },
+  )
 
   const confirmed = isLoaded && days.map((_day, i) =>
     allTeams.reduce((sum, { stats }) => sum + (stats.confirmed?.[i] ?? 0), 0))
@@ -38,7 +45,7 @@ export function BuildAndStrikeVolunteerReport({ type }) {
   }
 
   return (
-    <div className="chart-container">
+    <div className={`chart-container ${className ?? ''}`}>
       {!isLoaded ? (
         <Loading />
       ) : (
