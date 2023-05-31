@@ -96,6 +96,7 @@ export const signupDetailPipeline = (collections, included) => [
     $unwind: { path: '$user' },
   },
   ],
+  { $sort: { createdAt: 1 } },
 ]
 
 export const projectsAndStaffingAggregation = (collections, type, eventStart, eventEnd) => [

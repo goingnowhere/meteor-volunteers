@@ -180,12 +180,13 @@ export const initStatsService = (volunteersClass) => {
     const dept = getDepts({ _id: deptId })[0]
     const signupQuery = {
       parentId: { $in: [deptId, ...(dept?.teamIds ?? [])] },
-      type: 'lead',
       status: 'pending',
     }
+    const pendingRequests = collections.signups.find(signupQuery).fetch()
     return {
       dept,
-      pendingLeadRequests: collections.signups.find(signupQuery).fetch(),
+      pendingRequests,
+      pendingLeadRequests: pendingRequests.filter(({ type }) => type === 'lead'),
     }
   }
 

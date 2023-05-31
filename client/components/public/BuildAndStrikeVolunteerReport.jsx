@@ -8,6 +8,7 @@ import { useMethodCallData } from '../../utils/useMethodCallData'
 import { Loading } from '../common/Loading.jsx'
 
 const chartOptions = {
+  maintainAspectRatio: false,
   scales: {
     xAxes: [{
       stacked: true,
@@ -49,7 +50,7 @@ export function BuildAndStrikeVolunteerReport({
       {!isLoaded ? (
         <Loading />
       ) : (
-        <Bar data={data} options={chartOptions} />
+        <Bar data={data} options={chartOptions} height="250" />
       )}
     </div>
   )
