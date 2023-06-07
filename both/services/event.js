@@ -1,23 +1,16 @@
 import moment from 'moment-timezone'
 
 export const initEventService = (volunteersClass) => {
-  const { collections } = volunteersClass
+  const { collections, settings } = volunteersClass
 
-  const isEarlyEntryOpen = () => {
-    // TODO Add settings date for when EE changes cannot be made
-    const earlyEntryClose = moment('2020-06-10')
-    return moment().isBefore(earlyEntryClose)
-  }
-
-  return {
-    isEarlyEntryOpen,
-    areShiftChangesOpen: ({ start, shiftId, type }, parentDuty) => {
-      if (isEarlyEntryOpen()) {
-        return true
-      }
-      // TODO get from settings when we no longer have a separate meteor-volunteers module
-      const eventStart = moment('2020-07-07')
-
+  const service = {
+    isEarlyShift: ({ start }) => {
+      // Can't do this in parent as it doesn't autorun on client
+      const eeEnd = moment(settings.get()?.eventPeriod?.start).add(1, 'day')
+      return eeEnd.isAfter(start)
+    },
+    areShiftChangesOpen: (signup, parentDuty) => {
+      const { start, shiftId, type } = signup
       let startDate
       if (type === 'project') {
         startDate = moment(start)
@@ -27,7 +20,14 @@ export const initEventService = (volunteersClass) => {
       } else {
         return true
       }
-      return startDate.isAfter(eventStart)
+
+      if (!service.isEarlyShift({ start: startDate })) {
+        return true
+      }
+
+      const earlyEntryClose = moment(settings.get()?.earlyEntryClose)
+      return earlyEntryClose.isAfter()
     },
   }
+  return service
 }

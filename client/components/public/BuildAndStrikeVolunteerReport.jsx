@@ -50,7 +50,7 @@ export function BuildAndStrikeVolunteerReport({
       {!isLoaded ? (
         <Loading />
       ) : (
-        <Bar data={data} options={chartOptions} height="250" />
+        <Bar data={data} options={chartOptions} height={250} />
       )}
     </div>
   )

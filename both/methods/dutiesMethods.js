@@ -10,7 +10,8 @@ import { projectsAndStaffingAggregation } from './aggregations'
 const moment = extendMoment(Moment)
 
 export function initDutiesMethods(volunteersClass) {
-  const { collections, services: { auth, stats }, settings } = volunteersClass
+  const { collections, services: { auth, stats }, settings: settingsVar } = volunteersClass
+  const settings = settingsVar.get()
 
   function createMethod(collection) {
     const collectionName = collection._name

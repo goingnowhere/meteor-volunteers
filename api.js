@@ -1,4 +1,5 @@
 import { Meteor } from 'meteor/meteor'
+import { ReactiveVar } from 'meteor/reactive-var'
 import { Roles } from 'meteor/alanning:roles'
 import moment from 'moment-timezone'
 
@@ -36,10 +37,10 @@ export class VolunteersClass {
     this.previousEventName = settings.previousEventName
     // This allows us to use the settings but without having to refactor everything not to auto
     // import
-    this.settings = {}
+    this.settings = new ReactiveVar()
     settings.SettingsCollection.find().observe({
-      added: (setting) => { this.settings = setting },
-      changed: (setting) => { this.settings = setting },
+      added: (setting) => { this.settings.set(setting) },
+      changed: (setting) => { this.settings.set(setting) },
     })
 
     // establish a hierarchy among roles
