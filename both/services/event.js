@@ -21,12 +21,15 @@ export const initEventService = (volunteersClass) => {
         return true
       }
 
-      if (!service.isEarlyShift({ start: startDate })) {
-        return true
+      if (service.isEarlyShift({ start: startDate })) {
+        const earlyEntryClose = moment(settings.get()?.earlyEntryClose)
+        return earlyEntryClose.isAfter()
       }
 
-      const earlyEntryClose = moment(settings.get()?.earlyEntryClose)
-      return earlyEntryClose.isAfter()
+      const eventPeriod = settings.get()?.eventPeriod
+      return !eventPeriod
+        || moment(eventPeriod.start).isAfter()
+        || startDate.isAfter(eventPeriod.end)
     },
   }
   return service
