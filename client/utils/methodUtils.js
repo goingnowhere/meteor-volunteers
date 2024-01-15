@@ -26,7 +26,7 @@ export function meteorCall(VolClass, methodName, ...args) {
     nonCallbackArgs = args.slice(0, -1)
   }
   // TODO remove when blaze has been eradicated...
-  const Volunteers = VolClass || { eventName: 'nowhere2023' }
+  const Volunteers = VolClass || { eventName: 'nowhere2024' }
   Meteor.call(
     `${Volunteers.eventName}.Volunteers.${methodName}`,
     ...nonCallbackArgs,
