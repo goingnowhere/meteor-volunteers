@@ -91,8 +91,8 @@ export const initCollections = (eventName) => {
   collections.signups = createCollection(`${prefix}.signups`)
   collections.signups.attachSchema(schemas.signup)
   if (Meteor.isServer) {
-    // we enforce using a unique index that a person cannot sign up twice for the same duty
-    collections.signups.createIndex({ userId: 1, shiftId: 1 })
+    collections.signups.createIndex({ shiftId: 1 })
+    collections.signups.createIndex({ userId: 1 })
   }
 
   collections.rotas = createCollection(`${prefix}.rotas`)
