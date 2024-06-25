@@ -4,8 +4,11 @@ import { ValidatedMethod } from 'meteor/mdg:validated-method'
 import Moment from 'moment-timezone'
 import { extendMoment } from 'moment-range'
 
-import { dutyPriorityScore, userPrefsMatch } from '../collections/utils'
-import { projectsAndStaffingAggregation } from './aggregations'
+import {
+  projectsAndStaffingAggregation,
+  projectPriorityAggregation,
+  rotaPriorityAggregation,
+} from './aggregations'
 
 const moment = extendMoment(Moment)
 
@@ -56,9 +59,10 @@ export function initDutiesMethods(volunteersClass) {
   return {
     listOpenShifts: new ValidatedMethod({
       name: 'shifts.open.list',
-      validate: ({ type }) => check(type, Match.OneOf('build', 'strike', 'build-strike')),
+      validate: ({ type }) => check(type, Match.OneOf('all', 'build', 'strike', 'build-strike', 'event')),
       run({
         type,
+        teams,
       }) {
         // Aggregate is only available on the server
         if (!Meteor.isServer) {
@@ -66,98 +70,47 @@ export function initDutiesMethods(volunteersClass) {
         }
         const eventStart = settings.eventPeriod?.start
         const eventEnd = settings.eventPeriod?.end
-        return collections.project.aggregate([
-          {
-            $match: {
-              policy: { $in: ['public', 'requireApproval'] },
-              ...type === 'build' && eventStart && { start: { $lt: eventStart } },
-              ...type === 'strike' && eventEnd && { end: { $gt: eventEnd } },
-            },
-          },
-          // Get volunteer form to have user preferences
+        const match = {
+          ...type === 'build' && eventStart && { start: { $lt: eventStart } },
+          ...type === 'strike' && eventEnd && { end: { $gt: eventEnd } },
+          ...type === 'event' && eventStart && eventEnd && { start: { $gt: eventStart, $lt: eventEnd } },
+          ...teams && { parentId: { $in: teams } },
+        }
+        const results = collections.volunteerForm.aggregate([
+          { $match: { userId: this.userId } },
+          { $project: { skills: true, quirks: true } },
           {
             $lookup: {
-              from: collections.volunteerForm._name,
-              let: { userId: this.userId },
+              from: collections.project._name,
+              let: { skills: '$skills', quirks: '$quirks' },
+              as: 'projects',
               pipeline: [
-                {
-                  $match: { $expr: { $eq: ['$userId', '$$userId'] } },
-                },
-                {
-                  $project: { skills: true, quirks: true },
-                },
+                ...projectPriorityAggregation({
+                  collections,
+                  skillsPath: '$$skills',
+                  quirksPath: '$$quirks',
+                  match,
+                }),
               ],
-              as: 'prefs',
             },
           },
           {
-            $unwind: { path: '$prefs' },
-          },
-          // Get team for skills and quirk info
-          {
             $lookup: {
-              from: collections.team._name,
-              localField: 'parentId',
-              foreignField: '_id',
-              as: 'team',
-            },
-          },
-          {
-            $unwind: { path: '$team' },
-          },
-          // Get confirmed signups to judge staffing levels
-          {
-            $lookup: {
-              from: collections.signups._name,
-              let: { shiftId: '$_id' },
+              from: collections.rotas._name,
+              let: { skills: '$skills', quirks: '$quirks', userId: '$userId' },
+              as: 'rotas',
               pipeline: [
-                { $match: { $expr: { $eq: ['$$shiftId', '$shiftId'] }, status: 'confirmed' } },
-                {
-                  $project: {
-                    days: {
-                      // If moving to later than mongo 5.0 can use dateDiff
-                      $add: [{ $divide: [{ $subtract: ['$end', '$start'] }, 1000 * 60 * 60 * 24] }, 1],
-                    },
-                  },
-                },
+                ...rotaPriorityAggregation({
+                  collections,
+                  skillsPath: '$$skills',
+                  quirksPath: '$$quirks',
+                  match,
+                }),
               ],
-              as: 'signups',
             },
-          },
-          {
-            $addFields: {
-              // A literal to indicate what type of 'duty'
-              type: 'project',
-              volDays: { $sum: '$signups.days' },
-              minStaffing: { $sum: '$staffing.min' },
-              maxStaffing: { $sum: '$staffing.max' },
-              quirks: '$team.quirks',
-              skills: '$team.skills',
-            },
-          },
-          {
-            $addFields: {
-              // How many skills or quirks match the user's
-              preferenceScore: userPrefsMatch('$prefs.skills', '$prefs.quirks'),
-              priorityScore: dutyPriorityScore,
-              minRemaining: { $max: [0, { $subtract: ['$minStaffing', '$volDays'] }] },
-              maxRemaining: { $max: [0, { $subtract: ['$maxStaffing', '$volDays'] }] },
-            },
-          },
-          {
-            $addFields: {
-              score: {
-                $add: [
-                  { $multiply: ['$maxRemaining', { $add: [1, '$preferenceScore'] }] },
-                  { $multiply: ['$minRemaining', '$priorityScore', { $add: [1, '$preferenceScore'] }] },
-                ],
-              },
-            },
-          },
-          {
-            $sort: { score: -1 },
           },
         ])
+        return results[0]
       },
     }),
 

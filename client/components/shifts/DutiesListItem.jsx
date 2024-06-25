@@ -12,7 +12,7 @@ const DutiesListItemTitle = ({
     priority,
   },
 }) => {
-  if (type === 'shift') {
+  if (['shift', 'rota'].includes(type)) {
     return <ShiftTitle team={team} title={title} priority={priority} />
   }
   if (type === 'task') {

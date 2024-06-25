@@ -113,5 +113,17 @@
   "site_roles": "FIST roles",
   "essential": "This role is essential!",
   "important": "This role is important!",
-  "require_approval": "A lead must approve each volunteer"
+  "require_approval": "Un líder debe aprobar a cada voluntario",
+  "shift_cancel_confirm": "¿Seguro que quieres anular este turno?",
+  "build": "Montaje",
+  "strike": "Desmontaje",
+  "build_strike": "Montaje y Desmontaje",
+  "event_shifts": "Horario turnos durante el Evento",
+  "all_shifts": "Todos los turnos",
+  "priorities": "priorities",
+  "contact": "Contacto",
+  "teams": "Equipos",
+  "public_link": "Public Link",
+  "shifts_in_this_team": "Shifts in this Team",
+  "teams_in_this_department": "Teams within this department"
 }

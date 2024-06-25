@@ -7,6 +7,7 @@ import { SignupShiftButtons } from './SignupShiftButtons.jsx'
 import { reactContext } from '../../clientInit'
 
 export const SignupShiftRow = ({
+  onChange,
   start,
   end,
   signup,
@@ -29,12 +30,22 @@ export const SignupShiftRow = ({
             <button
               className="btn btn-primary btn-action"
               type="button"
-              onClick={bailCall(Volunteers, { ...duty })}
+              onClick={bailCall(
+                Volunteers,
+                { signupId: signup._id, rotaId: duty.rotaId },
+                (_err, res) => onChange(res))
+              }
             >
               <T>cancel</T>
             </button>
           </div>
-        ) : <SignupShiftButtons {...duty} />}
+        ) : (
+          <SignupShiftButtons
+            {...duty}
+            signedUp={duty.signups ? duty.signups.confirmed : undefined}
+            onSignup={onChange}
+          />
+        )}
       </div>
     </>
   )

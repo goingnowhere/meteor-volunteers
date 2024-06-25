@@ -1,63 +1,56 @@
 import React, { useContext, useState } from 'react'
-import { Meteor } from 'meteor/meteor'
-import { useTracker } from 'meteor/react-meteor-data'
-import { LeadListItemGrouped } from './LeadListItemGrouped.jsx'
-import { SignupsListTeam } from '../volunteers/SignupsListTeam.jsx'
+import { SignupsListItem } from './SignupsListItem.jsx'
 import { reactContext } from '../../clientInit'
-import { T } from '../common/i18n'
+import { useMethodCallData } from '../../utils/useMethodCallData'
+import { Modal } from '../common/Modal.jsx'
+import { RotaSignupForm } from './RotaSignupForm.jsx'
+import { ProjectSignupForm } from './ProjectSignupForm.jsx'
 
 export function SignupsList({
-  dutyType, filters = {}, quirks, skills,
+  dutyType = 'all', filters = {},
 }) {
-  const { collections, eventName } = useContext(reactContext)
-  const [limit, setLimit] = useState(8)
-  const { allTeams, showLoadMore } = useTracker(() => {
-    if (quirks || skills) {
-      Meteor.subscribe(`${eventName}.Volunteers.team.ByUserPref`, quirks, skills)
-    } else {
-      Meteor.subscribe(`${eventName}.Volunteers.team`)
-    }
+  const { methods } = useContext(reactContext)
 
-    const query = {
-      ...(filters.skills ? { skills: { $in: filters.skills } } : {}),
-      ...(filters.quirks ? { quirks: { $in: filters.quirks } } : {}),
-    }
-    // teams are ordered using the score that is calculated by considering
-    // the priority of the shifts associated with each team
-    // We used to limit here but it meant we didn't know if we had more results, so istead get
-    // everything
-    const allTeamsCursor = collections.team
-      .find(query, { sort: { userpref: -1, totalscore: -1 } })
-    // TODO Doesn't work well for build/strike. Temp fix until we can add a better sort/search
-    return dutyType === 'build-strike' ? {
-      allTeams: allTeamsCursor.fetch(),
-      showLoadMore: false,
-    } : {
-      allTeams: allTeamsCursor.fetch().slice(0, limit),
-      showLoadMore: allTeamsCursor.count() >= limit,
-    }
-  }, [limit, filters, quirks, skills, dutyType])
+  const [projects, isLoaded] = useMethodCallData(methods.listOpenShifts, {
+    type: dutyType,
+    teams: filters.teams,
+  })
+
+  const [modalSignupDuty, setModalSignup] = useState()
+  const [changedRotas, setChangedRotas] = useState({})
+  const onSignupChange = (signupInfo) => {
+    setChangedRotas({ ...changedRotas, [signupInfo.rotaInfo._id]: signupInfo.rotaInfo })
+  }
+
+  // Since we load with all data it's more efficient to filter on the front-end instead of querying
+  // more. If we add deep-linking to filters maybe it would make sense to change this.
+  let filteredList = isLoaded && [...projects.projects, ...projects.rotas]
+    .sort((a, b) => b.score - a.score)
+  if (filters.quirks?.length > 0) {
+    filteredList = filteredList.filter(({ quirks }) =>
+      filters.quirks.some((filtered) => quirks?.includes(filtered)))
+  }
+  if (filters.skills?.length > 0) {
+    filteredList = filteredList.filter(({ skills }) =>
+      filters.skills.some((filtered) => skills?.includes(filtered)))
+  }
+  if (filters.priorities?.length > 0) {
+    filteredList = filteredList.filter(({ priority }) =>
+      filters.priorities.includes(priority))
+  }
 
   return (
     <div className="container-fluid p-0">
-      {allTeams.map(team =>
-        (dutyType === 'lead' ? (
-          <LeadListItemGrouped key={team._id} teamId={team._id} />
-        ) : (
-          <SignupsListTeam key={team._id} team={team} filters={filters} dutyType={dutyType === 'build-strike' ? 'project' : dutyType} />
-        )))}
-      {showLoadMore && (
-        <div className="row align-content-right no-gutters">
-          <div className="col">
-            <button
-              type="button"
-              className="btn btn-light btn-primary"
-              onClick={() => setLimit(limit + 2)}
-            ><T>load_more_teams</T>
-            </button>
-          </div>
+      <Modal isOpen={!!modalSignupDuty} closeModal={() => setModalSignup(null)} title={modalSignupDuty?.title}>
+        {modalSignupDuty && (modalSignupDuty?.type === 'project'
+          ? <ProjectSignupForm project={modalSignupDuty} onSubmit={setModalSignup} />
+          : <RotaSignupForm duty={changedRotas[modalSignupDuty._id] ?? modalSignupDuty} onChange={onSignupChange} />)}
+      </Modal>
+      {isLoaded && filteredList.map((project) => (
+        <div key={project._id} className="px-2 pb-0 signupsListItem">
+          <SignupsListItem duty={project} showSignupModal={setModalSignup} />
         </div>
-      )}
+      ))}
     </div>
   )
 }

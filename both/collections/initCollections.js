@@ -62,13 +62,6 @@ export const initCollections = (eventName) => {
     collections.shift.createIndex({ rotaId: 1 })
   }
 
-  // Temporarily re-add to get dashboard working
-  if (Meteor.isClient) {
-    // Create client-side only collection to reactively aggregate into
-    // If preformance is a problem we could aggregate into a collection inside Mongo
-    collections.shiftGroups = createCollection(`${prefix}.shiftGroups`)
-  }
-
   collections.project = createCollection(`${prefix}.projects`)
   collections.project.attachSchema(schemas.project)
   if (Meteor.isServer) {

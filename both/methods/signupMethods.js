@@ -7,6 +7,7 @@ import { Roles } from 'meteor/alanning:roles'
 import { _ } from 'meteor/underscore'
 
 import { signupStatuses } from '../collections/schemas/volunteer'
+import { rotaPriorityAggregation } from './aggregations'
 
 const moment = extendMoment(Moment)
 
@@ -165,7 +166,7 @@ export const initSignupMethods = (volunteersClass) => {
       return true
     },
     // this is actually an upsert
-    [`${prefix}.signups.insert`](wholeSignup) {
+    [`${prefix}.signups.insert`]({ rotaId, ...wholeSignup }) {
       console.log(`${prefix}.signups.insert`, wholeSignup)
       check(wholeSignup, Object)
       SimpleSchema.validate(wholeSignup, schemas.signup.omit('status'))
@@ -217,44 +218,103 @@ export const initSignupMethods = (volunteersClass) => {
             createdAt: new Date(),
           },
         })
+        let rotaInfo
+        if (rotaId) {
+          rotaInfo = collections.volunteerForm.aggregate([
+            { $match: { userId: this.userId } },
+            { $project: { skills: true, quirks: true } },
+            {
+              $lookup: {
+                from: collections.rotas._name,
+                let: { skills: '$skills', quirks: '$quirks', userId: '$userId' },
+                as: 'rotas',
+                pipeline: [
+                  ...rotaPriorityAggregation({
+                    collections,
+                    skillsPath: '$$skills',
+                    quirksPath: '$$quirks',
+                    match: {
+                      _id: rotaId,
+                    },
+                  }),
+                ],
+              },
+            },
+          ])?.[0]?.rotas?.[0]
+        }
         if (res && res.insertedId) {
-          return res.insertedId
+          return {
+            id: res.insertedId,
+            userId: signupIdentifiers.userId,
+            shiftId: signupIdentifiers.shiftId,
+            status,
+            rotaInfo,
+          }
         }
         const existing = collections.signups.findOne(signupIdentifiers)
-        return existing && existing._id
+        return {
+          ...existing,
+          rotaInfo,
+        }
       }
       throw new Meteor.Error(403, 'Insufficient Permission')
     },
-    [`${prefix}.signups.bail`](signupIds) {
-      console.log(`${prefix}.signups.bail`, signupIds)
-      check(signupIds, {
+    [`${prefix}.signups.bail`]({ rotaId, ...signupIds }) {
+      console.log(`${prefix}.signups.bail`, signupIds, rotaId)
+      check(signupIds, Match.OneOf({
         parentId: String,
         shiftId: String,
         userId: String,
-      })
+      }, { _id: String }))
       const signup = collections.signups.findOne(signupIds)
-      const isLead = services.auth.isLead(this.userId, signupIds.parentId)
+      const isLead = services.auth.isLead(this.userId, signup.parentId)
+      if ((signup.userId !== this.userId) && !isLead) {
+        throw new Meteor.Error(403, 'Insufficient Permission')
+      }
       if (!services.event.areShiftChangesOpen(signup) && !isLead) {
         throw new Meteor.Error(403, 'Too late to change this shift! Contact your lead')
       }
-      if ((signupIds.userId === this.userId) || isLead) {
-        // multi : true just in case it is possible to singup for the same shift twice
-        // this should not be possible. Failsafe !
-        return collections.signups.update(signupIds, {
+
+      try {
+        collections.signups.update(signupIds, {
           $set: {
             status: 'bailed',
           },
-        }, (err) => {
-          if (err) {
-            console.error('Error when bailing', err)
-            throw new Meteor.Error(500, 'Cannot Update')
-          }
-          if (signup.type === 'lead' && signup.status === 'confirmed' && Meteor.isServer) {
-            Roles.removeUsersFromRoles(signup.userId, signup.parentId, eventName)
-          }
         })
+        if (signup.type === 'lead' && signup.status === 'confirmed' && Meteor.isServer) {
+          Roles.removeUsersFromRoles(signup.userId, signup.parentId, eventName)
+        }
+      } catch (err) {
+        console.error('Error when bailing', err)
+        throw new Meteor.Error(500, 'Cannot Update')
       }
-      throw new Meteor.Error(403, 'Insufficient Permission')
+
+      let rotaInfo
+      if (rotaId) {
+        rotaInfo = collections.volunteerForm.aggregate([
+          { $match: { userId: this.userId } },
+          { $project: { skills: true, quirks: true } },
+          {
+            $lookup: {
+              from: collections.rotas._name,
+              let: { skills: '$skills', quirks: '$quirks', userId: '$userId' },
+              as: 'rotas',
+              pipeline: [
+                ...rotaPriorityAggregation({
+                  collections,
+                  skillsPath: '$$skills',
+                  quirksPath: '$$quirks',
+                  match: {
+                    _id: rotaId,
+                  },
+                }),
+              ],
+            },
+          },
+        ])?.[0]?.rotas?.[0]
+      }
+
+      return { rotaInfo }
     },
   })
 }

@@ -3,19 +3,24 @@ import { Bert } from 'meteor/themeteorchef:bert'
 import { t } from '../components/common/i18n'
 import { meteorCall } from './methodUtils'
 
-export const bailCall = (Volunteers, {
-  parentId,
-  _id,
-  shiftId = _id,
-  userId = Meteor.userId(),
-}) => () => {
-  // I18N
-  if (window.confirm('Are you sure you want to cancel this shift?')) {
-    meteorCall(Volunteers, 'signups.bail', {
+export const bailCall = (
+  Volunteers, {
+    parentId,
+    _id,
+    shiftId = _id,
+    userId = Meteor.userId(),
+    signupId,
+    rotaId,
+  },
+  callback = () => {},
+) => () => {
+  if (window.confirm(t('shift_cancel_confirm'))) {
+    meteorCall(Volunteers, 'signups.bail', signupId ? { _id: signupId, rotaId } : {
       parentId,
       shiftId,
       userId,
-    })
+      rotaId,
+    }, callback)
   }
 }
 
@@ -48,18 +53,23 @@ const applyErrorCallback = (err) => {
   }
 }
 
-export const applyCall = (Volunteers, {
-  _id,
-  shiftId = _id,
-  type,
-  parentId,
-  userId = Meteor.userId(),
-}) => () => {
+export const applyCall = (
+  Volunteers, {
+    _id,
+    shiftId = _id,
+    type,
+    parentId,
+    userId = Meteor.userId(),
+    rotaId,
+  },
+  callback = () => {},
+) => () => {
   const signup = {
     parentId,
     shiftId,
     userId,
     type,
+    rotaId,
   }
   if (type === 'project') {
     console.error('Project signups not supported')
@@ -68,6 +78,6 @@ export const applyCall = (Volunteers, {
     // FIXME This was actually being called with null. If called with an error will lead to multiple
     // messages. We need to combine this with methodUtils handling.
     // meteorCall(Volunteers, 'signups.insert', signup, applyErrorCallback)
-    meteorCall(Volunteers, 'signups.insert', signup)
+    meteorCall(Volunteers, 'signups.insert', signup, callback)
   }
 }

@@ -5,7 +5,7 @@ import { t } from '../../both/utils/i18n'
 
 export const methodCallback = (cb) => (err, res) => {
   if (err) {
-    if (Meteor.isDevelopment) console.error('Error calling method', err)
+    console.error('Error calling method', err)
     Bert.alert({
       title: t('method_error'),
       message: err.reason,
@@ -13,7 +13,17 @@ export const methodCallback = (cb) => (err, res) => {
       style: 'growl-top-right',
     })
   } else {
-    cb(err, res)
+    try {
+      cb(err, res)
+    } catch (error) {
+      console.error('Error running callback for method', error)
+      Bert.alert({
+        title: t('method_error'),
+        message: error.message,
+        type: 'danger',
+        style: 'growl-top-right',
+      })
+    }
   }
 }
 

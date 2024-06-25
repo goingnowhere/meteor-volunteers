@@ -16,7 +16,7 @@ export const SignupsListItem = ({ duty, type, showSignupModal }) => {
             <>
               <div className="col">
                 <div className="btn-action">
-                  <h5 className="mb-0">{ duty.length } <T>shift_length_hours</T></h5>
+                  <h5 className="mb-0">{ dutyType === 'rota' ? duty.shiftHours : duty.length } <T>shift_length_hours</T></h5>
                 </div>
               </div>
               <div className="col">

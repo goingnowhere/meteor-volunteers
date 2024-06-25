@@ -341,32 +341,4 @@ export const initPublications = (volunteersClass) => {
       },
     ])
   })
-
-  Meteor.publish(`${eventName}.Volunteers.shiftGroups`, function publishSiftGroups(sel = {}) {
-    let query = { ...sel, ...dutiesPublicPolicy }
-    if (this.userId) {
-      query = filterForPublic(this.userId, query)
-    }
-    return ReactiveAggregate(this, collections.shift, [
-      { $match: query },
-      {
-        $group: {
-          _id: '$rotaId',
-          parentId: { $first: '$parentId' },
-          title: { $first: '$title' },
-          description: { $first: '$description' },
-          priority: { $first: '$priority' },
-          policy: { $first: '$policy' },
-          length: {
-            $first: {
-              $divide: [
-                { $subtract: ['$end', '$start'] },
-                3600000,
-              ],
-            },
-          },
-        },
-      },
-    ], { clientCollection: `${eventName}.Volunteers.shiftGroups` })
-  })
 }

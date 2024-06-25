@@ -13,6 +13,7 @@ const numLeft = (gaps, spotsLeft) =>
   `${gaps || spotsLeft} ${t(gaps ? 'people_needed' : 'spots_left')}`
 
 export const SignupShiftButtons = ({
+  onSignup,
   policy,
   type,
   min,
@@ -29,7 +30,7 @@ export const SignupShiftButtons = ({
       <button
         className="btn btn-primary btn-action"
         type="button"
-        onClick={applyCall(Volunteers, { type, ...duty })}
+        onClick={applyCall(Volunteers, { type, ...duty }, (_err, res) => onSignup(res))}
         disabled={!spotsLeft}
       >
         {`${t(signupMessages[policy])} (${numLeft(gaps, spotsLeft)})`}

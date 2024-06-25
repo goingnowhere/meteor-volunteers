@@ -18,12 +18,13 @@ export { BookedTable } from './client/components/volunteers/BookedTable.jsx'
 export { SignupApproval } from './client/components/teamLeads/SignupApproval.jsx'
 export { TeamShiftsTable } from './client/components/teamLeads/TeamShiftsTable.jsx'
 export { TeamProjectsTable } from './client/components/teamLeads/TeamProjectsTable.jsx'
+export { PublicDeptView } from './client/components/teamLeads/PublicDeptView.jsx'
+export { PublicTeamView } from './client/components/teamLeads/PublicTeamView.jsx'
 export { ShiftDateInline } from './client/components/common/ShiftDateInline.jsx'
 export { DutiesListItem } from './client/components/shifts/DutiesListItem.jsx'
 export { SignupShiftButtons } from './client/components/shifts/SignupShiftButtons.jsx'
-export { SignupsListTeam } from './client/components/volunteers/SignupsListTeam.jsx'
+export { FilteredSignupList } from './client/components/volunteers/FilteredSignupList.jsx'
 export { SignupsList } from './client/components/shifts/SignupsList.jsx'
-export { SignupsList as SignupsListNew } from './client/components/shifts/SignupsListNew.jsx'
 export { UserInfoList } from './client/components/common/UserInfoList.jsx'
 export { Loading } from './client/components/common/Loading.jsx'
 export { DisplayName } from './client/components/common/DisplayName.jsx'
@@ -81,6 +82,7 @@ export class VolunteersClass {
     if (Meteor.isClient) {
       initClient()
       this.reactContext = reactContext
+      this.userId = Meteor.userId()
     }
   }
 

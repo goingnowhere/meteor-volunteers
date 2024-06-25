@@ -139,6 +139,7 @@ export function initRotaMethods(volunteersClass) {
         collections.shift.update({ rotaId: oldRota._id }, { $set: meta }, { multi: true })
       }
 
+      // FIXME need to handle same time shifts in either old or new shifts
       // Go through oldRota.shifts to find which have changed
       const changes = oldRota.shifts.map((oldShift, oldIndex) => {
         const newIndex = shifts.findIndex((shift) => _.isEqual(shift, oldShift))
