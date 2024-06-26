@@ -73,7 +73,7 @@ export function initDutiesMethods(volunteersClass) {
         const match = {
           ...type === 'build' && eventStart && { start: { $lt: eventStart } },
           ...type === 'strike' && eventEnd && { end: { $gt: eventEnd } },
-          ...type === 'event' && eventStart && eventEnd && { start: { $gt: eventStart, $lt: eventEnd } },
+          ...type === 'event' && eventStart && eventEnd && { end: { $gt: eventStart }, start: { $lt: eventEnd } },
           ...teams && { parentId: { $in: teams } },
         }
         const results = collections.volunteerForm.aggregate([
