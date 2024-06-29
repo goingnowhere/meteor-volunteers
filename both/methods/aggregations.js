@@ -219,6 +219,7 @@ export const projectPriorityAggregation = ({
 export const rotaPriorityAggregation = ({
   collections,
   match,
+  shiftMatch = {},
   skillsPath,
   quirksPath,
 }) => [
@@ -250,6 +251,7 @@ export const rotaPriorityAggregation = ({
         {
           $match: {
             $expr: { $eq: ['$$rotaId', '$rotaId'] },
+            ...shiftMatch,
           },
         },
         // Get confirmed and pending signups to judge staffing levels

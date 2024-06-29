@@ -59,7 +59,7 @@ export function initDutiesMethods(volunteersClass) {
   return {
     listOpenShifts: new ValidatedMethod({
       name: 'shifts.open.list',
-      validate: ({ type }) => check(type, Match.OneOf('all', 'build', 'strike', 'build-strike', 'event')),
+      validate: ({ type }) => check(type, Match.OneOf('all', 'build', 'strike', 'event')),
       run({
         type,
         teams,
@@ -68,12 +68,16 @@ export function initDutiesMethods(volunteersClass) {
         if (!Meteor.isServer) {
           return []
         }
+        const now = new Date()
         const eventStart = settings.eventPeriod?.start
         const eventEnd = settings.eventPeriod?.end
+        const endOrNow = eventEnd && moment(now).isBefore(eventEnd) ? eventEnd : now
+        const startOrNow = eventStart && moment(now).isBefore(eventStart) ? eventStart : now
         const match = {
-          ...type === 'build' && eventStart && { start: { $lt: eventStart } },
-          ...type === 'strike' && eventEnd && { end: { $gt: eventEnd } },
-          ...type === 'event' && eventStart && eventEnd && { end: { $gt: eventStart }, start: { $lt: eventEnd } },
+          ...type === 'build' && eventStart && { start: { $lt: eventStart }, end: { $gt: now } },
+          ...type === 'strike' && endOrNow && { end: { $gt: endOrNow } },
+          ...type === 'event' && startOrNow && eventEnd && { end: { $gt: startOrNow }, start: { $lt: eventEnd } },
+          ...type === 'all' && { end: { $gt: now } },
           ...teams && { parentId: { $in: teams } },
         }
         const results = collections.volunteerForm.aggregate([
@@ -105,6 +109,7 @@ export function initDutiesMethods(volunteersClass) {
                   skillsPath: '$$skills',
                   quirksPath: '$$quirks',
                   match,
+                  shiftMatch: match,
                 }),
               ],
             },

@@ -39,7 +39,6 @@ export function FilteredSignupList({ initialShiftType }) {
         >
           <option value="all">{t('all_shifts')}</option>
           <option value="event">{t('event_shifts')}</option>
-          <option value="build-strike">{t('build_strike')}</option>
           <option value="build">{t('build')}</option>
           <option value="strike">{t('strike')}</option>
         </select>
