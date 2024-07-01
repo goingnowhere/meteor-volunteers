@@ -19,7 +19,7 @@ const DutiesListItemTitle = ({
     return <TaskTitle team={team} title={title} />
   }
   if (type === 'project') {
-    return <ProjectTitle team={team} title={title} />
+    return <ProjectTitle team={team} title={title} priority={priority} />
   }
   return null
 }

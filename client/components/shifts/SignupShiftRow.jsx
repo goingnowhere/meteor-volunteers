@@ -14,6 +14,7 @@ export const SignupShiftRow = ({
   ...duty
 }) => {
   const Volunteers = useContext(reactContext)
+  const onClickSignup = (shift) => applyCall(Volunteers, shift, (_err, res) => onChange(res))
   return (
     <>
       <ShiftDate start={start} end={end} />
@@ -40,11 +41,7 @@ export const SignupShiftRow = ({
             </button>
           </div>
         ) : (
-          <SignupShiftButtons
-            {...duty}
-            signedUp={duty.signups ? duty.signups.confirmed : undefined}
-            onSignup={onChange}
-          />
+          <SignupShiftButtons {...duty} onClickSignup={onClickSignup} />
         )}
       </div>
     </>

@@ -11,10 +11,10 @@ export function SignupsList({
 }) {
   const { methods } = useContext(reactContext)
 
-  const [projects, isLoaded] = useMethodCallData(methods.listOpenShifts, {
+  let [filteredList, isLoaded] = useMethodCallData(methods.listOpenShiftsByPref, {
     type: dutyType,
     teams: filters.teams,
-  })
+  }, { default: [] })
 
   const [modalSignupDuty, setModalSignup] = useState()
   const [changedRotas, setChangedRotas] = useState({})
@@ -24,8 +24,6 @@ export function SignupsList({
 
   // Since we load with all data it's more efficient to filter on the front-end instead of querying
   // more. If we add deep-linking to filters maybe it would make sense to change this.
-  let filteredList = isLoaded && [...projects.projects, ...projects.rotas]
-    .sort((a, b) => b.score - a.score)
   if (filters.quirks?.length > 0) {
     filteredList = filteredList.filter(({ quirks }) =>
       filters.quirks.some((filtered) => quirks?.includes(filtered)))

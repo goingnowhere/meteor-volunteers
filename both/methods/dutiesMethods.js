@@ -59,10 +59,51 @@ export function initDutiesMethods(volunteersClass) {
   return {
     listOpenShifts: new ValidatedMethod({
       name: 'shifts.open.list',
-      validate: ({ type }) => check(type, Match.OneOf('all', 'build', 'strike', 'event')),
+      validate({ dates }) {
+        check(dates?.start, Date)
+        check(dates?.end, Date)
+      },
+      run({
+        teams,
+        dates,
+      }) {
+        // Aggregate is only available on the server
+        if (!Meteor.isServer) {
+          return []
+        }
+        const match = {
+          start: { $lt: dates.end },
+          end: { $gt: dates.start },
+          ...teams && { parentId: { $in: teams } },
+        }
+        // TODO re-enable when projects are supported
+        // const projects = collections.project.aggregate([
+        //   ...projectPriorityAggregation({
+        //     collections,
+        //     match,
+        //   }),
+        // ])
+        const rotas = collections.rotas.aggregate([
+          ...rotaPriorityAggregation({
+            collections,
+            match,
+            shiftMatch: match,
+          }),
+        ])
+
+        // return [...projects.projects, ...projects.rotas]
+        return [...rotas]
+          .sort((a, b) => b.score - a.score)
+      },
+    }),
+
+    listOpenShiftsByPref: new ValidatedMethod({
+      name: 'shifts.byPref.list',
+      validate: ({ type }) => check(type, Match.OneOf('all', 'build', 'strike', 'event', 'dates')),
       run({
         type,
         teams,
+        dates,
       }) {
         // Aggregate is only available on the server
         if (!Meteor.isServer) {
@@ -78,6 +119,7 @@ export function initDutiesMethods(volunteersClass) {
           ...type === 'strike' && endOrNow && { end: { $gt: endOrNow } },
           ...type === 'event' && startOrNow && eventEnd && { end: { $gt: startOrNow }, start: { $lt: eventEnd } },
           ...type === 'all' && { end: { $gt: now } },
+          ...type === 'dates' && dates && { start: { $lt: dates.end }, end: { $gt: dates.start } },
           ...teams && { parentId: { $in: teams } },
         }
         const results = collections.volunteerForm.aggregate([
@@ -115,7 +157,9 @@ export function initDutiesMethods(volunteersClass) {
             },
           },
         ])
-        return results[0]
+
+        return [...results[0].projects, ...results[0].rotas]
+          .sort((a, b) => b.score - a.score)
       },
     }),
 

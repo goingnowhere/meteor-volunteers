@@ -197,7 +197,7 @@ export const projectPriorityAggregation = ({
   {
     $addFields: {
       // How many skills or quirks match the user's
-      preferenceScore: userPrefsMatch(skillsPath, quirksPath),
+      preferenceScore: skillsPath && quirksPath ? userPrefsMatch(skillsPath, quirksPath) : 1,
       priorityScore: dutyPriorityScore,
       minRemaining: { $max: [0, { $subtract: ['$minStaffing', '$volDays'] }] },
       maxRemaining: { $max: [0, { $subtract: ['$maxStaffing', '$volDays'] }] },
@@ -321,7 +321,7 @@ export const rotaPriorityAggregation = ({
   {
     $addFields: {
       // How many skills or quirks match the user's
-      preferenceScore: userPrefsMatch(skillsPath, quirksPath),
+      preferenceScore: skillsPath && quirksPath ? userPrefsMatch(skillsPath, quirksPath) : 1,
       priorityScore: dutyPriorityScore,
     },
   },

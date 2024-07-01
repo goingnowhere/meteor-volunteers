@@ -1,8 +1,6 @@
-import React, { useContext } from 'react'
+import React from 'react'
 
 import { T, t } from '../common/i18n'
-import { applyCall } from '../../utils/signups'
-import { reactContext } from '../../clientInit'
 
 const signupMessages = {
   public: 'join',
@@ -13,15 +11,15 @@ const numLeft = (gaps, spotsLeft) =>
   `${gaps || spotsLeft} ${t(gaps ? 'people_needed' : 'spots_left')}`
 
 export const SignupShiftButtons = ({
-  onSignup,
+  onClickSignup,
   policy,
-  type,
   min,
   max,
-  signedUp = 0,
+  signups,
   ...duty
 }) => {
-  const Volunteers = useContext(reactContext)
+  const signedUp = signups?.confirmed || 0
+  // TODO this should use the server-calculated versions
   const gaps = Math.max(0, min - signedUp)
   const spotsLeft = Math.max(0, max - signedUp)
   return policy === 'adminOnly'
@@ -30,7 +28,7 @@ export const SignupShiftButtons = ({
       <button
         className="btn btn-primary btn-action"
         type="button"
-        onClick={applyCall(Volunteers, { type, ...duty }, (_err, res) => onSignup(res))}
+        onClick={() => onClickSignup({ policy, ...duty })}
         disabled={!spotsLeft}
       >
         {`${t(signupMessages[policy])} (${numLeft(gaps, spotsLeft)})`}

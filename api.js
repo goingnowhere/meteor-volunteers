@@ -28,6 +28,7 @@ export { SignupsList } from './client/components/shifts/SignupsList.jsx'
 export { UserInfoList } from './client/components/common/UserInfoList.jsx'
 export { Loading } from './client/components/common/Loading.jsx'
 export { DisplayName } from './client/components/common/DisplayName.jsx'
+export { ShiftDate } from './client/components/common/ShiftDate.jsx'
 export { TextField } from './client/components/forms/TextField.jsx'
 export { BuildAndStrikeVolunteerReport } from './client/components/public/BuildAndStrikeVolunteerReport.jsx'
 
