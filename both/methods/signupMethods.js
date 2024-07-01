@@ -178,15 +178,18 @@ export const initSignupMethods = (volunteersClass) => {
         return null
       }
       const isLead = services.auth.isLead(this.userId, parentDuty.parentId)
+      const isNoInfo = services.auth.isNoInfo()
       if (!services.event.areShiftChangesOpen(wholeSignup, parentDuty) && !isLead) {
         throw new Meteor.Error(403, 'Too late to change this shift! Contact your lead')
       }
       if (parentDuty.policy === 'adminOnly' && !isLead) {
         throw new Meteor.Error(403, 'Admin only')
       }
-      if ((signupIdentifiers.userId === this.userId) || isLead) {
+      if ((signupIdentifiers.userId === this.userId) || isLead || isNoInfo) {
         // Leads cannot be public so no special handling of roles needed in this method
-        const status = parentDuty.policy === 'public' ? 'confirmed' : 'pending'
+        // FIXME should pass a flag to say we're voluntelling, so lead applications don't
+        // automatically get approved for their teams
+        const status = parentDuty.policy === 'public' || isLead || isNoInfo ? 'confirmed' : 'pending'
         const [failReason, conflicts] = findConflicts(wholeSignup, parentDuty)
         if (failReason) {
           throw new Meteor.Error(409, failReason, conflicts)

@@ -10,9 +10,9 @@ export const userPrefsMatch = (skills, quirks) => ({
 export const dutyPriorityScore = {
   $cond: [{ $eq: ['$priority', 'normal'] }, 1,
     {
-      $cond: [{ $eq: ['$priority', 'important'] }, 2,
+      $cond: [{ $eq: ['$priority', 'important'] }, 3,
         {
-          $cond: [{ $eq: ['$priority', 'essential'] }, 3, 1],
+          $cond: [{ $eq: ['$priority', 'essential'] }, 6, 1],
         },
       ],
     },

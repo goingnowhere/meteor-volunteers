@@ -10,6 +10,7 @@ export function RotaSignupForm({
   const Volunteers = useContext(reactContext)
   return (
     <>
+      {duty.information && <p>{duty.information}</p>}
       {duty.shiftObjects.map((shift) => (
         <div key={shift._id} className="list-item row align-items-center px-2">
           <SignupShiftRow
