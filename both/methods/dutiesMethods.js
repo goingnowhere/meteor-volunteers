@@ -76,13 +76,12 @@ export function initDutiesMethods(volunteersClass) {
           end: { $gt: dates.start },
           ...teams && { parentId: { $in: teams } },
         }
-        // TODO re-enable when projects are supported
-        // const projects = collections.project.aggregate([
-        //   ...projectPriorityAggregation({
-        //     collections,
-        //     match,
-        //   }),
-        // ])
+        const projects = collections.project.aggregate([
+          ...projectPriorityAggregation({
+            collections,
+            match,
+          }),
+        ])
         const rotas = collections.rotas.aggregate([
           ...rotaPriorityAggregation({
             collections,
@@ -91,8 +90,7 @@ export function initDutiesMethods(volunteersClass) {
           }),
         ])
 
-        // return [...projects.projects, ...projects.rotas]
-        return [...rotas]
+        return [...projects, ...rotas]
           .sort((a, b) => b.score - a.score)
       },
     }),

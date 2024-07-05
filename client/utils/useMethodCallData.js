@@ -15,6 +15,8 @@ import { methodCallback } from './methodUtils'
  * @returns [data or {}, isLoadComplete, reload]
  */
 export const useMethodCallData = (method, methodArgs = {}, options = {}) => {
+  // TODO when reloading after input changes, does not re-enter a loading state which could be
+  // confusing e.g. on noinfo dashboard
   const dfault = options.default || {}
   const [data, setData] = useState()
   // The function returned by methodCallback has unknown deps, but in fact it has none
