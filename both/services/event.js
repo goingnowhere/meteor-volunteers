@@ -20,16 +20,14 @@ export const initEventService = (volunteersClass) => {
       } else {
         return true
       }
+      const now = moment()
 
       if (service.isEarlyShift({ start: startDate })) {
-        const earlyEntryClose = moment(settings.get()?.earlyEntryClose)
-        return earlyEntryClose.isAfter()
+        const earlyEntryClose = settings.get()?.earlyEntryClose
+        return !earlyEntryClose || now.isBefore(earlyEntryClose)
       }
 
-      const eventPeriod = settings.get()?.eventPeriod
-      return !eventPeriod
-        || moment(eventPeriod.start).isAfter()
-        || startDate.isAfter(eventPeriod.end)
+      return now.isBefore(startDate)
     },
   }
   return service
