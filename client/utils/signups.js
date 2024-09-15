@@ -54,16 +54,16 @@ const applyErrorCallback = (err) => {
 }
 
 export const applyCall = (
-  Volunteers, {
-    _id,
-    shiftId = _id,
-    type,
-    parentId,
-    userId = Meteor.userId(),
-    rotaId,
-  },
+  Volunteers,
   callback = () => {},
-) => () => {
+) => ({
+  _id,
+  shiftId = _id,
+  type,
+  parentId,
+  userId = Meteor.userId(),
+  rotaId,
+}) => {
   const signup = {
     parentId,
     shiftId,

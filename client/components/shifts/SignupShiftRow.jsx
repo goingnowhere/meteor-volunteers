@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 
 import { T } from '../common/i18n'
 import { ShiftDate } from '../common/ShiftDate.jsx'
-import { bailCall } from '../../utils/signups'
+import { applyCall, bailCall } from '../../utils/signups'
 import { SignupShiftButtons } from './SignupShiftButtons.jsx'
 import { reactContext } from '../../clientInit'
 
@@ -14,7 +14,7 @@ export const SignupShiftRow = ({
   ...duty
 }) => {
   const Volunteers = useContext(reactContext)
-  const onClickSignup = (shift) => applyCall(Volunteers, shift, (_err, res) => onChange(res))
+  const onClickSignup = applyCall(Volunteers, (_err, res) => onChange(res))
   return (
     <>
       <ShiftDate start={start} end={end} />
@@ -34,8 +34,8 @@ export const SignupShiftRow = ({
               onClick={bailCall(
                 Volunteers,
                 { signupId: signup._id, rotaId: duty.rotaId },
-                (_err, res) => onChange(res))
-              }
+                (_err, res) => onChange(res),
+              )}
             >
               <T>cancel</T>
             </button>
