@@ -95,6 +95,15 @@ export const initServerMethods = (volunteersClass) => {
   })
 
   new ValidatedMethod({
+    name: `${prefix}.getAllDeptStats.manager`,
+    validate: null,
+    mixins: [services.auth.mixins.isManager],
+    run() {
+      return services.stats.getAllDeptStats()
+    },
+  })
+
+  new ValidatedMethod({
     name: `${prefix}.rotas.findOne`,
     validate({ rotaId }) {
       check(rotaId, String)

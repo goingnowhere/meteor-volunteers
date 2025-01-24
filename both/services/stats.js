@@ -192,5 +192,14 @@ export const initStatsService = (volunteersClass) => {
     }
   }
 
+  service.getAllDeptStats = () => {
+    const depts = getDepts({})
+    return {
+      leadsStats: sumSignupRates(depts.map((dept) => dept.leadRate)),
+      metaleadsStats: sumSignupRates(depts.map((dept) => dept.metaleadRate)),
+      shiftsStats: sumSignupRates(depts.map((dept) => dept.shiftRate)),
+    }
+  }
+
   return service
 }
