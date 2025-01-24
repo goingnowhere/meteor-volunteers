@@ -156,8 +156,8 @@ export function initDutiesMethods(volunteersClass) {
           },
         ])
 
-        return [...results[0].projects, ...results[0].rotas]
-          .sort((a, b) => b.score - a.score)
+        return (results[0] && [...results[0].projects, ...results[0].rotas]
+          .sort((a, b) => b.score - a.score)) ?? []
       },
     }),
 
