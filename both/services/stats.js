@@ -150,16 +150,18 @@ export const initStatsService = (volunteersClass) => {
    * Lead only
    */
   const getDepts = (query) => collections.department.find(query).map((dept) => {
-    const teamsOfThisDept = getTeams({ _id: dept._id }, 'department')
-      .concat(getTeams({ parentId: dept._id }))
+    const thisDept = getTeams({ _id: dept._id }, 'department')[0]
+    const teams = getTeams({ parentId: dept._id })
+    const teamsOfThisDept = [thisDept].concat(teams)
 
     return {
       teamIds: teamsOfThisDept.map(team => team._id),
-      teamsNumber: teamsOfThisDept.length,
+      teamsNumber: teams.length,
       teams: teamsOfThisDept,
       volunteerNumber: teamsOfThisDept.reduce((sum, team) => sum + team.volunteerNumber, 0),
       shiftRate: sumSignupRates(teamsOfThisDept.map((team) => team.shiftRate)),
-      leadRate: sumSignupRates(teamsOfThisDept.map((team) => team.leadRate)),
+      metaleadRate: thisDept.leadRate,
+      leadRate: sumSignupRates(teams.map((team) => team.leadRate)),
       ...dept,
     }
   })
