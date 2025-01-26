@@ -50,10 +50,8 @@ export const initServerMethods = (volunteersClass) => {
       check(type, Match.OneOf(...dutyTypes))
       check(date, Match.Maybe(Date))
     },
+    mixins: [services.auth.mixins.isLead],
     run({ type, teamId, date }) {
-      if (!services.auth.isLead(this.userId, teamId)) {
-        throw new Meteor.Error(403, 'Insufficient Permission')
-      }
       let query = { parentId: teamId }
       if (date) {
         const startOfDay = moment(date).startOf('day')
@@ -79,10 +77,8 @@ export const initServerMethods = (volunteersClass) => {
     validate({ teamId }) {
       check(teamId, String)
     },
+    mixins: [services.auth.mixins.isLead],
     run({ teamId }) {
-      if (!services.auth.isLead(this.userId, teamId)) {
-        throw new Meteor.Error(403, 'Insufficient Permission')
-      }
       return services.stats.getTeamStats(teamId, true)
     },
   })
@@ -92,11 +88,18 @@ export const initServerMethods = (volunteersClass) => {
     validate({ deptId }) {
       check(deptId, String)
     },
+    mixins: [services.auth.mixins.isLead],
     run({ deptId }) {
-      if (!services.auth.isLead(this.userId, deptId)) {
-        throw new Meteor.Error(403, 'Insufficient Permission')
-      }
       return services.stats.getDeptStats(deptId, true)
+    },
+  })
+
+  new ValidatedMethod({
+    name: `${prefix}.getAllDeptStats.manager`,
+    validate: null,
+    mixins: [services.auth.mixins.isManager],
+    run() {
+      return services.stats.getAllDeptStats()
     },
   })
 
