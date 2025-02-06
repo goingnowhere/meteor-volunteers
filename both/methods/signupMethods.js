@@ -186,7 +186,6 @@ export const initSignupMethods = (volunteersClass) => {
         throw new Meteor.Error(403, 'Admin only')
       }
       if ((signupIdentifiers.userId === this.userId) || isLead || isNoInfo) {
-        // Leads cannot be public so no special handling of roles needed in this method
         // FIXME should pass a flag to say we're voluntelling, so lead applications don't
         // automatically get approved for their teams
         const status = parentDuty.policy === 'public' || isLead || isNoInfo ? 'confirmed' : 'pending'
@@ -244,6 +243,9 @@ export const initSignupMethods = (volunteersClass) => {
               },
             },
           ])?.[0]?.rotas?.[0]
+        }
+        if (status === 'confirmed' && parentDuty.policy !== 'public') {
+          Roles.addUsersToRoles(signupIdentifiers.userId, parentDuty.parentId, eventName)
         }
         if (res && res.insertedId) {
           return {
