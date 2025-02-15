@@ -141,12 +141,7 @@ export const initSignupMethods = (volunteersClass) => {
       if (!services.event.areShiftChangesOpen(oldSignup) && !isLead) {
         throw new Meteor.Error(403, 'Too late to change this shift! Contact your lead')
       }
-      if (isLead) {
-        doc.modifier.$set.enrolled = true
-        // This logic probably needs review but currently this isn't used to approve
-        doc.modifier.$set.reviewed = (oldSignup.status === 'pending' && doc.status !== 'pending')
-        collections.signups.update(doc._id, doc.modifier)
-      } else if (oldSignup.userId === Meteor.userId()) {
+      if (oldSignup.userId === Meteor.userId()) {
         const parentDuty = collections.dutiesCollections[oldSignup.type]
           .findOne({ _id: oldSignup.shiftId })
         if (!parentDuty && Meteor.isClient) {
@@ -160,8 +155,22 @@ export const initSignupMethods = (volunteersClass) => {
           enrolled: false,
         }
         collections.signups.update(doc._id, doc.modifier)
+      } else if (isLead) {
+        // counts as a 'voluntell' as the lead changed the shift
+        doc.modifier.$set.enrolled = true
+        // This logic probably needs review but currently this isn't used to approve
+        doc.modifier.$set.reviewed = (oldSignup.status === 'pending' && doc.status !== 'pending')
+        collections.signups.update(doc._id, doc.modifier)
       } else {
         throw new Meteor.Error(403, 'Insufficient Permission')
+      }
+      if (oldSignup.type === 'lead') {
+        if (oldSignup.parentId !== doc.modifier.$set.parentId || doc.modifier.$set.status !== 'confirmed') {
+          Roles.removeRolesFromParent(oldSignup.userId, oldSignup.parentId)
+        }
+        if (doc.modifier.$set.parentId && doc.modifier.$set.status === 'confirmed') {
+          Roles.addRolesToParent(oldSignup.userId, doc.modifier.$set.parentId)
+        }
       }
       return true
     },
@@ -170,6 +179,7 @@ export const initSignupMethods = (volunteersClass) => {
       console.log(`${prefix}.signups.insert`, wholeSignup)
       check(wholeSignup, Object)
       SimpleSchema.validate(wholeSignup, schemas.signup.omit('status'))
+
       const signupIdentifiers = _.pick(wholeSignup, ['userId', 'shiftId', 'parentId'])
       const parentDuty = collections.dutiesCollections[wholeSignup.type]
         .findOne(signupIdentifiers.shiftId)
@@ -178,18 +188,28 @@ export const initSignupMethods = (volunteersClass) => {
         return null
       }
       const isLead = services.auth.isLead(this.userId, parentDuty.parentId)
-      const isNoInfo = services.auth.isNoInfo()
+      const isVoluntell = wholeSignup.enrolled && (isLead || services.auth.isNoInfo())
+      // We don't include NoInfo in these as NoInfo shouldn't be signing people up after shifts have
+      // started or EE shifts after EE close
       if (!services.event.areShiftChangesOpen(wholeSignup, parentDuty) && !isLead) {
         throw new Meteor.Error(403, 'Too late to change this shift! Contact your lead')
       }
+      // ...and shouldn't be putting people in admin only roles
       if (parentDuty.policy === 'adminOnly' && !isLead) {
         throw new Meteor.Error(403, 'Admin only')
       }
-      if ((signupIdentifiers.userId === this.userId) || isLead || isNoInfo) {
-        // Leads cannot be public so no special handling of roles needed in this method
-        // FIXME should pass a flag to say we're voluntelling, so lead applications don't
-        // automatically get approved for their teams
-        const status = parentDuty.policy === 'public' || isLead || isNoInfo ? 'confirmed' : 'pending'
+      if ((signupIdentifiers.userId !== this.userId) && !isVoluntell) {
+        throw new Meteor.Error(403, 'Insufficient Permission')
+      }
+      const status = parentDuty.policy === 'public' || isVoluntell ? 'confirmed' : 'pending'
+      const {
+        type,
+        start,
+        end,
+        enrolled,
+      } = wholeSignup
+      // Leads (not NoInfo) skip some validation checks when voluntelling
+      if (!isVoluntell || !isLead) {
         const [failReason, conflicts] = findConflicts(wholeSignup, parentDuty)
         if (failReason) {
           throw new Meteor.Error(409, failReason, conflicts)
@@ -197,70 +217,68 @@ export const initSignupMethods = (volunteersClass) => {
         if (isDutyFull(wholeSignup, parentDuty)) {
           throw new Meteor.Error(409, 'Too many signups')
         }
-        const {
-          type,
-          start,
-          end,
-          enrolled,
-        } = wholeSignup
         if (type === 'project' && (
           moment(start).isBefore(parentDuty.start)
           || moment(end).isAfter(parentDuty.end)
         )) {
           throw new Meteor.Error(400, 'Start and end need to be within the project dates')
         }
-        const res = collections.signups.upsert(signupIdentifiers, {
-          $set: {
-            ...signupIdentifiers,
-            type,
-            status,
-            start,
-            end,
-            enrolled,
-            notification: false,
-            createdAt: new Date(),
-          },
-        })
-        let rotaInfo
-        if (rotaId) {
-          rotaInfo = collections.volunteerForm.aggregate([
-            { $match: { userId: this.userId } },
-            { $project: { skills: true, quirks: true } },
-            {
-              $lookup: {
-                from: collections.rotas._name,
-                let: { skills: '$skills', quirks: '$quirks', userId: '$userId' },
-                as: 'rotas',
-                pipeline: [
-                  ...rotaPriorityAggregation({
-                    collections,
-                    skillsPath: '$$skills',
-                    quirksPath: '$$quirks',
-                    match: {
-                      _id: rotaId,
-                    },
-                  }),
-                ],
-              },
+      }
+      if (wholeSignup.type === 'lead' && status === 'confirmed') {
+        Roles.addUsersToRoles(signupIdentifiers.userId, parentDuty.parentId, eventName)
+      }
+      const res = collections.signups.upsert(signupIdentifiers, {
+        $set: {
+          ...signupIdentifiers,
+          type,
+          status,
+          start,
+          end,
+          enrolled,
+          notification: false,
+          createdAt: new Date(),
+        },
+      })
+      // If we were passed a rotaId, fetch new info for that rota, so we can update the UI
+      let rotaInfo
+      if (rotaId) {
+        rotaInfo = collections.volunteerForm.aggregate([
+          { $match: { userId: this.userId } },
+          { $project: { skills: true, quirks: true } },
+          {
+            $lookup: {
+              from: collections.rotas._name,
+              let: { skills: '$skills', quirks: '$quirks', userId: '$userId' },
+              as: 'rotas',
+              pipeline: [
+                ...rotaPriorityAggregation({
+                  collections,
+                  skillsPath: '$$skills',
+                  quirksPath: '$$quirks',
+                  match: {
+                    _id: rotaId,
+                  },
+                }),
+              ],
             },
-          ])?.[0]?.rotas?.[0]
-        }
-        if (res && res.insertedId) {
-          return {
-            id: res.insertedId,
-            userId: signupIdentifiers.userId,
-            shiftId: signupIdentifiers.shiftId,
-            status,
-            rotaInfo,
-          }
-        }
-        const existing = collections.signups.findOne(signupIdentifiers)
+          },
+        ])?.[0]?.rotas?.[0]
+      }
+
+      if (res && res.insertedId) {
         return {
-          ...existing,
+          id: res.insertedId,
+          userId: signupIdentifiers.userId,
+          shiftId: signupIdentifiers.shiftId,
+          status,
           rotaInfo,
         }
       }
-      throw new Meteor.Error(403, 'Insufficient Permission')
+      const existing = collections.signups.findOne(signupIdentifiers)
+      return {
+        ...existing,
+        rotaInfo,
+      }
     },
     [`${prefix}.signups.bail`]({ rotaId, ...signupIds }) {
       console.log(`${prefix}.signups.bail`, signupIds, rotaId)

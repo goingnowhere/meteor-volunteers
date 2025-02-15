@@ -44,7 +44,7 @@ export const initAuthMixins = (authService) => ({
     ...methodOptions,
     run(args) {
     // Check if lead of parentId from args if it has it
-      const teamId = typeof args === 'object' ? args.parentId : args
+      const teamId = typeof args === 'object' ? args.parentId ?? args.teamId ?? args.deptId : args
       if (!authService.isManager(this.userId) && !authService.isLead(this.userId, teamId)) {
         throw new Meteor.Error('403', "You don't have permission for this operation")
       }
