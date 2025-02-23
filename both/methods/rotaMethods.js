@@ -145,11 +145,11 @@ export function initRotaMethods(volunteersClass) {
         const newIndex = shifts.findIndex((shift) => _.isEqual(shift, oldShift))
         // Assume index is the same if there isn't an exact match. Need to improve when re-writing
         const newShift = shifts[oldIndex]
-        const timeChange = newShift.startTime !== oldShift.startTime
+        const timeChange = !newShift || newShift.startTime !== oldShift.startTime
           || newShift.endTime !== oldShift.endTime
         return {
           indexChange: (newIndex !== -1 && newIndex !== oldIndex) ? newIndex : false,
-          numChange: newShift.min !== oldShift.min || newShift.max !== oldShift.max,
+          numChange: newShift && (newShift.min !== oldShift.min || newShift.max !== oldShift.max),
           timeChange,
           oldIndex,
           oldShift,
@@ -168,10 +168,13 @@ export function initRotaMethods(volunteersClass) {
       changes
         .filter(({ indexChange, timeChange, numChange }) =>
           !indexChange && !timeChange && numChange)
-        .forEach(({ oldIndex, newShift: { min, max } }) => {
-          collections.shift.update({ rotaId: oldRota._id, rotaIndex: oldIndex },
-            { $set: { min, max } }, { multi: true })
-          indexesAlreadySet.push(oldIndex)
+        .forEach(({ oldIndex, newShift }) => {
+          if (newShift) {
+            const { min, max } = newShift
+            collections.shift.update({ rotaId: oldRota._id, rotaIndex: oldIndex },
+              { $set: { min, max } }, { multi: true })
+            indexesAlreadySet.push(oldIndex)
+          }
         })
       changes
         .filter(({ indexChange }) => indexChange !== false)
