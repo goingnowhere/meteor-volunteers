@@ -8,6 +8,7 @@ import {
   projectsAndStaffingAggregation,
   projectPriorityAggregation,
   rotaPriorityAggregation,
+  volunteerListAggregation,
 } from './aggregations'
 
 const moment = extendMoment(Moment)
@@ -228,6 +229,123 @@ export function initDutiesMethods(volunteersClass) {
         return {
           days: days.map(day => day.toDate()),
           allTeams: projStats,
+        }
+      },
+    }),
+
+    listEarlyEntries: new ValidatedMethod({
+      name: 'duties.earlyEntry.list',
+      mixins: [auth.mixins.isLead],
+      validate: ({ teamId, deptId }) => {
+        console.log('hah', teamId, deptId)
+        check(deptId, Match.Maybe(String))
+        check(teamId, Match.Maybe(String))
+        if (deptId && teamId) {
+          throw new Match.Error(400, 'Can\'t specify both team and dept')
+        }
+      },
+      run({ deptId, teamId }) {
+        // Aggregate is only available on the server
+        if (!Meteor.isServer) {
+          return []
+        }
+        if (!settings.buildPeriod || !settings.eventPeriod || !settings.strikePeriod) {
+          throw new Meteor.Error(500, 'Invalid event settings')
+        }
+        const buildStart = moment(settings.buildPeriod.start)
+        const eventStart = moment(settings.eventPeriod.start)
+
+        const volList = collections.team.aggregate([
+          {
+            $match: {
+              policy: 'public',
+              ...((!teamId && !deptId)
+                && teamId ? { _id: teamId } : { parentId: deptId }
+              ),
+            },
+          },
+          ...volunteerListAggregation(
+            collections, buildStart.toDate(), eventStart.add(1, 'day').toDate(),
+          ),
+        ])
+
+        const eeMap = new Map()
+        volList.forEach((team) => {
+          // projects
+          team.projects.forEach((project) => {
+            project.signups.forEach((projectSignup) => {
+              const existing = eeMap.get(projectSignup.userId) ?? {
+                projects: [],
+                shifts: [],
+                teams: [],
+              }
+              if (!existing.firstStart || moment(existing.firstStart).isAfter(projectSignup.start)) {
+                eeMap.set(projectSignup.userId, {
+                  userId: projectSignup.userId,
+                  firstname: projectSignup.firstname,
+                  lastname: projectSignup.lastname,
+                  nickname: projectSignup.nickname,
+                  ticketId: projectSignup.ticketId,
+                  email: projectSignup.emails.find((email) => email.verified)?.address,
+                  firstStart: projectSignup.start,
+                  firstDuty: project.title,
+                  firstTeam: team.name,
+                  teams: [...existing.teams, team],
+                  projects: [...existing.projects, project],
+                  shifts: existing.shifts,
+                })
+              }
+              // TODO add last date
+            })
+          })
+          // shifts
+          team.shifts.forEach((shift) => {
+            shift.signups.forEach((shiftSignup) => {
+              const existing = eeMap.get(shiftSignup.userId) ?? {
+                projects: [],
+                shifts: [],
+                teams: [],
+              }
+              if (!existing.firstStart || moment(existing.firstStart).isAfter(shift.start)) {
+                eeMap.set(shiftSignup.userId, {
+                  userId: shiftSignup.userId,
+                  firstname: shiftSignup.firstname,
+                  lastname: shiftSignup.lastname,
+                  nickname: shiftSignup.nickname,
+                  ticketId: shiftSignup.ticketId,
+                  email: shiftSignup.emails.find((email) => email.verified)?.address,
+                  firstStart: shift.start,
+                  firstDuty: shift.title,
+                  firstTeam: team.name,
+                  teams: [...existing.teams, team],
+                  projects: existing.projects,
+                  shifts: [...existing.shifts, shift],
+                })
+              }
+              // TODO add last date
+            })
+          })
+        })
+        const eeList = [...eeMap.values()]
+        eeList.sort((a, b) => (moment(a.firstStart).isBefore(b.firstStart) ? -1 : 1))
+
+        const newEE = eeList.map((ee) => ({
+          eeDate: moment(ee.firstStart).subtract(1, 'days').format('DD/MM/YY'),
+          start: moment(ee.firstStart).format(),
+          end: '',
+          team: ee.firstTeam,
+          // firstTeam: ee.firstTeam,
+          title: ee.firstDuty,
+          name: ee.nickname || ee.firstname || ee.email,
+          email: ee.email,
+          ticket: ee.ticketId || 'NO_TICKET',
+          fullName: `${ee.firstname} ${ee.lastname || ''}`,
+        }))
+
+        return {
+          volList,
+          eeList,
+          newEE,
         }
       },
     }),

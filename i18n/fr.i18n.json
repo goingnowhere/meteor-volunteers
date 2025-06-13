@@ -104,6 +104,8 @@
   "method_error": "Un problème est survenu lors de l'échange avec le serveur.",
   "public_email": "Email public",
   "public_email_help": "Ceci est l'email public pour cette unité",
+  "arrival_date": "Date d'arrivée",
+  "early_entry": "Early Entry",
   "email_not_verified": "Email address not verified",
   "no_ticket": "No Ticket!",
   "real_name": "Real Name",

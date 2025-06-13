@@ -124,9 +124,6 @@ export const projectsAndStaffingAggregation = (collections, type, eventStart, ev
             pipeline: [
               { $match: { $expr: { $eq: ['$$shiftId', '$shiftId'] }, status: 'confirmed' } },
               {
-                $addFields: { test: '$$shiftId' },
-              },
-              {
                 // Remove anything about user so this can be public
                 $unset: ['userId'],
               },
@@ -136,6 +133,156 @@ export const projectsAndStaffingAggregation = (collections, type, eventStart, ev
         },
       ],
       as: 'projects',
+    },
+  },
+]
+
+export const volunteerListAggregation = (collections, startDate, endDate) => [
+  {
+    $lookup: {
+      from: collections.project._name,
+      let: { teamId: '$_id' },
+      pipeline: [
+        {
+          $match: { $expr: { $eq: ['$parentId', '$$teamId'] } },
+        }, {
+          $match: {
+            // Used for EE, so include everything, not just public
+            end: { $gt: startDate },
+            start: { $lt: endDate },
+          },
+        },
+        {
+          $lookup: {
+            from: collections.signups._name,
+            let: { shiftId: '$_id' },
+            pipeline: [
+              { $match: { $expr: { $eq: ['$$shiftId', '$shiftId'] }, status: 'confirmed' } },
+              {
+                $lookup: {
+                  from: Meteor.users._name,
+                  let: { userId: '$userId' },
+                  pipeline: [
+                    {
+                      $match: { $expr: { $eq: ['$_id', '$$userId'] } },
+                    }, {
+                      $project: {
+                        emails: true,
+                        profile: true,
+                        ticketId: true,
+                      },
+                    },
+                  ],
+                  as: 'user',
+                },
+              },
+              { $unwind: { path: '$user' } },
+              {
+                $project: {
+                  _id: false,
+                  userId: true,
+                  enrolled: true,
+                  reviewed: true,
+                  type: true,
+                  start: true,
+                  end: true,
+                  emails: '$user.emails',
+                  nickname: '$user.profile.nickname',
+                  firstname: '$user.profile.firstName',
+                  lastname: '$user.profile.lastName',
+                  ticketId: '$user.ticketId',
+                },
+              },
+            ],
+            as: 'signups',
+          },
+        },
+        {
+          $project: {
+            _id: true,
+            title: true,
+            start: true,
+            end: true,
+            signups: true,
+          },
+        },
+      ],
+      as: 'projects',
+    },
+  },
+  {
+    $lookup: {
+      from: collections.shift._name,
+      let: { teamId: '$_id' },
+      pipeline: [
+        {
+          $match: { $expr: { $eq: ['$parentId', '$$teamId'] } },
+        }, {
+          $match: {
+            // Used for EE, so include everything, not just public
+            end: { $gt: startDate },
+            start: { $lt: endDate },
+          },
+        },
+        {
+          $lookup: {
+            from: collections.signups._name,
+            let: { shiftId: '$_id' },
+            pipeline: [
+              { $match: { $expr: { $eq: ['$$shiftId', '$shiftId'] }, status: 'confirmed' } },
+              {
+                $lookup: {
+                  from: Meteor.users._name,
+                  let: { userId: '$userId' },
+                  pipeline: [
+                    {
+                      $match: { $expr: { $eq: ['$_id', '$$userId'] } },
+                    }, {
+                      $project: {
+                        emails: true,
+                        profile: true,
+                        ticketId: true,
+                      },
+                    },
+                  ],
+                  as: 'user',
+                },
+              },
+              { $unwind: { path: '$user' } },
+              {
+                $project: {
+                  _id: false,
+                  userId: true,
+                  enrolled: true,
+                  reviewed: true,
+                  type: true,
+                  emails: '$user.emails',
+                  nickname: '$user.profile.nickname',
+                  firstname: '$user.profile.firstName',
+                  lastname: '$user.profile.lastName',
+                  ticketId: '$user.ticketId',
+                },
+              },
+            ],
+            as: 'signups',
+          },
+        },
+        {
+          $project: {
+            _id: true,
+            title: true,
+            start: true,
+            end: true,
+            shiftHours: {
+              $max: [1, {
+                $divide: [{ $subtract: ['$end', '$start'] }, 1000 * 60 * 60],
+              }],
+            },
+            signups: true,
+          },
+        },
+      ],
+      as: 'shifts',
     },
   },
 ]

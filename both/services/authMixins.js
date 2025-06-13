@@ -1,7 +1,7 @@
 import { Meteor } from 'meteor/meteor'
 
 export const initAuthMixins = (authService) => ({
-  /* check if the first argument is a String and compares it with the current user Id
+  /** check if the first argument is a String and compares it with the current user Id
      Or if the first argument is an object with a field userId
      Or if the first argument is an object with a field _id  */
   isSameUser: ({ run, ...methodOptions }) => ({

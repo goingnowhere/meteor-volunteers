@@ -32,6 +32,8 @@ export { DisplayName } from './client/components/common/DisplayName.jsx'
 export { ShiftDate } from './client/components/common/ShiftDate.jsx'
 export { TextField } from './client/components/forms/TextField.jsx'
 export { BuildAndStrikeVolunteerReport } from './client/components/public/BuildAndStrikeVolunteerReport.jsx'
+export { EarlyEntryList } from './client/components/teamLeads/EarlyEntryList.jsx'
+export { EarlyEntryModalButton } from './client/components/teamLeads/EarlyEntryModalButton.jsx'
 
 export class VolunteersClass {
   /** dontShare is used to start an instance without weird coffeescript global effects */

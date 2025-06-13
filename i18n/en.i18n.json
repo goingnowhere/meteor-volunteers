@@ -112,6 +112,8 @@
   "voluntell": "VolunTell",
   "associated_project": "Associated Project",
   "associated_project_help": "The visibility of this shift is restricted to the users enrolled in this project.",
+  "arrival_date": "Arrival Date",
+  "early_entry": "Early Entry",
   "more_needed": "More needed",
   "full": "Full",
   "practical_information": "Practical Information",
