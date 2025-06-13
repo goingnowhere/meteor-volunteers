@@ -109,8 +109,11 @@ export function initDutiesMethods(volunteersClass) {
         }
         const now = new Date()
         const eventStart = settings.eventPeriod?.start
-        const eventEnd = settings.eventPeriod?.end
-        const endOrNow = eventEnd && moment(now).isBefore(eventEnd) ? eventEnd : now
+        // TODO Ideally eventPeriod.end should be the actual end and the date display for the
+        // selector should be hacked, instead of having to do a +1 day everywhere...
+        const eventEndMoment = settings.eventPeriod && moment(settings.eventPeriod.end).add(1, 'day')
+        const eventEnd = eventEndMoment?.toDate()
+        const endOrNow = eventEnd && moment(now).isBefore(eventEndMoment) ? eventEnd : now
         const startOrNow = eventStart && moment(now).isBefore(eventStart) ? eventStart : now
         const match = {
           ...type === 'build' && eventStart && { start: { $lt: eventStart }, end: { $gt: now } },
