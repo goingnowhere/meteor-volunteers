@@ -109,7 +109,7 @@ export function initDutiesMethods(volunteersClass) {
           return []
         }
         const now = new Date()
-        const eventStart = settings.eventPeriod?.start
+        const eventStart = settings.earlyEntryRequirementEnd || settings.eventPeriod?.start
         // TODO Ideally eventPeriod.end should be the actual end and the date display for the
         // selector should be hacked, instead of having to do a +1 day everywhere...
         const eventEndMoment = settings.eventPeriod && moment(settings.eventPeriod.end).add(1, 'day')

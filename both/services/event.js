@@ -6,7 +6,8 @@ export const initEventService = (volunteersClass) => {
   const service = {
     isEarlyShift: ({ start }) => {
       // Can't do this in parent as it doesn't autorun on client
-      const eeEnd = moment(settings.get()?.eventPeriod?.start).add(1, 'day')
+      const eeReqEnd = settings.get()?.earlyEntryRequirementEnd
+      const eeEnd = eeReqEnd ? moment(eeReqEnd) : moment(settings.get()?.eventPeriod?.start).add(1, 'day')
       return eeEnd.isAfter(start)
     },
     areShiftChangesOpen: (signup, parentDuty) => {
