@@ -237,12 +237,8 @@ export function initDutiesMethods(volunteersClass) {
       name: 'duties.earlyEntry.list',
       mixins: [auth.mixins.isLead],
       validate: ({ teamId, deptId }) => {
-        console.log('hah', teamId, deptId)
         check(deptId, Match.Maybe(String))
         check(teamId, Match.Maybe(String))
-        if (deptId && teamId) {
-          throw new Match.Error(400, 'Can\'t specify both team and dept')
-        }
       },
       run({ deptId, teamId }) {
         // Aggregate is only available on the server
@@ -256,14 +252,12 @@ export function initDutiesMethods(volunteersClass) {
         const eventStart = moment(settings.eventPeriod.start)
 
         const volList = collections.team.aggregate([
-          {
+          ...(!teamId && !deptId) ? [] : [{
             $match: {
-              policy: 'public',
-              ...((!teamId && !deptId)
-                && teamId ? { _id: teamId } : { parentId: deptId }
-              ),
+              ...teamId ? { _id: teamId } : {},
+              ...deptId ? { parentId: deptId } : {},
             },
-          },
+          }],
           ...volunteerListAggregation(
             collections, buildStart.toDate(), eventStart.add(1, 'day').toDate(),
           ),
