@@ -248,7 +248,6 @@ export function initDutiesMethods(volunteersClass) {
         if (!settings.buildPeriod || !settings.eventPeriod || !settings.strikePeriod) {
           throw new Meteor.Error(500, 'Invalid event settings')
         }
-        const buildStart = moment(settings.buildPeriod.start)
         const eventStart = moment(settings.eventPeriod.start)
 
         const volList = collections.team.aggregate([
@@ -259,7 +258,7 @@ export function initDutiesMethods(volunteersClass) {
             },
           }],
           ...volunteerListAggregation(
-            collections, buildStart.toDate(), eventStart.add(1, 'day').toDate(),
+            collections, eventStart.add(1, 'day').toDate(),
           ),
         ])
 

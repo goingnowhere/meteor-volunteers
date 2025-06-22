@@ -137,7 +137,7 @@ export const projectsAndStaffingAggregation = (collections, type, eventStart, ev
   },
 ]
 
-export const volunteerListAggregation = (collections, startDate, endDate) => [
+export const volunteerListAggregation = (collections, endDate) => [
   {
     $lookup: {
       from: collections.project._name,
@@ -148,7 +148,6 @@ export const volunteerListAggregation = (collections, startDate, endDate) => [
         }, {
           $match: {
             // Used for EE, so include everything, not just public
-            end: { $gt: startDate },
             start: { $lt: endDate },
           },
         },
@@ -220,7 +219,6 @@ export const volunteerListAggregation = (collections, startDate, endDate) => [
         }, {
           $match: {
             // Used for EE, so include everything, not just public
-            end: { $gt: startDate },
             start: { $lt: endDate },
           },
         },
